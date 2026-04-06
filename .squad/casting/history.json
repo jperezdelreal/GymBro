@@ -1,0 +1,22 @@
+{
+  "universe_usage_history": [
+    {
+      "universe": "The Matrix",
+      "assignment_id": "gymbro-init-2026-04-06",
+      "used_at": "2026-04-06T18:26:30Z"
+    }
+  ],
+  "assignment_cast_snapshots": {
+    "gymbro-init-2026-04-06": {
+      "universe": "The Matrix",
+      "agents": {
+        "lead": "Morpheus",
+        "ios-dev": "Trinity",
+        "ai-ml-engineer": "Neo",
+        "backend-dev": "Tank",
+        "tester": "Switch"
+      },
+      "created_at": "2026-04-06T18:26:30Z"
+    }
+  }
+}

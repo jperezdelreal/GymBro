@@ -1,0 +1,39 @@
+{
+  "agents": {
+    "lead": {
+      "persistent_name": "Morpheus",
+      "universe": "The Matrix",
+      "created_at": "2026-04-06T18:26:30Z",
+      "legacy_named": false,
+      "status": "active"
+    },
+    "ios-dev": {
+      "persistent_name": "Trinity",
+      "universe": "The Matrix",
+      "created_at": "2026-04-06T18:26:30Z",
+      "legacy_named": false,
+      "status": "active"
+    },
+    "ai-ml-engineer": {
+      "persistent_name": "Neo",
+      "universe": "The Matrix",
+      "created_at": "2026-04-06T18:26:30Z",
+      "legacy_named": false,
+      "status": "active"
+    },
+    "backend-dev": {
+      "persistent_name": "Tank",
+      "universe": "The Matrix",
+      "created_at": "2026-04-06T18:26:30Z",
+      "legacy_named": false,
+      "status": "active"
+    },
+    "tester": {
+      "persistent_name": "Switch",
+      "universe": "The Matrix",
+      "created_at": "2026-04-06T18:26:30Z",
+      "legacy_named": false,
+      "status": "active"
+    }
+  }
+}
