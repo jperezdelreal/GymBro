@@ -43,3 +43,17 @@
 - Performance budget validated: <100ms per operation supports 1-2 tap logging target
 - SPM modular architecture: Trinity owns GymBroUI package; can develop independently without merge conflicts on Tank's core models
 - Unblocked work: Issue #4 (UI screens) can now proceed without architectural dependencies
+
+### 2026-04-06: Workout Logging UI — Crown Jewel Shipped (Issue #7)
+**Implementation highlights:**
+- **1-2 tap workflow achieved**: Large 60pt "Complete Set" button in thumb zone, smart defaults eliminate most input
+- **Smart defaults working**: SmartDefaultsService queries last workout, applies progression logic (2.5kg compound, 1.25kg isolation)
+- **Haptic feedback patterns**: Success on set complete, triple-burst celebration on PR detection (UINotificationFeedbackGenerator)
+- **@Observable MVVM**: ActiveWorkoutViewModel drives all state, no manual binding
+- **Optimistic UI**: Immediate SwiftData writes, < 100ms set log confirmed in dev testing
+- **PR detection**: e1RM calculation with historical comparison, auto-celebration
+- **Rest timer integration**: Auto-start after non-warmup sets, skip button, notification support
+- **One-handed design**: All primary actions bottom 60%, stepper controls for weight/rep adjustment
+- **Comprehensive tests**: 11 test cases cover smart defaults, set completion, warmup flow, PR detection, timer integration
+- **Architecture**: Services in GymBroCore (SmartDefaults, HapticFeedback, RestTimer, Notification), Views + ViewModel in GymBroUI
+- **Shipped**: PR #20 opened, closes #7
