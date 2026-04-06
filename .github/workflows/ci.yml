@@ -1,0 +1,92 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  lint:
+    name: SwiftLint
+    runs-on: macos-15
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Install SwiftLint
+      run: brew install swiftlint
+    
+    - name: Run SwiftLint
+      run: swiftlint lint --strict
+  
+  build-and-test:
+    name: Build and Test
+    runs-on: macos-15
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Select Xcode
+      run: sudo xcode-select -switch /Applications/Xcode_16.0.app/Contents/Developer
+    
+    - name: Show Xcode version
+      run: xcodebuild -version
+    
+    - name: Cache SPM packages
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/Library/Developer/Xcode/DerivedData/**/SourcePackages/checkouts
+          .build
+        key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
+        restore-keys: |
+          ${{ runner.os }}-spm-
+    
+    - name: Cache DerivedData
+      uses: actions/cache@v4
+      with:
+        path: ~/Library/Developer/Xcode/DerivedData
+        key: ${{ runner.os }}-deriveddata-${{ hashFiles('**/*.xcodeproj/project.pbxproj') }}
+        restore-keys: |
+          ${{ runner.os }}-deriveddata-
+    
+    - name: Build for iOS Simulator
+      run: |
+        xcodebuild clean build \
+          -scheme GymBro \
+          -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=18.0' \
+          CODE_SIGN_IDENTITY="" \
+          CODE_SIGNING_REQUIRED=NO \
+          ONLY_ACTIVE_ARCH=NO \
+          | xcpretty && exit ${PIPESTATUS[0]}
+      continue-on-error: false
+    
+    - name: Run Unit Tests
+      run: |
+        xcodebuild test \
+          -scheme GymBro \
+          -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=18.0' \
+          -enableCodeCoverage YES \
+          CODE_SIGN_IDENTITY="" \
+          CODE_SIGNING_REQUIRED=NO \
+          | xcpretty && exit ${PIPESTATUS[0]}
+      continue-on-error: false
+    
+    - name: Generate Code Coverage Report
+      if: always()
+      run: |
+        xcrun llvm-cov export -format="lcov" \
+          -instr-profile=$(find ~/Library/Developer/Xcode/DerivedData -name "*.profdata" | head -1) \
+          $(find ~/Library/Developer/Xcode/DerivedData -name "GymBro" -type f | head -1) \
+          > coverage.lcov || echo "Coverage report generation skipped (no test data yet)"
+    
+    - name: Upload Coverage to Artifacts
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-report
+        path: coverage.lcov
+        if-no-files-found: ignore
