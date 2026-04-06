@@ -38,3 +38,12 @@
 - **AI Architecture (Neo):** On-device LLM + privacy-first approach enables the "Conversation" pillar with strong positioning on user trust.
 - **Technical Delivery (Tank):** MVVM + SwiftData + CloudKit architecture is lean enough to hit MVP timeline (10 weeks), supports all three pillars.
 - **Team Consensus:** All four agents aligned on target market (serious lifters), MVP scope (logging + AI + adaptive training), and platform strategy (iOS-first). No conflicts; maximum synergy across product, UX, AI, and tech.
+
+### 2025-07-18: Skills Installation for Team
+
+- **Installed 13 skills** in `.squad/skills/` covering platform safety, git workflow, testing, security, documentation, Azure cloud, iOS App Store compliance, and AI safety
+- **Key Sources:** 6 built-in Squad templates, 1 custom project conventions skill, 3 adapted from `microsoft/azure-skills`, 3 adapted from `github/awesome-copilot`
+- **Azure Skills Architecture:** Tailored to GymBro's 300€/month budget — documented specific tier selections (Functions Consumption, Cosmos DB Serverless, OpenAI GPT-4o-mini default), cost allocation per service, and alert thresholds
+- **AI Safety is Critical:** GymBro gives physical training advice — the `ai-prompt-safety` skill defines red-flag triggers, response filtering pipeline, and mandatory disclaimers. Every AI prompt change must pass safety review.
+- **App Store Prep Early:** Installed `apple-appstore-review` skill proactively — HealthKit apps, AI content, and IAP are the top three rejection risk areas for GymBro. Better to build compliance in than retrofit.
+- **Skills README** at `.squad/skills/README.md` catalogs all installed skills with rationale

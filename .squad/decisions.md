@@ -400,6 +400,81 @@ else:
 
 ---
 
+## User Directive (2026-04-06T18:44:40Z)
+
+**By:** Copilot (user request)  
+**Directive:** Platform & budget constraints
+
+- All-in on Microsoft ecosystem: GitHub + Azure. No exceptions.
+- GitHub licensing: unlimited (enterprise-level access)
+- Azure budget: max 300€/month hard cap
+- Initial user base: 1-2 users (the developer + maybe one more)
+- Reference repos shared for team review: everything-claude-code, GSD-2, awesome-copilot, azure-skills
+
+**Why:** User request — platform commitment and budget constraint for all technical decisions
+
+---
+
+## User Directive (2026-04-06T18:46:09Z)
+
+**By:** Copilot (user request)  
+**Directive:** Team autonomy on tooling
+
+The team has full autonomy to install any skills, plugins, tools, or dependencies they want. No approval needed — if the team wants it, they get it. This applies to azure-skills, awesome-copilot resources, built-in Squad skills, and anything else relevant.
+
+**Why:** User request — captured for team memory
+
+---
+
+## Decision: Skills Installed for GymBro Team (2026-04-06)
+
+**By:** Morpheus (Lead/Architect)  
+**Status:** Implemented  
+
+### What
+
+Installed 13 skills in `.squad/skills/` to train all team agents on GymBro-specific patterns, guardrails, and workflows.
+
+### Skills Installed
+
+#### Built-in Squad Templates (6)
+- `windows-compatibility` — Windows path/command safety
+- `git-workflow` — dev-first branching, worktrees, PR conventions
+- `test-discipline` — API changes require test updates in same commit
+- `secret-handling` — credential protection, pre-commit validation
+- `docs-standards` — Microsoft Style Guide compliance
+- `reviewer-protocol` — strict lockout on rejection
+
+#### Custom Project Skill (1)
+- `project-conventions` — Swift/SwiftUI/MVVM architecture, naming, file structure, performance budgets, offline-first patterns
+
+#### Azure Skills (3, adapted from microsoft/azure-skills)
+- `azure-ai-services` — OpenAI proxy architecture, AI Search RAG, Content Safety, cost estimates per service
+- `azure-deploy` — `azd` workflow, Bicep IaC, CI/CD with GitHub Actions, environment strategy
+- `azure-cost-management` — 300€/month budget allocation, alert thresholds, tier selection rules
+
+#### Community Skills (3, adapted from github/awesome-copilot)
+- `apple-appstore-review` — P0/P1 rejection risks specific to GymBro (HealthKit, AI disclaimers, IAP)
+- `ai-prompt-safety` — Training advice safety framework, red flag triggers, response filtering pipeline
+- `security-review` — iOS client + Azure backend security checklist, prompt injection prevention
+
+### Rationale
+
+- **Built-in skills** prevent recurring mistakes (Windows bugs, secret leaks, stale tests)
+- **Project conventions** ensure consistent Swift/MVVM patterns across all agents
+- **Azure skills** are essential — team has committed to Azure backend for AI coach MVP
+- **App Store skill** prevents costly rejection cycles (each re-review adds 1-3 days)
+- **AI safety + security** are non-negotiable for an app giving physical training advice
+
+### Implications
+
+- All agents now have access to these skills via `.squad/skills/`
+- Skills should be referenced when making architecture or implementation decisions
+- Azure cost skill should be consulted before any new Azure resource provisioning
+- AI prompt safety skill must be followed for any AI coach prompt changes
+
+---
+
 ## Governance
 
 - All meaningful changes require team consensus
