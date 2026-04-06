@@ -34,3 +34,12 @@
 - **Personal Record Tracking:** Implemented PR detection service comparing current sets against historical data across 4 metrics (max weight, max reps, max volume, max e1RM). Foundation for motivation features.
 - **UI Patterns:** Searchable lists, grouped sections by date/category, navigation stacks for drill-down. Minimal viable versions shipped — detail views with rich PR displays, calendar views can be enhanced in future iterations.
 - **Technical Debt Note:** Views created as MVPs to unblock development. Future iterations should add: detailed exercise instructions UI, calendar grid for history, PR badges on workout details, filtering/sorting controls.
+
+### 2026-04-06: Tech Foundation from Tank (Scaffold & Models)
+**Why this matters for Trinity's UX work:**
+- Core models now available: UserProfile, Exercise, ExerciseSet, Workout, Program, ProgramDay
+- MVVM foundation complete: GymBroApp.swift with ModelContainer, ContentView.swift with 5-tab navigation
+- App entry point ready: Trinity can now build UI screens against stable data models
+- Performance budget validated: <100ms per operation supports 1-2 tap logging target
+- SPM modular architecture: Trinity owns GymBroUI package; can develop independently without merge conflicts on Tank's core models
+- Unblocked work: Issue #4 (UI screens) can now proceed without architectural dependencies

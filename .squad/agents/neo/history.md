@@ -56,3 +56,13 @@
 - **Technical Stack (Tank):** Using CloudKit for sync and HealthKit for data ingestion. Supports Neo's readiness score architecture and data pipeline.
 - **Target Market (Morpheus):** Serious lifters 2+ years experience. Validates Neo's choice of sophisticated ML models (heuristics-first, multi-factor progression) over simple linear progression.
 - **MVP Scope (Morpheus):** AI coach chat + adaptive training engine IN v1.0. Recovery integration (HealthKit HRV/sleep) IN v1.0. Full adaptive training validated in MVP.
+
+
+### 2026-04-06: Data Models from Tank (Scaffold & Models)  
+**Why this matters for Neo's AI work:**
+- Workout history accessible: Workout model with date, exerciseSets relationship enables historical analysis
+- UserProfile enrichment: birthDate, bodyweight enable readiness score calculations
+- ExerciseSet telemetry: rpe, weight, reps available for progression/plateau detection algorithms
+- Program structure: Program + ProgramDay models support adaptive training engine state machine
+- e1RM computed property: Epley formula available for strength analytics and forecasting
+- Unblocked work: Issue #6 (AI coach) can now query historical data; readiness score algorithms can integrate HealthKit + SwiftData
