@@ -475,6 +475,106 @@ Installed 13 skills in `.squad/skills/` to train all team agents on GymBro-speci
 
 ---
 
+## MVP Backlog Decomposition (Morpheus)
+
+**Author:** Morpheus (Lead/Architect)  
+**Date:** 2025-07-18  
+**Status:** Created — ready for Ralph's watch mode triage
+
+### Summary
+
+Decomposed the GymBro MVP into 17 GitHub issues across 5 phases, with dependency ordering and `squad` labels for autonomous dispatch. Created 12 repo labels for triage.
+
+### Labels Created
+
+| Label | Purpose |
+|-------|---------|
+| `squad` | Ralph watch mode triage (required on all) |
+| `mvp` | In-scope for v1.0 |
+| `frontend` | SwiftUI / iOS UI work |
+| `backend` | Azure / API / CloudKit / data |
+| `ai-ml` | AI coach, ML models, periodization |
+| `testing` | Unit, integration, UI tests |
+| `infrastructure` | CI/CD, build, project setup |
+| `phase-0` through `phase-4` | Dependency ordering |
+
+### Issues by Phase
+
+#### Phase 0 — Foundation (no dependencies)
+
+| # | Title | Labels |
+|---|-------|--------|
+| 2 | Xcode project scaffold — Swift Package structure, MVVM folders, basic app target | infrastructure |
+| 3 | SwiftData models — Workout, Exercise, Set, Program, UserProfile entities | backend |
+| 1 | CI/CD pipeline — GitHub Actions for Swift build + test | infrastructure, testing |
+
+#### Phase 1 — Core Features (depends on Phase 0)
+
+| # | Title | Labels |
+|---|-------|--------|
+| 5 | Exercise library — seed data, search, categorization | backend, frontend |
+| 7 | Workout logging screen — ultra-fast 1-2 tap gesture-based UI | frontend |
+| 4 | Rest timer with haptics — auto-start, notification, next-set preview | frontend |
+| 6 | Workout history view — past workouts, calendar view, PR tracking | frontend |
+
+#### Phase 2 — Intelligence (depends on Phase 1)
+
+| # | Title | Labels |
+|---|-------|--------|
+| 8 | Progress tracking — e1RM trends, volume load, tonnage charts | frontend, ai-ml |
+| 9 | Plateau detection algorithm — rolling averages, rate of change analysis | backend, ai-ml |
+| 10 | Basic AI coach — conversational interface, workout suggestions | frontend, backend, ai-ml |
+
+#### Phase 3 — Platform (depends on Phase 1)
+
+| # | Title | Labels |
+|---|-------|--------|
+| 11 | HealthKit integration — sleep, HRV, resting HR reads | backend |
+| 14 | Recovery/readiness score — weighted calculation from HealthKit signals | backend, ai-ml |
+| 13 | Sign in with Apple + CloudKit sync | backend, infrastructure |
+| 12 | Apple Watch companion — basic set logging from wrist | frontend |
+
+#### Phase 4 — Polish (depends on prior phases)
+
+| # | Title | Labels |
+|---|-------|--------|
+| 16 | Dynamic Island + Live Activities for active workouts | frontend |
+| 15 | Widget designs — Lock Screen, StandBy, home screen | frontend |
+| 17 | App Store submission prep — privacy labels, screenshots, compliance | infrastructure |
+
+### Dependency Graph
+
+```
+Phase 0 (parallel):  #2 Scaffold ──┬── #3 Models ──┬── #1 CI/CD
+                                    │               │
+Phase 1:              #5 Exercises ─┤  #7 Logging ──┤── #4 Rest Timer
+                                    │               │── #6 History
+                                    │               │
+Phase 2:              #8 Progress ──┤── #9 Plateau ─┤── #10 AI Coach
+                                    │               │
+Phase 3:              #11 HealthKit ┤── #14 Readiness│── #13 Auth+Sync
+                                    │── #12 Watch    │
+Phase 4:              #16 Dynamic Island ── #15 Widgets ── #17 App Store
+```
+
+### Notes for Ralph
+
+- Phase 0 issues can be dispatched immediately in parallel
+- Phase 1 issues should wait for #2 (scaffold) and #3 (models) to complete
+- #10 (AI Coach) is the most complex issue — crosses frontend, backend, and AI-ML; may need sub-decomposition
+- #17 (App Store prep) depends on all other issues and should be last
+- All issues reference the relevant docs for context (PRODUCT_CONCEPT.md, TECHNICAL_APPROACH.md, UX_APPROACH.md, AI_ML_APPROACH.md)
+
+### References
+
+- `docs/PRODUCT_CONCEPT.md` — MVP scope definition
+- `docs/TECHNICAL_APPROACH.md` — Architecture decisions
+- `docs/UX_APPROACH.md` — UX patterns and interaction design
+- `docs/AI_ML_APPROACH.md` — AI/ML architecture
+- `.squad/decisions.md` — Team decisions and constraints
+
+---
+
 ## Governance
 
 - All meaningful changes require team consensus
