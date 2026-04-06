@@ -1,98 +1,71 @@
-# GymBro
+# GymBro 💪
 
-AI-powered workout tracking and coaching app for serious strength athletes.
+[![CI](https://github.com/jperezdelreal/GymBro/actions/workflows/ci.yml/badge.svg)](https://github.com/jperezdelreal/GymBro/actions/workflows/ci.yml)
+[![Swift](https://img.shields.io/badge/Swift-6.0-orange.svg)](https://swift.org)
+[![Platform](https://img.shields.io/badge/Platform-iOS%2018.0+-lightgrey.svg)](https://www.apple.com/ios/)
+[![License](https://img.shields.io/badge/License-Private-red.svg)](LICENSE)
 
-## Overview
+> **AI-first workout companion for serious strength athletes**
 
-GymBro combines ultra-fast workout logging, intelligent training adaptation, and conversational AI coaching to deliver the training app that advanced lifters deserve.
+GymBro is an iOS app built for powerlifters, Olympic lifters, and bodybuilders who demand more than basic fitness tracking. Combining ultra-fast logging with adaptive AI coaching, GymBro learns your training patterns and helps you break plateaus intelligently.
 
-**Target Users:** Powerlifters, Olympic weightlifters, bodybuilders with 2+ years of training experience.
+## 🎯 Core Features
 
-**Core Features:**
-- 1-tap set logging with smart defaults
-- Adaptive periodization and autoregulation
-- AI coach chat with transparent reasoning
-- Progress tracking and plateau detection
-- Offline-first architecture
+- **⚡ Ultra-Fast Logging**: 1-tap set recording with smart defaults
+- **🤖 AI Coach**: Natural language coaching with transparent reasoning
+- **📊 Adaptive Training**: Auto-periodization and intelligent deload recommendations
+- **📈 Progress Intelligence**: Plateau detection, trend analysis, PR tracking
+- **🔒 Privacy-First**: On-device ML with optional cloud fallback
 
-## Tech Stack
+## 🏗️ Tech Stack
 
-- **Platform:** iOS 17+
-- **Language:** Swift 6
-- **UI Framework:** SwiftUI
-- **Data:** SwiftData + CloudKit
-- **Package Manager:** Swift Package Manager
-- **Architecture:** MVVM with modular SPM packages
+- **Platform**: iOS 18.0+, iPadOS 18.0+
+- **Language**: Swift 6.0
+- **UI**: SwiftUI
+- **Frameworks**: HealthKit, Core ML, CloudKit, WidgetKit
+- **Architecture**: MVVM with Coordinator pattern
+- **Testing**: XCTest, XCUITest
 
-## Project Structure
+## 🚀 Development Status
 
-```
-GymBro/
-├── Package.swift                 # Main app package
-├── GymBro/                       # App target
-│   ├── GymBroApp.swift          # App entry point
-│   └── ContentView.swift        # Tab navigation
-└── Packages/
-    ├── GymBroCore/              # Models, business logic
-    │   ├── Sources/Models/      # SwiftData models
-    │   └── Tests/
-    ├── GymBroUI/                # Views, ViewModels
-    │   └── Sources/
-    └── GymBroKit/               # Shared utilities
-        └── Sources/
-```
+**Current Phase**: Phase 0 — Foundation & Infrastructure  
+**Target**: MVP v1.0 — Q2 2026
 
-## Build Instructions
+This project is built by an autonomous AI squad. See [.squad/](.squad/) for team details.
 
-### Requirements
-- Xcode 16.0 or later
-- macOS 14.0 or later
-- iOS 17.0+ deployment target
+## 📦 Setup
 
-### Building
-
-1. Clone the repository:
 ```bash
+# Clone the repository
 git clone https://github.com/jperezdelreal/GymBro.git
 cd GymBro
+
+# Open in Xcode
+open GymBro.xcodeproj
+
+# Or use Xcode Cloud / GitHub Actions for CI
 ```
 
-2. Open in Xcode:
+## 🧪 Testing
+
 ```bash
-open Package.swift
+# Run tests via xcodebuild
+xcodebuild test \
+  -scheme GymBro \
+  -destination 'platform=iOS Simulator,name=iPhone 16 Pro'
+
+# Run SwiftLint
+swiftlint lint
 ```
 
-3. Select the GymBro scheme and an iOS simulator or device
+## 📋 Contributing
 
-4. Build and run: `⌘R`
+This is a private project built by an AI development squad. For issues and feature requests, see the [GitHub Issues](https://github.com/jperezdelreal/GymBro/issues) page.
 
-### Running Tests
+## 📄 License
 
-Run tests from Xcode (`⌘U`) or via command line:
-```bash
-swift test
-```
+Private — All Rights Reserved
 
-## Development Setup
+---
 
-The project uses Swift Package Manager for all dependencies. No additional setup needed.
-
-### Package Dependencies
-- **GymBroCore**: Data models, services, business logic
-- **GymBroUI**: SwiftUI views and view models
-- **GymBroKit**: Shared utilities and extensions
-
-## Architecture
-
-- **MVVM Pattern**: Clear separation between UI and business logic
-- **Offline-First**: SwiftData as source of truth, CloudKit for sync
-- **Modular Design**: SPM packages for clean boundaries
-- **Performance Budget**: <1s cold launch, <100ms per set log
-
-## Contributing
-
-This is a private project under active development. See `.squad/` directory for team structure and decisions.
-
-## License
-
-Proprietary - All rights reserved.
+**Built with ❤️ by the Squad** • [Documentation](docs/) • [Technical Approach](docs/TECHNICAL_APPROACH.md)
