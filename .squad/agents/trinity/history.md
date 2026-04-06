@@ -26,3 +26,11 @@
 - **AI Strategy (Neo):** AI Coach is conversational (LLM-based). Contextual overlay + sheet modal design is perfect fit for real-time coaching interactions during workouts.
 - **Technical Stack (Tank):** SwiftUI + MVVM + Live Activities + ActivityKit. Supports all of Trinity's iOS platform features (Dynamic Island, haptics, Watch companion).
 - **Platform Commit (Morpheus):** iOS-first launch (defer Android to v2.0+). Trinity's iOS-native design approach is optimal.
+
+### 2026-04-06: Exercise Library + Workout History Implementation
+**Issues #5 & #6 Complete:**
+- **Exercise Seed Data:** Created 50-exercise seed dataset with proper categorization (compound/isolation/accessory), equipment types, muscle group tagging (primary/secondary). JSON-based for easy expansion. Seeder service loads on first app launch.
+- **SwiftData Architecture:** Established pattern for efficient querying with FetchDescriptor + predicates. ViewModels handle data fetching, Views stay presentation-focused. Clean separation enables testability.
+- **Personal Record Tracking:** Implemented PR detection service comparing current sets against historical data across 4 metrics (max weight, max reps, max volume, max e1RM). Foundation for motivation features.
+- **UI Patterns:** Searchable lists, grouped sections by date/category, navigation stacks for drill-down. Minimal viable versions shipped — detail views with rich PR displays, calendar views can be enhanced in future iterations.
+- **Technical Debt Note:** Views created as MVPs to unblock development. Future iterations should add: detailed exercise instructions UI, calendar grid for history, PR badges on workout details, filtering/sorting controls.
