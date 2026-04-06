@@ -11,6 +11,7 @@ final class Exercise {
     var category: ExerciseCategory
     var equipment: Equipment
     var instructions: String
+    var defaultRestSeconds: Int?
     
     @Relationship(deleteRule: .nullify)
     var muscleGroups: [MuscleGroup]
@@ -27,7 +28,8 @@ final class Exercise {
         equipment: Equipment,
         instructions: String = "",
         muscleGroups: [MuscleGroup] = [],
-        isCustom: Bool = false
+        isCustom: Bool = false,
+        defaultRestSeconds: Int? = nil
     ) {
         self.id = id
         self.createdAt = Date()
@@ -39,6 +41,22 @@ final class Exercise {
         self.muscleGroups = muscleGroups
         self.sets = []
         self.isCustom = isCustom
+        self.defaultRestSeconds = defaultRestSeconds
+    }
+    
+    var restTime: Int {
+        if let defaultRestSeconds = defaultRestSeconds {
+            return defaultRestSeconds
+        }
+        
+        switch category {
+        case .compound:
+            return 180 // 3 minutes
+        case .isolation:
+            return 90  // 90 seconds
+        case .accessory:
+            return 60  // 60 seconds
+        }
     }
 }
 

@@ -47,3 +47,13 @@
 - **AI Safety is Critical:** GymBro gives physical training advice — the `ai-prompt-safety` skill defines red-flag triggers, response filtering pipeline, and mandatory disclaimers. Every AI prompt change must pass safety review.
 - **App Store Prep Early:** Installed `apple-appstore-review` skill proactively — HealthKit apps, AI content, and IAP are the top three rejection risk areas for GymBro. Better to build compliance in than retrofit.
 - **Skills README** at `.squad/skills/README.md` catalogs all installed skills with rationale
+
+### 2025-01-XX: Board Clear Retro Ceremony
+
+- **Configured new auto-triggered ceremony:** "Board Clear Retro" fires when Ralph reports the board is clear (all squad issues/PRs resolved)
+- **Continuous Improvement Loop:** Work Wave → Board Clear → Retro → New Issues → Ralph Picks Up → Work Wave. This prevents Ralph from idling and maintains squad momentum.
+- **Quality Gate:** Forces structured reflection on completed work while context is fresh — identify bugs, gaps, technical debt before moving to next wave
+- **Automation Synergy:** Retro outputs new GitHub issues labeled `squad`; Ralph automatically picks them up in next poll cycle
+- **Natural Cadence:** Event-driven (fires on board clear) rather than calendar-driven (arbitrary sprint boundaries)
+- **Decision Documented:** `.squad/decisions/inbox/morpheus-board-clear-retro.md` explains rationale, alternatives considered, and success metrics
+- **Implementation Notes:** Ralph's orchestration loop must detect board clear condition and trigger ceremony before entering idle state. Facilitator is always lead (Morpheus), participants are all-team members from the cleared wave.

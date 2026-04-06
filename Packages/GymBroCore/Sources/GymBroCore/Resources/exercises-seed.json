@@ -1,0 +1,819 @@
+[
+  {
+    "name": "Barbell Back Squat",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Stand with barbell on upper back. Squat down until thighs are parallel or below. Drive through heels to return to start.",
+    "muscleGroups": [
+      {"name": "Quadriceps", "isPrimary": true},
+      {"name": "Glutes", "isPrimary": true},
+      {"name": "Hamstrings", "isPrimary": false},
+      {"name": "Core", "isPrimary": false}
+    ]
+  },
+  {
+    "name": "Barbell Bench Press",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Lie on bench, grip barbell slightly wider than shoulders. Lower to chest, pause, then press up to lockout.",
+    "muscleGroups": [
+      {"name": "Chest", "isPrimary": true},
+      {"name": "Triceps", "isPrimary": false},
+      {"name": "Shoulders", "isPrimary": false}
+    ]
+  },
+  {
+    "name": "Conventional Deadlift",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Stand with feet hip-width, grip bar outside legs. Keep back flat, drive through heels to pull bar up to lockout.",
+    "muscleGroups": [
+      {"name": "Hamstrings", "isPrimary": true},
+      {"name": "Glutes", "isPrimary": true},
+      {"name": "Lower Back", "isPrimary": true},
+      {"name": "Traps", "isPrimary": false}
+    ]
+  },
+  {
+    "name": "Barbell Overhead Press",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Stand with barbell at shoulders. Press overhead to lockout, keeping core tight. Lower under control.",
+    "muscleGroups": [
+      {"name": "Shoulders", "isPrimary": true},
+      {"name": "Triceps", "isPrimary": false},
+      {"name": "Core", "isPrimary": false}
+    ]
+  },
+  {
+    "name": "Barbell Row",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Hinge at hips, back flat, pull bar to lower chest. Squeeze shoulder blades together at top.",
+    "muscleGroups": [
+      {"name": "Lats", "isPrimary": true},
+      {"name": "Upper Back", "isPrimary": true},
+      {"name": "Biceps", "isPrimary": false}
+    ]
+  },
+  {
+    "name": "Romanian Deadlift",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Start standing with barbell. Hinge at hips, keeping back flat and knees slightly bent. Lower bar to shins, drive hips forward to return.",
+    "muscleGroups": [
+      {"name": "Hamstrings", "isPrimary": true},
+      {"name": "Glutes", "isPrimary": true},
+      {"name": "Lower Back", "isPrimary": false}
+    ]
+  },
+  {
+    "name": "Front Squat",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Hold barbell on front shoulders. Squat down keeping torso upright. Drive through heels to stand.",
+    "muscleGroups": [
+      {"name": "Quadriceps", "isPrimary": true},
+      {"name": "Core", "isPrimary": false},
+      {"name": "Glutes", "isPrimary": false}
+    ]
+  },
+  {
+    "name": "Sumo Deadlift",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Wide stance, toes pointed out, grip inside legs. Pull bar up keeping back flat, drive through heels.",
+    "muscleGroups": [
+      {"name": "Glutes", "isPrimary": true},
+      {"name": "Hamstrings", "isPrimary": true},
+      {"name": "Quadriceps", "isPrimary": false},
+      {"name": "Lower Back", "isPrimary": false}
+    ]
+  },
+  {
+    "name": "Incline Barbell Bench Press",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "On incline bench (30-45 degrees), lower bar to upper chest, press to lockout.",
+    "muscleGroups": [
+      {"name": "Upper Chest", "isPrimary": true},
+      {"name": "Shoulders", "isPrimary": false},
+      {"name": "Triceps", "isPrimary": false}
+    ]
+  },
+  {
+    "name": "Close-Grip Bench Press",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Grip bar with hands shoulder-width. Lower to lower chest, press up focusing on triceps.",
+    "muscleGroups": [
+      {"name": "Triceps", "isPrimary": true},
+      {"name": "Chest", "isPrimary": false},
+      {"name": "Shoulders", "isPrimary": false}
+    ]
+  },
+  {
+    "name": "Dumbbell Bench Press",
+    "category": "compound",
+    "equipment": "dumbbell",
+    "instructions": "Lie on bench with dumbbells at chest level. Press up to lockout, lower under control.",
+    "muscleGroups": [
+      {"name": "Chest", "isPrimary": true},
+      {"name": "Triceps", "isPrimary": false},
+      {"name": "Shoulders", "isPrimary": false}
+    ]
+  },
+  {
+    "name": "Dumbbell Shoulder Press",
+    "category": "compound",
+    "equipment": "dumbbell",
+    "instructions": "Seated or standing, press dumbbells overhead to lockout. Lower to shoulder level.",
+    "muscleGroups": [
+      {"name": "Shoulders", "isPrimary": true},
+      {"name": "Triceps", "isPrimary": false},
+      {"name": "Core", "isPrimary": false}
+    ]
+  },
+  {
+    "name": "Dumbbell Row",
+    "category": "compound",
+    "equipment": "dumbbell",
+    "instructions": "One knee on bench, pull dumbbell to hip, squeeze at top. Keep back flat.",
+    "muscleGroups": [
+      {"name": "Lats", "isPrimary": true},
+      {"name": "Upper Back", "isPrimary": true},
+      {"name": "Biceps", "isPrimary": false}
+    ]
+  },
+  {
+    "name": "Goblet Squat",
+    "category": "compound",
+    "equipment": "dumbbell",
+    "instructions": "Hold dumbbell or kettlebell at chest. Squat down, keeping torso upright. Drive through heels.",
+    "muscleGroups": [
+      {"name": "Quadriceps", "isPrimary": true},
+      {"name": "Glutes", "isPrimary": true},
+      {"name": "Core", "isPrimary": false}
+    ]
+  },
+  {
+    "name": "Dumbbell Incline Press",
+    "category": "compound",
+    "equipment": "dumbbell",
+    "instructions": "On incline bench, press dumbbells up to lockout. Lower to chest level.",
+    "muscleGroups": [
+      {"name": "Upper Chest", "isPrimary": true},
+      {"name": "Shoulders", "isPrimary": false},
+      {"name": "Triceps", "isPrimary": false}
+    ]
+  },
+  {
+    "name": "Pull-Up",
+    "category": "compound",
+    "equipment": "bodyweight",
+    "instructions": "Hang from bar, palms facing away. Pull up until chin over bar. Lower under control.",
+    "muscleGroups": [
+      {"name": "Lats", "isPrimary": true},
+      {"name": "Upper Back", "isPrimary": true},
+      {"name": "Biceps", "isPrimary": false}
+    ]
+  },
+  {
+    "name": "Chin-Up",
+    "category": "compound",
+    "equipment": "bodyweight",
+    "instructions": "Hang from bar, palms facing you. Pull up until chin over bar.",
+    "muscleGroups": [
+      {"name": "Lats", "isPrimary": true},
+      {"name": "Biceps", "isPrimary": true},
+      {"name": "Upper Back", "isPrimary": false}
+    ]
+  },
+  {
+    "name": "Dip",
+    "category": "compound",
+    "equipment": "bodyweight",
+    "instructions": "On parallel bars, lower body until upper arms parallel to ground. Press back up.",
+    "muscleGroups": [
+      {"name": "Chest", "isPrimary": true},
+      {"name": "Triceps", "isPrimary": true},
+      {"name": "Shoulders", "isPrimary": false}
+    ]
+  },
+  {
+    "name": "Push-Up",
+    "category": "compound",
+    "equipment": "bodyweight",
+    "instructions": "Hands shoulder-width, body straight. Lower chest to ground, press back up.",
+    "muscleGroups": [
+      {"name": "Chest", "isPrimary": true},
+      {"name": "Triceps", "isPrimary": false},
+      {"name": "Shoulders", "isPrimary": false}
+    ]
+  },
+  {
+    "name": "Leg Press",
+    "category": "compound",
+    "equipment": "machine",
+    "instructions": "Seated in machine, feet shoulder-width on platform. Press up to lockout, lower under control.",
+    "muscleGroups": [
+      {"name": "Quadriceps", "isPrimary": true},
+      {"name": "Glutes", "isPrimary": false},
+      {"name": "Hamstrings", "isPrimary": false}
+    ]
+  },
+  {
+    "name": "Lat Pulldown",
+    "category": "compound",
+    "equipment": "cable",
+    "instructions": "Seated at cable machine, pull bar down to upper chest. Squeeze shoulder blades together.",
+    "muscleGroups": [
+      {"name": "Lats", "isPrimary": true},
+      {"name": "Upper Back", "isPrimary": true},
+      {"name": "Biceps", "isPrimary": false}
+    ]
+  },
+  {
+    "name": "Cable Row",
+    "category": "compound",
+    "equipment": "cable",
+    "instructions": "Seated at cable, pull handle to torso. Keep back straight, squeeze shoulder blades.",
+    "muscleGroups": [
+      {"name": "Lats", "isPrimary": true},
+      {"name": "Upper Back", "isPrimary": true},
+      {"name": "Biceps", "isPrimary": false}
+    ]
+  },
+  {
+    "name": "Leg Curl",
+    "category": "isolation",
+    "equipment": "machine",
+    "instructions": "Lying or seated, curl legs up against pad. Squeeze hamstrings at top.",
+    "muscleGroups": [
+      {"name": "Hamstrings", "isPrimary": true}
+    ]
+  },
+  {
+    "name": "Leg Extension",
+    "category": "isolation",
+    "equipment": "machine",
+    "instructions": "Seated, extend legs up against pad. Squeeze quads at top.",
+    "muscleGroups": [
+      {"name": "Quadriceps", "isPrimary": true}
+    ]
+  },
+  {
+    "name": "Barbell Curl",
+    "category": "isolation",
+    "equipment": "barbell",
+    "instructions": "Standing, curl bar up to shoulders keeping elbows stationary. Lower under control.",
+    "muscleGroups": [
+      {"name": "Biceps", "isPrimary": true}
+    ]
+  },
+  {
+    "name": "Dumbbell Curl",
+    "category": "isolation",
+    "equipment": "dumbbell",
+    "instructions": "Standing or seated, curl dumbbells up to shoulders. Can alternate or do both together.",
+    "muscleGroups": [
+      {"name": "Biceps", "isPrimary": true}
+    ]
+  },
+  {
+    "name": "Hammer Curl",
+    "category": "isolation",
+    "equipment": "dumbbell",
+    "instructions": "Hold dumbbells with neutral grip. Curl up to shoulders, keeping palms facing each other.",
+    "muscleGroups": [
+      {"name": "Biceps", "isPrimary": true},
+      {"name": "Forearms", "isPrimary": false}
+    ]
+  },
+  {
+    "name": "Tricep Pushdown",
+    "category": "isolation",
+    "equipment": "cable",
+    "instructions": "Stand at cable, push bar down to full extension. Keep elbows tucked at sides.",
+    "muscleGroups": [
+      {"name": "Triceps", "isPrimary": true}
+    ]
+  },
+  {
+    "name": "Overhead Tricep Extension",
+    "category": "isolation",
+    "equipment": "dumbbell",
+    "instructions": "Hold dumbbell overhead. Lower behind head, extend back up keeping elbows still.",
+    "muscleGroups": [
+      {"name": "Triceps", "isPrimary": true}
+    ]
+  },
+  {
+    "name": "Lateral Raise",
+    "category": "isolation",
+    "equipment": "dumbbell",
+    "instructions": "Standing, raise dumbbells out to sides until arms parallel to ground. Lower under control.",
+    "muscleGroups": [
+      {"name": "Shoulders", "isPrimary": true}
+    ]
+  },
+  {
+    "name": "Front Raise",
+    "category": "isolation",
+    "equipment": "dumbbell",
+    "instructions": "Standing, raise dumbbells forward until arms parallel to ground.",
+    "muscleGroups": [
+      {"name": "Shoulders", "isPrimary": true}
+    ]
+  },
+  {
+    "name": "Face Pull",
+    "category": "isolation",
+    "equipment": "cable",
+    "instructions": "Pull cable to face, separating hands at end. Focus on rear delts.",
+    "muscleGroups": [
+      {"name": "Rear Delts", "isPrimary": true},
+      {"name": "Upper Back", "isPrimary": false}
+    ]
+  },
+  {
+    "name": "Chest Fly",
+    "category": "isolation",
+    "equipment": "dumbbell",
+    "instructions": "On bench, arc dumbbells down and out to sides, then squeeze back together at top.",
+    "muscleGroups": [
+      {"name": "Chest", "isPrimary": true}
+    ]
+  },
+  {
+    "name": "Cable Fly",
+    "category": "isolation",
+    "equipment": "cable",
+    "instructions": "Standing at cable station, pull handles together in front of chest. Squeeze at contraction.",
+    "muscleGroups": [
+      {"name": "Chest", "isPrimary": true}
+    ]
+  },
+  {
+    "name": "Pec Deck",
+    "category": "isolation",
+    "equipment": "machine",
+    "instructions": "Seated, bring arm pads together in front of chest. Squeeze at contraction.",
+    "muscleGroups": [
+      {"name": "Chest", "isPrimary": true}
+    ]
+  },
+  {
+    "name": "Calf Raise",
+    "category": "isolation",
+    "equipment": "machine",
+    "instructions": "Standing or seated, rise up on toes. Squeeze calves at top, lower for stretch.",
+    "muscleGroups": [
+      {"name": "Calves", "isPrimary": true}
+    ]
+  },
+  {
+    "name": "Barbell Shrug",
+    "category": "isolation",
+    "equipment": "barbell",
+    "instructions": "Hold bar at arms length. Shrug shoulders straight up, squeeze traps at top.",
+    "muscleGroups": [
+      {"name": "Traps", "isPrimary": true}
+    ]
+  },
+  {
+    "name": "Dumbbell Shrug",
+    "category": "isolation",
+    "equipment": "dumbbell",
+    "instructions": "Hold dumbbells at sides. Shrug shoulders up, squeeze traps at top.",
+    "muscleGroups": [
+      {"name": "Traps", "isPrimary": true}
+    ]
+  },
+  {
+    "name": "Preacher Curl",
+    "category": "isolation",
+    "equipment": "barbell",
+    "instructions": "Arms on preacher pad, curl bar up. Full stretch at bottom, squeeze at top.",
+    "muscleGroups": [
+      {"name": "Biceps", "isPrimary": true}
+    ]
+  },
+  {
+    "name": "Concentration Curl",
+    "category": "isolation",
+    "equipment": "dumbbell",
+    "instructions": "Seated, elbow braced on inner thigh. Curl dumbbell up, squeeze at top.",
+    "muscleGroups": [
+      {"name": "Biceps", "isPrimary": true}
+    ]
+  },
+  {
+    "name": "Skull Crusher",
+    "category": "isolation",
+    "equipment": "barbell",
+    "instructions": "Lying on bench, lower bar to forehead keeping upper arms vertical. Extend to lockout.",
+    "muscleGroups": [
+      {"name": "Triceps", "isPrimary": true}
+    ]
+  },
+  {
+    "name": "Hip Thrust",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Upper back on bench, barbell over hips. Drive hips up, squeeze glutes at top.",
+    "muscleGroups": [
+      {"name": "Glutes", "isPrimary": true},
+      {"name": "Hamstrings", "isPrimary": false}
+    ]
+  },
+  {
+    "name": "Bulgarian Split Squat",
+    "category": "compound",
+    "equipment": "dumbbell",
+    "instructions": "Rear foot elevated on bench. Lower down on front leg. Drive through heel to stand.",
+    "muscleGroups": [
+      {"name": "Quadriceps", "isPrimary": true},
+      {"name": "Glutes", "isPrimary": true}
+    ]
+  },
+  {
+    "name": "Lunges",
+    "category": "compound",
+    "equipment": "dumbbell",
+    "instructions": "Step forward, lower back knee toward ground. Drive through front heel to return.",
+    "muscleGroups": [
+      {"name": "Quadriceps", "isPrimary": true},
+      {"name": "Glutes", "isPrimary": true}
+    ]
+  },
+  {
+    "name": "Good Morning",
+    "category": "accessory",
+    "equipment": "barbell",
+    "instructions": "Barbell on upper back. Hinge at hips keeping back flat. Return to standing.",
+    "muscleGroups": [
+      {"name": "Hamstrings", "isPrimary": true},
+      {"name": "Glutes", "isPrimary": true},
+      {"name": "Lower Back", "isPrimary": false}
+    ]
+  },
+  {
+    "name": "Cable Crossover",
+    "category": "isolation",
+    "equipment": "cable",
+    "instructions": "High cable handles, step forward and pull down and across body. Squeeze chest.",
+    "muscleGroups": [
+      {"name": "Chest", "isPrimary": true}
+    ]
+  },
+  {
+    "name": "T-Bar Row",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Straddle bar, hinge at hips. Pull bar to chest, squeeze shoulder blades.",
+    "muscleGroups": [
+      {"name": "Lats", "isPrimary": true},
+      {"name": "Upper Back", "isPrimary": true},
+      {"name": "Biceps", "isPrimary": false}
+    ]
+  },
+  {
+    "name": "Pendlay Row",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Bar on ground, explosive pull to chest, lower to ground each rep.",
+    "muscleGroups": [
+      {"name": "Upper Back", "isPrimary": true},
+      {"name": "Lats", "isPrimary": true},
+      {"name": "Biceps", "isPrimary": false}
+    ]
+  },
+  {
+    "name": "Power Clean",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Explosive pull from ground, catch on shoulders. Full body power movement.",
+    "muscleGroups": [
+      {"name": "Hamstrings", "isPrimary": true},
+      {"name": "Glutes", "isPrimary": true},
+      {"name": "Traps", "isPrimary": true},
+      {"name": "Core", "isPrimary": false}
+    ]
+  },
+  {
+    "name": "Snatch",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Explosive pull from ground to overhead in one motion. Highly technical Olympic lift.",
+    "muscleGroups": [
+      {"name": "Full Body", "isPrimary": true}
+    ]
+  },
+  {
+    "name": "Clean and Jerk",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Clean to shoulders, then jerk overhead. Technical Olympic lift.",
+    "muscleGroups": [
+      {"name": "Full Body", "isPrimary": true}
+    ]
+  },
+  {
+    "name": "Box Squat",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Squat down to box, pause seated, then drive up explosively.",
+    "muscleGroups": [
+      {"name": "Quadriceps", "isPrimary": true},
+      {"name": "Glutes", "isPrimary": true},
+      {"name": "Hamstrings", "isPrimary": false}
+    ]
+  },
+  {
+    "name": "Pause Squat",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Squat down, pause 2-3 seconds at bottom, drive up. Builds strength out of hole.",
+    "muscleGroups": [
+      {"name": "Quadriceps", "isPrimary": true},
+      {"name": "Glutes", "isPrimary": true}
+    ]
+  },
+  {
+    "name": "Pause Bench Press",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Lower bar to chest, pause 2-3 seconds, then press up. Eliminates stretch reflex.",
+    "muscleGroups": [
+      {"name": "Chest", "isPrimary": true},
+      {"name": "Triceps", "isPrimary": false},
+      {"name": "Shoulders", "isPrimary": false}
+    ]
+  },
+  {
+    "name": "Deficit Deadlift",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Stand on platform 1-4 inches high. Increases range of motion, builds strength off floor.",
+    "muscleGroups": [
+      {"name": "Hamstrings", "isPrimary": true},
+      {"name": "Glutes", "isPrimary": true},
+      {"name": "Lower Back", "isPrimary": true}
+    ]
+  },
+  {
+    "name": "Rack Pull",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Bar starts on pins at knee height. Pull to lockout focusing on top portion.",
+    "muscleGroups": [
+      {"name": "Upper Back", "isPrimary": true},
+      {"name": "Traps", "isPrimary": true},
+      {"name": "Glutes", "isPrimary": false}
+    ]
+  },
+  {
+    "name": "Farmer's Walk",
+    "category": "compound",
+    "equipment": "dumbbell",
+    "instructions": "Hold heavy dumbbells at sides. Walk for distance or time. Full body grip strength.",
+    "muscleGroups": [
+      {"name": "Forearms", "isPrimary": true},
+      {"name": "Traps", "isPrimary": true},
+      {"name": "Core", "isPrimary": false}
+    ]
+  },
+  {
+    "name": "Plank",
+    "category": "isolation",
+    "equipment": "bodyweight",
+    "instructions": "Hold push-up position on forearms. Keep body straight, engage core.",
+    "muscleGroups": [
+      {"name": "Core", "isPrimary": true}
+    ]
+  },
+  {
+    "name": "Ab Wheel Rollout",
+    "category": "compound",
+    "equipment": "other",
+    "instructions": "Knees or feet on ground, roll wheel forward extending body. Pull back with abs.",
+    "muscleGroups": [
+      {"name": "Core", "isPrimary": true}
+    ]
+  },
+  {
+    "name": "Hanging Leg Raise",
+    "category": "isolation",
+    "equipment": "bodyweight",
+    "instructions": "Hang from bar. Raise legs to 90 degrees. Lower under control.",
+    "muscleGroups": [
+      {"name": "Core", "isPrimary": true}
+    ]
+  },
+  {
+    "name": "Cable Crunch",
+    "category": "isolation",
+    "equipment": "cable",
+    "instructions": "Kneel at cable, hold rope behind head. Crunch down, focus on abs contraction.",
+    "muscleGroups": [
+      {"name": "Core", "isPrimary": true}
+    ]
+  },
+  {
+    "name": "Reverse Hyper",
+    "category": "isolation",
+    "equipment": "machine",
+    "instructions": "Lying face down, swing legs up behind you. Builds glutes and lower back recovery.",
+    "muscleGroups": [
+      {"name": "Glutes", "isPrimary": true},
+      {"name": "Lower Back", "isPrimary": false}
+    ]
+  },
+  {
+    "name": "Back Extension",
+    "category": "isolation",
+    "equipment": "machine",
+    "instructions": "On hyperextension bench, hinge at hips and lower torso. Raise back up to parallel.",
+    "muscleGroups": [
+      {"name": "Lower Back", "isPrimary": true},
+      {"name": "Glutes", "isPrimary": false}
+    ]
+  },
+  {
+    "name": "GHD Sit-Up",
+    "category": "compound",
+    "equipment": "machine",
+    "instructions": "On GHD machine, lower back past parallel, crunch up. Full range ab exercise.",
+    "muscleGroups": [
+      {"name": "Core", "isPrimary": true},
+      {"name": "Hip Flexors", "isPrimary": false}
+    ]
+  },
+  {
+    "name": "Nordic Curl",
+    "category": "isolation",
+    "equipment": "bodyweight",
+    "instructions": "Knees anchored, lower body forward under control. Eccentric hamstring destroyer.",
+    "muscleGroups": [
+      {"name": "Hamstrings", "isPrimary": true}
+    ]
+  },
+  {
+    "name": "Pistol Squat",
+    "category": "compound",
+    "equipment": "bodyweight",
+    "instructions": "Single leg squat, other leg extended forward. Advanced bodyweight leg exercise.",
+    "muscleGroups": [
+      {"name": "Quadriceps", "isPrimary": true},
+      {"name": "Glutes", "isPrimary": true},
+      {"name": "Core", "isPrimary": false}
+    ]
+  },
+  {
+    "name": "Muscle-Up",
+    "category": "compound",
+    "equipment": "bodyweight",
+    "instructions": "Pull-up transitioning into dip. Explosive upper body power move.",
+    "muscleGroups": [
+      {"name": "Lats", "isPrimary": true},
+      {"name": "Chest", "isPrimary": true},
+      {"name": "Triceps", "isPrimary": true}
+    ]
+  },
+  {
+    "name": "Handstand Push-Up",
+    "category": "compound",
+    "equipment": "bodyweight",
+    "instructions": "Inverted against wall, press up and down. Advanced shoulder pressing.",
+    "muscleGroups": [
+      {"name": "Shoulders", "isPrimary": true},
+      {"name": "Triceps", "isPrimary": false},
+      {"name": "Core", "isPrimary": false}
+    ]
+  },
+  {
+    "name": "Seal Row",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Lying face-down on elevated bench, row barbell or dumbbells. Eliminates lower back.",
+    "muscleGroups": [
+      {"name": "Upper Back", "isPrimary": true},
+      {"name": "Lats", "isPrimary": true},
+      {"name": "Biceps", "isPrimary": false}
+    ]
+  },
+  {
+    "name": "Meadows Row",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Standing perpendicular to bar, one hand row with fat grip end. Unilateral back work.",
+    "muscleGroups": [
+      {"name": "Lats", "isPrimary": true},
+      {"name": "Upper Back", "isPrimary": true}
+    ]
+  },
+  {
+    "name": "Zercher Squat",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Bar in crook of elbows. Squat down, stay upright. Builds core and front-loaded strength.",
+    "muscleGroups": [
+      {"name": "Quadriceps", "isPrimary": true},
+      {"name": "Core", "isPrimary": true},
+      {"name": "Glutes", "isPrimary": false}
+    ]
+  },
+  {
+    "name": "Arnold Press",
+    "category": "compound",
+    "equipment": "dumbbell",
+    "instructions": "Start with dumbbells at shoulders, palms facing you. Rotate and press overhead.",
+    "muscleGroups": [
+      {"name": "Shoulders", "isPrimary": true},
+      {"name": "Triceps", "isPrimary": false}
+    ]
+  },
+  {
+    "name": "Reverse Curl",
+    "category": "isolation",
+    "equipment": "barbell",
+    "instructions": "Overhand grip on bar. Curl up, focusing on brachialis and forearms.",
+    "muscleGroups": [
+      {"name": "Forearms", "isPrimary": true},
+      {"name": "Biceps", "isPrimary": false}
+    ]
+  },
+  {
+    "name": "Incline Curl",
+    "category": "isolation",
+    "equipment": "dumbbell",
+    "instructions": "On incline bench, arms hanging. Curl dumbbells up, full stretch at bottom.",
+    "muscleGroups": [
+      {"name": "Biceps", "isPrimary": true}
+    ]
+  },
+  {
+    "name": "Decline Bench Press",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "On decline bench, press bar from lower chest. Targets lower pecs.",
+    "muscleGroups": [
+      {"name": "Lower Chest", "isPrimary": true},
+      {"name": "Triceps", "isPrimary": false}
+    ]
+  },
+  {
+    "name": "Floor Press",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Lying on floor, press bar from chest. Limited range builds lockout strength.",
+    "muscleGroups": [
+      {"name": "Chest", "isPrimary": true},
+      {"name": "Triceps", "isPrimary": true}
+    ]
+  },
+  {
+    "name": "Inverted Row",
+    "category": "compound",
+    "equipment": "bodyweight",
+    "instructions": "Under bar or rings, pull chest to bar. Bodyweight horizontal pull.",
+    "muscleGroups": [
+      {"name": "Upper Back", "isPrimary": true},
+      {"name": "Lats", "isPrimary": true},
+      {"name": "Biceps", "isPrimary": false}
+    ]
+  },
+  {
+    "name": "Band Pull-Apart",
+    "category": "isolation",
+    "equipment": "band",
+    "instructions": "Hold band at chest level, pull apart stretching band. Rear delts and upper back.",
+    "muscleGroups": [
+      {"name": "Rear Delts", "isPrimary": true},
+      {"name": "Upper Back", "isPrimary": false}
+    ]
+  },
+  {
+    "name": "Kettlebell Swing",
+    "category": "compound",
+    "equipment": "kettlebell",
+    "instructions": "Hip hinge swing kettlebell to shoulder height. Explosive hip power.",
+    "muscleGroups": [
+      {"name": "Glutes", "isPrimary": true},
+      {"name": "Hamstrings", "isPrimary": true},
+      {"name": "Core", "isPrimary": false}
+    ]
+  },
+  {
+    "name": "Turkish Get-Up",
+    "category": "compound",
+    "equipment": "kettlebell",
+    "instructions": "Complex movement from lying to standing with weight overhead. Full body stability.",
+    "muscleGroups": [
+      {"name": "Core", "isPrimary": true},
+      {"name": "Shoulders", "isPrimary": true},
+      {"name": "Full Body", "isPrimary": false}
+    ]
+  }
+]
