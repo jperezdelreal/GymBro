@@ -17,6 +17,7 @@ public final class CoachChatViewModel {
     public var inputText: String = ""
     public var isLoading: Bool = false
     public var isStreaming: Bool = false
+    public var isRetrying: Bool = false
     public var errorMessage: String?
     public var remainingFreeMessages: Int = 5
     public var isOfflineMode: Bool = false
@@ -29,18 +30,30 @@ public final class CoachChatViewModel {
 
     private var cloudService: AICoachService?
     private let fallbackService: AICoachService
+    private let safetyFilter: SafetyFilter
     private let usageLimiter: UsageLimiter
     private let isPremium: Bool
     private var modelContext: ModelContext?
     private var contextService: CoachContextService?
 
+    /// Reconnection token emitted by RetryingAICoachService during stream retries.
+    private static let reconnectingToken = "\n⟳ Reconnecting...\n"
+    /// Offline switch token emitted when all retries are exhausted.
+    private static let offlineSwitchToken = "\n📡 Switching to offline mode...\n"
+
     public init(isPremium: Bool = false) {
         self.isPremium = isPremium
-        self.fallbackService = DeterministicCoachFallback()
+        let fallback = DeterministicCoachFallback()
+        self.fallbackService = fallback
+        self.safetyFilter = SafetyFilter()
         self.usageLimiter = UsageLimiter()
 
         if let config = AICoachConfiguration.fromEnvironment() {
-            self.cloudService = AzureOpenAICoachService(config: config)
+            let azure = AzureOpenAICoachService(config: config)
+            self.cloudService = RetryingAICoachService(
+                primary: azure,
+                fallback: fallback
+            )
             self.isOfflineMode = false
         } else {
             self.cloudService = nil
@@ -72,6 +85,20 @@ public final class CoachChatViewModel {
             return
         }
 
+        // Safety filter: intercept flagged messages before hitting any service
+        let safetyCheck = safetyFilter.checkUserMessage(text)
+        if case .flagged(_, let advisory) = safetyCheck {
+            let userMessage = ChatMessage(role: .user, content: text)
+            messages.append(userMessage)
+            persistMessage(userMessage)
+            inputText = ""
+
+            let advisoryMessage = ChatMessage(role: .assistant, content: advisory)
+            messages.append(advisoryMessage)
+            persistMessage(advisoryMessage)
+            return
+        }
+
         // Add user message
         let userMessage = ChatMessage(role: .user, content: text)
         messages.append(userMessage)
@@ -85,6 +112,7 @@ public final class CoachChatViewModel {
 
         isLoading = true
         isStreaming = true
+        isRetrying = false
 
         let context = buildContext()
         let service = selectService()
@@ -92,6 +120,22 @@ public final class CoachChatViewModel {
         do {
             var fullResponse = ""
             for try await token in service.streamMessage(text, context: context) {
+                // Detect retry/reconnection signals from RetryingAICoachService
+                if token == Self.reconnectingToken {
+                    isRetrying = true
+                    continue
+                }
+                if token == Self.offlineSwitchToken {
+                    isRetrying = false
+                    isOfflineMode = true
+                    continue
+                }
+
+                // Real content arrived — clear retry indicator
+                if isRetrying {
+                    isRetrying = false
+                }
+
                 fullResponse += token
                 if let index = messages.lastIndex(where: { $0.id == assistantMessage.id }) {
                     messages[index].content = fullResponse
@@ -107,26 +151,14 @@ public final class CoachChatViewModel {
             usageLimiter.recordUsage()
             remainingFreeMessages = usageLimiter.remainingMessages(isPremium: isPremium)
         } catch {
-            // On cloud failure, try fallback
-            if !isOfflineMode {
-                do {
-                    let fallbackResponse = try await fallbackService.sendMessage(text, context: context)
-                    if let index = messages.lastIndex(where: { $0.id == assistantMessage.id }) {
-                        messages[index].content = fallbackResponse
-                        messages[index].isStreaming = false
-                        persistMessage(messages[index])
-                    }
-                    isOfflineMode = true
-                } catch {
-                    handleError(error, messageId: assistantMessage.id)
-                }
-            } else {
-                handleError(error, messageId: assistantMessage.id)
-            }
+            // RetryingAICoachService already exhausted retries and fallback;
+            // this is a true unrecoverable error.
+            handleError(error, messageId: assistantMessage.id)
         }
 
         isLoading = false
         isStreaming = false
+        isRetrying = false
     }
 
     /// Send a suggested prompt directly.
