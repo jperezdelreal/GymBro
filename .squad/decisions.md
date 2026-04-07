@@ -575,6 +575,172 @@ Phase 4:              #16 Dynamic Island ── #15 Widgets ── #17 App Store
 
 ---
 
+## User Directive (2026-04-07T10:47:17Z)
+
+**By:** Copilot (via Copilot CLI)  
+**Directive:** Exercise data quality is CRITICAL
+
+**What:** The exercise database is fundamental. Without quality data (detailed descriptions, verified muscle groups, real instructions), the app is a chestnut and the AI Coach will be bad. GIFs/videos are secondary — first priority is having CORRECT and DEEP data. The AI Coach is only as good as the data it has.
+
+**Why:** User insight — exercise content is the product core. Without good data, all intelligent features (plateau detection, AI coaching, progress tracking) produce incorrect results.
+
+---
+
+## User Directive (2026-04-07T07:04:09Z)
+
+**By:** Copilot (via Copilot CLI)  
+**Directive:** Quality gate before Phase 3
+
+**What:** Before starting Phase 3, run a quality review of ALL Phase 1 and Phase 2 code against the newly installed skills (22+ skills covering SwiftUI patterns, Swift coding standards, accessibility, security, performance, concurrency). Morpheus reviews architecture, Switch audits test coverage and code quality. Fix issues before proceeding.
+
+**Why:** Skills were installed AFTER Phase 1 was built — that code was written without the benefit of these standards. Phase 2 is being built now. Both need validation before building more on top.
+
+---
+
+## User Directive (2026-04-07T09:53:24Z)
+
+**By:** Copilot (via Copilot CLI)  
+**Directive:** UX/UI must be world-class + auth simplification
+
+**What:** 1) UI/UX must be SUPER SEXY and MODERN — the goal is to DESTROY the competition visually, not just functionally. No generic iOS look. Premium, gym-aesthetic, dark-first design. 2) Authentication: Sign in with Apple + Sign in with Google only. No custom username/password. Keep it simple.
+
+**Why:** User wants GymBro to be visually superior to Strong, FitBod, and Juggernaut — not just feature-superior. Auth should be frictionless with industry standard providers only.
+
+---
+
+## Decision: AI Context Pipeline Pattern (Neo)
+
+**Author:** Neo (AI/ML Engineer)  
+**Date:** 2026-04-07  
+**Status:** Implemented (Issue #82, PR #88)  
+
+**Pattern:** When building AI features that require user context (profile, history, preferences), use a **three-layer pipeline**:
+
+1. **ViewModel layer** (`buildContext()`) — fetches raw data from SwiftData/CoreData
+2. **Snapshot layer** (e.g., `CoachContext`) — lightweight, decoupled DTOs
+3. **Prompt layer** (`PromptBuilder`) — formats snapshots into LLM system prompts
+
+**Why this pattern:**
+- Separates data access (ViewModel) from formatting (PromptBuilder)
+- Snapshots are plain structs, thread-safe, testable without ModelContext
+- Prevents SwiftData `@Model` objects from leaking into AI service layer
+
+**Implementation example:**
+- `CoachChatViewModel.buildContext()` fetches user profile, recent workouts, active program, personal records
+- Each fetch uses SwiftData predicates for efficient filtering
+- Returns `CoachContext` with typed snapshots (UserProfileSnapshot, WorkoutSnapshot, etc.)
+- `PromptBuilder` receives context and formats into markdown system prompt
+
+**Implications:**
+- All new AI features must follow this pipeline
+- Never fetch data in PromptBuilder or service layers
+- Always return snapshots, never @Model objects
+
+---
+
+## Decision: Progress Tracking & Plateau Detection Thresholds (Neo)
+
+**Author:** Neo (AI/ML Engineer)  
+**Date:** 2026-04-07  
+**Issues:** #8, #9  
+**PR:** #24
+
+**Key Decisions:**
+
+1. **E1RM Formula Strategy:** Default to Epley formula (`weight × (1 + reps/30)`) with Brzycki as optional alternative
+   - Rationale: Simpler, well-validated for 1-10 rep ranges, matches existing computed property
+
+2. **Plateau Detection Thresholds:** Composite score > 0.65 = plateau declared. Minimum 6 sessions before analysis activates
+   - Rationale: Conservative — better to under-detect than create false alarm fatigue
+
+3. **State Machine Hysteresis:** Plateau at >0.65 but must drop below 0.4 to recover
+   - Rationale: Prevents oscillation, ensures stable UX (status doesn't flicker)
+
+4. **Pure Computation Layer:** All algorithms operate on `[Double]` arrays, not SwiftData models
+   - Rationale: Enables unit testing without ModelContext, keeps math portable
+
+5. **Muscle Group Balance Weighting:** Primary muscle groups get 1.0×, secondary get 0.5×
+   - Rationale: More accurate training balance analysis (bench press triceps impact is secondary)
+
+**Team Implications:**
+- Trinity: ProgressDashboardView ready for tab integration
+- Tank: PlateauAnalysis is new @Model — add to ModelContainer schema
+- Morpheus: Plateau detection + recommendations are Premium features
+
+---
+
+## Quality Audit Findings: Phase 1+2 Code (Morpheus)
+
+**Author:** Morpheus (Lead/Architect)  
+**Date:** 2026-04-07  
+**Status:** 23 issues filed and resolved (PRs #48-51)
+
+**Summary:** 17 initial issues found auditing Phase 1+2 code against newly installed skills. Code was written before skills were available. All findings resolved.
+
+**Severity Breakdown:**
+- HIGH (5): @Observable migration, NavigationView, Dynamic Type, accessibility labels, @MainActor
+- MEDIUM (11): foregroundColor, GCD, .onAppear, security, animations, error handling, SwiftData
+- LOW (1): Tab API, view decomposition
+
+**Key Issues Resolved:**
+- Dynamic Type: 25+ hard-coded `.font(.system(size:))` replaced with `@ScaledMetric`
+- VoiceOver: All icon-only buttons now have accessibility labels
+- ObservableObject → @Observable: Converged on modern pattern
+- @MainActor: Added to all ViewModels
+- API Key Security: Moved from environment variables to Keychain
+
+**Recommendation:** All HIGH and MEDIUM items resolved. Code now passes audit.
+
+---
+
+## Quality Audit Findings: Test Coverage & Concurrency (Switch)
+
+**Author:** Switch (QA)  
+**Date:** 2026-04-07  
+**Status:** Issues filed (#25-30)
+
+**Summary:** Codebase has solid tested areas but critical gaps in concurrency and coverage.
+
+**Key Metrics:**
+- Test coverage: 22% of files (11/50) — 78% untested
+- Concurrency issues: 6 findings (2 critical)
+- Performance risks: 6 findings
+- Edge case gaps: 7 findings
+
+**Top 3 Blockers for MVP:**
+1. @MainActor on CoachChatViewModel and ActiveWorkoutViewModel — data races cause random crashes
+2. PersonalRecordService force unwrap in predicate (line 68) — crashes on nil completedAt
+3. Test coverage for SmartDefaultsService and PersonalRecordService — core features, zero verification
+
+**Recommendation:** Fix #26 (concurrency) + PersonalRecordService crash in #30 before MVP ship. Reach 60%+ coverage before beta.
+
+---
+
+## Board Clear Retro: Wave Complete (Morpheus)
+
+**Facilitated by:** Morpheus (Lead)  
+**Date:** 2026-04-06  
+**Status:** Complete
+
+**Summary:** 33 issues resolved (closed 18→51). Phase 1+2 quality audit completed. New issues #52-54 identified for next wave.
+
+**Metrics:**
+- Issues Completed: 33
+- Tests: 82 → 343 (318% increase)
+- Test Files: 23 comprehensive suites
+- Skills Installed: 22+ iOS development skills
+- Merged PRs: 11 major + 4 audit rounds
+
+**New Issues Created:**
+1. **#52: AI coach transient error recovery** (squad:neo) — retry logic with exponential backoff
+2. **#53: Recovery alerts** (squad:neo + squad:trinity) — notify on poor readiness, suggest deload
+3. **#54: Crash recovery** (squad:trinity) — restore active workout state on app relaunch
+
+**Phase-3 Readiness:** ✅ All issues correctly scoped and assigned (#11-14)
+**Phase-4 Readiness:** ✅ All issues ready for team capacity (#15-17)
+
+---
+
 ## Governance
 
 - All meaningful changes require team consensus

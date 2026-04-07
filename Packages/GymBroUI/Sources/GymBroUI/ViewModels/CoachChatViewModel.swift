@@ -186,7 +186,155 @@ public final class CoachChatViewModel {
     }
 
     private func buildContext() -> CoachContext {
-        CoachContext()
+        guard let ctx = modelContext else {
+            return CoachContext()
+        }
+        
+        // Fetch user profile
+        let userProfile = fetchUserProfile(from: ctx)
+        
+        // Fetch recent workouts (last 10 completed workouts)
+        let recentWorkouts = fetchRecentWorkouts(from: ctx, limit: 10)
+        
+        // Fetch active program
+        let activeProgram = fetchActiveProgram(from: ctx)
+        
+        // Fetch personal records (top 20 by weight)
+        let personalRecords = fetchPersonalRecords(from: ctx, limit: 20)
+        
+        return CoachContext(
+            userProfile: userProfile,
+            recentWorkouts: recentWorkouts,
+            activeProgram: activeProgram,
+            personalRecords: personalRecords
+        )
+    }
+    
+    private func fetchUserProfile(from ctx: ModelContext) -> UserProfileSnapshot? {
+        let descriptor = FetchDescriptor<UserProfile>(
+            sortBy: [SortDescriptor(\.createdAt, order: .reverse)]
+        )
+        
+        guard let profile = try? ctx.fetch(descriptor).first else {
+            return nil
+        }
+        
+        // Get latest bodyweight
+        let bodyweight = profile.bodyweightHistory
+            .sorted(by: { $0.date > $1.date })
+            .first?
+            .weightKg
+        
+        return UserProfileSnapshot(
+            experienceLevel: profile.experienceLevel.rawValue.capitalized,
+            unitSystem: profile.unitSystem.rawValue.capitalized,
+            bodyweightKg: bodyweight
+        )
+    }
+    
+    private func fetchRecentWorkouts(from ctx: ModelContext, limit: Int) -> [WorkoutSnapshot] {
+        var descriptor = FetchDescriptor<Workout>(
+            sortBy: [SortDescriptor(\.createdAt, order: .reverse)]
+        )
+        descriptor.predicate = #Predicate<Workout> { workout in
+            workout.endTime != nil && !workout.isCancelled
+        }
+        descriptor.fetchLimit = limit
+        
+        guard let workouts = try? ctx.fetch(descriptor) else {
+            return []
+        }
+        
+        return workouts.compactMap { workout in
+            // Group sets by exercise and compute best weight/reps
+            let exerciseData = Dictionary(grouping: workout.sets.filter { !$0.isWarmup }) { set in
+                set.exercise?.name ?? "Unknown"
+            }
+            
+            let exercises = exerciseData.compactMap { name, sets -> ExerciseSnapshot? in
+                guard !sets.isEmpty else { return nil }
+                let bestWeight = sets.map(\.weightKg).max() ?? 0
+                let bestReps = sets.map(\.reps).max() ?? 0
+                return ExerciseSnapshot(
+                    name: name,
+                    sets: sets.count,
+                    bestWeight: bestWeight,
+                    bestReps: bestReps
+                )
+            }
+            
+            guard !exercises.isEmpty else { return nil }
+            
+            let durationMinutes = workout.duration.map { $0 / 60.0 }
+            
+            return WorkoutSnapshot(
+                date: workout.date,
+                exercises: exercises,
+                totalVolume: workout.totalVolume,
+                durationMinutes: durationMinutes
+            )
+        }
+    }
+    
+    private func fetchActiveProgram(from ctx: ModelContext) -> ProgramSnapshot? {
+        var descriptor = FetchDescriptor<Program>()
+        descriptor.predicate = #Predicate<Program> { program in
+            program.isActive
+        }
+        descriptor.fetchLimit = 1
+        
+        guard let program = try? ctx.fetch(descriptor).first else {
+            return nil
+        }
+        
+        // Calculate current week number based on workouts logged
+        let completedWorkouts = program.workouts.filter { $0.endTime != nil && !$0.isCancelled }
+        let weekNumber = min(program.durationWeeks, (completedWorkouts.count / program.frequencyPerWeek) + 1)
+        
+        return ProgramSnapshot(
+            name: program.name,
+            periodization: program.periodizationType.rawValue.capitalized,
+            weekNumber: weekNumber,
+            frequencyPerWeek: program.frequencyPerWeek
+        )
+    }
+    
+    private func fetchPersonalRecords(from ctx: ModelContext, limit: Int) -> [PRSnapshot] {
+        // Fetch all completed sets and find PRs (best weight × reps for each exercise)
+        var descriptor = FetchDescriptor<ExerciseSet>(
+            sortBy: [SortDescriptor(\.createdAt, order: .reverse)]
+        )
+        descriptor.predicate = #Predicate<ExerciseSet> { set in
+            !set.isWarmup && set.completedAt != nil
+        }
+        
+        guard let allSets = try? ctx.fetch(descriptor) else {
+            return []
+        }
+        
+        // Group by exercise and find best lift for each rep range
+        let exerciseGroups = Dictionary(grouping: allSets) { set in
+            set.exercise?.name ?? "Unknown"
+        }
+        
+        var prs: [PRSnapshot] = []
+        
+        for (exerciseName, sets) in exerciseGroups {
+            // Find best 1RM equivalent using estimated 1RM
+            guard let bestSet = sets.max(by: { $0.estimatedOneRepMax < $1.estimatedOneRepMax }) else {
+                continue
+            }
+            
+            prs.append(PRSnapshot(
+                exerciseName: exerciseName,
+                weightKg: bestSet.weightKg,
+                reps: bestSet.reps,
+                date: bestSet.completedAt ?? bestSet.createdAt
+            ))
+        }
+        
+        // Sort by weight descending and limit
+        return Array(prs.sorted { $0.weightKg > $1.weightKg }.prefix(limit))
     }
 
     private func loadHistory() {
