@@ -4,7 +4,8 @@ import PackageDescription
 let package = Package(
     name: "GymBroCore",
     platforms: [
-        .iOS(.v17)
+        .iOS(.v17),
+        .watchOS(.v10)
     ],
     products: [
         .library(

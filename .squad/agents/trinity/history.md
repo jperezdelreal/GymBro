@@ -119,3 +119,15 @@
 **Testing Pattern:**
 - 11 test cases using in-memory SwiftData container. Tests cover: find/discard/cleanup service methods, ViewModel isActive lifecycle, cancel flow, set preservation on recovery, exercises ordering, and empty-state nil return.
 - PR #57 opened, closes #53.
+
+### 2026-04-07: Apple Watch Companion — Basic Set Logging (Issue #12)
+**Implementation highlights:**
+- **WatchConnectivityService** in GymBroCore: Bidirectional iPhone↔Watch communication via `WCSession`. Uses `updateApplicationContext` for latest-state delivery (workout state), `sendMessage` for real-time data (rest timer), and `transferUserInfo` for offline queuing (set completions).
+- **Lightweight transfer types**: `WatchWorkoutState`, `WatchSetCompletion`, `WatchRestTimerState` — all Codable/Sendable structs, no SwiftData dependency on Watch side.
+- **WatchWorkoutViewModel**: @Observable ViewModel with Digital Crown weight adjustment (`digitalCrownRotation` modifier with snap-to-step logic at 2.5kg increments), rest timer countdown via Task-based async, WKInterfaceDevice haptics.
+- **ActiveSetView**: Large touch targets (44pt minimum), high-contrast text, +/- buttons for weight/reps, Crown integration for hands-free weight adjustment.
+- **RestTimerWatchView**: Circular progress indicator with color transitions (blue→orange→red). Auto-switches tab when timer starts.
+- **WorkoutSummaryWatchView**: Post-workout stats display.
+- **Complications**: WidgetKit-based with circular and rectangular families. 30s refresh during active workout.
+- **Architecture**: GymBroCore Package.swift updated to support `.watchOS(.v10)`. Watch source files in `GymBroWatch/` — requires manual Xcode target setup.
+- **Pattern: Offline-resilient messaging** — Set completions use `transferUserInfo` when phone is unreachable.
