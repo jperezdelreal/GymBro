@@ -12,6 +12,7 @@ data class ActiveWorkoutState(
     val restTimerTotal: Int = 90,
     val isRestTimerActive: Boolean = false,
     val isCompleting: Boolean = false,
+    val isLoading: Boolean = true,
 )
 
 data class WorkoutExerciseUi(

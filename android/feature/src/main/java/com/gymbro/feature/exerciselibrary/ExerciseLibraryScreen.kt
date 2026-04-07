@@ -48,6 +48,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gymbro.core.model.Exercise
 import com.gymbro.core.model.ExerciseCategory
 import com.gymbro.core.model.MuscleGroup
+import com.gymbro.feature.common.FullScreenLoading
 
 private val AccentGreen = Color(0xFF00FF87)
 private val AccentCyan = Color(0xFF00E5FF)
@@ -190,12 +191,7 @@ fun ExerciseLibraryScreen(
             // Content
             when {
                 state.isLoading -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        CircularProgressIndicator(color = AccentGreen)
-                    }
+                    FullScreenLoading(message = "Loading exercises...")
                 }
                 state.exercises.isEmpty() -> {
                     EmptyExercisesView()

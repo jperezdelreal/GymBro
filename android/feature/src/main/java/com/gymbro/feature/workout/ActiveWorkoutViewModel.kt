@@ -39,7 +39,7 @@ class ActiveWorkoutViewModel @Inject constructor(
     private fun startWorkout() {
         viewModelScope.launch {
             val workout = workoutRepository.startWorkout()
-            _state.update { it.copy(workoutId = workout.id.toString()) }
+            _state.update { it.copy(workoutId = workout.id.toString(), isLoading = false) }
             startElapsedTimer()
         }
     }

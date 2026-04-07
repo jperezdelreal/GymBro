@@ -54,6 +54,7 @@ class ExerciseLibraryViewModel @Inject constructor(
     private fun loadExercises() {
         loadJob?.cancel()
         loadJob = viewModelScope.launch {
+            _state.update { it.copy(isLoading = true) }
             val currentState = _state.value
             val muscleGroup = currentState.selectedMuscleGroup?.name
             val query = currentState.searchQuery.takeIf { it.isNotBlank() }
