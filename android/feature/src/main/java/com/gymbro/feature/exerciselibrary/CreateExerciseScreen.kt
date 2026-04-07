@@ -42,6 +42,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -99,6 +101,7 @@ fun CreateExerciseScreen(
                     Text(
                         text = "Create Exercise",
                         style = MaterialTheme.typography.headlineMedium,
+                        modifier = Modifier.semantics { heading() }
                     )
                 },
                 navigationIcon = {
@@ -142,6 +145,7 @@ fun CreateExerciseScreen(
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.onBackground,
+                            modifier = Modifier.semantics { heading() }
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         OutlinedTextField(
@@ -176,6 +180,7 @@ fun CreateExerciseScreen(
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.onBackground,
+                            modifier = Modifier.semantics { heading() }
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         FlowRow(
@@ -215,6 +220,7 @@ fun CreateExerciseScreen(
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.onBackground,
+                            modifier = Modifier.semantics { heading() }
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         FlowRow(
@@ -254,6 +260,7 @@ fun CreateExerciseScreen(
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.onBackground,
+                            modifier = Modifier.semantics { heading() }
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         FlowRow(
@@ -298,6 +305,7 @@ fun CreateExerciseScreen(
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.onBackground,
+                            modifier = Modifier.semantics { heading() }
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         OutlinedTextField(

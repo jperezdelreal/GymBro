@@ -51,6 +51,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -128,11 +132,13 @@ fun ActiveWorkoutScreen(
                             Text(
                                 text = "Active Workout",
                                 style = MaterialTheme.typography.titleLarge,
+                                modifier = Modifier.semantics { heading() }
                             )
                             Text(
                                 text = formatDuration(state.elapsedSeconds),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = AccentCyan,
+                                modifier = Modifier.semantics { liveRegion = androidx.compose.ui.semantics.LiveRegionMode.Polite }
                             )
                         }
                     },
@@ -243,7 +249,7 @@ private fun WorkoutStatsBar(
 
 @Composable
 private fun StatItem(label: String, value: String, color: Color) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.semantics(mergeDescendants = true) { }) {
         Text(
             text = value,
             style = MaterialTheme.typography.titleMedium,
@@ -288,7 +294,7 @@ private fun ExerciseCard(
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.weight(1f).semantics { heading() },
             )
             IconButton(
                 onClick = { onEvent(ActiveWorkoutEvent.RemoveExercise(exerciseIndex)) },
@@ -433,12 +439,13 @@ private fun SetRow(
                 modifier = Modifier
                     .size(32.dp)
                     .clip(CircleShape)
-                    .background(AccentGreen),
+                    .background(AccentGreen)
+                    .semantics { contentDescription = "Set ${setUi.setNumber} completed" },
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
                     Icons.Default.Check,
-                    contentDescription = "Completed",
+                    contentDescription = null,
                     tint = Color.Black,
                     modifier = Modifier.size(18.dp),
                 )
@@ -449,12 +456,13 @@ private fun SetRow(
                     .size(32.dp)
                     .clip(CircleShape)
                     .border(1.5.dp, AccentGreen.copy(alpha = 0.5f), CircleShape)
-                    .clickable { onEvent(ActiveWorkoutEvent.CompleteSet(exerciseIndex, setIndex)) },
+                    .clickable { onEvent(ActiveWorkoutEvent.CompleteSet(exerciseIndex, setIndex)) }
+                    .semantics { contentDescription = "Complete set ${setUi.setNumber}" },
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
                     Icons.Default.Check,
-                    contentDescription = "Complete set",
+                    contentDescription = null,
                     tint = AccentGreen.copy(alpha = 0.5f),
                     modifier = Modifier.size(18.dp),
                 )
@@ -535,7 +543,11 @@ private fun RestTimerBar(
             .fillMaxWidth()
             .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
             .background(SurfaceCard)
-            .padding(16.dp),
+            .padding(16.dp)
+            .semantics { 
+                contentDescription = "Rest timer: $remainingSeconds seconds remaining"
+                liveRegion = androidx.compose.ui.semantics.LiveRegionMode.Polite
+            },
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),

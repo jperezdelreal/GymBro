@@ -85,11 +85,8 @@ fun GymBroNavGraph(
 
     val showBottomBar = currentDestination?.route in BottomNavTab.entries.map { it.route }
 
-    val startDestination = if (userPreferences.hasCompletedOnboarding()) {
-        "exercise_library"
-    } else {
-        "onboarding"
-    }
+    // TODO: Implement onboarding completion tracking
+    val startDestination = "exercise_library"
 
     NavHost(
         navController = navController,

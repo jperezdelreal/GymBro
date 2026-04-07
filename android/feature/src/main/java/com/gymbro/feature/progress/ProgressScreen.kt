@@ -42,6 +42,9 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontWeight
@@ -198,7 +201,7 @@ private fun EmptyProgressState() {
 private fun SectionHeader(title: String, icon: String) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(vertical = 4.dp),
+        modifier = Modifier.padding(vertical = 4.dp).semantics { heading() }
     ) {
         Text(
             text = icon,
@@ -242,7 +245,9 @@ private fun PRGrid(records: List<PersonalRecord>) {
 @Composable
 private fun PRCard(record: PersonalRecord, modifier: Modifier = Modifier) {
     Card(
-        modifier = modifier,
+        modifier = modifier.semantics(mergeDescendants = true) {
+            contentDescription = "${record.type.displayName}: ${formatPRValue(record)} for ${record.exerciseName}"
+        },
         colors = CardDefaults.cardColors(containerColor = SurfaceColor),
         shape = RoundedCornerShape(12.dp),
     ) {

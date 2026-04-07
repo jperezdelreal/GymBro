@@ -57,6 +57,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -110,6 +112,7 @@ internal fun SettingsScreen(
                         text = "Settings",
                         fontWeight = FontWeight.Bold,
                         color = Color.White,
+                        modifier = Modifier.semantics { heading() }
                     )
                 },
                 navigationIcon = {
@@ -370,7 +373,7 @@ private fun SectionTitle(title: String) {
         style = MaterialTheme.typography.labelLarge,
         color = Color(0xFF9E9E9E),
         fontWeight = FontWeight.SemiBold,
-        modifier = Modifier.padding(start = 4.dp, bottom = 4.dp),
+        modifier = Modifier.padding(start = 4.dp, bottom = 4.dp).semantics { heading() }
     )
 }
 

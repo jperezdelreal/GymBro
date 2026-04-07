@@ -39,6 +39,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -71,7 +73,7 @@ fun HistoryDetailRoute(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Workout Details", fontWeight = FontWeight.Bold) },
+                title = { Text("Workout Details", fontWeight = FontWeight.Bold, modifier = Modifier.semantics { heading() }) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -127,7 +129,7 @@ private fun HistoryDetailContent(detail: WorkoutDetail) {
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
-                modifier = Modifier.padding(vertical = 8.dp),
+                modifier = Modifier.padding(vertical = 8.dp).semantics { heading() },
             )
         }
 
@@ -190,7 +192,7 @@ private fun HistoryDetailContent(detail: WorkoutDetail) {
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
-                modifier = Modifier.padding(vertical = 8.dp),
+                modifier = Modifier.padding(vertical = 8.dp).semantics { heading() },
             )
         }
 
@@ -205,7 +207,7 @@ private fun HistoryDetailContent(detail: WorkoutDetail) {
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = Color.White,
-                    modifier = Modifier.padding(vertical = 8.dp),
+                    modifier = Modifier.padding(vertical = 8.dp).semantics { heading() },
                 )
             }
 
