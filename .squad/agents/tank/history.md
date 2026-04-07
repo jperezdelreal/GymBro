@@ -147,6 +147,34 @@ This foundation unblocks all Phase-1 work:
 - Conversation history size management — currently fetches last 50 messages; may need cleanup strategy for long-running users
 - Multi-turn context: currently each request sends only system + user message; should we send conversation history for multi-turn coherence?
 
+### 2026-04-07: Sign in with Apple + CloudKit Sync (Issue #13)
+
+**Architecture Decisions:**
+- **ASAuthorizationController Delegate Pattern:** Used `withCheckedThrowingContinuation` to bridge the delegate-based Apple Sign In API into async/await. AuthenticationService is both the service and the delegate, keeping the flow self-contained.
+- **Keychain for Credentials:** User identifier, identity token, display name, and email stored in Keychain via existing `KeychainService`. Using `kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly` for background sync access.
+- **CloudKit via SwiftData Built-in Integration:** `ModelConfiguration(cloudKitDatabase: .private(containerIdentifier))` — zero custom CloudKit code. SwiftData handles all CKRecord mapping, zone setup, and conflict resolution automatically.
+- **Local-Only Mode by Default:** App is fully functional without signing in. `ModelConfiguration(cloudKitDatabase: .none)` for unsigned users. No data gating behind auth.
+- **Typed State Machine:** `AuthState` enum (unknown → signedOut → signingIn → signedIn → error) drives UI reactively. No boolean flags.
+- **Last-Writer-Wins Conflict Resolution:** SwiftData+CloudKit default. Property-level merging for workout sets deferred to v1.1 per retro decision.
+
+**Service Architecture:**
+- `AuthenticationService` — owns auth flow, credential lifecycle, session restoration
+- `CloudKitSyncService` — monitors sync events via NotificationCenter, tracks iCloud account status, provides `ModelConfiguration` factory method
+- Both services are `@Observable` + `@MainActor`, injected from `GymBroApp` → `ContentView` → `ProfileView`
+
+**Files Created (7 new, 3 modified):**
+- Services: `AuthenticationService.swift`, `AuthState.swift`, `CloudKitSyncService.swift`
+- UI: `SignInView.swift`, `ProfileView.swift`, `SyncStatusView.swift`
+- Config: `GymBro.entitlements`
+- Tests: `AuthenticationServiceTests.swift`
+- Modified: `GymBroApp.swift`, `ContentView.swift`
+
+**Deferred to v1.1:**
+- Offline sync queue (writes queued when offline, replayed on reconnect)
+- Property-level merge conflict resolution for workout sets
+- iCloud storage usage display (CKContainer doesn't expose per-app storage easily)
+
+
 ### 2026-04-07: HealthKit Integration (Issue #11, PR #56)
 
 **Architecture Decisions:**
