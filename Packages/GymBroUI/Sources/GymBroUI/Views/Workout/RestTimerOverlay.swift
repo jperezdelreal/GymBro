@@ -22,6 +22,7 @@ public struct RestTimerOverlay: View {
                                 .symbolRenderingMode(.hierarchical)
                                 .foregroundStyle(.secondary)
                         }
+                        .accessibilityLabel("Close timer") // [VERIFY]
                     }
                 }
         }

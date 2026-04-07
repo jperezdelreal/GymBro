@@ -14,7 +14,7 @@ public struct StartWorkoutView: View {
     public init() {}
     
     public var body: some View {
-        NavigationView {
+        NavigationStack {
             ScrollView {
                 VStack(spacing: 24) {
                     // Quick Start
@@ -56,7 +56,7 @@ public struct StartWorkoutView: View {
                     VStack(alignment: .leading, spacing: 8) {
                         HStack {
                             Image(systemName: "dumbbell.fill")
-                                .font(.system(size: 28))
+                                .font(.title2)
                             Text("Empty Workout")
                                 .font(.title3)
                                 .fontWeight(.semibold)

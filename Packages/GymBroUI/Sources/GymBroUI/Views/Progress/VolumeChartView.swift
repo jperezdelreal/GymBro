@@ -39,14 +39,14 @@ public struct VolumeChartView: View {
         }
         .padding()
         .background(Color(.systemBackground))
-        .cornerRadius(12)
+        .clipShape(RoundedRectangle(cornerRadius: 12))
         .shadow(radius: 1)
     }
 
     private var emptyState: some View {
         Text("Log more workouts to see volume trends")
             .font(.caption)
-            .foregroundColor(.secondary)
+            .foregroundStyle(.secondary)
             .frame(height: 200)
             .frame(maxWidth: .infinity)
     }
@@ -56,7 +56,7 @@ public struct VolumeChartView: View {
             VStack(alignment: .leading) {
                 Text("Total Sets")
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
                 Text("\(data.reduce(0) { $0 + $1.totalSets })")
                     .font(.title3.bold())
             }
@@ -64,7 +64,7 @@ public struct VolumeChartView: View {
             VStack(alignment: .trailing) {
                 Text("Avg Weekly Volume")
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
                 let avgVolume = data.isEmpty ? 0 : data.reduce(0.0) { $0 + $1.totalVolume } / Double(data.count)
                 Text("\(avgVolume, specifier: "%.0f") kg")
                     .font(.title3.bold())
