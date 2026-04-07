@@ -14,8 +14,8 @@ public struct ProgramDetailView: View {
     @State private var showStartConfirmation = false
     @State private var showStopConfirmation = false
     @State private var selectedWeek: Int = 1
-    @State private var generatorVM: WorkoutGeneratorViewModel?
     @State private var showWorkoutPreview = false
+    @State private var generatorVM: WorkoutGeneratorViewModel?
     @State private var activeWorkoutVM: ActiveWorkoutViewModel?
     @State private var navigateToWorkout = false
     @ScaledMetric private var iconSize: CGFloat = 20
@@ -46,14 +46,6 @@ public struct ProgramDetailView: View {
             if viewModel == nil {
                 viewModel = ProgramsTabViewModel(modelContext: modelContext)
             }
-            if generatorVM == nil {
-                generatorVM = WorkoutGeneratorViewModel(modelContext: modelContext)
-            }
-        }
-        .navigationDestination(isPresented: $navigateToWorkout) {
-            if let vm = activeWorkoutVM {
-                ActiveWorkoutView(viewModel: vm)
-            }
         }
         .confirmationDialog(
             "Start \(program.name)?",
@@ -62,14 +54,11 @@ public struct ProgramDetailView: View {
         ) {
             Button("Start Program") {
                 viewModel?.startProgram(program)
-                generateAndShowPreview()
+                dismiss()
             }
             Button("Cancel", role: .cancel) {}
         } message: {
-            Text("This will replace your current active program. A workout will be generated from today's program day.")
-        }
-        .sheet(isPresented: $showWorkoutPreview) {
-            workoutPreviewSheet
+            Text("This will replace your current active program if you have one.")
         }
         .confirmationDialog(
             "Stop \(program.name)?",
@@ -83,6 +72,20 @@ public struct ProgramDetailView: View {
             Button("Cancel", role: .cancel) {}
         } message: {
             Text("Your progress will be saved but the program will no longer be active.")
+        }
+        .sheet(isPresented: $showWorkoutPreview) {
+            if let vm = generatorVM {
+                WorkoutPreviewSheet(generatorVM: vm) { workoutVM in
+                    activeWorkoutVM = workoutVM
+                    navigateToWorkout = true
+                }
+                .presentationDetents([.large])
+            }
+        }
+        .navigationDestination(isPresented: $navigateToWorkout) {
+            if let vm = activeWorkoutVM {
+                ActiveWorkoutView(viewModel: vm)
+            }
         }
     }
 
@@ -321,10 +324,17 @@ public struct ProgramDetailView: View {
 
     @ViewBuilder
     private var actionButton: some View {
-        if isActive {
-            VStack(spacing: GymBroSpacing.md) {
-                Button("Start Workout") {
-                    generateAndShowPreview()
+        VStack(spacing: GymBroSpacing.md) {
+            if isActive {
+                Button {
+                    let vm = WorkoutGeneratorViewModel(modelContext: modelContext)
+                    generatorVM = vm
+                    showWorkoutPreview = true
+                } label: {
+                    HStack(spacing: GymBroSpacing.sm) {
+                        Image(systemName: "wand.and.stars")
+                        Text("Start Smart Workout")
+                    }
                 }
                 .buttonStyle(.gymBroPrimary)
 
@@ -332,182 +342,13 @@ public struct ProgramDetailView: View {
                     showStopConfirmation = true
                 }
                 .buttonStyle(.gymBroDestructive)
-            }
-        } else {
-            Button("Start This Program") {
-                showStartConfirmation = true
-            }
-            .buttonStyle(.gymBroPrimary)
-        }
-    }
-
-    // MARK: - Workout Generation
-
-    private func generateAndShowPreview() {
-        generatorVM?.generateWorkout()
-        showWorkoutPreview = true
-    }
-
-    private func startGeneratedWorkout() {
-        guard let generatorVM else { return }
-        if let workout = generatorVM.startWorkout() {
-            let exercises = workout.exercises
-            activeWorkoutVM = ActiveWorkoutViewModel(
-                modelContext: modelContext,
-                workout: workout,
-                exercises: exercises
-            )
-            showWorkoutPreview = false
-            navigateToWorkout = true
-        }
-    }
-
-    @ViewBuilder
-    private var workoutPreviewSheet: some View {
-        NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: GymBroSpacing.lg) {
-                    if let generated = generatorVM?.generatedWorkout {
-                        if generated.isRestDay {
-                            restDayContent
-                        } else {
-                            previewHeader(generated)
-                            previewExerciseList(generated)
-                        }
-                    } else if generatorVM?.isGenerating == true {
-                        ProgressView("Generating workout…")
-                            .tint(GymBroColors.accentGreen)
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    } else if let error = generatorVM?.errorMessage {
-                        Text(error)
-                            .foregroundStyle(GymBroColors.accentRed)
-                    }
+            } else {
+                Button("Start This Program") {
+                    showStartConfirmation = true
                 }
-                .padding(.horizontal, GymBroSpacing.md)
-                .padding(.top, GymBroSpacing.sm)
-                .padding(.bottom, GymBroSpacing.xxl)
-            }
-            .gymBroDarkBackground()
-            .navigationTitle("Workout Preview")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") {
-                        showWorkoutPreview = false
-                    }
-                    .foregroundStyle(GymBroColors.textSecondary)
-                }
-            }
-            .safeAreaInset(edge: .bottom) {
-                if generatorVM?.generatedWorkout != nil && generatorVM?.isRestDay == false {
-                    Button("Start Workout") {
-                        startGeneratedWorkout()
-                    }
-                    .buttonStyle(.gymBroPrimary)
-                    .padding(.horizontal, GymBroSpacing.md)
-                    .padding(.bottom, GymBroSpacing.lg)
-                }
+                .buttonStyle(.gymBroPrimary)
             }
         }
-    }
-
-    @ViewBuilder
-    private func previewHeader(_ generated: GeneratedWorkout) -> some View {
-        VStack(alignment: .leading, spacing: GymBroSpacing.sm) {
-            Text(generated.sessionName)
-                .font(GymBroTypography.title2)
-                .foregroundStyle(GymBroColors.textPrimary)
-
-            HStack(spacing: GymBroSpacing.md) {
-                Label("\(generated.exercises.count) exercises", systemImage: "dumbbell.fill")
-                Label("~\(generated.estimatedDurationMinutes) min", systemImage: "clock")
-            }
-            .font(GymBroTypography.caption)
-            .foregroundStyle(GymBroColors.textSecondary)
-
-            if !generated.reasoningText.isEmpty {
-                GymBroCard(accent: GymBroColors.accentCyan) {
-                    Text(generated.reasoningText)
-                        .font(GymBroTypography.caption)
-                        .foregroundStyle(GymBroColors.textSecondary)
-                }
-            }
-        }
-    }
-
-    @ViewBuilder
-    private func previewExerciseList(_ generated: GeneratedWorkout) -> some View {
-        VStack(alignment: .leading, spacing: GymBroSpacing.md) {
-            Text("EXERCISES")
-                .font(GymBroTypography.caption2)
-                .foregroundStyle(GymBroColors.textTertiary)
-                .tracking(2)
-
-            ForEach(generated.exercises) { exercise in
-                GymBroCard {
-                    HStack(spacing: GymBroSpacing.md) {
-                        Text("\(exercise.order)")
-                            .font(GymBroTypography.caption2)
-                            .foregroundStyle(GymBroColors.textTertiary)
-                            .frame(width: 16)
-
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(exercise.exerciseName)
-                                .font(GymBroTypography.subheadline)
-                                .foregroundStyle(GymBroColors.textPrimary)
-
-                            HStack(spacing: GymBroSpacing.sm) {
-                                Text("\(exercise.targetSets)×\(exercise.targetReps)")
-                                    .font(GymBroTypography.caption)
-                                    .foregroundStyle(GymBroColors.accentCyan)
-
-                                if let rpe = exercise.targetRPE {
-                                    Text("RPE \(String(format: "%.0f", rpe))")
-                                        .font(GymBroTypography.caption)
-                                        .foregroundStyle(GymBroColors.accentAmber)
-                                }
-                            }
-
-                            if !exercise.notes.isEmpty {
-                                Text(exercise.notes)
-                                    .font(GymBroTypography.caption2)
-                                    .foregroundStyle(GymBroColors.textTertiary)
-                                    .lineLimit(2)
-                            }
-                        }
-
-                        Spacer()
-                    }
-                }
-            }
-        }
-    }
-
-    @ViewBuilder
-    private var restDayContent: some View {
-        VStack(spacing: GymBroSpacing.lg) {
-            Image(systemName: "bed.double.fill")
-                .font(.system(size: 60))
-                .foregroundStyle(GymBroColors.accentCyan)
-
-            Text("Rest Day Recommended")
-                .font(GymBroTypography.title2)
-                .foregroundStyle(GymBroColors.textPrimary)
-
-            Text("Your body needs recovery. Take it easy today and come back stronger.")
-                .font(GymBroTypography.body)
-                .foregroundStyle(GymBroColors.textSecondary)
-                .multilineTextAlignment(.center)
-
-            if let reasoning = generatorVM?.reasoningText {
-                GymBroCard(accent: GymBroColors.accentCyan) {
-                    Text(reasoning)
-                        .font(GymBroTypography.caption)
-                        .foregroundStyle(GymBroColors.textSecondary)
-                }
-            }
-        }
-        .padding(.top, GymBroSpacing.xxl)
     }
 
     // MARK: - Helpers
