@@ -221,3 +221,69 @@ This foundation unblocks all Phase-1 work:
 - Impact for Tank: No backend changes needed. Integration test ready (manual verification of PromptBuilder receiving full context)
 - Files affected: CoachChatViewModel (4 new fetch methods), 7 new unit tests
 - PR #88 ready for review
+
+### 2026-04-07: Exercise Library Expansion (Tank, Issue #80, PR #92)
+
+**Exercise Data Scale-Up:**
+- Expanded exercise library from 80 to 200 exercises (150% growth)
+- Average instruction length improved from 80 to 226 chars (3x more detailed)
+- All new exercises include: setup, execution, breathing cues, common mistakes, safety warnings
+- Instructions written for practical gym use, not generic descriptions
+
+**Exercise Coverage Added:**
+- **Barbell variations:** High/low bar squat, SSB squat, Anderson squat, Hatfield squat, trap bar deadlift, snatch grip deadlift, block pulls, paused deadlifts, Spoto press, Larsen press, board press, reverse band bench, feet-up bench, tempo variations, pin squats
+- **Olympic lifts:** Hang power clean/snatch, push jerk, split jerk, clean pulls, snatch pulls, power snatch, overhead squat, thrusters
+- **Cable exercises:** 10+ new movements including lateral raises, rear delt flies, wood chops, pull-throughs, Pallof press, upright rows, Y-raises
+- **Kettlebell:** Clean, snatch, windmill, double front squat, overhead press, double swing, single-arm row
+- **Dumbbell variations:** Floor press, pullover, neutral grip press, single-arm press, RDL, leaning lateral raise, chest-supported row, split squat, step-up, farmer's march
+- **Machine exercises:** Smith machine variations, hack squat, lying/seated leg curls, chest/shoulder press machines, lat pulldown variations (wide/close grip), seated cable row, leg press variations (narrow/wide stance), calf raises
+- **Bodyweight progressions:** Archer push-up, pseudo planche push-up, L-sit, dragon flag, ring dips/push-ups, front/back lever, weighted pull-ups/dips
+- **Band exercises:** Face pulls (dedicated exercise), dislocates, assisted pull-ups, resisted push-ups, good mornings, resisted squats
+- **Isolation movements:** Bayesian cable curl, sissy squat, cable kickback, glute-ham raise, wrist roller, wrist curls (regular/reverse), side bends, spider curl, overhead cable tricep extension, close/wide-grip EZ bar curls, JM press, Tate press, Zottman curl, cable hammer curl
+- **Strongman movements:** Yoke walk, sandbag carry, tire flip, sled push/drag
+- **Specialty movements:** Landmine press/row, one-arm barbell row, Bradford press, dumbbell incline fly, decline dumbbell press, reverse pec deck, cable Y-raise, Copenhagen plank, landmine rotation, suitcase carry, birddogs
+
+**Data Integrity:**
+- All exercises validated for: unique names, valid categories (compound/isolation/accessory), valid equipment types, muscle group assignments, primary muscle designation
+- Big three powerlifts (squat, bench, deadlift) verified present with multiple variations
+- Anatomically accurate muscle group mappings (19 muscle groups: Quadriceps, Glutes, Hamstrings, Chest, Shoulders, Rear Delts, Triceps, Biceps, Forearms, Lats, Upper Back, Lower Back, Traps, Core, Obliques, Calves, Adductors, Hip Flexors)
+- JSON structure matches Exercise model schema exactly
+
+**Testing:**
+- Updated `ExerciseSeedDataTests.swift` with instruction length requirements
+- Minimum exercise count raised from 30 to 200
+- Added average instruction length test (180+ chars)
+- Added instruction detail level test (no more than 20% can be < 150 chars)
+- All 17 existing tests pass + 3 new tests
+
+**Seeder Protection:**
+- Documented custom exercise protection behavior: seeder only runs on empty database
+- User's custom exercises are NEVER overwritten (seeder checks exercise count > 0 and skips)
+- Added clarifying comment in `ExerciseDataSeeder.swift`
+
+**Key Technical Decisions:**
+- **Kept original 80 exercises unchanged** — users may already have workouts referencing these by name; changing instructions would be breaking
+- **Instruction format consistency** — all new exercises follow: Setup → Execution → Breathing → Common mistakes → Safety notes
+- **Real exercise names** — used terminology serious lifters actually use (e.g., "Spoto Press" not "Paused Bench Press Variation")
+- **Safety-first for dangerous exercises** — Olympic lifts, heavy compounds, advanced calisthenics all include explicit safety warnings and progression advice
+- **Equipment variety** — covered all equipment types in Equipment enum (barbell, dumbbell, kettlebell, machine, cable, bodyweight, band, other)
+
+**Impact for Other Agents:**
+- **Neo (AI Coach):** Can now recommend from 200 exercises with detailed instructions to pass to LLM context
+- **Trinity (UI):** Exercise search/filter will surface vastly more options
+- **Morpheus (Product):** Addresses depth concern — library is now on par with FitBod/Strong
+- **Switch (QA):** Test coverage ensures data integrity at scale (200 exercises)
+
+**Open Questions for Future Work:**
+- Exercise images/videos: Deferred to separate issue (issue #80 was data-only)
+- Custom exercise UI flow: Model supports it, but UI needs design (Trinity's domain)
+- Exercise difficulty ratings: Not in current schema, would require model change
+- Exercise equipment alternatives: e.g., "can substitute dumbbells for barbell" — requires new data structure
+
+**Files Modified:**
+- `Packages/GymBroCore/Sources/GymBroCore/Resources/exercises-seed.json` — 80 → 200 exercises
+- `Packages/GymBroCore/Sources/GymBroCore/Services/ExerciseDataSeeder.swift` — added protection comment
+- `Packages/GymBroCore/Tests/GymBroCoreTests/ExerciseSeedDataTests.swift` — updated test requirements
+
+**PR Status:** Draft PR #92 opened, ready for review
+
