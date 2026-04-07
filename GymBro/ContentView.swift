@@ -1,4 +1,5 @@
 import SwiftUI
+import GymBroUI
 
 struct ContentView: View {
     @State private var selectedTab = 0
@@ -68,7 +69,7 @@ struct ProgramsTab: View {
 struct CoachTab: View {
     var body: some View {
         NavigationStack {
-            Text("AI Coach")
+            CoachChatView()
                 .navigationTitle("Coach")
         }
     }

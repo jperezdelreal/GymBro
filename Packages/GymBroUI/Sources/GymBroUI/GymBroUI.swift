@@ -7,3 +7,11 @@ public struct GymBroUI {
 // Views
 public typealias RestTimerView = RestTimerView
 public typealias RestTimerOverlay = RestTimerOverlay
+
+// AI Coach Views
+public typealias CoachChatView = CoachChatView
+public typealias ChatMessageBubble = ChatMessageBubble
+public typealias CoachFloatingButton = CoachFloatingButton
+
+// AI Coach ViewModels
+public typealias CoachChatViewModel = CoachChatViewModel

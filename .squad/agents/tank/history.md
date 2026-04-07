@@ -112,3 +112,37 @@ This foundation unblocks all Phase-1 work:
 - ModelContainer configuration: single shared container vs. per-view? Leaning toward single shared (simpler, faster).
 - Migration strategy when model schema changes: SwiftData auto-migration works for simple changes, but complex migrations need explicit ModelMigrationPlan.
 - CloudKit sync conflict resolution: Last-Writer-Wins is simple but loses data. Evaluate property-level merging for v1.1.
+
+### 2026-04-07: AI Coach Implementation (Issue #10)
+
+**Architecture Decisions:**
+- **Protocol-based AICoachService:** Abstraction layer (`AICoachService` protocol) with `AzureOpenAICoachService` (cloud) and `DeterministicCoachFallback` (offline) implementations. This enables seamless swap to on-device models when Core AI / iOS 27 matures.
+- **Lightweight Snapshots over @Model References:** Created `UserProfileSnapshot`, `WorkoutSnapshot`, `PRSnapshot` structs instead of passing SwiftData `@Model` objects to the AI service layer. Prevents threading issues (SwiftData models aren't `Sendable`) and keeps the AI service testable without a model container.
+- **Environment-based Configuration:** `AICoachConfiguration` loads Azure OpenAI endpoint/key from `ProcessInfo.processInfo.environment`. No hardcoded secrets. Production will use Xcode scheme env vars or a config file.
+- **Streaming-first API Design:** Both cloud and offline services implement `AsyncThrowingStream<String, Error>` for response streaming. The offline fallback simulates streaming by yielding words with delays — consistent UX regardless of backend.
+
+**Safety Architecture:**
+- **SafetyFilter runs pre-API:** Medical/dangerous queries are intercepted before hitting Azure OpenAI, saving API costs and preventing unsafe responses from ever being generated.
+- **Mandatory Disclaimer:** Every AI response gets a disclaimer appended. Cannot be turned off.
+- **Dual-layer Safety:** SafetyFilter catches keywords client-side; system prompt instructs the model to refuse medical advice server-side. Belt and suspenders.
+
+**Offline-First Design:**
+- `DeterministicCoachFallback` covers 7 common training topics: rest times, deloads, plateaus, warm-ups, RPE/RIR, progressive overload, workout suggestions.
+- Rule engine uses the user's experience level to personalize advice (e.g., different deload frequency for beginners vs advanced).
+- ViewModel auto-falls back to offline service on cloud failure — transparent to the user.
+
+**Cost Control:**
+- `UsageLimiter`: 5 free questions/week persisted in UserDefaults, weekly auto-reset.
+- `RateLimiter`: 20 requests/minute in-memory cap to prevent runaway API costs.
+- GPT-4o-mini chosen for cheapest per-token cost on Azure.
+
+**Files Created (19 files, ~1600 lines):**
+- Models: `ChatMessage.swift` (SwiftData)
+- Services: `AICoachService.swift`, `AzureOpenAICoachService.swift`, `DeterministicCoachFallback.swift`, `PromptBuilder.swift`, `SafetyFilter.swift`, `AICoachConfiguration.swift`, `UsageLimiter.swift`
+- UI: `CoachChatView.swift`, `ChatMessageBubble.swift`, `CoachFloatingButton.swift`, `CoachChatViewModel.swift`
+- Tests: `PromptBuilderTests.swift`, `SafetyFilterTests.swift`, `DeterministicCoachFallbackTests.swift`
+
+**Open Questions:**
+- Azure Functions proxy for production (rate limiting, prompt versioning server-side) — not implemented yet, using direct client→Azure OpenAI for MVP
+- Conversation history size management — currently fetches last 50 messages; may need cleanup strategy for long-running users
+- Multi-turn context: currently each request sends only system + user message; should we send conversation history for multi-turn coherence?
