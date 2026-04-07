@@ -7,10 +7,15 @@ import GymBroUI
 struct GymBroApp: App {
     @State private var authService = AuthenticationService()
     @State private var syncService = CloudKitSyncService()
+    @State private var conflictService = ConflictResolutionService()
 
     var body: some Scene {
         WindowGroup {
-            ContentView(authService: authService, syncService: syncService)
+            ContentView(
+                authService: authService,
+                syncService: syncService,
+                conflictService: conflictService
+            )
                 .task {
                     await authService.checkExistingCredential()
                     if authService.isSignedIn {
@@ -29,7 +34,8 @@ struct GymBroApp: App {
                 UserProfile.self,
                 ChatMessage.self,
                 HealthMetric.self,
-                HealthBaseline.self
+                HealthBaseline.self,
+                ConflictResolutionLog.self
             ],
             configurations: CloudKitSyncService.makeModelConfiguration(
                 isSignedIn: authService.isSignedIn
