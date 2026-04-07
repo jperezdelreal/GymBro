@@ -49,6 +49,7 @@ import com.gymbro.feature.onboarding.OnboardingRoute
 import com.gymbro.feature.profile.ProfileRoute
 import com.gymbro.feature.progress.ProgressRoute
 import com.gymbro.feature.recovery.RecoveryRoute
+import com.gymbro.feature.settings.SettingsRoute
 import com.gymbro.feature.workout.ActiveWorkoutRoute
 import com.gymbro.feature.workout.WorkoutSummaryScreen
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -323,9 +324,20 @@ fun GymBroNavGraph(
                 containerColor = MaterialTheme.colorScheme.background,
             ) { innerPadding ->
                 Box(modifier = Modifier.padding(innerPadding)) {
-                    ProfileRoute()
+                    ProfileRoute(
+                        onNavigateToSettings = {
+                            navController.navigate("settings")
+                        },
+                    )
                 }
             }
+        }
+        composable("settings") {
+            SettingsRoute(
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+            )
         }
     }
 }

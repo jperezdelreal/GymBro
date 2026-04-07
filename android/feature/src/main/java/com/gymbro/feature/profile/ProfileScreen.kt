@@ -22,6 +22,7 @@ import androidx.compose.material.icons.filled.CloudDone
 import androidx.compose.material.icons.filled.CloudOff
 import androidx.compose.material.icons.filled.CloudSync
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -57,6 +58,7 @@ private val SurfaceDark = Color(0xFF121212)
 
 @Composable
 fun ProfileRoute(
+    onNavigateToSettings: () -> Unit = {},
     viewModel: ProfileViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -73,6 +75,7 @@ fun ProfileRoute(
     ProfileScreen(
         state = state,
         onEvent = viewModel::onEvent,
+        onNavigateToSettings = onNavigateToSettings,
     )
 }
 
@@ -80,6 +83,7 @@ fun ProfileRoute(
 internal fun ProfileScreen(
     state: ProfileState,
     onEvent: (ProfileEvent) -> Unit,
+    onNavigateToSettings: () -> Unit = {},
 ) {
     Column(
         modifier = Modifier
@@ -136,6 +140,30 @@ internal fun ProfileScreen(
             onSignOut = { onEvent(ProfileEvent.SignOut) },
             onSyncNow = { onEvent(ProfileEvent.SyncNow) },
         )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Settings Button
+        OutlinedButton(
+            onClick = onNavigateToSettings,
+            shape = RoundedCornerShape(12.dp),
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.outlinedButtonColors(
+                contentColor = AccentGreen,
+            ),
+        ) {
+            Icon(
+                Icons.Default.Settings,
+                contentDescription = "Settings",
+                modifier = Modifier.size(20.dp),
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = "Settings",
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.padding(vertical = 4.dp),
+            )
+        }
 
         // Error
         if (state.error != null) {

@@ -62,6 +62,9 @@ dependencies {
     implementation(libs.coroutines.core)
     implementation(libs.coroutines.android)
 
+    // Health Connect
+    implementation(libs.health.connect)
+
     // Testing
     testImplementation(libs.junit)
     testImplementation(libs.coroutines.test)

@@ -1,57 +1,84 @@
 package com.gymbro.core.preferences
 
 import android.content.Context
-import android.content.SharedPreferences
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
+
+private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "user_preferences")
 
 @Singleton
 class UserPreferences @Inject constructor(
     @ApplicationContext private val context: Context,
 ) {
-    private val prefs: SharedPreferences = context.getSharedPreferences(
-        "gymbro_user_prefs",
-        Context.MODE_PRIVATE,
-    )
+    private val dataStore = context.dataStore
 
-    fun hasCompletedOnboarding(): Boolean {
-        return prefs.getBoolean(KEY_ONBOARDING_COMPLETE, false)
+    companion object {
+        val WEIGHT_UNIT = stringPreferencesKey("weight_unit")
+        val DEFAULT_REST_TIMER = intPreferencesKey("default_rest_timer")
+        val AUTO_START_REST_TIMER = booleanPreferencesKey("auto_start_rest_timer")
+        val NOTIFICATIONS_ENABLED = booleanPreferencesKey("notifications_enabled")
     }
 
-    fun setOnboardingComplete() {
-        prefs.edit().putBoolean(KEY_ONBOARDING_COMPLETE, true).apply()
+    enum class WeightUnit {
+        KG, LBS
     }
 
-    fun getPreferredUnit(): WeightUnit {
-        val unitName = prefs.getString(KEY_PREFERRED_UNIT, WeightUnit.KG.name)
-        return WeightUnit.entries.find { it.name == unitName } ?: WeightUnit.KG
-    }
-
-    fun setPreferredUnit(unit: WeightUnit) {
-        prefs.edit().putString(KEY_PREFERRED_UNIT, unit.name).apply()
-    }
-
-    fun getUserName(): String? {
-        return prefs.getString(KEY_USER_NAME, null)
-    }
-
-    fun setUserName(name: String?) {
-        if (name.isNullOrBlank()) {
-            prefs.edit().remove(KEY_USER_NAME).apply()
-        } else {
-            prefs.edit().putString(KEY_USER_NAME, name.trim()).apply()
+    val weightUnit: Flow<WeightUnit> = dataStore.data.map { preferences ->
+        when (preferences[WEIGHT_UNIT]) {
+            "LBS" -> WeightUnit.LBS
+            else -> WeightUnit.KG
         }
     }
 
-    companion object {
-        private const val KEY_ONBOARDING_COMPLETE = "onboarding_complete"
-        private const val KEY_PREFERRED_UNIT = "preferred_unit"
-        private const val KEY_USER_NAME = "user_name"
+    val defaultRestTimer: Flow<Int> = dataStore.data.map { preferences ->
+        preferences[DEFAULT_REST_TIMER] ?: 90
     }
-}
 
-enum class WeightUnit {
-    KG,
-    LBS
+    val autoStartRestTimer: Flow<Boolean> = dataStore.data.map { preferences ->
+        preferences[AUTO_START_REST_TIMER] ?: true
+    }
+
+    val notificationsEnabled: Flow<Boolean> = dataStore.data.map { preferences ->
+        preferences[NOTIFICATIONS_ENABLED] ?: false
+    }
+
+    suspend fun setWeightUnit(unit: WeightUnit) {
+        dataStore.edit { preferences ->
+            preferences[WEIGHT_UNIT] = unit.name
+        }
+    }
+
+    suspend fun setDefaultRestTimer(seconds: Int) {
+        dataStore.edit { preferences ->
+            preferences[DEFAULT_REST_TIMER] = seconds
+        }
+    }
+
+    suspend fun setAutoStartRestTimer(enabled: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[AUTO_START_REST_TIMER] = enabled
+        }
+    }
+
+    suspend fun setNotificationsEnabled(enabled: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[NOTIFICATIONS_ENABLED] = enabled
+        }
+    }
+
+    suspend fun clearAllData() {
+        dataStore.edit { preferences ->
+            preferences.clear()
+        }
+    }
 }
