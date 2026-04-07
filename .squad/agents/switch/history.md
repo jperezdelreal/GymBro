@@ -63,3 +63,14 @@
 - #30: Edge cases & robustness (HIGH)
 
 **Recommendation:** Block MVP ship on #26 (concurrency) and PersonalRecordService crash from #30. Target 60%+ coverage before beta.
+
+### 2026-04-07: AI Coach Context Pipeline Verification (Neo, Issue #82)
+**7 New Unit Tests for Context Fetching**
+- Neo added comprehensive test coverage for `CoachChatViewModel.buildContext()` implementation
+- Test cases cover: user profile + bodyweight history, recent workouts with filtering, active program week calculation, PRs sorted by e1RM, warmup set exclusion, cancelled workout exclusion, empty database handling
+- All fetch paths tested (happy path + empty data)
+- Filtering logic verified: cancelled workouts excluded, warmup sets excluded from PRs
+- Aggregation logic validated: exercise grouping, week calculation, PR sorting
+- No crashes on empty state
+- Files affected: `CoachChatViewModelTests.swift` (7 new tests)
+- Contribution to overall test coverage improvement — helps address the Phase 1+2 audit recommendation of 60%+ coverage

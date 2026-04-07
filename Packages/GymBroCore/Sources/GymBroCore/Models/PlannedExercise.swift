@@ -12,6 +12,9 @@ final class PlannedExercise {
     @Relationship(deleteRule: .nullify)
     var programDay: ProgramDay?
     
+    @Relationship(deleteRule: .nullify)
+    var programWeek: ProgramWeek?
+    
     var targetSets: Int
     var targetReps: String
     var targetRPE: Double?
@@ -22,6 +25,7 @@ final class PlannedExercise {
         order: Int,
         exercise: Exercise? = nil,
         programDay: ProgramDay? = nil,
+        programWeek: ProgramWeek? = nil,
         targetSets: Int,
         targetReps: String,
         targetRPE: Double? = nil,
@@ -31,6 +35,7 @@ final class PlannedExercise {
         self.order = order
         self.exercise = exercise
         self.programDay = programDay
+        self.programWeek = programWeek
         self.targetSets = targetSets
         self.targetReps = targetReps
         self.targetRPE = targetRPE
