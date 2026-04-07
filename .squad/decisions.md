@@ -634,6 +634,40 @@ For future onboarding-like flows, use same pattern for program creation wizard, 
 
 ---
 
+---
+
+## Android Skills Strategy (Issue #134) — Morpheus Analysis
+
+**Decision:** Install 5 P0 Android skills immediately. Defer 4 P1 skills to Sprint 2. Reject 6 redundant Compose sub-skills.
+
+**P0 Install Now (Unblock Android UI Development):**
+1. **compose-expert** (aldefy/compose-skill) — Best-in-class Compose skill. 17 reference files + androidx source backing. Covers state, navigation, animation, accessibility, production crashes, Compose Multiplatform. Replaces 6 proposed Compose sub-skills.
+2. **android-architecture** (new-silvermoon) — Clean Architecture + Hilt + modularization. Maps to GymBro iOS package structure consistency.
+3. **android-data-layer** (new-silvermoon) — Repository pattern + Room + offline-first sync. Core to GymBro's data philosophy.
+4. **kotlin-mvi** (Meet-Miyani) — MVI Event/State/Effect pattern. Includes Ktor networking, Paging, Room, Koin/Hilt integration. Matches iOS ViewModel patterns.
+5. **android-testing** (new-silvermoon) — Unit/Hilt/Screenshot testing. Enables TDD parity with iOS (`swift-testing` skill).
+
+**P1 Defer to Sprint 2:**
+- **android-gradle** — Convention plugins, version catalogs. Needed when codebase grows beyond initial scaffold.
+- **health-connect** (GAP IDENTIFIED) — Google HealthKit equivalent. Critical for recovery-aware training. Not in any source repo.
+- **firebase-android** (GAP IDENTIFIED) — Firestore sync, FCM push, auth. GymBro iOS uses CloudKit. Not in any source repo.
+- **workmanager** (GAP IDENTIFIED) — Background task scheduler. Maps to iOS BGTaskScheduler. Not in any source repo.
+
+**Redundant (Reject):**
+- 6 Compose sub-skills (jetpack-compose-ui, compose-state-management, compose-navigation, compose-theming, compose-animation, compose-lists) — all subsumed by aldefy/compose-expert.
+
+**Rationale:**
+- aldefy/compose-skill backed by actual androidx source code (not interpretations). 17 files vs fragmented 6 skills.
+- Avoids skill bloat — target ~10-12 Android core skills (mirrors iOS count).
+- Identifies 3 critical gaps to be filled separately.
+- MVI pattern in Meet-Miyani complements architecture guidance for full data flow coverage.
+
+**Impact:** Unblocks Android development with curated, non-overlapping skill set. Maintains dual-platform consistency (architecture patterns match iOS). Reveals gaps to address in follow-up issues.
+
+**Source Repos Evaluated:** new-silvermoon/awesome-android-agent-skills, anhvt52/jetpack-compose-skills, aldefy/compose-skill, Meet-Miyani/compose-skill.
+
+---
+
 ## User Directive (2026-04-07T07:04:09Z)
 
 **By:** Copilot (via Copilot CLI)  
