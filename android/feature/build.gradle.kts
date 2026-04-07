@@ -66,6 +66,7 @@ dependencies {
     implementation(libs.health.connect)
 
     // Testing
+    testImplementation(project(":core"))
     testImplementation(libs.junit)
     testImplementation(libs.coroutines.test)
     testImplementation(libs.mockk)

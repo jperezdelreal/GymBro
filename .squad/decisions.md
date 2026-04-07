@@ -1246,3 +1246,253 @@ The codebase has solid foundations in the tested areas (plateau detection, E1RM,
 ### Recommendation
 
 Do NOT ship MVP without fixing #26 (concurrency) and the PersonalRecordService crash in #30. Test coverage (#25) should reach 60%+ before beta.
+
+---
+
+## Android Test Infrastructure Decisions (Switch)
+
+**Date:** 2026-04-07  
+**Author:** Switch (Tester)  
+**Issue:** #157  
+
+### Context
+GymBro Android app had zero test files despite having 5 feature ViewModels, repositories, services, and sync infrastructure. Needed to establish testing foundation before writing actual ViewModel/Repository tests.
+
+### Decisions
+
+#### 1. MockK over Mockito
+**Choice:** MockK 1.13.16  
+**Rationale:**
+- Native Kotlin DSL (better than Mockito's Java-first API)
+- Coroutine-friendly mocking
+- Better support for suspend functions and Flows
+- Industry standard for Kotlin testing
+
+#### 2. Turbine for Flow Testing
+**Choice:** Turbine 1.2.0  
+**Rationale:**
+- Simplifies testing of Kotlin Flows
+- Provides clear assertion APIs for Flow emissions
+- Prevents test flakiness from async Flow collection
+- Created by Cash App (well-maintained, production-proven)
+
+#### 3. Fakes Over Mocks
+**Choice:** Write FakeWorkoutRepository and FakeExerciseRepository instead of using MockK for repositories  
+**Rationale:**
+- Tests survive refactors — fakes implement the interface contract, not specific call sequences
+- No flaky tests — real Flow implementations, deterministic behavior
+- Easier debugging — fakes are just Kotlin code, not mocking framework magic
+- Shared across tests — one fake serves many test cases
+- Follows "Test the contract, not the implementation" philosophy
+
+#### 4. TestFixtures with Deterministic UUIDs
+**Choice:** Create TestFixtures object with known-good sample data using deterministic UUIDs  
+**Rationale:**
+- Consistent test data across all tests
+- Readable test code — use `TestFixtures.benchPress` instead of inline object creation
+- Deterministic UUIDs (e.g., `00000000-0000-0000-0000-000000000001`) make test failures easier to debug
+- Comprehensive coverage — fixtures for all core domain models
+
+#### 5. MainDispatcherRule with UnconfinedTestDispatcher
+**Choice:** JUnit rule that sets Dispatchers.Main to UnconfinedTestDispatcher  
+**Rationale:**
+- ViewModels use Dispatchers.Main for viewModelScope
+- UnconfinedTestDispatcher runs coroutines synchronously (no flakiness)
+- Rule pattern is familiar to Android devs
+- Easy to override with StandardTestDispatcher when needed
+
+#### 6. runTest from kotlinx-coroutines-test
+**Choice:** Use `runTest { }` for all suspend function tests  
+**Rationale:**
+- Handles TestScope and virtual time automatically
+- Works with Turbine for Flow testing
+- Standard coroutine testing approach
+- Prevents test timeouts from hanging coroutines
+
+### Non-Decisions (Deferred)
+
+#### Test Coverage Thresholds
+Not setting minimum coverage % yet. Will establish baseline after Phase 1 ViewModel tests are written.
+
+#### UI Testing Infrastructure
+No Compose UI testing setup yet (no `@Composable` test rules). That's Phase 2. Focus on ViewModels and repositories first.
+
+#### Integration Tests
+No Room database testing, no network integration tests. Pure unit tests only for Phase 0.
+
+### Files Created
+- `android/core/src/test/java/com/gymbro/core/TestFixtures.kt` — Sample data for all domain models
+- `android/core/src/test/java/com/gymbro/core/fakes/FakeWorkoutRepository.kt` — Fake WorkoutRepository
+- `android/core/src/test/java/com/gymbro/core/fakes/FakeExerciseRepository.kt` — Fake ExerciseRepository
+- `android/feature/src/test/java/com/gymbro/feature/MainDispatcherRule.kt` — Coroutine dispatcher rule
+- `android/core/src/test/java/com/gymbro/core/TestInfrastructureTest.kt` — 14 verification tests
+
+### Verification
+✅ All 14 tests passing  
+✅ Build successful (Gradle)  
+✅ Zero production code changes  
+✅ Ready for Phase 1 (ViewModel unit tests)  
+
+### Impact
+Future ViewModel tests can now:
+- Use `TestFixtures.benchPress` instead of building test data inline
+- Inject `FakeWorkoutRepository()` instead of mocking with MockK
+- Use `@get:Rule val mainDispatcherRule = MainDispatcherRule()` for coroutine testing
+- Use `runTest { }` and Turbine for Flow assertions
+
+---
+
+## Android Project Scaffold — Tank
+
+**Date:** 2026-04-07
+**By:** Tank (Backend Dev)
+
+### Decision
+
+Scaffolded the Android project in `android/` with a three-module Gradle architecture:
+- `:app` — Entry point (Hilt Application, single Activity, Compose, theme, navigation)
+- `:core` — Shared infrastructure (Room database, domain models, Hilt modules, repository interfaces)
+- `:feature` — Feature screens (depends on `:core`, owns UI + ViewModels)
+
+### Stack Locked In
+
+| Component | Choice | Version |
+|-----------|--------|---------|
+| Language | Kotlin | 2.1.21 |
+| Build | Gradle + AGP | 8.14.2 / 8.10.1 |
+| UI | Jetpack Compose + Material 3 | BOM 2025.05.01 |
+| DI | Hilt | 2.56.2 |
+| Database | Room | 2.7.1 |
+| Networking | Retrofit + OkHttp | 2.11.0 / 4.12.0 |
+| Images | Coil 3 | 3.2.0 |
+| Background | WorkManager | 2.10.1 |
+| Min SDK | 26 (Android 8.0) | — |
+| Target SDK | 36 | — |
+
+### Rationale
+
+- Module structure mirrors iOS SPM packages for team mental model consistency
+- Version catalog centralizes all dependency versions for easy upgrades
+- Domain models (Exercise, Workout, ExerciseSet) structurally match iOS models
+- All weights stored as kg with computed lbs conversion — same as iOS
+- Dark-only theme with colors matching iOS palette
+
+### Impact
+
+Unblocks all Android feature development. Any squad member can now build features by adding screens to `:feature` and entities to `:core`.
+
+---
+
+## Decision: Android Skills Installed
+
+**Author:** Tank (Backend Dev)
+**Date:** 2026-04-07
+**Status:** Implemented
+**PR:** #141
+
+### Context
+
+Morpheus analyzed 4 source repos and recommended 5 P0 Android skills for GymBro's dual-platform expansion (Issue #134). Tank installed all 5 from their upstream GitHub repos.
+
+### Decision
+
+Installed 5 Android agent skills to `.squad/skills/android/`:
+
+1. **compose-expert** (aldefy/compose-skill) — Premier Compose skill with actual androidx source code backing. Includes 4 reference files (state-management, performance, navigation, production-crash-playbook).
+2. **android-architecture** (new-silvermoon/awesome-android-agent-skills) — Clean Architecture + Hilt + modularization.
+3. **android-data-layer** (new-silvermoon/awesome-android-agent-skills) — Repository pattern + Room + offline-first sync.
+4. **kotlin-mvi** (Meet-Miyani/compose-skill) — MVI Event/State/Effect pattern, Ktor, Paging, Room.
+5. **android-testing** (new-silvermoon/awesome-android-agent-skills) — JUnit, Roborazzi screenshot tests, Hilt testing.
+
+### Implications
+
+- All agents building Android features should consult these skills before writing code.
+- GymBro-specific notes were added to skills where relevant (mapping iOS patterns to Android equivalents).
+- The compose-expert skill has a large reference tree — additional reference files can be pulled from the source repo as needed.
+- Skills are under `.squad/skills/android/` to keep them separate from iOS-specific content.
+
+---
+
+## Decision: Firebase Firestore for Android Cloud Sync
+
+**By:** Tank (Backend Dev)  
+**Date:** 2026-04-07  
+**Issue:** #143
+
+### Context
+
+GymBro Android needs cloud sync equivalent to iOS CloudKit. Firebase Firestore was chosen for the Android implementation.
+
+### Decisions
+
+#### 1. Firebase is optional at build time
+The google-services plugin is conditionally applied only when `google-services.json` exists. This means:
+- CI and developers can build without a Firebase project
+- `BuildConfig.FIREBASE_ENABLED` flag allows runtime checks
+- No fake config files that could silently break things
+
+#### 2. Last-write-wins conflict resolution (MVP)
+For MVP, conflicts are resolved by timestamp — the latest `updatedAt` wins. This is simple and works well for single-user scenarios. Property-level merging can be added post-MVP.
+
+#### 3. Anonymous auth for MVP
+Users can sign in anonymously to enable cloud backup without friction. Email/Google sign-in upgrade path is built into the AuthService interface.
+
+#### 4. Denormalized Firestore documents
+Workouts embed their sets as a nested list rather than separate subcollections. This trades write efficiency for read speed — one document fetch gets the full workout.
+
+#### 5. Offline-first sync queue
+OfflineSyncManager monitors connectivity and queues operations when offline. Changes flush automatically when the device reconnects. Room remains the source of truth.
+
+### Implications for team
+
+- **Trinity (UI):** ProfileScreen follows existing MVI pattern with AccentGreen theme
+- **Switch (QA):** Firebase tests will need mock/fake implementations of AuthService and CloudSyncService
+- **Morpheus (Architecture):** CloudSyncService interface is platform-agnostic — could be shared with iOS via KMP later
+- **Neo (AI):** No impact on AI features yet, but user profiles could carry AI preferences in the future
+
+---
+
+## Decision: Repo Restructure for Dual-Platform
+
+**Author:** Tank (Backend Dev)
+**Date:** 2026-04-07
+**Issue:** #133
+**PR:** #142
+
+### What Changed
+
+Restructured the GymBro monorepo from a single-platform iOS layout to a dual-platform structure:
+
+```
+Before:                     After:
+GymBro/                     ios/GymBro/
+GymBroWatch/                ios/GymBroWatch/
+GymBroWidgets/              ios/GymBroWidgets/
+Packages/                   ios/Packages/
+Package.swift               ios/Package.swift
+                            android/          (new)
+                            shared/data/      (new)
+.squad/skills/{flat}        .squad/skills/ios/
+                            .squad/skills/android/
+                            .squad/skills/shared/
+```
+
+### Key Decisions
+
+1. **Package.swift paths unchanged** — relative paths from `ios/Package.swift` to `ios/Packages/*` are identical since they moved together. No code changes.
+
+2. **Seed data stays in iOS packages** — `exercises-seed.json` and `programs-seed.json` are loaded via Swift `Bundle.module` in `ExerciseDataSeeder.swift` and `ProgramSeeder.swift`. Moving them would break the build. Future task: create a shared data loader and copy seed data to `shared/data/`.
+
+3. **No .xcodeproj/.xcworkspace** — the project uses SPM exclusively, so no Xcode project file references to update.
+
+4. **`.swiftlint.yml` stays at repo root** — CI runs `swiftlint lint --strict` from the repo root. Moving it would break CI. May need adjusting later to scope to `ios/`.
+
+5. **CI will need updates** — `.github/workflows/ci.yml` runs `xcodebuild` and `swiftlint` from the repo root. After this restructure, the build step needs `cd ios` or a `-project` flag update. Filed as follow-up work, not blocking the restructure.
+
+6. **Skills reorganized into platform subdirs** — 26 iOS skills → `.squad/skills/ios/`, 13 shared skills → `.squad/skills/shared/`, Android skills already in `.squad/skills/android/`.
+
+### Follow-Up Tasks
+
+- [ ] Update `.github/workflows/ci.yml` to build from `ios/` directory
+- [ ] Create shared data loading layer for cross-platform seed data
+- [ ] Scaffold Android project structure in `android/`
