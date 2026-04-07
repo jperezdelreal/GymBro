@@ -141,3 +141,36 @@ GymBro is a **specialist for serious lifters**, not a generalist. We don't need 
 3. **Unit tests for onboarding model extensions** (Switch, medium)
 4. **Unit tests for instruction parsing logic** (Switch, low)
 5. **Verify PR #92 branch cleanliness before merge** (Tank, pre-merge)
+
+---
+
+## 2026-04-07T15:29Z: User directive — UX Philosophy
+
+**By:** Copilot (via user request)
+
+**What:** La UI/UX tiene que ser ultra-clean, ágil, fresca. Año 2030, no 2020. Mínimas pulsaciones, mínimos menús. Super agradable de usar. Si algo requiere muchos taps o se siente pesado, está mal. Priorizar simplicidad radical sobre feature density.
+
+**Why:** El usuario sospecha que las features construidas hoy tienen demasiada complejidad visual — muchos menús, muchas opciones. La app debe sentirse como si no tuviera UI — solo flujo.
+
+---
+
+## 2026-04-07T15:35Z: User directive — Android migration planned
+
+**By:** Copilot (via user request)
+
+**What:** After finishing the current iOS audit fixes, plan to migrate/port GymBro to Android (Kotlin + Jetpack Compose). Repo structure: GymBro-ios/ and GymBro-Android/ folders. Skills should be split per platform. Motivation: user has no Mac, can't test iOS app. Android is easier to develop/test on Windows with Android Studio.
+
+**Why:** Practical necessity — user cannot currently run or test the iOS app. Android enables local development, emulation, and testing on Windows.
+
+---
+
+## 2026-04-07T15:40Z: Android migration resources
+
+**By:** Copilot (via user input)
+
+**What:** Reference repos for Android migration:
+- Skills: https://github.com/new-silvermoon/awesome-android-agent-skills
+- Jetpack Compose skills: https://github.com/anhvt52/jetpack-compose-skills
+- Patterns/reference apps: https://github.com/androiddevnotes/awesome-jetpack-compose-android-apps
+
+**Why:** When we start Android port, analyze these for useful skills, patterns, and best practices to integrate into the team's knowledge base.
