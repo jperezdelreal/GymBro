@@ -149,6 +149,32 @@
 - **Rest timer in Dynamic Island**: Uses `Text(timerInterval:countsDown:)` for system-native countdown that works even when app is backgrounded.
 - **Tests**: WorkoutActivityAttributes tests (defaults, Codable, Hashable, LiveActivityService singleton), WidgetDataProvider data type tests.
 
+### 2026-04-07: Premium Design System + SwiftUI Previews (Issues #67 & #64)
+**Design System Foundation (`GymBroUI/DesignSystem/`):**
+- **GymBroTheme**: Dark-first color palette (#0A0A0A backgrounds, neon green #00FF87, amber #FFB800, red #FF3B30, cyan #00D4FF accents). SF Pro typography scale with 72pt hero numbers (Heavy + monospaced digits), spacing tokens (xs=4, sm=8, md=16, lg=24, xl=32, xxl=48), corner radii (sm=8, md=12, lg=16, xl=24), shadow presets. View modifiers: `.gymBroDarkBackground()`, `.gymBroCardShadow()`, `.gymBroElevatedShadow()`.
+- **GymBroButton**: Three styles — Primary (`.gymBroPrimary` — neon green gradient, heavy haptic via UIImpactFeedbackGenerator, 0.95 scale on press), Secondary (outlined with customizable accent), Destructive (`.gymBroDestructive` — red tint). All with smooth press animation.
+- **GymBroCard**: Generic card component with dark surface (#1C1C1E), subtle border (#2C2C2E), optional accent stripe on left edge (4pt wide). Used across all workout views.
+- **HeroNumber**: Large stat display — monospaced digits at 72pt, unit label in caption2 with tracking, optional trend arrow (↑ green, ↓ red, → gray). Properly combined accessibility element.
+
+**Applied to Existing Views:**
+- ActiveWorkoutView: dark background, GymBroCard for exercise section with green accent stripe, cyan accent buttons, design tokens for all spacing/typography/colors.
+- ExerciseSetRow: design tokens for colors, typography, spacing. Uppercase tracking labels.
+- RestTimerView: cyan accent, GymBroCard for "up next" section, themed buttons.
+- StartWorkoutView: dark background, themed quick-start card with green accent.
+- WorkoutSummaryView: GymBroCard for stat cards, primary button for dismiss.
+- WorkoutRecoveryView: amber accent icon, primary/destructive buttons, GymBroCard for summary.
+- ContentView: tab bar tinted with accent green, dark mode enforced.
+
+**SwiftUI Previews (27 total):**
+- Design system: color swatches, button variants, card variants, hero number variants.
+- Workout views: start workout, summary with/without PRs, rest timer, recovery.
+- Coach: welcome state, chat bubbles with streaming indicator.
+- Dashboard: readiness excellent/poor/empty, check-in default.
+- Exercise Library: loaded/empty. History: loaded/empty. Progress: loaded/empty.
+- Profile: signed out state.
+- PR #74 opened, closes #67 and #64.
+
+
 ### 2026-04-07: Animations & Gesture-Based Workout Logging (Issues #65 & #66)
 **Animations (#65):**
 - **CheckmarkAnimationView**: Custom `Shape` path with `.trim(from:to:)` draw animation + spring scale bounce on set completion. Reused in ExerciseSetRow.
