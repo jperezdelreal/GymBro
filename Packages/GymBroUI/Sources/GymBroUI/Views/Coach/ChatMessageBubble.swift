@@ -1,16 +1,19 @@
 import SwiftUI
 import GymBroCore
 
-/// Individual chat message bubble — supports user and assistant messages with streaming indicator.
+/// Individual chat message bubble -- dark themed with design system tokens,
+/// streaming indicator, and reaction support for assistant messages.
 public struct ChatMessageBubble: View {
     let message: ChatMessage
+    var onReaction: ((MessageReaction) -> Void)?
 
-    public init(message: ChatMessage) {
+    public init(message: ChatMessage, onReaction: ((MessageReaction) -> Void)? = nil) {
         self.message = message
+        self.onReaction = onReaction
     }
 
     public var body: some View {
-        HStack(alignment: .top, spacing: 8) {
+        HStack(alignment: .top, spacing: GymBroSpacing.sm) {
             if message.role == .assistant {
                 assistantAvatar
             }
@@ -19,22 +22,30 @@ public struct ChatMessageBubble: View {
                 Spacer(minLength: 60)
             }
 
-            VStack(alignment: message.role == .user ? .trailing : .leading, spacing: 4) {
-                Text(message.content.isEmpty && message.isStreaming ? "Thinking..." : message.content)
-                    .font(.body)
-                    .foregroundStyle(message.role == .user ? .white : .primary)
+            VStack(alignment: message.role == .user ? .trailing : .leading, spacing: GymBroSpacing.xs) {
+                Text(message.content.isEmpty && message.isStreaming ? " " : message.content)
+                    .font(GymBroTypography.body)
+                    .foregroundStyle(message.role == .user ? .white : GymBroColors.textPrimary)
                     .padding(.horizontal, 14)
                     .padding(.vertical, 10)
                     .background(bubbleBackground)
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                    .clipShape(RoundedRectangle(cornerRadius: GymBroRadius.lg))
 
                 if message.isStreaming {
-                    streamingIndicator
+                    TypingIndicatorView()
                 }
 
-                Text(formattedTime)
-                    .font(.caption2)
-                    .foregroundStyle(.tertiary)
+                HStack(spacing: GymBroSpacing.sm) {
+                    Text(formattedTime)
+                        .font(GymBroTypography.caption2)
+                        .foregroundStyle(GymBroColors.textTertiary)
+
+                    if message.role == .assistant && !message.isStreaming && onReaction != nil {
+                        MessageReactionBar(message: message) { reaction in
+                            onReaction?(reaction)
+                        }
+                    }
+                }
             }
 
             if message.role == .assistant {
@@ -48,28 +59,20 @@ public struct ChatMessageBubble: View {
     private var assistantAvatar: some View {
         Image(systemName: "brain.head.profile")
             .font(.caption)
-            .foregroundStyle(.white)
+            .foregroundStyle(GymBroColors.background)
             .frame(width: 28, height: 28)
-            .background(Color.accentColor)
+            .background(GymBroColors.accentCyan)
             .clipShape(Circle())
             .accessibilityHidden(true)
     }
 
-    private var bubbleBackground: some ShapeStyle {
-        message.role == .user
-            ? AnyShapeStyle(Color.accentColor)
-            : AnyShapeStyle(Color(.systemGray6))
-    }
-
-    private var streamingIndicator: some View {
-        HStack(spacing: 4) {
-            ForEach(0..<3, id: \.self) { i in
-                Circle()
-                    .fill(Color.secondary.opacity(0.5))
-                    .frame(width: 4, height: 4)
-            }
+    @ViewBuilder
+    private var bubbleBackground: some View {
+        if message.role == .user {
+            GymBroColors.accentGreen.opacity(0.85)
+        } else {
+            GymBroColors.surfaceSecondary
         }
-        .padding(.leading, 8)
     }
 
     private var formattedTime: String {
