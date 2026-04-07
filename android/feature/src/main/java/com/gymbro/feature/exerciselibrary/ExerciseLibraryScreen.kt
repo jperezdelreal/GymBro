@@ -21,12 +21,14 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Scaffold
@@ -64,6 +66,7 @@ private val AccentRed = Color(0xFFCF6679)
 fun ExerciseLibraryRoute(
     viewModel: ExerciseLibraryViewModel = hiltViewModel(),
     onNavigateToDetail: (String) -> Unit = {},
+    onNavigateToCreateExercise: () -> Unit = {},
     onExercisePicked: ((Exercise) -> Unit)? = null,
     isPickerMode: Boolean = false,
 ) {
@@ -94,6 +97,7 @@ fun ExerciseLibraryRoute(
                 viewModel.onEvent(event)
             }
         },
+        onNavigateToCreateExercise = onNavigateToCreateExercise,
         isPickerMode = isPickerMode,
         snackbarHostState = snackbarHostState,
     )
@@ -104,6 +108,7 @@ fun ExerciseLibraryRoute(
 fun ExerciseLibraryScreen(
     state: ExerciseLibraryState,
     onEvent: (ExerciseLibraryEvent) -> Unit,
+    onNavigateToCreateExercise: () -> Unit = {},
     isPickerMode: Boolean = false,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
 ) {
@@ -115,6 +120,17 @@ fun ExerciseLibraryScreen(
                         text = if (isPickerMode) "Pick Exercise" else "Exercise Library",
                         style = MaterialTheme.typography.headlineMedium,
                     )
+                },
+                actions = {
+                    if (!isPickerMode) {
+                        IconButton(onClick = onNavigateToCreateExercise) {
+                            Icon(
+                                Icons.Default.Add,
+                                contentDescription = "Create Exercise",
+                                tint = AccentGreen,
+                            )
+                        }
+                    }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background,
