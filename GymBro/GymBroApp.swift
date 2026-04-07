@@ -31,6 +31,8 @@ struct GymBroApp: App {
                 ExerciseSet.self,
                 Program.self,
                 ProgramDay.self,
+                ProgramWeek.self,
+                PlannedExercise.self,
                 UserProfile.self,
                 ChatMessage.self,
                 HealthMetric.self,

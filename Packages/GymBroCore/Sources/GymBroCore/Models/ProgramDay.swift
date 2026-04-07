@@ -2,28 +2,28 @@ import Foundation
 import SwiftData
 
 @Model
-final class ProgramDay {
-    var id: UUID
-    var createdAt: Date
-    var updatedAt: Date
+public final class ProgramDay {
+    public var id: UUID
+    public var createdAt: Date
+    public var updatedAt: Date
     
-    var dayNumber: Int
-    var name: String
-    var dayDescription: String
+    public var dayNumber: Int
+    public var name: String
+    public var dayDescription: String
     
     @Relationship(deleteRule: .nullify)
-    var program: Program?
+    public var program: Program?
     
     @Relationship(deleteRule: .cascade, inverse: \PlannedExercise.programDay)
-    var plannedExercises: [PlannedExercise]
+    public var plannedExercises: [PlannedExercise]
     
     @Relationship(deleteRule: .cascade, inverse: \ProgramWeek.programDay)
-    var weeks: [ProgramWeek]
+    public var weeks: [ProgramWeek]
     
     @Relationship(deleteRule: .nullify, inverse: \Workout.programDay)
-    var workouts: [Workout]
+    public var workouts: [Workout]
     
-    init(
+    public init(
         id: UUID = UUID(),
         dayNumber: Int,
         name: String,
