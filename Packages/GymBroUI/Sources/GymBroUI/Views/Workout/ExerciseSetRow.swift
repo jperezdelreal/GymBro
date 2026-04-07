@@ -22,77 +22,77 @@ public struct ExerciseSetRow: View {
         self.unitSystem = unitSystem
         self.onTap = onTap
     }
-    
+
     private var weightString: String {
         let weight = set.weightInUnit(unitSystem)
         let unit = unitSystem == .metric ? "kg" : "lb"
         return String(format: "%.1f %@", weight, unit)
     }
-    
+
     public var body: some View {
         Button(action: onTap) {
-            HStack(spacing: 16) {
-            // Set number
-            Text("\(setNumber)")
-                .font(.system(size: setNumberSize, weight: .bold, design: .rounded))
-                .foregroundStyle(set.isWarmup ? .secondary : .primary)
-                .frame(width: 40)
-            
-            // Weight
-            VStack(alignment: .leading, spacing: 2) {
-                Text(weightString)
-                    .font(.system(size: valueSize, weight: .semibold))
-                    .foregroundStyle(set.completedAt != nil ? .primary : .secondary)
-                Text("Weight")
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            
-            // Reps
-            VStack(alignment: .leading, spacing: 2) {
-                Text("\(set.reps)")
-                    .font(.system(size: valueSize, weight: .semibold))
-                    .foregroundStyle(set.completedAt != nil ? .primary : .secondary)
-                Text("Reps")
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-            }
-            .frame(width: 60, alignment: .leading)
-            
-            // RPE
-            if let rpe = set.rpe {
+            HStack(spacing: GymBroSpacing.md) {
+                Text("\(setNumber)")
+                    .font(GymBroTypography.monoNumber(size: setNumberSize))
+                    .foregroundStyle(set.isWarmup ? GymBroColors.textTertiary : GymBroColors.textPrimary)
+                    .frame(width: 40)
+
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(String(format: "%.0f", rpe))
+                    Text(weightString)
                         .font(.system(size: valueSize, weight: .semibold))
-                        .foregroundStyle(.orange)
-                    Text("RPE")
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(set.completedAt != nil ? GymBroColors.textPrimary : GymBroColors.textSecondary)
+                    Text("WEIGHT")
+                        .font(GymBroTypography.caption2)
+                        .foregroundStyle(GymBroColors.textTertiary)
+                        .tracking(0.5)
                 }
-                .frame(width: 50, alignment: .leading)
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("\(set.reps)")
+                        .font(.system(size: valueSize, weight: .semibold))
+                        .foregroundStyle(set.completedAt != nil ? GymBroColors.textPrimary : GymBroColors.textSecondary)
+                    Text("REPS")
+                        .font(GymBroTypography.caption2)
+                        .foregroundStyle(GymBroColors.textTertiary)
+                        .tracking(0.5)
+                }
+                .frame(width: 60, alignment: .leading)
+
+                if let rpe = set.rpe {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(String(format: "%.0f", rpe))
+                            .font(.system(size: valueSize, weight: .semibold))
+                            .foregroundStyle(GymBroColors.accentAmber)
+                        Text("RPE")
+                            .font(GymBroTypography.caption2)
+                            .foregroundStyle(GymBroColors.textTertiary)
+                            .tracking(0.5)
+                    }
+                    .frame(width: 50, alignment: .leading)
+                }
+
+                if set.completedAt != nil {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.system(size: checkSize))
+                        .foregroundStyle(GymBroColors.accentGreen)
+                }
             }
-            
-            // Completion indicator
-            if set.completedAt != nil {
-                Image(systemName: "checkmark.circle.fill")
-                    .font(.system(size: checkSize))
-                    .foregroundStyle(.green)
-            }
-        }
-        .padding(.vertical, 12)
-        .padding(.horizontal, 16)
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(set.completedAt != nil ? Color.green.opacity(0.1) : Color(.systemGray6))
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 12)
-                .strokeBorder(
-                    set.isWarmup ? Color.orange.opacity(0.3) : Color.clear,
-                    lineWidth: 2
-                )
-        )
+            .padding(.vertical, GymBroSpacing.md)
+            .padding(.horizontal, GymBroSpacing.md)
+            .background(
+                RoundedRectangle(cornerRadius: GymBroRadius.md)
+                    .fill(set.completedAt != nil
+                        ? GymBroColors.accentGreen.opacity(0.08)
+                        : GymBroColors.surfaceSecondary)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: GymBroRadius.md)
+                    .strokeBorder(
+                        set.isWarmup ? GymBroColors.accentAmber.opacity(0.3) : GymBroColors.border,
+                        lineWidth: 1
+                    )
+            )
         }
         .buttonStyle(.plain)
     }
