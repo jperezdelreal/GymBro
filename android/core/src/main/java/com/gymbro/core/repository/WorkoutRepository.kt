@@ -13,4 +13,5 @@ interface WorkoutRepository {
     fun observeWorkout(workoutId: String): Flow<Workout?>
     fun getRecentWorkouts(limit: Int = 20): Flow<List<Workout>>
     suspend fun getBestWeight(exerciseId: String, reps: Int): Double?
+    suspend fun getDaysSinceLastWorkout(): Int?
 }

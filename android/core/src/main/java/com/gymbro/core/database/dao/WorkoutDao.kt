@@ -75,4 +75,7 @@ interface WorkoutDao {
     @Transaction
     @Query("SELECT * FROM workouts WHERE completed = 1 ORDER BY startedAt DESC")
     suspend fun getAllCompletedWorkouts(): List<WorkoutWithSets>
+
+    @Query("SELECT MAX(completedAt) FROM workouts WHERE completed = 1")
+    suspend fun getLastCompletedTimestamp(): Long?
 }

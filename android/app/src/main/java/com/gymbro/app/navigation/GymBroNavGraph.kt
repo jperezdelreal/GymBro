@@ -10,7 +10,9 @@ import androidx.compose.material.icons.automirrored.filled.ShowChart
 import androidx.compose.material.icons.automirrored.outlined.ShowChart
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.FitnessCenter
+import androidx.compose.material.icons.filled.MonitorHeart
 import androidx.compose.material.icons.outlined.FitnessCenter
+import androidx.compose.material.icons.outlined.MonitorHeart
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -40,6 +42,7 @@ import com.gymbro.core.model.ExerciseCategory
 import com.gymbro.core.model.MuscleGroup
 import com.gymbro.feature.exerciselibrary.ExerciseLibraryRoute
 import com.gymbro.feature.progress.ProgressRoute
+import com.gymbro.feature.recovery.RecoveryRoute
 import com.gymbro.feature.workout.ActiveWorkoutRoute
 import com.gymbro.feature.workout.WorkoutSummaryScreen
 
@@ -53,6 +56,7 @@ private enum class BottomNavTab(
 ) {
     LIBRARY("exercise_library", "Library", Icons.Filled.FitnessCenter, Icons.Outlined.FitnessCenter),
     PROGRESS("progress", "Progress", Icons.AutoMirrored.Filled.ShowChart, Icons.AutoMirrored.Outlined.ShowChart),
+    RECOVERY("recovery", "Recovery", Icons.Filled.MonitorHeart, Icons.Outlined.MonitorHeart),
 }
 
 @Composable
@@ -227,6 +231,31 @@ fun GymBroNavGraph() {
             ) { innerPadding ->
                 Box(modifier = Modifier.padding(innerPadding)) {
                     ProgressRoute()
+                }
+            }
+        }
+        composable("recovery") {
+            Scaffold(
+                bottomBar = {
+                    if (showBottomBar) {
+                        GymBroBottomNavBar(
+                            currentRoute = currentDestination?.route,
+                            onTabSelected = { tab ->
+                                navController.navigate(tab.route) {
+                                    popUpTo(navController.graph.findStartDestination().id) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
+                            },
+                        )
+                    }
+                },
+                containerColor = MaterialTheme.colorScheme.background,
+            ) { innerPadding ->
+                Box(modifier = Modifier.padding(innerPadding)) {
+                    RecoveryRoute()
                 }
             }
         }
