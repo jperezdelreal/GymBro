@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gymbro.core.repository.ExerciseRepository
 import com.gymbro.core.service.PersonalRecordService
+import com.gymbro.core.service.PlateauDetectionService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,6 +19,7 @@ import javax.inject.Inject
 class ProgressViewModel @Inject constructor(
     private val prService: PersonalRecordService,
     private val exerciseRepository: ExerciseRepository,
+    private val plateauDetectionService: PlateauDetectionService,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ProgressState())
@@ -37,6 +39,15 @@ class ProgressViewModel @Inject constructor(
             is ProgressEvent.ViewWorkoutDetail -> {
                 viewModelScope.launch {
                     _effects.send(ProgressEffect.NavigateToWorkoutDetail(event.workoutId))
+                }
+            }
+            is ProgressEvent.DismissPlateauAlert -> {
+                _state.update { 
+                    it.copy(
+                        plateauAlerts = it.plateauAlerts.filter { alert -> 
+                            alert.exerciseId != event.exerciseId 
+                        }
+                    )
                 }
             }
         }
@@ -66,6 +77,10 @@ class ProgressViewModel @Inject constructor(
                 prService.getE1RMHistory(selectedId)
             } else emptyList()
 
+            val plateauAlerts = plateauDetectionService.detectAllPlateaus(
+                exerciseOptions.map { it.id to it.name }
+            )
+
             _state.update {
                 it.copy(
                     workoutHistory = history,
@@ -73,6 +88,7 @@ class ProgressViewModel @Inject constructor(
                     exerciseOptions = exerciseOptions,
                     selectedExerciseId = selectedId,
                     chartData = chartData,
+                    plateauAlerts = plateauAlerts,
                     isLoading = false,
                 )
             }
