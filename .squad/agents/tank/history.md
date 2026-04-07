@@ -211,4 +211,13 @@ This foundation unblocks all Phase-1 work:
 - Background delivery frequency: `.hourly` for all types — might want `.immediate` for sleep if recovery score needs to update faster
 - HealthKit entitlement + Info.plist usage descriptions: need Xcode project file configuration (currently SPM-only repo)
 - Stale data cleanup: currently inserts new HealthMetric rows on each sync — need a cleanup strategy to prevent unbounded growth
-- Integration with recovery/readiness score engine (downstream consumer of this data)
+### 2026-04-07: AI Coach Context Pipeline Complete (Neo, Issue #82)
+**No Schema Changes Needed — Uses Existing Models**
+- Neo completed the three-layer data pipeline: ViewModel → Snapshots → PromptBuilder
+- `CoachChatViewModel.buildContext()` now fetches user profile, recent workouts, active program, personal records
+- All fetching done efficiently via SwiftData predicates (not in-memory iteration)
+- Uses existing Workout, ExerciseSet, Program, UserProfile models — no new @Model types
+- PromptBuilder infrastructure confirmed working; ready to receive rich context
+- Impact for Tank: No backend changes needed. Integration test ready (manual verification of PromptBuilder receiving full context)
+- Files affected: CoachChatViewModel (4 new fetch methods), 7 new unit tests
+- PR #88 ready for review

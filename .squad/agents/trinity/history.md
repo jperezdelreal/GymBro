@@ -193,7 +193,15 @@
 - **Thumb zone**: All primary actions (Complete Set button, rest timer, weight/rep steppers) remain in bottom 40% of screen. Existing button tap preserved as fallback — gestures are pure enhancement.
 - **Accessibility**: All swipeable rows have `.accessibilityAction` equivalents for Complete, Undo, and Options.
 
-### 2026-04-07: AI Coach UX -- Conversation History, Prompts, Voice Input (Issue #70)
+### 2026-04-07: AI Coach Context Fix (Neo, Issue #82)
+**CRITICAL: CoachChatViewModel.buildContext() Now Populated**
+- Neo fixed the missing data pipeline — CoachChatView can now surface context-aware responses
+- AI coach receives: user profile (experience level, bodyweight), recent 10 workouts (grouped by exercise), active program (with week calculation), top 20 personal records
+- PromptBuilder receives rich context from ViewModel → system prompt now includes user's training history, program phase, PRs
+- Impact for Trinity: CoachChatView was ready but blind. Now it can show responses like "You've hit a plateau on squat" with actual user data backing it
+- Ready to polish: styling on context indicator bar, smooth chat bubble animations, voice input streaming UX
+- Files affected: CoachChatViewModel (added 4 fetch methods + buildContext() impl), 7 new unit tests
+- PR #88 ready for review
 **Implementation highlights:**
 - **Persistent conversation history**: SwiftData ChatMessage with list UI in CoachChatView. LazyVStack with ScrollViewReader auto-scrolls on new messages. History loads last 50 messages on configure().
 - **Suggested prompt chips**: SuggestedPromptsBar -- horizontal ScrollView of capsule-shaped chips with SF Symbol icons. 6 contextual defaults. Shown both on welcome screen (vertical list) and above input area (horizontal scroll) after conversation starts.
