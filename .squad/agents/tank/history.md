@@ -412,3 +412,28 @@ This foundation unblocks all Phase-1 work:
 
 **PR Status:** Draft PR #92 opened, ready for review
 
+### 2026-XX-XX: Android Skills Installation (Issue #134)
+
+**Task:** Installed 5 P0 Android agent skills for dual-platform expansion, as recommended by Morpheus's analysis.
+
+**Skills Installed:**
+
+| Skill | Source Repo | Path |
+|-------|------------|------|
+| compose-expert | [aldefy/compose-skill](https://github.com/aldefy/compose-skill) | `.squad/skills/android/compose-expert/` |
+| android-architecture | [new-silvermoon/awesome-android-agent-skills](https://github.com/new-silvermoon/awesome-android-agent-skills) | `.squad/skills/android/android-architecture/` |
+| android-data-layer | [new-silvermoon/awesome-android-agent-skills](https://github.com/new-silvermoon/awesome-android-agent-skills) | `.squad/skills/android/android-data-layer/` |
+| kotlin-mvi | [Meet-Miyani/compose-skill](https://github.com/Meet-Miyani/compose-skill) | `.squad/skills/android/kotlin-mvi/` |
+| android-testing | [new-silvermoon/awesome-android-agent-skills](https://github.com/new-silvermoon/awesome-android-agent-skills) | `.squad/skills/android/android-testing/` |
+
+**compose-expert reference files (4):** state-management.md, performance.md, navigation.md, production-crash-playbook.md
+
+**Notes:**
+- All content sourced directly from upstream repos via GitHub API — nothing fabricated
+- Added GymBro-specific notes to architecture, data-layer, testing, and MVI skills (mapping iOS patterns to Android equivalents)
+- aldefy/compose-skill is the premier Compose skill — includes actual androidx source code analysis
+- Meet-Miyani/compose-skill is MVI-focused with Ktor, Paging, Room integration guidance
+- new-silvermoon/awesome-android-agent-skills provides Clean Architecture, Hilt, Room, and testing patterns
+
+**PR Status:** Draft PR #141 opened against master
+
