@@ -1,9 +1,12 @@
 import Foundation
+import Observation
 import SwiftData
 import GymBroCore
 
-public class WorkoutHistoryViewModel: ObservableObject {
-    @Published var workouts: [Workout] = []
+@MainActor
+@Observable
+public final class WorkoutHistoryViewModel {
+    var workouts: [Workout] = []
     private var modelContext: ModelContext?
     
     public init() {}

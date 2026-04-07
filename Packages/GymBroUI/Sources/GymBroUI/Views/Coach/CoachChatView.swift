@@ -47,7 +47,7 @@ public struct CoachChatView: View {
             // Input area
             inputArea
         }
-        .onAppear {
+        .task {
             viewModel.configure(modelContext: modelContext)
         }
     }

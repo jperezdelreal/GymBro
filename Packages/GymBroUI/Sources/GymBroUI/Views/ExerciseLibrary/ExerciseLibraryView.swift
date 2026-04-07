@@ -3,7 +3,7 @@ import SwiftData
 import GymBroCore
 
 public struct ExerciseLibraryView: View {
-    @StateObject private var viewModel = ExerciseLibraryViewModel()
+    @State private var viewModel = ExerciseLibraryViewModel()
     @Environment(\.modelContext) private var modelContext
     @State private var searchText = ""
     
@@ -16,7 +16,7 @@ public struct ExerciseLibraryView: View {
             }
             .searchable(text: $searchText)
             .navigationTitle("Exercise Library")
-            .onAppear {
+            .task {
                 viewModel.setup(modelContext: modelContext)
             }
         }

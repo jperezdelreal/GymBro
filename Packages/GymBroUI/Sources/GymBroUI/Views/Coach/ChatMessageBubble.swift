@@ -72,8 +72,6 @@ public struct ChatMessageBubble: View {
     }
 
     private var formattedTime: String {
-        let formatter = DateFormatter()
-        formatter.timeStyle = .short
-        return formatter.string(from: message.createdAt)
+        message.createdAt.formatted(date: .omitted, time: .shortened)
     }
 }

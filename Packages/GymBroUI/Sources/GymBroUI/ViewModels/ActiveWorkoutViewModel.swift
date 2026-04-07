@@ -3,6 +3,7 @@ import SwiftData
 import Observation
 import GymBroCore
 
+@MainActor
 @Observable
 public final class ActiveWorkoutViewModel {
     private let modelContext: ModelContext

@@ -39,3 +39,27 @@
 - Fail fast: Lint before build, build before test
 - Coverage tracking from day one (even if not enforced yet)
 - CI runs on every PR and push to main—no exceptions
+
+### 2026-04-07: Phase 1+2 Quality Audit (Issues #25-#30)
+
+**What was audited:**
+- All 50 Swift source files across GymBroCore (28), GymBroUI (22), and App entry (2)
+- All 10 existing test files (9 Core, 1 UI)
+- Audited against 6 skill files: swift-testing-pro, swift-testing-expert, swift-concurrency-pro, swift-concurrency-expert, swiftui-performance-audit, swift-swiftui-standards
+
+**Key findings:**
+1. **Test coverage at 22%** — 39/50 source files have zero tests. All tests use legacy XCTest, none use Swift Testing framework.
+2. **Critical concurrency violations** — CoachChatViewModel and ActiveWorkoutViewModel are @Observable without @MainActor, creating data races on every UI interaction.
+3. **Runtime crash risk** — PersonalRecordService has a force unwrap (`completedAt!`) inside a SwiftData predicate that will crash on nil values.
+4. **Performance risks** — `.reduce()` in view body, 345-line ActiveWorkoutView, no Equatable on reusable subviews.
+5. **No mocking infrastructure** — Tests are tightly coupled to real services (SwiftData, URLSession, UserDefaults).
+
+**Issues created:**
+- #25: Test coverage gaps (CRITICAL)
+- #26: Concurrency safety violations (CRITICAL)
+- #27: Test quality issues (HIGH)
+- #28: SwiftUI performance risks (HIGH)
+- #29: Code smells (MEDIUM)
+- #30: Edge cases & robustness (HIGH)
+
+**Recommendation:** Block MVP ship on #26 (concurrency) and PersonalRecordService crash from #30. Target 60%+ coverage before beta.
