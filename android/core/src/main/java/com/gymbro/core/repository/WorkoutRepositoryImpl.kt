@@ -78,6 +78,13 @@ class WorkoutRepositoryImpl @Inject constructor(
     override suspend fun getBestWeight(exerciseId: String, reps: Int): Double? {
         return workoutDao.getBestWeight(exerciseId, reps)
     }
+
+    override suspend fun getDaysSinceLastWorkout(): Int? {
+        val lastTimestamp = workoutDao.getLastCompletedTimestamp() ?: return null
+        val lastInstant = Instant.ofEpochMilli(lastTimestamp)
+        val now = Instant.now()
+        return java.time.Duration.between(lastInstant, now).toDays().toInt()
+    }
 }
 
 private fun WorkoutWithSets.toDomain(): Workout {
