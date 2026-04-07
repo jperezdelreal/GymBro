@@ -3,16 +3,20 @@ import GymBroCore
 
 // MARK: - SubjectiveCheckInView Previews
 
-#Preview("Check-In — Default") {
-    SubjectiveCheckInView()
-        .padding()
-        .gymBroDarkBackground()
+#Preview("Check-In — Quick Vibe") {
+    ScrollView {
+        SubjectiveCheckInView()
+            .padding()
+    }
+    .gymBroDarkBackground()
 }
 
-#Preview("Check-In — Submitted") {
-    SubjectiveCheckInView { checkIn in
-        // Submitted callback
+#Preview("Check-In — With Callback") {
+    ScrollView {
+        SubjectiveCheckInView { checkIn in
+            print("Energy: \(checkIn.energy), Soreness: \(checkIn.soreness), Motivation: \(checkIn.motivation)")
+        }
+        .padding()
     }
-    .padding()
     .gymBroDarkBackground()
 }
