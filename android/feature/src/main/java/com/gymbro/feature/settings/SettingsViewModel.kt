@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.health.connect.client.HealthConnectClient
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.gymbro.core.notification.ReminderScheduler
 import com.gymbro.core.preferences.UserPreferences
 import com.gymbro.core.preferences.UserPreferences.WeightUnit
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,6 +23,7 @@ import javax.inject.Inject
 class SettingsViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val userPreferences: UserPreferences,
+    private val reminderScheduler: ReminderScheduler,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SettingsState())
@@ -120,6 +122,11 @@ class SettingsViewModel @Inject constructor(
     private fun setNotifications(enabled: Boolean) {
         viewModelScope.launch {
             userPreferences.setNotificationsEnabled(enabled)
+            if (enabled) {
+                reminderScheduler.scheduleWorkoutReminders()
+            } else {
+                reminderScheduler.cancelWorkoutReminders()
+            }
         }
     }
 
