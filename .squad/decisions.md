@@ -664,6 +664,296 @@ For future onboarding-like flows, use same pattern for program creation wizard, 
 
 **Impact:** Unblocks Android development with curated, non-overlapping skill set. Maintains dual-platform consistency (architecture patterns match iOS). Reveals gaps to address in follow-up issues.
 
+---
+
+## User Directive (2026-04-07T18:26Z)
+
+**By:** Copilot (via Copilot CLI)  
+**What:** The user never reviews PRs manually. The squad handles everything — Morpheus reviews, approves, and merges. No PR should wait for human review.  
+**Why:** User request — captured for team memory
+
+---
+
+## User Directive (2026-04-07T18:35Z)
+
+**By:** Copilot (via Copilot CLI)  
+**What:** The squad works autonomously without stopping on the Android migration. No waiting for user input. Create, review, merge — full pipeline. Ralph keeps going until all Android issues are done.  
+**Why:** User request — captured for team memory
+
+---
+
+## Android Development Readiness Report (2026-07-16)
+
+**By:** Morpheus (Lead / Architect)  
+**Issue:** #133 (Dual-Platform Architecture)
+
+**Verdict:** 🟡 Almost Ready — One Fix Required
+
+The machine has Android Studio, SDK, build tools, platform API 36, adb, and emulator all installed. The **only blocker** is the system JDK version (11 vs required 17+). Android Studio bundles JDK 21 which is already on disk — just needs `JAVA_HOME` pointed at it.
+
+**Fix:** Set JAVA_HOME to Android Studio's bundled JDK:
+```powershell
+[Environment]::SetEnvironmentVariable("JAVA_HOME", "C:\Program Files\Android\Android Studio\jbr", "User")
+```
+
+**Additional advisories:**
+- Set ANDROID_HOME environment variable
+- Create an AVD (Android Virtual Device) for testing
+- Install Android SDK Command-line Tools for CI/automation
+
+**Recommended first task:** Once JAVA_HOME is fixed, scaffold the Android Gradle project with root `build.gradle.kts`, `:app` module, Hilt, and initial `MainActivity.kt`.
+
+---
+
+## Android Project Scaffold Decision (Tank)
+
+**By:** Tank (Backend Dev)  
+**Date:** 2026-07-XX  
+**Issue:** #135 (Android Project Scaffold)
+
+Three-module Gradle architecture:
+- **`:app`** — Entry point (Hilt Application, single Activity, Compose, theme, navigation)
+- **`:core`** — Shared infrastructure (Room database, domain models, Hilt modules, repository interfaces)
+- **`:feature`** — Feature screens (depends on `:core`, owns UI + ViewModels)
+
+**Stack Locked In:**
+| Component | Choice | Version |
+|-----------|--------|---------|
+| Language | Kotlin | 2.1.21 |
+| Build | Gradle + AGP | 8.14.2 / 8.10.1 |
+| UI | Jetpack Compose + Material 3 | BOM 2025.05.01 |
+| DI | Hilt | 2.56.2 |
+| Database | Room | 2.7.1 |
+| Networking | Retrofit + OkHttp | 2.11.0 / 4.12.0 |
+| Images | Coil 3 | 3.2.0 |
+| Background | WorkManager | 2.10.1 |
+| Min SDK | 26 (Android 8.0) | — |
+| Target SDK | 36 | — |
+
+**Module structure mirrors iOS SPM packages for team mental model consistency.**
+
+---
+
+## Decision: Android Skills Installed (Tank)
+
+**By:** Tank (Backend Dev)  
+**Date:** Auto  
+**Status:** Implemented  
+**PR:** #141
+
+Installed 5 Android agent skills to `.squad/skills/android/`:
+
+1. **compose-expert** — Compose state, nav, animation, accessibility
+2. **android-architecture** — Clean Architecture + Hilt + modularization
+3. **android-data-layer** — Repository pattern + Room + offline-first sync
+4. **kotlin-mvi** — MVI Event/State/Effect pattern
+5. **android-testing** — Unit/Hilt/Screenshot testing
+
+All agents building Android features should consult these skills before writing code.
+
+---
+
+## Decision: Repo Restructure for Dual-Platform (Tank)
+
+**By:** Tank (Backend Dev)  
+**Date:** 2025-07-04  
+**Issue:** #133  
+**PR:** #142
+
+Restructured monorepo from single-platform iOS to dual-platform:
+```
+Before:                     After:
+GymBro/                     ios/GymBro/
+GymBroWatch/                ios/GymBroWatch/
+GymBroWidgets/              ios/GymBroWidgets/
+Packages/                   ios/Packages/
+Package.swift               ios/Package.swift
+                            android/          (new)
+                            shared/data/      (new)
+.squad/skills/{flat}        .squad/skills/ios/
+                            .squad/skills/android/
+                            .squad/skills/shared/
+```
+
+**Key decisions:**
+- Package.swift paths unchanged — relative paths from `ios/Package.swift` to `ios/Packages/*` still work
+- Seed data stays in iOS packages for now (future: shared data loader)
+- Skills reorganized into platform subdirs
+
+**Follow-up tasks:**
+- Update `.github/workflows/ci.yml` to build from `ios/` directory
+- Create shared data loading layer for cross-platform seed data
+
+---
+
+## Decision: Exercise Library — Android Architecture Patterns (Tank)
+
+**By:** Tank (Backend Developer)  
+**Date:** 2026-07-04  
+**Issue:** #146  
+**PR:** #151
+
+### MVI Pattern for Feature Screens
+- Sealed `Event` interface with single `onEvent()` entry point
+- Immutable `State` data class exposed via `StateFlow`
+- One-shot `Effect` via `Channel<Effect>(Channel.BUFFERED)`
+- Matches kotlin-mvi skill recommendations
+
+### Route/Screen Composable Separation
+- **Route:** obtains ViewModel, collects state/effects, binds navigation
+- **Screen:** stateless renderer, fully previewable and testable
+- Aligns with compose-expert skill pattern
+
+### Repository Pattern with Hilt Bindings
+- Interface in `core.repository` package
+- Implementation with `@Inject constructor`
+- Bound via `@Binds` in `RepositoryModule`
+
+### Seed Data Strategy
+- `RoomDatabase.Callback.onCreate()` with raw SQL inserts
+- `UUID.nameUUIDFromBytes()` for deterministic exercise IDs
+- 23 exercises covering all major muscle groups
+- Runs only on first database creation
+
+### Database Versioning
+- Schema v2 with `exportSchema = true`
+- `fallbackToDestructiveMigration(true)` acceptable pre-launch
+- Post-launch: must write proper Room migrations
+
+**All future feature screens should follow this MVI + Route/Screen pattern.**
+
+---
+
+## Decision: Firebase Firestore for Android Cloud Sync (Tank)
+
+**By:** Tank (Backend Dev)  
+**Date:** 2026-07-16  
+**Issue:** #143
+
+### Firebase is Optional at Build Time
+- google-services plugin applied only when `google-services.json` exists
+- CI and developers can build without Firebase project
+- `BuildConfig.FIREBASE_ENABLED` flag for runtime checks
+
+### Last-Write-Wins Conflict Resolution
+- Latest `updatedAt` timestamp wins (MVP approach)
+- Property-level merging can be added post-MVP
+
+### Anonymous Auth for MVP
+- Users sign in anonymously to enable cloud backup
+- Email/Google sign-in upgrade path built into AuthService interface
+
+### Denormalized Firestore Documents
+- Workouts embed sets as nested list
+- Trades write efficiency for read speed
+
+### Offline-First Sync Queue
+- OfflineSyncManager monitors connectivity
+- Changes flush automatically when device reconnects
+- Room remains source of truth
+
+**Implications:** CloudSyncService interface is platform-agnostic — could be shared with iOS via KMP later.
+
+---
+
+## Decision: Health Connect Integration Pattern (Tank)
+
+**By:** Tank (Backend Dev)  
+**Date:** 2026-07-14  
+**Issue:** #145  
+**PR:** #154
+
+### Health Connect Client Version
+Using `androidx.health.connect:connect-client:1.1.0-alpha11` — latest with stable APIs for sleep, heart rate, steps, exercise sessions.
+
+### Readiness Score Formula
+Weighted: **40% sleep + 30% HRV + 30% rest days**
+- Sleep: 8h = 100, linear down to 0 at 4h
+- HRV: normalized against 20-80ms range (50ms baseline)
+- Rest days: 0 = 50, 1 = 80, 2+ = 100
+
+### HRV Approximation
+Health Connect lacks dedicated HRV type. Using RMSSD-style calculation from `HeartRateRecord` sample variability — rough estimate.
+
+### Permissions Strategy
+Declared in both core and app manifests. Added intent filter for `ACTION_SHOW_PERMISSIONS_RATIONALE` for system routing.
+
+### Architecture
+- `HealthConnectService` (core) — raw API calls
+- `HealthConnectRepository` (core) — business logic
+- `RecoveryViewModel` (feature) — MVI pattern
+- `RecoveryScreen` (feature) — Compose UI
+
+**Recovery tab is third item in bottom navigation.**
+
+---
+
+## Decision: Progress Tracking Architecture (Tank)
+
+**By:** Tank (Backend Developer)  
+**Date:** 2026-07-22  
+**Issue:** #147  
+**PR:** #153
+
+### E1RM Formula Choice
+**Brzycki formula** (`weight * 36 / (37 - reps)`) — matches iOS `E1RMCalculator.swift`. More accurate for low-rep ranges (1-10) which matters for serious lifters.
+
+### No External Chart Library
+Built E1RM trend chart using **Compose Canvas** directly. Keeps APK small, avoids dependency risk. If candlestick/multi-series charts needed later, revisit library choice.
+
+### PR Detection Strategy
+`PersonalRecordService` queries historical sets in-memory. O(n) per exercise where n = number of historical sets. Fast enough for MVP data volumes. Post-MVP: consider caching PR values in Room table.
+
+### Bottom Navigation
+Added `NavigationBar` with Library and Progress tabs. Workout FAB stays on Library tab. Future tabs (Programs, Coach, Profile) can be added to `BottomNavTab` enum.
+
+---
+
+## Decision: Android Workout Logging Architecture (Tank)
+
+**By:** Tank (Backend Dev)  
+**Date:** 2026-XX-XX  
+**Issue:** #148
+
+### Room Schema for Workout Data
+Added `WorkoutEntity` and `WorkoutSetEntity` with foreign keys. Database bumped to v3 with `fallbackToDestructiveMigration` for development. **Before production: replace with proper `Migration(2, 3)` object.**
+
+### Exercise Picker via SavedStateHandle
+Uses Navigation's `savedStateHandle` instead of Parcelable or shared ViewModel. Lightweight approach avoiding coupling domain models to Android serialization.
+
+### Rest Timer Design
+Auto-starts after completing a set (matching iOS behavior). Implemented as coroutine countdown in ViewModel, not system-level timer. For v2: consider `AlarmManager` or foreground service for background notifications.
+
+### Set Pre-fill (Smart Defaults)
+When adding a new set, weight and reps pre-filled from last set's values. Supports "1-tap logging" product goal by reducing input friction.
+
+**No tests added yet — should be written as follow-up.**
+
+---
+
+## Android Codebase Audit & Issue Creation (Morpheus)
+
+**By:** Morpheus (Lead)  
+**Date:** 2026-04-07
+
+**26 GitHub issues created** (#157–#182) organizing all Android work needed to achieve feature parity with iOS and establish production-ready quality.
+
+**Issues organized across 5 phases:**
+1. **Testing Foundation** (6 issues) — Test infrastructure, ViewModel tests, integration tests
+2. **Quality & Polish** (6 issues) — Error handling, loading/empty states, design system, accessibility
+3. **Core Features** (7 issues) — History screen, custom exercises, settings, onboarding, programs
+4. **AI & Intelligence** (4 issues) — AI coach chat, smart generation, PR celebration, plateau detection
+5. **Competitive Edge** (4 issues) — Notifications, Wear OS, widgets, voice logging, advanced analytics
+
+**All 26 issues pre-triaged with `squad:{member}` labels for autonomous routing.**
+
+**Key findings from audit:**
+- **Strengths:** Clean Architecture, MVI pattern, Hilt DI, Room DB, Compose UI, 6 feature screens
+- **Critical gaps:** ZERO test coverage, no error handling pattern, no loading/empty states, no onboarding
+- **Missing vs iOS:** Workout history, custom exercises, settings, programs, AI coach, notifications, Wear OS, widgets, voice logging, advanced analytics
+
+**Recommendation:** Phase 0 (Testing) must complete before new features. iOS has 60+ test files with excellent coverage. Android cannot ship without comparable quality.
+
 **Source Repos Evaluated:** new-silvermoon/awesome-android-agent-skills, anhvt52/jetpack-compose-skills, aldefy/compose-skill, Meet-Miyani/compose-skill.
 
 ---
