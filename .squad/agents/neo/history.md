@@ -86,3 +86,20 @@
 - ACWR sweet spot 0.8-1.3; TSB < -25 triggers deload recommendation
 - Graceful degradation: empty input returns neutral 50.0, single-factor inputs redistribute full weight
 - ReadinessScore cached in SwiftData for instant dashboard rendering
+
+### 2026-04-07: Smart Defaults Overhaul Complete (Issue #84, PR #90)
+
+**Complete rewrite of SmartDefaultsService with adaptive features**
+
+- **Fatigue Detection:** Multiplier based on set number, exercise position, historical pattern
+- **RPE Integration:** Calibrates based on perceived exertion (RPE < 7 = +2.5%, RPE >= 9.5 = -5%)
+- **Recovery Awareness:** Readiness score multiplier (>=80 = +2.5%, <40 = -20%)
+- **Historical Trends:** 7-day rolling analysis of e1RM progression direction
+- **Deload Detection:** Recognizes recovery weeks, holds weight (weight < 85% of max)
+- **Experience-Level Scaling:** Beginner 1.5x, Intermediate 1.0x, Advanced 0.5x, Elite 0.25x
+
+**Test Coverage:** 20 unit tests, 527 lines, all edge cases + graceful degradation
+
+**Decision Captured:** Merged to .squad/decisions.md as heuristics-first design pattern
+
+**Impact:** Smart defaults now adapt to user's training state; enables true autoregulation

@@ -575,6 +575,57 @@ Phase 4:              #16 Dynamic Island ── #15 Widgets ── #17 App Store
 
 ---
 
+---
+
+## Smart Defaults Algorithm — Heuristics-First Design Pattern
+
+**Date:** 2026-04-07  
+**Author:** Neo (AI/ML Engineer)  
+**Context:** Issue #84 — Smart Defaults Overhaul  
+
+### Decision
+
+When building adaptive/predictive algorithms for training recommendations, we follow a **heuristics-first approach** with these principles:
+
+1. **Well-tuned rules before machine learning**
+   - Start with clear, explainable heuristics (e.g., "RPE < 7 = +2.5% weight")
+   - Only add ML when heuristics can't capture the pattern
+   - Rationale: Explainability builds user trust, easier to debug, no training data required for MVP
+
+2. **Every prediction must be explainable**
+   - Log reasoning at each step (fatigue multiplier, RPE adjustment, readiness impact)
+   - Users can ask "why this weight?" and get a clear answer
+   - Rationale: Users won't trust a black box telling them what to lift
+
+3. **Graceful degradation**
+   - Missing RPE? Fall back to simpler model
+   - Missing readiness score? Skip recovery adjustment
+   - Algorithm still works with minimal data
+   - Rationale: Enables MVP shipping without requiring perfect data collection
+
+4. **Conservative by default**
+   - Always round down weights (floor, not ceil)
+   - Back off when in doubt (injury risk > max performance)
+   - Rationale: Safety over ego — injured users churn
+
+### See also
+
+- .squad/agents/neo/history.md — Smart Defaults implementation details
+
+---
+
+## Onboarding Flow Pattern
+
+**Decision:** Use progressive disclosure with 7 single-focus steps for onboarding, not a single long form.
+
+**Date:** 2026-04-07  
+**Author:** Trinity (iOS Dev)  
+**Context:** Issue #87
+
+For future onboarding-like flows, use same pattern for program creation wizard, body composition setup, etc.
+
+---
+
 ## Governance
 
 - All meaningful changes require team consensus
