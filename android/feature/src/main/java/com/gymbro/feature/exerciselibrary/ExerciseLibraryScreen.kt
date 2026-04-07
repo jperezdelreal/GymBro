@@ -28,7 +28,9 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -36,6 +38,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -49,6 +52,7 @@ import com.gymbro.core.model.Exercise
 import com.gymbro.core.model.ExerciseCategory
 import com.gymbro.core.model.MuscleGroup
 import com.gymbro.feature.common.FullScreenLoading
+import com.gymbro.feature.common.ObserveErrors
 
 private val AccentGreen = Color(0xFF00FF87)
 private val AccentCyan = Color(0xFF00E5FF)
@@ -63,6 +67,12 @@ fun ExerciseLibraryRoute(
     isPickerMode: Boolean = false,
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    ObserveErrors(
+        errorFlow = viewModel.errorEvents,
+        snackbarHostState = snackbarHostState
+    )
 
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
@@ -84,6 +94,7 @@ fun ExerciseLibraryRoute(
             }
         },
         isPickerMode = isPickerMode,
+        snackbarHostState = snackbarHostState,
     )
 }
 
@@ -93,6 +104,7 @@ fun ExerciseLibraryScreen(
     state: ExerciseLibraryState,
     onEvent: (ExerciseLibraryEvent) -> Unit,
     isPickerMode: Boolean = false,
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
 ) {
     Scaffold(
         topBar = {
@@ -109,6 +121,7 @@ fun ExerciseLibraryScreen(
                 ),
             )
         },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         containerColor = MaterialTheme.colorScheme.background,
     ) { innerPadding ->
         Column(

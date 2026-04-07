@@ -1,5 +1,6 @@
 package com.gymbro.feature.exerciselibrary
 
+import com.gymbro.core.error.UiError
 import com.gymbro.core.model.Exercise
 import com.gymbro.core.model.MuscleGroup
 
@@ -8,6 +9,7 @@ data class ExerciseLibraryState(
     val searchQuery: String = "",
     val selectedMuscleGroup: MuscleGroup? = null,
     val isLoading: Boolean = true,
+    val error: UiError? = null,
 )
 
 sealed interface ExerciseLibraryEvent {

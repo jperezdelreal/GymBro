@@ -1,8 +1,8 @@
 package com.gymbro.feature.exerciselibrary
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gymbro.core.repository.ExerciseRepository
+import com.gymbro.feature.common.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
@@ -17,7 +17,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ExerciseLibraryViewModel @Inject constructor(
     private val exerciseRepository: ExerciseRepository,
-) : ViewModel() {
+) : BaseViewModel() {
 
     private val _state = MutableStateFlow(ExerciseLibraryState())
     val state: StateFlow<ExerciseLibraryState> = _state.asStateFlow()
@@ -53,7 +53,12 @@ class ExerciseLibraryViewModel @Inject constructor(
 
     private fun loadExercises() {
         loadJob?.cancel()
-        loadJob = viewModelScope.launch {
+        loadJob = safeLaunch(
+            onError = { error ->
+                _state.update { it.copy(isLoading = false) }
+                handleError(error) { loadExercises() }
+            }
+        ) {
             _state.update { it.copy(isLoading = true) }
             val currentState = _state.value
             val muscleGroup = currentState.selectedMuscleGroup?.name
@@ -62,9 +67,13 @@ class ExerciseLibraryViewModel @Inject constructor(
             exerciseRepository.getFilteredExercises(muscleGroup, query)
                 .collect { exercises ->
                     _state.update {
-                        it.copy(exercises = exercises, isLoading = false)
+                        it.copy(exercises = exercises, isLoading = false, error = null)
                     }
                 }
         }
+    }
+    
+    override fun setLoading(loading: Boolean) {
+        _state.update { it.copy(isLoading = loading) }
     }
 }
