@@ -6,7 +6,7 @@ public struct PersonalRecord {
     public let exerciseSet: ExerciseSet
     public let recordType: RecordType
     
-    public enum RecordType {
+    public enum RecordType: Hashable, Sendable {
         case maxWeight
         case maxReps
         case maxVolume
