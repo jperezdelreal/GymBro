@@ -44,7 +44,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.gymbro.core.preferences.WeightUnit
+import com.gymbro.core.preferences.UserPreferences.WeightUnit
 
 private val AccentGreen = Color(0xFF00FF87)
 private val Background = Color(0xFF0A0A0A)

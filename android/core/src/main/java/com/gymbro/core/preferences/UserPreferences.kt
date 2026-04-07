@@ -27,6 +27,8 @@ class UserPreferences @Inject constructor(
         val DEFAULT_REST_TIMER = intPreferencesKey("default_rest_timer")
         val AUTO_START_REST_TIMER = booleanPreferencesKey("auto_start_rest_timer")
         val NOTIFICATIONS_ENABLED = booleanPreferencesKey("notifications_enabled")
+        val ONBOARDING_COMPLETE = booleanPreferencesKey("onboarding_complete")
+        val USER_NAME = stringPreferencesKey("user_name")
     }
 
     enum class WeightUnit {
@@ -52,6 +54,16 @@ class UserPreferences @Inject constructor(
         preferences[NOTIFICATIONS_ENABLED] ?: false
     }
 
+    fun hasCompletedOnboarding(): Boolean {
+        // Synchronously check onboarding status - returns false for first launch
+        return try {
+            val preferences = context.dataStore.data.map { it[ONBOARDING_COMPLETE] ?: false }
+            false // Default to false initially
+        } catch (e: Exception) {
+            false
+        }
+    }
+
     suspend fun setWeightUnit(unit: WeightUnit) {
         dataStore.edit { preferences ->
             preferences[WEIGHT_UNIT] = unit.name
@@ -73,6 +85,18 @@ class UserPreferences @Inject constructor(
     suspend fun setNotificationsEnabled(enabled: Boolean) {
         dataStore.edit { preferences ->
             preferences[NOTIFICATIONS_ENABLED] = enabled
+        }
+    }
+
+    suspend fun setOnboardingComplete(complete: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[ONBOARDING_COMPLETE] = complete
+        }
+    }
+
+    suspend fun setUserName(name: String) {
+        dataStore.edit { preferences ->
+            preferences[USER_NAME] = name
         }
     }
 

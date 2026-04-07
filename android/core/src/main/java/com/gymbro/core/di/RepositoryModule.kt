@@ -4,6 +4,8 @@ import com.gymbro.core.repository.ExerciseRepository
 import com.gymbro.core.repository.ExerciseRepositoryImpl
 import com.gymbro.core.repository.WorkoutRepository
 import com.gymbro.core.repository.WorkoutRepositoryImpl
+import com.gymbro.core.repository.WorkoutTemplateRepository
+import com.gymbro.core.repository.WorkoutTemplateRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -18,4 +20,7 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun bindWorkoutRepository(impl: WorkoutRepositoryImpl): WorkoutRepository
+
+    @Binds
+    abstract fun bindWorkoutTemplateRepository(impl: WorkoutTemplateRepositoryImpl): WorkoutTemplateRepository
 }
