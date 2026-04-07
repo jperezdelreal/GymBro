@@ -56,6 +56,7 @@ import com.gymbro.feature.recovery.RecoveryRoute
 import com.gymbro.feature.settings.SettingsRoute
 import com.gymbro.feature.workout.ActiveWorkoutRoute
 import com.gymbro.feature.workout.WorkoutSummaryScreen
+import com.gymbro.core.model.PersonalRecord
 import androidx.hilt.navigation.compose.hiltViewModel
 
 private val AccentGreen = Color(0xFF00FF87)
@@ -182,8 +183,11 @@ fun GymBroNavGraph(
                     navController.navigate("exercise_picker")
                 },
                 onNavigateToSummary = { duration, volume, sets, exercises, prs ->
+                    navController.currentBackStackEntry
+                        ?.savedStateHandle
+                        ?.set("summary_prs", prs)
                     navController.navigate(
-                        "workout_summary/$duration/$volume/$sets/$exercises/$prs"
+                        "workout_summary/$duration/$volume/$sets/$exercises"
                     ) {
                         popUpTo("active_workout") { inclusive = true }
                     }
@@ -219,27 +223,26 @@ fun GymBroNavGraph(
             )
         }
         composable(
-            route = "workout_summary/{duration}/{volume}/{sets}/{exercises}/{prs}",
+            route = "workout_summary/{duration}/{volume}/{sets}/{exercises}",
             arguments = listOf(
                 navArgument("duration") { type = NavType.LongType },
                 navArgument("volume") { type = NavType.FloatType },
                 navArgument("sets") { type = NavType.IntType },
                 navArgument("exercises") { type = NavType.IntType },
-                navArgument("prs") { type = NavType.IntType },
             ),
         ) { backStackEntry ->
             val duration = backStackEntry.arguments?.getLong("duration") ?: 0L
             val volume = backStackEntry.arguments?.getFloat("volume")?.toDouble() ?: 0.0
             val sets = backStackEntry.arguments?.getInt("sets") ?: 0
             val exercises = backStackEntry.arguments?.getInt("exercises") ?: 0
-            val prs = backStackEntry.arguments?.getInt("prs") ?: 0
+            val prs = navController.previousBackStackEntry?.savedStateHandle?.get<List<PersonalRecord>>("summary_prs") ?: emptyList()
 
             WorkoutSummaryScreen(
                 durationSeconds = duration,
                 totalVolume = volume,
                 totalSets = sets,
                 exerciseCount = exercises,
-                prsCount = prs,
+                personalRecords = prs,
                 onDone = {
                     navController.navigate("exercise_library") {
                         popUpTo("exercise_library") { inclusive = true }

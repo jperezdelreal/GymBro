@@ -1,6 +1,7 @@
 package com.gymbro.feature.workout
 
 import com.gymbro.core.model.Exercise
+import com.gymbro.core.model.PersonalRecord
 
 data class ActiveWorkoutState(
     val workoutId: String? = null,
@@ -55,7 +56,7 @@ sealed interface ActiveWorkoutEffect {
         val totalVolume: Double,
         val totalSets: Int,
         val exerciseCount: Int,
-        val prsCount: Int,
+        val personalRecords: List<PersonalRecord>,
     ) : ActiveWorkoutEffect
     data object NavigateBack : ActiveWorkoutEffect
     data object RestTimerFinished : ActiveWorkoutEffect

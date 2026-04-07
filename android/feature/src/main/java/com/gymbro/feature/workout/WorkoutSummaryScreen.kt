@@ -27,6 +27,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,6 +38,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.gymbro.core.model.PersonalRecord
+import com.gymbro.feature.common.PRCelebration
 
 private val AccentGreen = Color(0xFF00FF87)
 private val AccentCyan = Color(0xFF00E5FF)
@@ -47,119 +53,130 @@ fun WorkoutSummaryScreen(
     totalVolume: Double,
     totalSets: Int,
     exerciseCount: Int,
-    prsCount: Int,
+    personalRecords: List<PersonalRecord>,
     onDone: () -> Unit,
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(SurfaceDark)
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-    ) {
-        // Checkmark
-        Box(
+    var showCelebration by remember { mutableStateOf(personalRecords.isNotEmpty()) }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
             modifier = Modifier
-                .size(80.dp)
-                .clip(CircleShape)
-                .background(AccentGreen),
-            contentAlignment = Alignment.Center,
+                .fillMaxSize()
+                .background(SurfaceDark)
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
         ) {
-            Icon(
-                Icons.Default.Check,
-                contentDescription = null,
-                tint = Color.Black,
-                modifier = Modifier.size(48.dp),
+            // Checkmark
+            Box(
+                modifier = Modifier
+                    .size(80.dp)
+                    .clip(CircleShape)
+                    .background(AccentGreen),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    Icons.Default.Check,
+                    contentDescription = null,
+                    tint = Color.Black,
+                    modifier = Modifier.size(48.dp),
+                )
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Text(
+                text = "Workout Complete!",
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Bold,
+                color = Color.White,
             )
-        }
 
-        Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
-        Text(
-            text = "Workout Complete!",
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Bold,
-            color = Color.White,
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text(
-            text = "Great session — keep pushing.",
-            style = MaterialTheme.typography.bodyMedium,
-            color = Color.White.copy(alpha = 0.6f),
-        )
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        // Summary cards
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            SummaryCard(
-                icon = Icons.Default.Timer,
-                label = "Duration",
-                value = formatSummaryDuration(durationSeconds),
-                color = AccentCyan,
-                modifier = Modifier.weight(1f),
+            Text(
+                text = "Great session — keep pushing.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.White.copy(alpha = 0.6f),
             )
-            SummaryCard(
-                icon = Icons.Default.FitnessCenter,
-                label = "Volume",
-                value = "${totalVolume.toInt()} kg",
-                color = AccentGreen,
-                modifier = Modifier.weight(1f),
-            )
-        }
 
-        Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(32.dp))
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            SummaryCard(
-                icon = Icons.Default.BarChart,
-                label = "Sets",
-                value = "$totalSets",
-                color = AccentAmber,
-                modifier = Modifier.weight(1f),
-            )
-            SummaryCard(
-                icon = Icons.Default.Star,
-                label = "Exercises",
-                value = "$exerciseCount",
-                color = AccentGreen,
-                modifier = Modifier.weight(1f),
-            )
-        }
-
-        if (prsCount > 0) {
-            Spacer(modifier = Modifier.height(12.dp))
-            SummaryCard(
-                icon = Icons.Default.Star,
-                label = "Personal Records",
-                value = "$prsCount",
-                color = AccentAmber,
+            // Summary cards
+            Row(
                 modifier = Modifier.fillMaxWidth(),
-            )
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                SummaryCard(
+                    icon = Icons.Default.Timer,
+                    label = "Duration",
+                    value = formatSummaryDuration(durationSeconds),
+                    color = AccentCyan,
+                    modifier = Modifier.weight(1f),
+                )
+                SummaryCard(
+                    icon = Icons.Default.FitnessCenter,
+                    label = "Volume",
+                    value = "${totalVolume.toInt()} kg",
+                    color = AccentGreen,
+                    modifier = Modifier.weight(1f),
+                )
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                SummaryCard(
+                    icon = Icons.Default.BarChart,
+                    label = "Sets",
+                    value = "$totalSets",
+                    color = AccentAmber,
+                    modifier = Modifier.weight(1f),
+                )
+                SummaryCard(
+                    icon = Icons.Default.Star,
+                    label = "Exercises",
+                    value = "$exerciseCount",
+                    color = AccentGreen,
+                    modifier = Modifier.weight(1f),
+                )
+            }
+
+            if (personalRecords.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(12.dp))
+                SummaryCard(
+                    icon = Icons.Default.Star,
+                    label = "Personal Records",
+                    value = "${personalRecords.size}",
+                    color = AccentAmber,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+
+            Spacer(modifier = Modifier.height(40.dp))
+
+            Button(
+                onClick = onDone,
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = AccentGreen,
+                    contentColor = Color.Black,
+                ),
+                shape = RoundedCornerShape(12.dp),
+                contentPadding = PaddingValues(vertical = 16.dp),
+            ) {
+                Text("Done", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
+            }
         }
 
-        Spacer(modifier = Modifier.height(40.dp))
-
-        Button(
-            onClick = onDone,
-            modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = AccentGreen,
-                contentColor = Color.Black,
-            ),
-            shape = RoundedCornerShape(12.dp),
-            contentPadding = PaddingValues(vertical = 16.dp),
-        ) {
-            Text("Done", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
+        if (showCelebration) {
+            PRCelebration(
+                personalRecords = personalRecords,
+                onDismiss = { showCelebration = false },
+            )
         }
     }
 }
