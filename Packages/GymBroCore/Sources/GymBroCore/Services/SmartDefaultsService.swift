@@ -361,7 +361,7 @@ public final class SmartDefaultsService {
             baseProgression = 2.5
         case .isolation:
             baseProgression = 1.25
-        case .accessory:
+        case .accessory, .cardio:
             baseProgression = 0.0
         }
         
@@ -395,7 +395,7 @@ public final class SmartDefaultsService {
             increment = 2.5 // Round to nearest 2.5kg
         case .isolation:
             increment = 1.25 // Round to nearest 1.25kg
-        case .accessory:
+        case .accessory, .cardio:
             increment = 0.5 // Round to nearest 0.5kg
         }
         
@@ -429,6 +429,8 @@ public final class SmartDefaultsService {
             baseDefaults = (15.0, 10)
         case .accessory:
             baseDefaults = (10.0, 12)
+        case .cardio:
+            baseDefaults = (0.0, 1)
         }
         
         // Apply progression to defaults for first-time suggestion

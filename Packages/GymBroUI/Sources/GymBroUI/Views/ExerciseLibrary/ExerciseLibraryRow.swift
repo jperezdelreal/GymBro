@@ -9,9 +9,23 @@ struct ExerciseLibraryRow: View {
     var body: some View {
         HStack(spacing: GymBroSpacing.md) {
             VStack(alignment: .leading, spacing: GymBroSpacing.xs) {
-                Text(exercise.name)
-                    .font(.system(size: titleSize, weight: .semibold))
-                    .foregroundStyle(GymBroColors.textPrimary)
+                HStack(spacing: GymBroSpacing.sm) {
+                    Text(exercise.name)
+                        .font(.system(size: titleSize, weight: .semibold))
+                        .foregroundStyle(GymBroColors.textPrimary)
+                    
+                    if exercise.isCustom {
+                        Text("CUSTOM")
+                            .font(.system(size: 9, weight: .bold))
+                            .foregroundStyle(GymBroColors.accentCyan)
+                            .padding(.horizontal, 5)
+                            .padding(.vertical, 2)
+                            .background(
+                                RoundedRectangle(cornerRadius: 4)
+                                    .fill(GymBroColors.accentCyan.opacity(0.15))
+                            )
+                    }
+                }
                 
                 HStack(spacing: GymBroSpacing.sm) {
                     categoryBadge
@@ -58,6 +72,8 @@ struct ExerciseLibraryRow: View {
             return GymBroColors.accentAmber
         case .accessory:
             return GymBroColors.accentCyan
+        case .cardio:
+            return GymBroColors.accentRed
         }
     }
     

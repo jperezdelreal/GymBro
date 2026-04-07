@@ -81,6 +81,8 @@ public struct ExerciseQuickInfoSheet: View {
             return GymBroColors.accentAmber
         case .accessory:
             return GymBroColors.accentCyan
+        case .cardio:
+            return GymBroColors.accentRed
         }
     }
     
