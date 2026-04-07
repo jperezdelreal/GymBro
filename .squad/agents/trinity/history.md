@@ -327,3 +327,31 @@
 - **Onboarding gate timing**: Check hasCompletedOnboarding after auth is known but before mainTabView renders. Use .task {} on Group, not on TabView, to avoid double-execution per tab.
 - **FetchDescriptor pattern for single-item checks**: `FetchDescriptor<UserProfile>()` with try? fetch returns empty array on failure. First profile = current user (single-user app). More reliable than relying on implicit fetch.
 
+
+### 2026-04-07: UX Simplification Pass (Issue #115)
+**Onboarding Flow Consolidation:**
+- Reduced onboarding from 7 separate screens to 4 by combining related decisions into single views.
+- GoalsExperienceStepView: goals as FlowLayout capsule chips + experience as inline radio cards — both on one screen.
+- FrequencyEquipmentStepView: frequency as numeric pills (2-6) + equipment as icon cards + optional limitations behind toggle (progressive disclosure).
+- Pattern: Progressive disclosure for optional inputs — limitations toggle hidden by default, revealed on tap. Reduces perceived complexity.
+
+**Exercise Library Filter Architecture:**
+- Quick muscle group chips in horizontal ScrollView at top of list for instant filtering.
+- Full category/equipment filters behind single Filter toolbar button → `.presentationDetents([.medium])` sheet.
+- Filled vs outline filter icon (`.fill` suffix) indicates active filter state — zero-chrome status indicator.
+- Filter state uses `@State` properties directly (not ViewModel) since filters are transient UI state.
+
+**Recovery Dashboard Sectioned Layout:**
+- Added section headers with icon + uppercased label + tracking for visual hierarchy.
+- Push/Pull balance now collapsed by default with inline ratio badge — full detail on tap.
+- Pattern: Information density reduced by hiding secondary content behind expand gestures while keeping key numbers visible.
+
+**Program Detail Swipeable Week Navigation:**
+- Replaced horizontal ScrollView chip bar with prev/next chevron buttons + dot indicators + DragGesture.
+- `.id(selectedWeek)` forces view identity change on week switch for clean transitions.
+- DragGesture with 50pt minimum distance for swipe-to-navigate between weeks.
+
+**Active Workout Progressive Disclosure:**
+- Warmup toggle and RPE picker moved into `Menu` (`ellipsis.circle` button) — no longer visible by default.
+- Inline status badges (capsule pills) appear only when warmup or RPE are set, so user still sees state.
+- Pattern: Primary actions (weight/reps adjust + complete set button) always visible. Secondary actions behind menu. Context shown via badges.
