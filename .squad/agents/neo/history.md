@@ -86,3 +86,90 @@
 - ACWR sweet spot 0.8-1.3; TSB < -25 triggers deload recommendation
 - Graceful degradation: empty input returns neutral 50.0, single-factor inputs redistribute full weight
 - ReadinessScore cached in SwiftData for instant dashboard rendering
+
+### 2026-04-07: Smart Defaults Overhaul (Issue #84, PR #90)
+**The Problem:**
+- Original SmartDefaultsService was naive: `weight = avg(last_workout) + increment`, `reps = avg(last_workout_reps)`
+- Ignored fatigue, RPE, recovery state, historical trends, plateaus, deloads, and exercise order
+- Resulted in poor weight suggestions that didn't adapt to user's actual training state
+
+**The Solution — Sophisticated Heuristics-First Algorithm:**
+Completely rewrote SmartDefaultsService with 6 major enhancements:
+
+1. **Intra-session fatigue detection**
+   - Accounts for rep drop-off from set 1→3 (Set 1: 1.0x, Set 2: 0.975x, Set 3: 0.95x)
+   - Considers exercise position in workout (Exercise 1-2: 1.0x, 3-4: 0.98x, 5+: 0.95x)
+   - Analyzes historical fatigue pattern (ratio of last set reps to first set reps across sessions)
+
+2. **Recovery-aware predictions**
+   - Integrates ReadinessScoreService for context-aware load adjustment
+   - Readiness >= 80: +2.5% weight (push intensity)
+   - Readiness 60-79: 0% (normal training)
+   - Readiness 40-59: -10% (reduce load)
+   - Readiness < 40: -20% (rest day — minimal load)
+
+3. **Historical trend analysis**
+   - Uses last 3-5 sessions instead of just the last one
+   - Calculates linear trend of e1RM progression (slope normalized to -1.0 to +1.0)
+   - Positive trend: full progression, negative trend: half progression (plateau detection)
+   - Tracks volume stability using coefficient of variation
+
+4. **RPE integration**
+   - If RPE data exists on sets, calibrates next-session weights
+   - RPE < 7.0: +2.5% (user has more in tank)
+   - RPE 7.0-9.5: 0% (perfect difficulty)
+   - RPE >= 9.5: -5% (too difficult, back off)
+
+5. **Deload recognition**
+   - Detects deload weeks when weight < 85% of recent max
+   - Holds weight during deload (doesn't add progression)
+   - Prevents inappropriate +2.5kg suggestions during recovery weeks
+
+6. **Experience-level scaling**
+   - Beginner: 1.5x progression multiplier (faster gains)
+   - Intermediate: 1.0x (normal)
+   - Advanced: 0.5x (slower gains)
+   - Elite: 0.25x (very slow gains)
+
+**Algorithm Design Philosophy:**
+- **Heuristics before ML** — well-tuned rules with clear logic, not black boxes
+- **Every prediction is explainable** — detailed logging shows reasoning at each step
+- **Graceful degradation** — missing RPE? Fall back to simpler model. Missing readiness? Skip recovery adjustment
+- **Conservative by default** — always round down for safety (injury prevention over max performance)
+
+**Technical Implementation:**
+- New method signature: `getSmartDefaults(for:setNumber:exercisePositionInWorkout:currentReadinessScore:)`
+- Fetches recent sessions grouped by workout (not individual sets)
+- TrendAnalysis struct with trendStrength, averageFatiguePattern, volumeStability
+- Helper methods for session fetching, trend calculation, deload detection, RPE calibration, fatigue/recovery multipliers
+- Weight rounding: compound 2.5kg, isolation 1.25kg, accessory 0.5kg increments
+
+**Testing:**
+- 20 comprehensive unit tests covering all features
+- Tests: defaults, progression, RPE, fatigue, recovery, deload, trend analysis, edge cases, graceful degradation
+- All tests use mocked data for deterministic results
+
+**Key Learnings:**
+- **Top-set approach beats average-set approach** — using max weight from last session (not average) better reflects user's true capacity
+- **Fatigue is multiplicative, not additive** — Set 3 at position 5 = 0.95 * 0.95 * historyAdjustment
+- **Conservative rounding matters** — always floor() to nearest increment, never ceil() (safety over ego)
+- **Deload detection is critical** — without it, algorithm suggests +2.5kg on 60% deload weeks (dangerous)
+- **Graceful degradation enables MVP shipping** — RPE and readiness are optional enhancements, core algorithm works without them
+
+**File Paths:**
+- `Packages/GymBroCore/Sources/GymBroCore/Services/SmartDefaultsService.swift` — complete rewrite (422 insertions)
+- `Packages/GymBroCore/Tests/GymBroCoreTests/SmartDefaultsServiceTests.swift` — 20 new tests (527 insertions)
+
+**Next Integration Steps:**
+- Wire up to workout logging UI (call with setNumber and exercisePosition context)
+- Add readiness score to call site (fetch latest ReadinessScore from SwiftData)
+- Manual testing with real workout data (100+ sets across multiple weeks)
+- Performance testing with large datasets (1000+ sets)
+- Consider caching trend analysis per exercise (recompute only on new session)
+
+**Impact:**
+- Smart defaults now adapt to user's actual training state (fatigue, recovery, trend)
+- Reduces injury risk by backing off when readiness is low or RPE was too high
+- Improves adherence by making suggestions feel "right" (users trust the numbers)
+- Enables true autoregulation — the app "feels" when to push vs when to hold
+- Foundation for future adaptive training engine (this is the core prediction logic)
