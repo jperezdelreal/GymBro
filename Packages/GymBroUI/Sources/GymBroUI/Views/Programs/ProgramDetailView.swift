@@ -182,37 +182,65 @@ public struct ProgramDetailView: View {
         }
     }
 
-    // MARK: - Week Selector
+    // MARK: - Week Selector (Swipeable)
 
     @ViewBuilder
     private var weekSelector: some View {
         VStack(alignment: .leading, spacing: GymBroSpacing.sm) {
-            Text("WEEK-BY-WEEK BREAKDOWN")
-                .font(GymBroTypography.caption2)
-                .foregroundStyle(GymBroColors.textTertiary)
-                .tracking(2)
+            HStack {
+                Text("WEEKLY PLAN")
+                    .font(GymBroTypography.caption2)
+                    .foregroundStyle(GymBroColors.textTertiary)
+                    .tracking(2)
 
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: GymBroSpacing.sm) {
+                Spacer()
+
+                Text("Week \(selectedWeek) of \(program.durationWeeks)")
+                    .font(GymBroTypography.caption)
+                    .foregroundStyle(GymBroColors.accentGreen)
+            }
+
+            HStack(spacing: GymBroSpacing.md) {
+                Button {
+                    withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.2)) {
+                        selectedWeek = max(1, selectedWeek - 1)
+                    }
+                } label: {
+                    Image(systemName: "chevron.left")
+                        .font(.headline)
+                        .foregroundStyle(selectedWeek > 1 ? GymBroColors.accentGreen : GymBroColors.textTertiary)
+                        .frame(width: 44, height: 44)
+                        .background(GymBroColors.surfaceSecondary)
+                        .clipShape(Circle())
+                }
+                .disabled(selectedWeek <= 1)
+
+                Spacer()
+
+                HStack(spacing: GymBroSpacing.xs) {
                     ForEach(1...program.durationWeeks, id: \.self) { week in
-                        Button {
-                            withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.2)) {
-                                selectedWeek = week
-                            }
-                        } label: {
-                            Text("Week \(week)")
-                                .font(GymBroTypography.caption)
-                                .foregroundStyle(selectedWeek == week ? GymBroColors.background : GymBroColors.textSecondary)
-                                .padding(.horizontal, GymBroSpacing.md)
-                                .padding(.vertical, GymBroSpacing.sm)
-                                .background(
-                                    Capsule()
-                                        .fill(selectedWeek == week ? GymBroColors.accentGreen : GymBroColors.surfaceElevated)
-                                )
-                        }
-                        .buttonStyle(.plain)
+                        Circle()
+                            .fill(week == selectedWeek ? GymBroColors.accentGreen : GymBroColors.surfaceElevated)
+                            .frame(width: week == selectedWeek ? 8 : 6, height: week == selectedWeek ? 8 : 6)
+                            .animation(reduceMotion ? nil : .easeInOut(duration: 0.15), value: selectedWeek)
                     }
                 }
+
+                Spacer()
+
+                Button {
+                    withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.2)) {
+                        selectedWeek = min(program.durationWeeks, selectedWeek + 1)
+                    }
+                } label: {
+                    Image(systemName: "chevron.right")
+                        .font(.headline)
+                        .foregroundStyle(selectedWeek < program.durationWeeks ? GymBroColors.accentGreen : GymBroColors.textTertiary)
+                        .frame(width: 44, height: 44)
+                        .background(GymBroColors.surfaceSecondary)
+                        .clipShape(Circle())
+                }
+                .disabled(selectedWeek >= program.durationWeeks)
             }
         }
     }
@@ -223,9 +251,30 @@ public struct ProgramDetailView: View {
     private var weekBreakdown: some View {
         let sortedDays = program.days.sorted { $0.dayNumber < $1.dayNumber }
 
-        ForEach(sortedDays, id: \.id) { day in
-            dayCard(day: day, weekNumber: selectedWeek)
+        VStack(spacing: GymBroSpacing.md) {
+            ForEach(sortedDays, id: \.id) { day in
+                dayCard(day: day, weekNumber: selectedWeek)
+            }
         }
+        .id(selectedWeek)
+        .transition(.asymmetric(
+            insertion: .move(edge: .trailing).combined(with: .opacity),
+            removal: .move(edge: .leading).combined(with: .opacity)
+        ))
+        .gesture(
+            DragGesture(minimumDistance: 50)
+                .onEnded { value in
+                    if value.translation.width < -50 && selectedWeek < program.durationWeeks {
+                        withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.3)) {
+                            selectedWeek += 1
+                        }
+                    } else if value.translation.width > 50 && selectedWeek > 1 {
+                        withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.3)) {
+                            selectedWeek -= 1
+                        }
+                    }
+                }
+        )
     }
 
     @ViewBuilder

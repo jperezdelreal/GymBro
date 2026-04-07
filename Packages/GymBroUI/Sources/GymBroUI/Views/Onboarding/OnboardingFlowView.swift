@@ -31,40 +31,25 @@ public struct OnboardingFlowView: View {
                     .padding(.horizontal, GymBroSpacing.md)
                     .padding(.top, GymBroSpacing.md)
                 
-                // Current step view
+                // Current step view — consolidated from 7 to 4 steps
                 Group {
                     switch currentStep {
                     case .welcome:
-                        WelcomeStepView(onNext: { currentStep = .goals })
-                    case .goals:
-                        GoalsStepView(
+                        WelcomeStepView(onNext: { currentStep = .goalsExperience })
+                    case .goalsExperience:
+                        GoalsExperienceStepView(
                             selectedGoals: $trainingGoals,
-                            onNext: { currentStep = .experience },
+                            selectedLevel: $experienceLevel,
+                            onNext: { currentStep = .frequencyEquipment },
                             onBack: { currentStep = .welcome }
                         )
-                    case .experience:
-                        ExperienceStepView(
-                            selectedLevel: $experienceLevel,
-                            onNext: { currentStep = .frequency },
-                            onBack: { currentStep = .goals }
-                        )
-                    case .frequency:
-                        FrequencyStepView(
+                    case .frequencyEquipment:
+                        FrequencyEquipmentStepView(
                             selectedFrequency: $trainingFrequency,
-                            onNext: { currentStep = .equipment },
-                            onBack: { currentStep = .experience }
-                        )
-                    case .equipment:
-                        EquipmentStepView(
                             selectedEquipment: $equipmentType,
-                            onNext: { currentStep = .limitations },
-                            onBack: { currentStep = .frequency }
-                        )
-                    case .limitations:
-                        LimitationsStepView(
                             injuriesText: $injuriesText,
                             onNext: { currentStep = .summary },
-                            onBack: { currentStep = .equipment }
+                            onBack: { currentStep = .goalsExperience }
                         )
                     case .summary:
                         SummaryStepView(
@@ -74,7 +59,7 @@ public struct OnboardingFlowView: View {
                             equipment: equipmentType,
                             limitations: injuriesText,
                             onComplete: completeOnboarding,
-                            onBack: { currentStep = .limitations }
+                            onBack: { currentStep = .frequencyEquipment }
                         )
                     }
                 }
@@ -127,11 +112,8 @@ public struct OnboardingFlowView: View {
 
 enum OnboardingStep: Int, CaseIterable {
     case welcome = 0
-    case goals
-    case experience
-    case frequency
-    case equipment
-    case limitations
+    case goalsExperience
+    case frequencyEquipment
     case summary
     
     var progress: CGFloat {

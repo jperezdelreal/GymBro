@@ -56,7 +56,7 @@ struct WelcomeStepView: View {
                     .font(GymBroTypography.caption)
                     .foregroundStyle(GymBroColors.textTertiary)
                 
-                Text("Takes under 2 minutes")
+                Text("Takes under a minute")
                     .font(GymBroTypography.caption2)
                     .foregroundStyle(GymBroColors.textTertiary.opacity(0.7))
             }

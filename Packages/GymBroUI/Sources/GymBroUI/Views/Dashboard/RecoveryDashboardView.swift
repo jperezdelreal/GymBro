@@ -11,23 +11,27 @@ public struct RecoveryDashboardView: View {
 
     public init() {}
 
+    @State private var showBalanceDetail = false
+
     public var body: some View {
         ScrollView {
-            LazyVStack(spacing: GymBroSpacing.lg) {
+            LazyVStack(spacing: GymBroSpacing.xl) {
                 // Active anomaly alerts (top priority — user safety)
                 anomalyAlerts
 
-                // Enhanced readiness gauge
+                // Section 1: Readiness — the number that matters
+                sectionHeader(title: "Readiness", icon: "heart.circle.fill")
                 readinessSection
 
-                // Muscle heat map
+                // Section 2: Muscle Recovery
+                sectionHeader(title: "Muscle Recovery", icon: "figure.strengthtraining.traditional")
                 heatMapSection
 
-                // Workout adjustment explainer
+                // Section 3: Adjustments — only when relevant
                 adjustmentSection
 
-                // Push/Pull ratio
-                pushPullSection
+                // Section 4: Balance — expandable detail
+                balanceSection
             }
             .padding(.horizontal, GymBroSpacing.md)
             .padding(.bottom, GymBroSpacing.xxl)
@@ -40,6 +44,25 @@ public struct RecoveryDashboardView: View {
         .refreshable {
             viewModel.loadData(modelContext: modelContext)
         }
+    }
+
+    // MARK: - Section Headers
+
+    private func sectionHeader(title: String, icon: String) -> some View {
+        HStack(spacing: GymBroSpacing.sm) {
+            Image(systemName: icon)
+                .font(.system(size: 14))
+                .foregroundStyle(GymBroColors.accentGreen)
+
+            Text(title.uppercased())
+                .font(GymBroTypography.caption2)
+                .fontWeight(.bold)
+                .foregroundStyle(GymBroColors.textTertiary)
+                .tracking(2)
+
+            Spacer()
+        }
+        .padding(.top, GymBroSpacing.sm)
     }
 
     // MARK: - Anomaly Alerts
@@ -205,62 +228,92 @@ public struct RecoveryDashboardView: View {
     @ViewBuilder
     private var adjustmentSection: some View {
         if let rec = viewModel.workoutRecommendation, !viewModel.didOverrideAdjustment {
+            sectionHeader(title: "Today's Adjustment", icon: "slider.horizontal.3")
             WorkoutAdjustmentExplainer(recommendation: rec) {
                 viewModel.overrideAdjustment()
             }
         }
     }
 
-    // MARK: - Push/Pull Ratio
+    // MARK: - Balance Section (Expandable)
 
     @ViewBuilder
-    private var pushPullSection: some View {
+    private var balanceSection: some View {
         if let analysis = viewModel.imbalanceAnalysis {
-            GymBroCard {
-                VStack(alignment: .leading, spacing: GymBroSpacing.md) {
-                    HStack {
-                        Image(systemName: "arrow.left.arrow.right")
-                            .foregroundStyle(GymBroColors.accentCyan)
-                        Text("Push / Pull Balance")
-                            .font(GymBroTypography.title3)
-                            .foregroundStyle(GymBroColors.textPrimary)
+            VStack(spacing: GymBroSpacing.md) {
+                Button {
+                    withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.25)) {
+                        showBalanceDetail.toggle()
                     }
-
-                    // Ratio bar
-                    pushPullBar(ratio: analysis.pushPullRatio)
-
-                    // Status
+                } label: {
                     HStack(spacing: GymBroSpacing.sm) {
-                        Circle()
-                            .fill(pushPullStatusColor(ratio: analysis.pushPullRatio))
-                            .frame(width: 8, height: 8)
-                        Text(viewModel.pushPullStatus)
-                            .font(GymBroTypography.subheadline)
-                            .foregroundStyle(GymBroColors.textSecondary)
+                        Image(systemName: "arrow.left.arrow.right")
+                            .font(.system(size: 14))
+                            .foregroundStyle(GymBroColors.accentCyan)
+
+                        Text("PUSH / PULL BALANCE")
+                            .font(GymBroTypography.caption2)
+                            .fontWeight(.bold)
+                            .foregroundStyle(GymBroColors.textTertiary)
+                            .tracking(2)
 
                         Spacer()
 
-                        Text(String(format: "%.2f:1", analysis.pushPullRatio))
-                            .font(GymBroTypography.subheadline.monospacedDigit().bold())
-                            .foregroundStyle(pushPullStatusColor(ratio: analysis.pushPullRatio))
-                    }
+                        HStack(spacing: GymBroSpacing.xs) {
+                            Circle()
+                                .fill(pushPullStatusColor(ratio: analysis.pushPullRatio))
+                                .frame(width: 6, height: 6)
+                            Text(String(format: "%.1f:1", analysis.pushPullRatio))
+                                .font(GymBroTypography.caption.monospacedDigit().bold())
+                                .foregroundStyle(pushPullStatusColor(ratio: analysis.pushPullRatio))
+                        }
 
-                    // Recommendations
-                    if !analysis.recommendations.isEmpty {
-                        VStack(alignment: .leading, spacing: GymBroSpacing.xs) {
-                            ForEach(analysis.recommendations.prefix(2), id: \.self) { rec in
-                                Text(rec)
-                                    .font(GymBroTypography.caption)
+                        Image(systemName: showBalanceDetail ? "chevron.up" : "chevron.down")
+                            .font(.caption2)
+                            .foregroundStyle(GymBroColors.textTertiary)
+                    }
+                }
+                .buttonStyle(.plain)
+                .padding(.top, GymBroSpacing.sm)
+
+                if showBalanceDetail {
+                    GymBroCard {
+                        VStack(alignment: .leading, spacing: GymBroSpacing.md) {
+                            pushPullBar(ratio: analysis.pushPullRatio)
+
+                            HStack(spacing: GymBroSpacing.sm) {
+                                Circle()
+                                    .fill(pushPullStatusColor(ratio: analysis.pushPullRatio))
+                                    .frame(width: 8, height: 8)
+                                Text(viewModel.pushPullStatus)
+                                    .font(GymBroTypography.subheadline)
                                     .foregroundStyle(GymBroColors.textSecondary)
-                                    .fixedSize(horizontal: false, vertical: true)
+
+                                Spacer()
+
+                                Text(String(format: "%.2f:1", analysis.pushPullRatio))
+                                    .font(GymBroTypography.subheadline.monospacedDigit().bold())
+                                    .foregroundStyle(pushPullStatusColor(ratio: analysis.pushPullRatio))
+                            }
+
+                            if !analysis.recommendations.isEmpty {
+                                VStack(alignment: .leading, spacing: GymBroSpacing.xs) {
+                                    ForEach(analysis.recommendations.prefix(2), id: \.self) { rec in
+                                        Text(rec)
+                                            .font(GymBroTypography.caption)
+                                            .foregroundStyle(GymBroColors.textSecondary)
+                                            .fixedSize(horizontal: false, vertical: true)
+                                    }
+                                }
+                                .padding(GymBroSpacing.sm)
+                                .background(
+                                    RoundedRectangle(cornerRadius: GymBroRadius.sm)
+                                        .fill(GymBroColors.surfacePrimary)
+                                )
                             }
                         }
-                        .padding(GymBroSpacing.sm)
-                        .background(
-                            RoundedRectangle(cornerRadius: GymBroRadius.sm)
-                                .fill(GymBroColors.surfacePrimary)
-                        )
                     }
+                    .transition(.opacity.combined(with: .move(edge: .top)))
                 }
             }
             .accessibilityElement(children: .combine)

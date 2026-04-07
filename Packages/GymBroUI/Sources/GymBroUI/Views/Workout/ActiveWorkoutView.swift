@@ -115,19 +115,52 @@ public struct ActiveWorkoutView: View {
                             .foregroundStyle(GymBroColors.accentGreen)
                     }
                     Spacer()
+
+                    // Contextual menu — warmup + RPE tucked away
+                    Menu {
+                        Button {
+                            viewModel.toggleWarmup()
+                            HapticFeedbackService.shared.lightImpact()
+                        } label: {
+                            Label(
+                                viewModel.isWarmup ? "Remove Warmup" : "Mark as Warmup",
+                                systemImage: viewModel.isWarmup ? "flame.fill" : "flame"
+                            )
+                        }
+
+                        Button {
+                            showingRPEPicker = true
+                        } label: {
+                            if let rpe = viewModel.currentRPE {
+                                Label("RPE \(Int(rpe))", systemImage: "gauge.with.needle.fill")
+                            } else {
+                                Label("Add RPE", systemImage: "gauge.with.needle")
+                            }
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis.circle")
+                            .font(.title3)
+                            .foregroundStyle(GymBroColors.textSecondary)
+                            .frame(width: 44, height: 44)
+                    }
                 }
 
-                // Weight & Reps
+                // Status badges — only visible when warmup/RPE are set
+                if viewModel.isWarmup || viewModel.currentRPE != nil {
+                    HStack(spacing: GymBroSpacing.sm) {
+                        if viewModel.isWarmup {
+                            statusBadge(text: "Warmup", color: GymBroColors.accentAmber)
+                        }
+                        if let rpe = viewModel.currentRPE {
+                            statusBadge(text: "RPE \(Int(rpe))", color: GymBroColors.accentAmber)
+                        }
+                    }
+                }
+
+                // Weight & Reps — the only things that matter
                 HStack(spacing: GymBroSpacing.md + GymBroSpacing.xs) {
                     weightAdjuster
                     repsAdjuster
-                }
-
-                // Warmup & RPE
-                HStack(spacing: GymBroSpacing.md) {
-                    warmupToggle
-                    Spacer()
-                    rpeButton
                 }
             }
         }
@@ -141,6 +174,19 @@ public struct ActiveWorkoutView: View {
                 viewModel.updateRPE(nil)
             }
         }
+    }
+
+    private func statusBadge(text: String, color: Color) -> some View {
+        Text(text)
+            .font(GymBroTypography.caption2)
+            .fontWeight(.semibold)
+            .foregroundStyle(color)
+            .padding(.horizontal, GymBroSpacing.sm)
+            .padding(.vertical, GymBroSpacing.xs)
+            .background(
+                Capsule()
+                    .fill(color.opacity(0.12))
+            )
     }
 
     private var weightAdjuster: some View {
@@ -211,37 +257,6 @@ public struct ActiveWorkoutView: View {
             }
         }
         .frame(maxWidth: .infinity)
-    }
-
-    private var warmupToggle: some View {
-        Button {
-            viewModel.toggleWarmup()
-            HapticFeedbackService.shared.lightImpact()
-        } label: {
-            HStack {
-                Image(systemName: viewModel.isWarmup ? "checkmark.circle.fill" : "circle")
-                Text("Warmup Set")
-            }
-            .font(GymBroTypography.subheadline)
-            .foregroundStyle(viewModel.isWarmup ? GymBroColors.accentAmber : GymBroColors.textSecondary)
-        }
-    }
-
-    private var rpeButton: some View {
-        Button {
-            showingRPEPicker = true
-        } label: {
-            HStack {
-                Image(systemName: "gauge.with.needle")
-                if let rpe = viewModel.currentRPE {
-                    Text("RPE \(Int(rpe))")
-                } else {
-                    Text("Add RPE")
-                }
-            }
-            .font(GymBroTypography.subheadline)
-            .foregroundStyle(viewModel.currentRPE != nil ? GymBroColors.accentAmber : GymBroColors.textSecondary)
-        }
     }
 
     // MARK: - Completed Sets
