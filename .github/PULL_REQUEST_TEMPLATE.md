@@ -1,51 +1,54 @@
-# Pull Request
+### What
+<!-- One paragraph: what does this PR change? -->
 
-## Description
-<!-- Provide a clear summary of the changes. Link to related issues. -->
+### Why
+<!-- Problem being solved. Link to the issue: Closes #N -->
 
-Closes #
-
-## Type of Change
-<!-- Check all that apply -->
-
-- [ ] 🐛 Bug fix (non-breaking change which fixes an issue)
-- [ ] ✨ New feature (non-breaking change which adds functionality)
-- [ ] 💥 Breaking change (fix or feature that would cause existing functionality to not work as expected)
-- [ ] 📝 Documentation update
-- [ ] 🧪 Test update
-- [ ] 🔧 Configuration/infrastructure change
-- [ ] ♻️ Code refactoring
-
-## Testing
-<!-- Describe the tests you ran and how to reproduce -->
-
-- [ ] Unit tests added/updated
-- [ ] UI tests added/updated (if applicable)
-- [ ] Manual testing performed
-- [ ] All tests passing locally
-
-**Test Coverage:**
-- New code coverage: __%
-- Overall coverage change: __% → __%
-
-## Checklist
-
-- [ ] My code follows the Swift style guidelines
-- [ ] I have performed a self-review of my code
-- [ ] I have commented my code, particularly in hard-to-understand areas
-- [ ] I have made corresponding changes to the documentation
-- [ ] My changes generate no new warnings
-- [ ] I have added tests that prove my fix is effective or that my feature works
-- [ ] New and existing unit tests pass locally with my changes
-- [ ] SwiftLint passes with no violations
-- [ ] Any dependent changes have been merged and published
-
-## Screenshots / Videos
-<!-- If applicable, add screenshots or videos to demonstrate the changes -->
-
-## Additional Context
-<!-- Add any other context about the PR here -->
+### How
+<!-- Approach taken. Key design decisions and trade-offs. -->
 
 ---
-**Squad Assignment:** <!-- @squad/agent-name if applicable -->
-**Reviewers:** <!-- Tag specific reviewers if needed -->
+
+### ⚠️ Quick Check
+- [ ] If SDK/CLI source files changed: completed the applicable Changeset step below (`npx changeset add` / `.changeset/*.md`, direct `CHANGELOG.md` entry for maintainers, or `skip-changelog` label for no user-facing changes)
+
+### PR Readiness Checklist
+
+> The PR readiness bot will validate these automatically after push.
+> Check each item before requesting review. See [CONTRIBUTING.md](../CONTRIBUTING.md) for full details.
+
+#### Branch & Commit
+- [ ] Branch created from `dev` (not `main`)
+- [ ] Branch is up to date with `dev` (`git fetch upstream && git rebase upstream/dev`)
+- [ ] Verified diff contains only intended changes (`git diff --cached --stat`)
+- [ ] PR is **not** in draft mode (mark ready when checks pass)
+- [ ] Commit history is clean (squash fixups before review)
+
+#### Build & Test
+- [ ] `npm run build` passes
+- [ ] `npm test` passes (all tests green)
+- [ ] `npm run lint` passes (type check clean)
+- [ ] `npm run lint:eslint` passes
+- [ ] For migration PRs (>20 files): include test output summary in PR description
+
+#### Changeset
+- [ ] Changeset added via `npx changeset add` (if `packages/squad-sdk/src/` or `packages/squad-cli/src/` changed)
+- [ ] Or direct `CHANGELOG.md` entry (maintainers only — write-protected for external contributors)
+- [ ] Or `skip-changelog` label applied (if no user-facing changes)
+
+#### Docs
+<!-- "N/A" only if truly no user-facing change. -->
+- [ ] README section updated (if new feature/module)
+- [ ] Docs feature page (if new user-facing capability)
+
+#### Exports
+<!-- For SDK changes only. "N/A" if no new modules. -->
+- [ ] package.json subpath exports updated (if new module)
+
+---
+
+### Breaking Changes
+<!-- Any backward-incompatible changes. "None" if clean. -->
+
+### Waivers
+<!-- If skipping any REQUIRED item: 1) Request waiver in this section, 2) Named reviewer must approve in PR comments BEFORE merge. Format: "Waived: {item}, reason: {why}, approved by: {Flight|FIDO}" -->
