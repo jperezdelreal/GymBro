@@ -1,12 +1,19 @@
 import SwiftUI
+import SwiftData
 import GymBroCore
 
 public struct ExerciseDetailView: View {
     let exercise: Exercise
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) private var modelContext
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @ScaledMetric(relativeTo: .title) private var titleSize: CGFloat = 28
     @ScaledMetric(relativeTo: .headline) private var badgeSize: CGFloat = 14
+
+    @State private var showNoWorkoutAlert = false
+    @State private var showAddedConfirmation = false
+    @State private var activeWorkoutVM: ActiveWorkoutViewModel?
+    @State private var navigateToNewWorkout = false
     
     public init(exercise: Exercise) {
         self.exercise = exercise
@@ -33,6 +40,24 @@ public struct ExerciseDetailView: View {
         }
         .gymBroDarkBackground()
         .navigationBarTitleDisplayMode(.inline)
+        .navigationDestination(isPresented: $navigateToNewWorkout) {
+            if let vm = activeWorkoutVM {
+                ActiveWorkoutView(viewModel: vm)
+            }
+        }
+        .alert("No Active Workout", isPresented: $showNoWorkoutAlert) {
+            Button("Start Workout") {
+                startNewWorkoutWithExercise()
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("Start a new workout with \(exercise.name)?")
+        }
+        .overlay {
+            if showAddedConfirmation {
+                addedConfirmationOverlay
+            }
+        }
     }
     
     private var headerSection: some View {
@@ -145,7 +170,7 @@ public struct ExerciseDetailView: View {
     
     private var addToWorkoutButton: some View {
         Button {
-            // TODO: Implement add to workout
+            addExerciseToWorkout()
         } label: {
             HStack {
                 Image(systemName: "plus.circle.fill")
@@ -161,6 +186,69 @@ public struct ExerciseDetailView: View {
             )
         }
         .buttonStyle(.plain)
+    }
+
+    // MARK: - Add to Workout Logic
+
+    private func addExerciseToWorkout() {
+        // Check for an active workout in SwiftData
+        let descriptor = FetchDescriptor<Workout>(
+            predicate: #Predicate<Workout> { $0.isActive && !$0.isCancelled }
+        )
+
+        if let activeWorkout = try? modelContext.fetch(descriptor).first {
+            // Active workout exists — add exercise to it
+            let vm = ActiveWorkoutViewModel(
+                modelContext: modelContext,
+                workout: activeWorkout,
+                exercises: activeWorkout.exercises
+            )
+            vm.addExercise(exercise)
+            vm.setActiveExercise(exercise)
+            HapticFeedbackService.shared.setCompleted()
+
+            showAddedConfirmation = true
+            Task {
+                try? await Task.sleep(for: .seconds(1.5))
+                showAddedConfirmation = false
+                dismiss()
+            }
+        } else {
+            showNoWorkoutAlert = true
+        }
+    }
+
+    private func startNewWorkoutWithExercise() {
+        let workout = Workout(date: Date())
+        modelContext.insert(workout)
+
+        let vm = ActiveWorkoutViewModel(
+            modelContext: modelContext,
+            workout: workout,
+            exercises: [exercise]
+        )
+        activeWorkoutVM = vm
+        navigateToNewWorkout = true
+    }
+
+    @ViewBuilder
+    private var addedConfirmationOverlay: some View {
+        VStack(spacing: GymBroSpacing.md) {
+            Image(systemName: "checkmark.circle.fill")
+                .font(.system(size: 48))
+                .foregroundStyle(GymBroColors.accentGreen)
+
+            Text("Added to Workout")
+                .font(GymBroTypography.headline)
+                .foregroundStyle(GymBroColors.textPrimary)
+        }
+        .padding(GymBroSpacing.xl)
+        .background(
+            RoundedRectangle(cornerRadius: GymBroRadius.xl)
+                .fill(GymBroColors.surfaceSecondary)
+        )
+        .gymBroElevatedShadow()
+        .transition(.scale.combined(with: .opacity))
     }
 }
 
