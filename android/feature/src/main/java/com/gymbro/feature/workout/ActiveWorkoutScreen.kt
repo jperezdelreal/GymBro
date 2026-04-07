@@ -59,6 +59,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gymbro.core.model.Exercise
+import com.gymbro.feature.common.FullScreenLoading
 
 private val AccentGreen = Color(0xFF00FF87)
 private val AccentCyan = Color(0xFF00E5FF)
@@ -113,6 +114,11 @@ fun ActiveWorkoutScreen(
     state: ActiveWorkoutState,
     onEvent: (ActiveWorkoutEvent) -> Unit,
 ) {
+    if (state.isLoading) {
+        FullScreenLoading(message = "Starting workout...")
+        return
+    }
+
     Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
             topBar = {

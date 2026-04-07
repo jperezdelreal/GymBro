@@ -50,6 +50,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gymbro.core.model.SleepData
+import com.gymbro.feature.common.FullScreenLoading
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
@@ -126,12 +127,7 @@ internal fun RecoveryScreen(
                 })
             }
             state.isLoading -> {
-                Box(
-                    modifier = Modifier.fillMaxWidth().height(300.dp),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    CircularProgressIndicator(color = AccentGreen)
-                }
+                FullScreenLoading(message = "Loading recovery data...")
             }
             else -> {
                 // Readiness Score Card

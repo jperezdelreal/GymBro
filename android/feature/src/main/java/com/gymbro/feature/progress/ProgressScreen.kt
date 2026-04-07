@@ -54,6 +54,7 @@ import com.gymbro.core.model.E1RMDataPoint
 import com.gymbro.core.model.PersonalRecord
 import com.gymbro.core.model.RecordType
 import com.gymbro.core.model.WorkoutHistoryItem
+import com.gymbro.feature.common.FullScreenLoading
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
@@ -94,16 +95,7 @@ private fun ProgressScreen(
     onEvent: (ProgressEvent) -> Unit,
 ) {
     if (state.isLoading) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                text = "Loading progress...",
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
+        FullScreenLoading(message = "Loading progress...")
         return
     }
 
