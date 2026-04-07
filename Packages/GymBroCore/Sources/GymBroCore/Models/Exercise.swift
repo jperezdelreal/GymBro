@@ -77,6 +77,8 @@ public final class Exercise {
             return 90  // 90 seconds
         case .accessory:
             return 60  // 60 seconds
+        case .cardio:
+            return 30  // 30 seconds
         }
     }
 }
@@ -87,13 +89,14 @@ public enum ExerciseSource: String, Codable {
     case custom
 }
 
-public enum ExerciseCategory: String, Codable {
+public enum ExerciseCategory: String, Codable, CaseIterable {
     case compound
     case isolation
     case accessory
+    case cardio
 }
 
-public enum Equipment: String, Codable {
+public enum Equipment: String, Codable, CaseIterable {
     case barbell
     case dumbbell
     case kettlebell
