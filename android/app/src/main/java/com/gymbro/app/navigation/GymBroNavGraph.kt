@@ -6,20 +6,32 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ShowChart
+import androidx.compose.material.icons.automirrored.outlined.ShowChart
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.FitnessCenter
+import androidx.compose.material.icons.outlined.FitnessCenter
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.gymbro.core.model.Equipment
@@ -27,14 +39,29 @@ import com.gymbro.core.model.Exercise
 import com.gymbro.core.model.ExerciseCategory
 import com.gymbro.core.model.MuscleGroup
 import com.gymbro.feature.exerciselibrary.ExerciseLibraryRoute
+import com.gymbro.feature.progress.ProgressRoute
 import com.gymbro.feature.workout.ActiveWorkoutRoute
 import com.gymbro.feature.workout.WorkoutSummaryScreen
 
 private val AccentGreen = Color(0xFF00FF87)
 
+private enum class BottomNavTab(
+    val route: String,
+    val label: String,
+    val selectedIcon: ImageVector,
+    val unselectedIcon: ImageVector,
+) {
+    LIBRARY("exercise_library", "Library", Icons.Filled.FitnessCenter, Icons.Outlined.FitnessCenter),
+    PROGRESS("progress", "Progress", Icons.AutoMirrored.Filled.ShowChart, Icons.AutoMirrored.Outlined.ShowChart),
+}
+
 @Composable
 fun GymBroNavGraph() {
     val navController = rememberNavController()
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = navBackStackEntry?.destination
+
+    val showBottomBar = currentDestination?.route in BottomNavTab.entries.map { it.route }
 
     NavHost(
         navController = navController,
@@ -42,6 +69,22 @@ fun GymBroNavGraph() {
     ) {
         composable("exercise_library") {
             Scaffold(
+                bottomBar = {
+                    if (showBottomBar) {
+                        GymBroBottomNavBar(
+                            currentRoute = currentDestination?.route,
+                            onTabSelected = { tab ->
+                                navController.navigate(tab.route) {
+                                    popUpTo(navController.graph.findStartDestination().id) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
+                            },
+                        )
+                    }
+                },
                 floatingActionButton = {
                     FloatingActionButton(
                         onClick = { navController.navigate("active_workout") },
@@ -162,6 +205,31 @@ fun GymBroNavGraph() {
         composable("history") {
             PlaceholderScreen(title = "History")
         }
+        composable("progress") {
+            Scaffold(
+                bottomBar = {
+                    if (showBottomBar) {
+                        GymBroBottomNavBar(
+                            currentRoute = currentDestination?.route,
+                            onTabSelected = { tab ->
+                                navController.navigate(tab.route) {
+                                    popUpTo(navController.graph.findStartDestination().id) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
+                            },
+                        )
+                    }
+                },
+                containerColor = MaterialTheme.colorScheme.background,
+            ) { innerPadding ->
+                Box(modifier = Modifier.padding(innerPadding)) {
+                    ProgressRoute()
+                }
+            }
+        }
         composable("programs") {
             PlaceholderScreen(title = "Programs")
         }
@@ -185,5 +253,43 @@ private fun PlaceholderScreen(title: String) {
             style = MaterialTheme.typography.headlineLarge,
             color = MaterialTheme.colorScheme.onBackground,
         )
+    }
+}
+
+@Composable
+private fun GymBroBottomNavBar(
+    currentRoute: String?,
+    onTabSelected: (BottomNavTab) -> Unit,
+) {
+    NavigationBar(
+        containerColor = Color(0xFF1A1A1A),
+        contentColor = Color.White,
+    ) {
+        BottomNavTab.entries.forEach { tab ->
+            val selected = currentRoute == tab.route
+            NavigationBarItem(
+                selected = selected,
+                onClick = { onTabSelected(tab) },
+                icon = {
+                    Icon(
+                        if (selected) tab.selectedIcon else tab.unselectedIcon,
+                        contentDescription = tab.label,
+                    )
+                },
+                label = {
+                    Text(
+                        text = tab.label,
+                        style = MaterialTheme.typography.labelSmall,
+                    )
+                },
+                colors = NavigationBarItemDefaults.colors(
+                    selectedIconColor = AccentGreen,
+                    selectedTextColor = AccentGreen,
+                    unselectedIconColor = Color(0xFF9E9E9E),
+                    unselectedTextColor = Color(0xFF9E9E9E),
+                    indicatorColor = AccentGreen.copy(alpha = 0.12f),
+                ),
+            )
+        }
     }
 }
