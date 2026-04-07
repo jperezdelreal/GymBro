@@ -57,3 +57,45 @@
 - **Comprehensive tests**: 11 test cases cover smart defaults, set completion, warmup flow, PR detection, timer integration
 - **Architecture**: Services in GymBroCore (SmartDefaults, HapticFeedback, RestTimer, Notification), Views + ViewModel in GymBroUI
 - **Shipped**: PR #20 opened, closes #7
+### 2026-04-06: Rest Timer Implementation (Issue #4)
+**Pattern Established: Observable Singletons for Global Services**
+- Created `RestTimerService` as observable singleton using Swift's @Observable macro (iOS 17+) — preferred over ObservableObject for cleaner syntax and better performance.
+- Pattern: Singleton for truly global state (timer), passed service refs via `@State private var service = Service.shared` in views rather than @Environment.
+- Avoided @StateObject/@ObservedObject (legacy) in favor of @Observable + @State for iOS 17+ projects.
+
+**Haptic Feedback Design Pattern**
+- Medium impact (`UIImpactFeedbackGenerator`) for gentle feedback (10s warning).
+- Warning notification (`UINotificationFeedbackGenerator`) for critical events (timer complete).
+- Always prepare() generators in init to reduce latency on first trigger.
+- Haptics work even in silent mode — critical for gym environment where users silence notifications.
+
+**Timer Implementation: Task-based vs Timer.publish**
+- Used `Task.sleep(for: .seconds(1))` over Combine's `Timer.publish` for cleaner cancellation and modern async/await patterns.
+- @MainActor annotation ensures UI updates happen on main thread.
+- Task cancellation handled gracefully with `Task.isCancelled` checks.
+
+**Background Notifications**
+- `UNUserNotificationCenter` for local notifications when app is backgrounded.
+- Category identifier "REST_TIMER" enables custom notification actions in future (snooze, skip, add time).
+- Automatically cancels notification if timer stopped/skipped to avoid false alerts.
+
+**Model Design: Default Rest Times**
+- Added `defaultRestSeconds: Int?` to Exercise model — optional to allow per-exercise overrides.
+- Computed property `restTime` provides smart defaults: Compound (180s), Isolation (90s), Accessory (60s).
+- Pattern: Model should contain computed logic for business rules (rest time calculation) rather than pushing to ViewModels.
+
+**SwiftUI Animation: Circular Progress**
+- `.trim(from:to:)` on Circle() for smooth progress indicator.
+- `.animation(.linear(duration: 1), value: progress)` — explicit value binding prevents janky redraws.
+- `.rotationEffect(.degrees(-90))` rotates trim to start at top (12 o'clock) instead of right (3 o'clock).
+- Color transitions (blue → orange → red) via computed property based on remaining time — clear visual urgency signal.
+
+**Sheet Presentation: Auto-Dismiss Pattern**
+- `.presentationDetents([.medium, .large])` enables flexible sheet sizing — medium for quick glance, large for full context.
+- `.onChange(of: timerService.isActive)` to auto-dismiss when timer completes — no manual dismiss needed.
+- User can still manually close via X button or swipe down.
+
+**Testing Async Services**
+- Used `async throws` test methods with `Task.sleep(for: .seconds())` to validate timer countdown behavior.
+- Tests must be realistic: Timer counting down over 2-3 seconds is acceptable test duration for accuracy validation.
+- Singleton pattern requires careful `setUp()`/`tearDown()` to reset state between tests.
