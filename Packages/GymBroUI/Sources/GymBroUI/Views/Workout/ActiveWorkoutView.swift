@@ -52,6 +52,15 @@ public struct ActiveWorkoutView: View {
                 Spacer()
                 bottomActionBar
             }
+
+            // PR Celebration Overlay
+            if let prResult = viewModel.activePRCelebration {
+                PRCelebrationOverlay(result: prResult) {
+                    viewModel.dismissPRCelebration()
+                }
+                .transition(.opacity)
+                .zIndex(100)
+            }
         }
         .navigationTitle("Active Workout")
         .navigationBarTitleDisplayMode(.inline)
@@ -254,11 +263,17 @@ public struct ActiveWorkoutView: View {
                 .tracking(1.5)
 
             ForEach(Array(viewModel.completedSetsForActiveExercise.enumerated()), id: \.element.id) { _, set in
-                ExerciseSetRow(
-                    set: set,
-                    setNumber: set.setNumber,
-                    unitSystem: unitSystem
-                )
+                HStack(spacing: GymBroSpacing.sm) {
+                    ExerciseSetRow(
+                        set: set,
+                        setNumber: set.setNumber,
+                        unitSystem: unitSystem
+                    )
+
+                    if let recordTypes = viewModel.prRecordsBySetId[set.id], !recordTypes.isEmpty {
+                        PRBadge(recordTypes: recordTypes)
+                    }
+                }
             }
         }
     }

@@ -12,6 +12,7 @@ public final class ActiveWorkoutViewModel {
     private let modelContext: ModelContext
     private let smartDefaultsService: SmartDefaultsService
     private let supersetService = SupersetService.shared
+    private let prDetectionService: PRDetectionService
     
     public private(set) var workout: Workout
     public private(set) var activeExercise: Exercise?
@@ -23,6 +24,11 @@ public final class ActiveWorkoutViewModel {
     public private(set) var restTimerEndTime: Date?
     public private(set) var isRestTimerActive: Bool = false
     public var saveError: String?
+
+    /// Active PR celebration — set when a PR is detected, nil otherwise.
+    public private(set) var activePRCelebration: PRDetectionResult?
+    /// Maps set IDs to their PR record types for badge display on completed rows.
+    public private(set) var prRecordsBySetId: [UUID: [PersonalRecord.RecordType]] = [:]
     
     private var restTimerSeconds: Int = 120
     
@@ -57,6 +63,7 @@ public final class ActiveWorkoutViewModel {
         self.modelContext = modelContext
         self.workout = workout
         self.smartDefaultsService = SmartDefaultsService(modelContext: modelContext)
+        self.prDetectionService = PRDetectionService(modelContext: modelContext)
         
         if !exercises.isEmpty {
             self.activeExercise = exercises.first
@@ -137,8 +144,11 @@ public final class ActiveWorkoutViewModel {
         
         HapticFeedbackService.shared.setCompleted()
         
-        if isPR(set: set) {
+        let prResult = prDetectionService.checkForPR(set: set)
+        if prResult.isPR {
             HapticFeedbackService.shared.personalRecordAchieved()
+            activePRCelebration = prResult
+            prRecordsBySetId[set.id] = prResult.recordTypes
         }
         
         activeSetNumber += 1
@@ -259,6 +269,17 @@ public final class ActiveWorkoutViewModel {
         currentReps = defaults.reps
         currentRPE = nil
         isWarmup = false
+    }
+
+    /// Dismiss the PR celebration overlay.
+    public func dismissPRCelebration() {
+        activePRCelebration = nil
+    }
+
+    /// Fetch all-time PRs for the active exercise (for PRHistoryView).
+    public func getAllTimePRs() -> [PersonalRecord] {
+        guard let exercise = activeExercise else { return [] }
+        return prDetectionService.getAllTimePRs(for: exercise)
     }
     
     private func startRestTimer() {
@@ -430,8 +451,11 @@ public final class ActiveWorkoutViewModel {
         
         HapticFeedbackService.shared.setCompleted()
         
-        if isPR(set: set) {
+        let rpPRResult = prDetectionService.checkForPR(set: set)
+        if rpPRResult.isPR {
             HapticFeedbackService.shared.personalRecordAchieved()
+            activePRCelebration = rpPRResult
+            prRecordsBySetId[set.id] = rpPRResult.recordTypes
         }
         
         activeSetNumber += 1
