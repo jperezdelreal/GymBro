@@ -7,7 +7,15 @@ public struct ActiveWorkoutView: View {
     @State private var showingRPEPicker = false
     @State private var showingSummary = false
     @State private var workoutSummary: WorkoutSummary?
-    
+
+    @ScaledMetric(relativeTo: .title3) private var statFontSize: CGFloat = 20
+    @ScaledMetric(relativeTo: .title) private var exerciseNameSize: CGFloat = 24
+    @ScaledMetric(relativeTo: .title) private var adjustButtonSize: CGFloat = 36
+    @ScaledMetric(relativeTo: .title2) private var adjustValueSize: CGFloat = 28
+    @ScaledMetric(relativeTo: .title3) private var completeIconSize: CGFloat = 24
+    @ScaledMetric(relativeTo: .title3) private var completeTextSize: CGFloat = 20
+    @ScaledMetric(relativeTo: .largeTitle) private var emptyIconSize: CGFloat = 60
+
     private let unitSystem: UnitSystem
     
     public init(viewModel: ActiveWorkoutViewModel, unitSystem: UnitSystem = .metric) {
@@ -65,7 +73,7 @@ public struct ActiveWorkoutView: View {
                 WorkoutSummaryView(summary: summary)
             }
         }
-        .onAppear {
+        .task {
             HapticFeedbackService.shared.prepare()
         }
     }
@@ -97,7 +105,7 @@ public struct ActiveWorkoutView: View {
     private func statItem(title: String, value: String) -> some View {
         VStack(spacing: 4) {
             Text(value)
-                .font(.system(size: 20, weight: .bold, design: .rounded))
+                .font(.system(size: statFontSize, weight: .bold, design: .rounded))
             Text(title)
                 .font(.caption)
                 .foregroundStyle(.secondary)
@@ -110,7 +118,7 @@ public struct ActiveWorkoutView: View {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(exercise.name)
-                        .font(.system(size: 24, weight: .bold))
+                        .font(.system(size: exerciseNameSize, weight: .bold))
                     Text("Set \(viewModel.activeSetNumber)")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
@@ -131,12 +139,13 @@ public struct ActiveWorkoutView: View {
                             adjustWeight(-2.5)
                         } label: {
                             Image(systemName: "minus.circle.fill")
-                                .font(.system(size: 36))
+                                .font(.system(size: adjustButtonSize))
                                 .foregroundStyle(.blue)
                         }
+                        .accessibilityLabel("Decrease weight") // [VERIFY]
                         
                         Text(formatWeight(viewModel.currentWeight))
-                            .font(.system(size: 28, weight: .bold, design: .rounded))
+                            .font(.system(size: adjustValueSize, weight: .bold, design: .rounded))
                             .frame(minWidth: 100)
                             .multilineTextAlignment(.center)
                         
@@ -144,9 +153,10 @@ public struct ActiveWorkoutView: View {
                             adjustWeight(2.5)
                         } label: {
                             Image(systemName: "plus.circle.fill")
-                                .font(.system(size: 36))
+                                .font(.system(size: adjustButtonSize))
                                 .foregroundStyle(.blue)
                         }
+                        .accessibilityLabel("Increase weight") // [VERIFY]
                     }
                 }
                 .frame(maxWidth: .infinity)
@@ -163,12 +173,13 @@ public struct ActiveWorkoutView: View {
                             HapticFeedbackService.shared.valueChanged()
                         } label: {
                             Image(systemName: "minus.circle.fill")
-                                .font(.system(size: 36))
+                                .font(.system(size: adjustButtonSize))
                                 .foregroundStyle(.blue)
                         }
+                        .accessibilityLabel("Decrease reps") // [VERIFY]
                         
                         Text("\(viewModel.currentReps)")
-                            .font(.system(size: 28, weight: .bold, design: .rounded))
+                            .font(.system(size: adjustValueSize, weight: .bold, design: .rounded))
                             .frame(minWidth: 60)
                             .multilineTextAlignment(.center)
                         
@@ -177,9 +188,10 @@ public struct ActiveWorkoutView: View {
                             HapticFeedbackService.shared.valueChanged()
                         } label: {
                             Image(systemName: "plus.circle.fill")
-                                .font(.system(size: 36))
+                                .font(.system(size: adjustButtonSize))
                                 .foregroundStyle(.blue)
                         }
+                        .accessibilityLabel("Increase reps") // [VERIFY]
                     }
                 }
                 .frame(maxWidth: .infinity)
@@ -254,8 +266,9 @@ public struct ActiveWorkoutView: View {
     private var emptyStateView: some View {
         VStack(spacing: 20) {
             Image(systemName: "dumbbell")
-                .font(.system(size: 60))
+                .font(.system(size: emptyIconSize))
                 .foregroundStyle(.secondary)
+                .accessibilityHidden(true)
             
             Text("Add an exercise to begin")
                 .font(.headline)
@@ -280,7 +293,7 @@ public struct ActiveWorkoutView: View {
         VStack(spacing: 12) {
             // Rest timer
             if viewModel.isRestTimerActive, let endTime = viewModel.restTimerEndTime {
-                RestTimerView(endTime: endTime) {
+                InlineRestTimerView(endTime: endTime) {
                     viewModel.skipRestTimer()
                 }
             }
@@ -291,9 +304,9 @@ public struct ActiveWorkoutView: View {
             } label: {
                 HStack(spacing: 12) {
                     Image(systemName: "checkmark.circle.fill")
-                        .font(.system(size: 24))
+                        .font(.system(size: completeIconSize))
                     Text("Complete Set")
-                        .font(.system(size: 20, weight: .semibold))
+                        .font(.system(size: completeTextSize, weight: .semibold))
                 }
                 .foregroundStyle(.white)
                 .frame(maxWidth: .infinity)
@@ -343,20 +356,23 @@ public struct ActiveWorkoutView: View {
     }
 }
 
-struct RestTimerView: View {
+struct InlineRestTimerView: View {
     let endTime: Date
     let onSkip: () -> Void
-    
+
+    @ScaledMetric(relativeTo: .title3) private var timerIconSize: CGFloat = 20
+    @ScaledMetric(relativeTo: .body) private var timerTextSize: CGFloat = 18
+
     @State private var remainingTime: TimeInterval = 0
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     
     var body: some View {
         HStack {
             Image(systemName: "timer")
-                .font(.system(size: 20))
+                .font(.system(size: timerIconSize))
             
             Text("Rest: \(formatTime(remainingTime))")
-                .font(.system(size: 18, weight: .semibold, design: .rounded))
+                .font(.system(size: timerTextSize, weight: .semibold, design: .rounded))
             
             Spacer()
             

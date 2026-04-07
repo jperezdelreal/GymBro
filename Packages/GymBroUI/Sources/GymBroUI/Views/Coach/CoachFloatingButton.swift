@@ -24,6 +24,7 @@ public struct CoachFloatingButton: View {
                         .clipShape(Circle())
                         .shadow(color: .black.opacity(0.2), radius: 8, y: 4)
                 }
+                .accessibilityLabel("Open AI Coach") // [VERIFY]
                 .padding(.trailing, 20)
                 .padding(.bottom, 20)
             }

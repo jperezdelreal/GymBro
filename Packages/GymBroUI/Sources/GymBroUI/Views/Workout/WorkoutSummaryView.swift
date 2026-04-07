@@ -4,23 +4,29 @@ import GymBroCore
 public struct WorkoutSummaryView: View {
     let summary: WorkoutSummary
     @Environment(\.dismiss) private var dismiss
-    
+
+    @ScaledMetric(relativeTo: .largeTitle) private var celebrationIconSize: CGFloat = 80
+    @ScaledMetric(relativeTo: .title) private var titleSize: CGFloat = 32
+    @ScaledMetric(relativeTo: .title2) private var cardIconSize: CGFloat = 28
+    @ScaledMetric(relativeTo: .title2) private var cardValueSize: CGFloat = 24
+
     public init(summary: WorkoutSummary) {
         self.summary = summary
     }
     
     public var body: some View {
-        NavigationView {
+        NavigationStack {
             ScrollView {
                 VStack(spacing: 32) {
                     // Celebration icon
                     Image(systemName: "checkmark.circle.fill")
-                        .font(.system(size: 80))
+                        .font(.system(size: celebrationIconSize))
                         .foregroundStyle(.green)
                         .padding(.top, 40)
+                        .accessibilityHidden(true)
                     
                     Text("Workout Complete!")
-                        .font(.system(size: 32, weight: .bold))
+                        .font(.system(size: titleSize, weight: .bold))
                     
                     // Stats grid
                     VStack(spacing: 20) {
@@ -83,7 +89,7 @@ public struct WorkoutSummaryView: View {
     private func summaryCard(icon: String, title: String, value: String, color: Color) -> some View {
         HStack(spacing: 16) {
             Image(systemName: icon)
-                .font(.system(size: 28))
+                .font(.system(size: cardIconSize))
                 .foregroundStyle(color)
                 .frame(width: 50)
             
@@ -92,7 +98,7 @@ public struct WorkoutSummaryView: View {
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                 Text(value)
-                    .font(.system(size: 24, weight: .bold, design: .rounded))
+                    .font(.system(size: cardValueSize, weight: .bold, design: .rounded))
             }
             
             Spacer()

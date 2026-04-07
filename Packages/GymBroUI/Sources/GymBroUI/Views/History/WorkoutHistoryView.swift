@@ -3,7 +3,7 @@ import SwiftData
 import GymBroCore
 
 public struct WorkoutHistoryView: View {
-    @StateObject private var viewModel = WorkoutHistoryViewModel()
+    @State private var viewModel = WorkoutHistoryViewModel()
     @Environment(\.modelContext) private var modelContext
     
     public init() {}
@@ -16,11 +16,11 @@ public struct WorkoutHistoryView: View {
                         .font(.headline)
                     Text("\(workout.totalSets) sets • \(Int(workout.totalVolume)) kg")
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                 }
             }
             .navigationTitle("Workout History")
-            .onAppear {
+            .task {
                 viewModel.setup(modelContext: modelContext)
             }
         }

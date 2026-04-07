@@ -66,7 +66,7 @@ final class ProgramDay {
     @Relationship(deleteRule: .nullify)
     var program: Program?
     
-    @Relationship(deleteRule: .cascade)
+    @Relationship(deleteRule: .cascade, inverse: \PlannedExercise.programDay)
     var plannedExercises: [PlannedExercise]
     
     @Relationship(deleteRule: .nullify, inverse: \Workout.programDay)
@@ -99,6 +99,9 @@ final class PlannedExercise {
     @Relationship(deleteRule: .nullify)
     var exercise: Exercise?
     
+    @Relationship(deleteRule: .nullify)
+    var programDay: ProgramDay?
+    
     var targetSets: Int
     var targetReps: String
     var targetRPE: Double?
@@ -108,6 +111,7 @@ final class PlannedExercise {
         id: UUID = UUID(),
         order: Int,
         exercise: Exercise? = nil,
+        programDay: ProgramDay? = nil,
         targetSets: Int,
         targetReps: String,
         targetRPE: Double? = nil,
@@ -116,6 +120,7 @@ final class PlannedExercise {
         self.id = id
         self.order = order
         self.exercise = exercise
+        self.programDay = programDay
         self.targetSets = targetSets
         self.targetReps = targetReps
         self.targetRPE = targetRPE

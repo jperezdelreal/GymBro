@@ -15,7 +15,10 @@ let package = Package(
     targets: [
         .target(
             name: "GymBroCore",
-            dependencies: []
+            dependencies: [],
+            resources: [
+                .process("Resources")
+            ]
         ),
         .testTarget(
             name: "GymBroCoreTests",

@@ -1,26 +1,28 @@
 import SwiftUI
+import Observation
 import SwiftData
 import GymBroCore
 
 /// ViewModel that drives the progress dashboard.
 /// Fetches workout data from SwiftData and computes all progress metrics.
 @MainActor
-public class ProgressDashboardViewModel: ObservableObject {
+@Observable
+public final class ProgressDashboardViewModel {
 
-    @Published public var selectedTimeWindow: TimeWindow = .threeMonths
-    @Published public var selectedExerciseName: String?
-    @Published public var availableExercises: [String] = []
+    public var selectedTimeWindow: TimeWindow = .threeMonths
+    public var selectedExerciseName: String?
+    public var availableExercises: [String] = []
 
     // Chart data
-    @Published public var e1rmData: [E1RMDataPoint] = []
-    @Published public var volumeData: [VolumeDataPoint] = []
-    @Published public var tonnageData: [VolumeDataPoint] = []
-    @Published public var frequencyData: [FrequencyDataPoint] = []
-    @Published public var muscleBalance: [MuscleGroupBalance] = []
-    @Published public var prEvents: [PREvent] = []
-    @Published public var plateauAnalyses: [PlateauAnalysis] = []
+    public var e1rmData: [E1RMDataPoint] = []
+    public var volumeData: [VolumeDataPoint] = []
+    public var tonnageData: [VolumeDataPoint] = []
+    public var frequencyData: [FrequencyDataPoint] = []
+    public var muscleBalance: [MuscleGroupBalance] = []
+    public var prEvents: [PREvent] = []
+    public var plateauAnalyses: [PlateauAnalysis] = []
 
-    @Published public var isLoading: Bool = false
+    public var isLoading: Bool = false
 
     private let progressService: ProgressTrackingService
     private let plateauService: PlateauDetectionService

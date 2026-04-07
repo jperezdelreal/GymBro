@@ -3,7 +3,10 @@ import GymBroCore
 
 public struct RestTimerView: View {
     @State private var timerService = RestTimerService.shared
-    
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    @ScaledMetric(relativeTo: .largeTitle) private var timerFontSize: CGFloat = 56
+
     public init() {}
     
     public var body: some View {
@@ -24,12 +27,12 @@ public struct RestTimerView: View {
                     )
                     .frame(width: 200, height: 200)
                     .rotationEffect(.degrees(-90))
-                    .animation(.linear(duration: 1), value: progress)
+                    .animation(reduceMotion ? nil : .linear(duration: 1), value: progress)
                 
                 // Time remaining
                 VStack(spacing: 4) {
                     Text(timeString)
-                        .font(.system(size: 56, weight: .bold, design: .rounded))
+                        .font(.system(size: timerFontSize, weight: .bold, design: .rounded))
                         .monospacedDigit()
                     
                     Text("remaining")

@@ -4,6 +4,7 @@ import GymBroCore
 
 /// ViewModel for the AI Coach chat interface.
 /// Manages conversation state, message history, and AI service coordination.
+@MainActor
 @Observable
 public final class CoachChatViewModel {
 

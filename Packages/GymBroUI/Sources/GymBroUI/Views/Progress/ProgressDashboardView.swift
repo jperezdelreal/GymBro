@@ -4,7 +4,7 @@ import GymBroCore
 
 /// Main progress dashboard showing strength trends, volume, and insights.
 public struct ProgressDashboardView: View {
-    @StateObject private var viewModel = ProgressDashboardViewModel()
+    @State private var viewModel = ProgressDashboardViewModel()
 
     public init() {}
 
@@ -66,7 +66,7 @@ public struct ProgressDashboardView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     Label("Plateau Detected", systemImage: "exclamationmark.triangle.fill")
                         .font(.headline)
-                        .foregroundColor(.orange)
+                        .foregroundStyle(.orange)
 
                     Text("\(analysis.exerciseName) — Score: \(analysis.compositeScore, specifier: "%.0f%%")")
                         .font(.subheadline)
@@ -78,7 +78,7 @@ public struct ProgressDashboardView: View {
                 }
                 .padding()
                 .background(Color.orange.opacity(0.1))
-                .cornerRadius(12)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
             }
         }
     }
@@ -95,24 +95,27 @@ public struct ProgressDashboardView: View {
                     ForEach(viewModel.prEvents.suffix(10)) { pr in
                         HStack {
                             Image(systemName: "trophy.fill")
-                                .foregroundColor(.yellow)
+                                .foregroundStyle(.yellow)
                             VStack(alignment: .leading) {
                                 Text("\(pr.recordType): \(pr.value, specifier: "%.1f") kg")
                                     .font(.subheadline.bold())
                                 Text(pr.date, style: .date)
                                     .font(.caption)
-                                    .foregroundColor(.secondary)
+                                    .foregroundStyle(.secondary)
                             }
                             Spacer()
-                            Text("+\(pr.value - pr.previousBest, specifier: "%.1f")")
-                                .font(.caption.bold())
-                                .foregroundColor(.green)
+                            HStack(spacing: 2) {
+                                Image(systemName: "arrow.up.right")
+                                Text("+\(pr.value - pr.previousBest, specifier: "%.1f")")
+                            }
+                            .font(.caption.bold())
+                            .foregroundStyle(.green)
                         }
                     }
                 }
                 .padding()
                 .background(Color(.systemBackground))
-                .cornerRadius(12)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
                 .shadow(radius: 1)
             }
         }

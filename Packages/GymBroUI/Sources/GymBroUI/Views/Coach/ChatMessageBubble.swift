@@ -52,6 +52,7 @@ public struct ChatMessageBubble: View {
             .frame(width: 28, height: 28)
             .background(Color.accentColor)
             .clipShape(Circle())
+            .accessibilityHidden(true)
     }
 
     private var bubbleBackground: some ShapeStyle {
@@ -72,8 +73,6 @@ public struct ChatMessageBubble: View {
     }
 
     private var formattedTime: String {
-        let formatter = DateFormatter()
-        formatter.timeStyle = .short
-        return formatter.string(from: message.createdAt)
+        message.createdAt.formatted(date: .omitted, time: .shortened)
     }
 }
