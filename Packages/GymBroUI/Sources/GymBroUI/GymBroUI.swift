@@ -15,3 +15,12 @@ public typealias CoachFloatingButton = CoachFloatingButton
 
 // AI Coach ViewModels
 public typealias CoachChatViewModel = CoachChatViewModel
+// Progress Views (Issue #8)
+public typealias ProgressDashboardView = ProgressDashboardView
+public typealias E1RMChartView = E1RMChartView
+public typealias VolumeChartView = VolumeChartView
+public typealias TonnageChartView = TonnageChartView
+public typealias MuscleBalanceChart = MuscleBalanceChart
+
+// ViewModels
+public typealias ProgressDashboardViewModel = ProgressDashboardViewModel
