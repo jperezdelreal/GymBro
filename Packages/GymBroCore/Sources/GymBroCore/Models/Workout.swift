@@ -11,6 +11,8 @@ public public final class Workout {
     public var startTime: Date?
     public var endTime: Date?
     public var notes: String
+    public var isActive: Bool
+    public var isCancelled: Bool
     
     @Relationship(deleteRule: .cascade, inverse: \ExerciseSet.workout)
     public var sets: [ExerciseSet]
@@ -33,6 +35,8 @@ public public final class Workout {
         self.updatedAt = Date()
         self.date = date
         self.notes = notes
+        self.isActive = false
+        self.isCancelled = false
         self.sets = []
         self.program = program
         self.programDay = programDay
@@ -49,5 +53,17 @@ public public final class Workout {
     
     public var totalSets: Int {
         sets.filter { !$0.isWarmup }.count
+    }
+    
+    /// Unique exercises used in this workout, preserving insertion order.
+    public var exercises: [Exercise] {
+        var seen = Set<UUID>()
+        var result: [Exercise] = []
+        for set in sets.sorted(by: { $0.createdAt < $1.createdAt }) {
+            if let exercise = set.exercise, seen.insert(exercise.id).inserted {
+                result.append(exercise)
+            }
+        }
+        return result
     }
 }

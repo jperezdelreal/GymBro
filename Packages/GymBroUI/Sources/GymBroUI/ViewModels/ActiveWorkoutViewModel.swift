@@ -68,6 +68,7 @@ public final class ActiveWorkoutViewModel {
     public func startWorkout() {
         guard workout.startTime == nil else { return }
         workout.startTime = Date()
+        workout.isActive = true
         workout.updatedAt = Date()
         do {
             try modelContext.save()
@@ -155,6 +156,7 @@ public final class ActiveWorkoutViewModel {
     
     public func finishWorkout() -> WorkoutSummary {
         workout.endTime = Date()
+        workout.isActive = false
         workout.updatedAt = Date()
         do {
             try modelContext.save()
@@ -171,6 +173,19 @@ public final class ActiveWorkoutViewModel {
         )
         
         return summary
+    }
+    
+    public func cancelWorkout() {
+        workout.endTime = Date()
+        workout.isActive = false
+        workout.isCancelled = true
+        workout.updatedAt = Date()
+        do {
+            try modelContext.save()
+        } catch {
+            Self.logger.error("Failed to save cancelled workout: \(error.localizedDescription)")
+            saveError = "Failed to cancel workout. Your data may not be persisted."
+        }
     }
     
     private func loadSmartDefaults(for exercise: Exercise) {

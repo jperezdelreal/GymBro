@@ -141,6 +141,7 @@ public struct StartWorkoutView: View {
     
     private func startEmptyWorkout() {
         let workout = Workout()
+        workout.isActive = true
         modelContext.insert(workout)
         
         do {
