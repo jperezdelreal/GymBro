@@ -10,8 +10,10 @@ import androidx.compose.material.icons.automirrored.filled.ShowChart
 import androidx.compose.material.icons.automirrored.outlined.ShowChart
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.FitnessCenter
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.MonitorHeart
 import androidx.compose.material.icons.outlined.FitnessCenter
+import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.MonitorHeart
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.outlined.Person
@@ -45,6 +47,7 @@ import com.gymbro.core.model.MuscleGroup
 import com.gymbro.core.preferences.UserPreferences
 import com.gymbro.feature.exerciselibrary.ExerciseLibraryRoute
 import com.gymbro.feature.history.HistoryDetailRoute
+import com.gymbro.feature.history.HistoryListRoute
 import com.gymbro.feature.onboarding.OnboardingRoute
 import com.gymbro.feature.profile.ProfileRoute
 import com.gymbro.feature.progress.ProgressRoute
@@ -63,6 +66,7 @@ private enum class BottomNavTab(
     val unselectedIcon: ImageVector,
 ) {
     LIBRARY("exercise_library", "Library", Icons.Filled.FitnessCenter, Icons.Outlined.FitnessCenter),
+    HISTORY("history", "History", Icons.Filled.History, Icons.Outlined.History),
     PROGRESS("progress", "Progress", Icons.AutoMirrored.Filled.ShowChart, Icons.AutoMirrored.Outlined.ShowChart),
     RECOVERY("recovery", "Recovery", Icons.Filled.MonitorHeart, Icons.Outlined.MonitorHeart),
     PROFILE("profile", "Profile", Icons.Filled.Person, Icons.Outlined.Person),
@@ -245,7 +249,34 @@ fun GymBroNavGraph(
             )
         }
         composable("history") {
-            PlaceholderScreen(title = "History")
+            Scaffold(
+                bottomBar = {
+                    if (showBottomBar) {
+                        GymBroBottomNavBar(
+                            currentRoute = currentDestination?.route,
+                            onTabSelected = { tab ->
+                                navController.navigate(tab.route) {
+                                    popUpTo(navController.graph.findStartDestination().id) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
+                            },
+                        )
+                    }
+                },
+                containerColor = MaterialTheme.colorScheme.background,
+            ) { innerPadding ->
+                Box(modifier = Modifier.padding(innerPadding)) {
+                    HistoryListRoute(
+                        onNavigateBack = { },
+                        onNavigateToDetail = { workoutId ->
+                            navController.navigate("history/$workoutId")
+                        },
+                    )
+                }
+            }
         }
         composable("progress") {
             Scaffold(
