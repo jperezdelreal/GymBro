@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">GymBro</string>
+    <string name="quick_start_widget_description">Quick access to start a workout</string>
+    <string name="stats_widget_description">View your weekly workout stats</string>
 </resources>

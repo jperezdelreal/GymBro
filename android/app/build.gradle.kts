@@ -109,6 +109,10 @@ dependencies {
     // Background work
     implementation(libs.workmanager)
 
+    // Glance (Widgets)
+    implementation(libs.glance.appwidget)
+    implementation(libs.glance.material3)
+
     // Coroutines
     implementation(libs.coroutines.core)
     implementation(libs.coroutines.android)
