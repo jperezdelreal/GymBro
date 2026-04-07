@@ -76,6 +76,9 @@ public final class ActiveWorkoutViewModel {
             Self.logger.error("Failed to save workout start: \(error.localizedDescription)")
             saveError = "Failed to save workout. Please try again."
         }
+
+        // Start Live Activity for Dynamic Island + Lock Screen
+        LiveActivityService.shared.startWorkoutActivity(workoutId: workout.id.uuidString)
     }
     
     public func setActiveExercise(_ exercise: Exercise) {
@@ -146,6 +149,9 @@ public final class ActiveWorkoutViewModel {
         if isWarmup {
             isWarmup = false
         }
+
+        // Update Live Activity with new set info
+        updateLiveActivityState()
     }
     
     public func addExercise(_ exercise: Exercise) {
@@ -171,6 +177,13 @@ public final class ActiveWorkoutViewModel {
             totalSets: workout.totalSets,
             personalRecords: countPersonalRecords()
         )
+
+        // End Live Activity with summary
+        LiveActivityService.shared.endWorkoutActivity(
+            totalSets: summary.totalSets,
+            totalVolume: summary.totalVolume,
+            durationSeconds: Int(summary.duration)
+        )
         
         return summary
     }
@@ -186,6 +199,9 @@ public final class ActiveWorkoutViewModel {
             Self.logger.error("Failed to save cancelled workout: \(error.localizedDescription)")
             saveError = "Failed to cancel workout. Your data may not be persisted."
         }
+
+        // Dismiss Live Activity immediately
+        LiveActivityService.shared.dismissWorkoutActivity()
     }
     
     private func loadSmartDefaults(for exercise: Exercise) {
@@ -199,13 +215,53 @@ public final class ActiveWorkoutViewModel {
     private func startRestTimer() {
         restTimerEndTime = Date().addingTimeInterval(TimeInterval(restTimerSeconds))
         isRestTimerActive = true
+
+        // Push rest timer to Live Activity / Dynamic Island
+        if let exercise = activeExercise {
+            LiveActivityService.shared.updateRestTimer(
+                exerciseName: exercise.name,
+                currentSetNumber: activeSetNumber,
+                restDuration: restTimerSeconds,
+                completedSets: totalCompletedSets,
+                totalVolume: totalVolume,
+                elapsedSeconds: Int(workoutDuration),
+                lastWeight: currentWeight,
+                lastReps: currentReps
+            )
+        }
     }
     
     public func skipRestTimer() {
         restTimerEndTime = nil
         isRestTimerActive = false
+
+        // Clear rest timer from Live Activity
+        if let exercise = activeExercise {
+            LiveActivityService.shared.clearRestTimer(
+                exerciseName: exercise.name,
+                currentSetNumber: activeSetNumber,
+                completedSets: totalCompletedSets,
+                totalVolume: totalVolume,
+                elapsedSeconds: Int(workoutDuration),
+                lastWeight: currentWeight,
+                lastReps: currentReps
+            )
+        }
     }
     
+    private func updateLiveActivityState() {
+        guard let exercise = activeExercise else { return }
+        LiveActivityService.shared.updateWorkoutActivity(
+            exerciseName: exercise.name,
+            currentSetNumber: activeSetNumber,
+            completedSets: totalCompletedSets,
+            totalVolume: totalVolume,
+            elapsedSeconds: Int(workoutDuration),
+            lastWeight: currentWeight,
+            lastReps: currentReps
+        )
+    }
+
     private func isPR(set: ExerciseSet) -> Bool {
         guard let exercise = activeExercise else { return false }
         
