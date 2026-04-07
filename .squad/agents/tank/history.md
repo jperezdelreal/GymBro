@@ -211,6 +211,32 @@ This foundation unblocks all Phase-1 work:
 - Background delivery frequency: `.hourly` for all types — might want `.immediate` for sleep if recovery score needs to update faster
 - HealthKit entitlement + Info.plist usage descriptions: need Xcode project file configuration (currently SPM-only repo)
 - Stale data cleanup: currently inserts new HealthMetric rows on each sync — need a cleanup strategy to prevent unbounded growth
+- Integration with recovery/readiness score engine (downstream consumer of this data)
+
+### 2026-04-08: wger.de API Integration (Issue #77, PR #94)
+
+**Architecture Decisions:**
+- **ExerciseSource Enum:** Added `ExerciseSource` (seed/wger/custom) to `Exercise` model for origin tracking. Existing seeded exercises default to `.seed`, user-created to `.custom`, and API-imported to `.wger`.
+- **Actor-based Services:** Both `WgerAPIService` and `ExerciseSyncService` are Swift actors for thread-safe concurrent access.
+- **Offline-First Design:** API sync enhances the exercise library but never blocks core functionality. All sync failures are logged and swallowed — the app works fine without network.
+- **24-Hour Sync Throttle:** `ExerciseSyncService` uses UserDefaults-based timestamp to avoid hammering wger.de. Respects their public API rate limits.
+
+**Key Implementation Details:**
+- `WgerAPIService`: Handles paginated fetching of exercises, muscles, and equipment from wger.de REST API. Returns clean DTOs (`WgerExerciseData`, `WgerMuscleData`, `WgerEquipmentData`). Handles HTTP 429 (rate limited) as a distinct error case.
+- `ExerciseSyncService`: Orchestrates multi-page fetch, maps wger data to GymBro models (categories, equipment, muscle groups), deduplicates by name similarity (case-insensitive + substring matching), strips HTML from descriptions, and batch-inserts into SwiftData.
+- Wger muscle IDs mapped to GymBro's 19 muscle groups via static dictionary with API-name fallback.
+- Wger equipment mapped by name keywords (barbell, dumbbell, machine, etc.).
+- Wger categories mapped by ID (legs/chest/back → compound, arms/abs/calves → isolation, others → accessory).
+
+**Files Created/Modified (4 files, ~823 lines):**
+- Modified: `Exercise.swift` (added `ExerciseSource`, `source`, `wgerId`, `lastSyncedAt`)
+- Created: `WgerAPIService.swift` (API client with pagination and error handling)
+- Created: `ExerciseSyncService.swift` (sync orchestration, mapping, deduplication)
+- Created: `WgerAPIServiceTests.swift` (15 tests with MockURLProtocol)
+
+**Testing Strategy:**
+- Mock `URLProtocol` subclass injects fake HTTP responses — no real network calls in tests.
+- Tests cover: successful decoding, pagination extraction, rate limit handling, HTTP errors, decoding errors, empty results, language/page params, muscle/equipment endpoints, ExerciseSource codability.
 ### 2026-04-07: AI Coach Context Pipeline Complete (Neo, Issue #82)
 **No Schema Changes Needed — Uses Existing Models**
 - Neo completed the three-layer data pipeline: ViewModel → Snapshots → PromptBuilder
