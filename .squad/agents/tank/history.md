@@ -368,6 +368,33 @@ This foundation unblocks all Phase-1 work:
 - **Strongman movements:** Yoke walk, sandbag carry, tire flip, sled push/drag
 - **Specialty movements:** Landmine press/row, one-arm barbell row, Bradford press, dumbbell incline fly, decline dumbbell press, reverse pec deck, cable Y-raise, Copenhagen plank, landmine rotation, suitcase carry, birddogs
 
+### 2026-07-XX: Android Project Scaffold
+
+**Architecture Decisions:**
+- **Three-module Gradle project:** `:app` (UI entry point), `:core` (database, models, DI), `:feature` (feature screens). Mirrors iOS's modular SPM layout for team consistency.
+- **Version catalog (libs.versions.toml):** All dependency versions centralized. Kotlin 2.1.21, Compose BOM 2025.05.01, Hilt 2.56.2, Room 2.7.1, AGP 8.10.1, Gradle 8.14.2.
+- **Clean Architecture + MVI:** Matches team decisions. Domain models in `core/model/`, Room entities in `core/database/entity/`, DAOs in `core/database/dao/`, Hilt DI in `core/di/`.
+- **GymBro dark theme:** Colors match iOS palette — Background #0A0A0A, AccentGreen #00FF87, AccentCyan #00E5FF, AccentAmber #FFAB00. Always dark, no light theme.
+- **Domain models mirror iOS:** `Exercise` (with MuscleGroup/Equipment enums), `Workout`, `ExerciseSet` (with e1RM Epley formula and kg→lbs conversion). All weights stored as kg — same as iOS decision.
+
+**Key Files Created (34 files, ~1067 lines):**
+- Root: `build.gradle.kts`, `settings.gradle.kts`, `gradle.properties`, `gradle/libs.versions.toml`, `gradlew`, `gradlew.bat`
+- App: `GymBroApplication.kt` (@HiltAndroidApp), `MainActivity.kt` (@AndroidEntryPoint + Compose), Theme (Color/Type/Theme.kt), `GymBroNavGraph.kt` (5-route placeholder), resources
+- Core: `GymBroDatabase.kt` (Room), `ExerciseEntity.kt`, `ExerciseDao.kt`, `DatabaseModule.kt` (Hilt), domain models
+- Feature: Scaffold with Compose + Hilt + Navigation dependencies, workout package placeholder
+
+**Build Verification:**
+- `assembleDebug` passes cleanly (BUILD SUCCESSFUL in ~1m)
+- Minor deprecation warning on `statusBarColor` — cosmetic, standard for edge-to-edge migration
+- Min SDK 26, Target/Compile SDK 36, JVM target 17
+
+**Unblocked Work:**
+- Feature development: workout logging, exercise library, history screens
+- Room entity expansion for full data model
+- Health Connect integration (permissions already in manifest)
+- CI/CD: GitHub Actions Android build workflow
+
+
 **Data Integrity:**
 - All exercises validated for: unique names, valid categories (compound/isolation/accessory), valid equipment types, muscle group assignments, primary muscle designation
 - Big three powerlifts (squat, bench, deadlift) verified present with multiple variations
