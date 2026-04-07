@@ -25,6 +25,13 @@ class ExerciseRepositoryImpl @Inject constructor(
 
     override suspend fun getExerciseById(id: String): Exercise? =
         exerciseDao.getExerciseById(id)?.toDomain()
+
+    override suspend fun addExercise(exercise: Exercise) {
+        exerciseDao.insertExercise(exercise.toEntity())
+    }
+
+    override suspend fun isExerciseNameTaken(name: String): Boolean =
+        exerciseDao.countExercisesByName(name) > 0
 }
 
 private fun ExerciseEntity.toDomain(): Exercise = Exercise(
@@ -33,6 +40,16 @@ private fun ExerciseEntity.toDomain(): Exercise = Exercise(
     muscleGroup = MuscleGroup.entries.find { it.name == muscleGroup } ?: MuscleGroup.FULL_BODY,
     category = ExerciseCategory.entries.find { it.name == category } ?: ExerciseCategory.COMPOUND,
     equipment = Equipment.entries.find { it.name == equipment } ?: Equipment.OTHER,
+    description = description,
+    youtubeUrl = youtubeUrl,
+)
+
+private fun Exercise.toEntity(): ExerciseEntity = ExerciseEntity(
+    id = id.toString(),
+    name = name,
+    muscleGroup = muscleGroup.name,
+    category = category.name,
+    equipment = equipment.name,
     description = description,
     youtubeUrl = youtubeUrl,
 )

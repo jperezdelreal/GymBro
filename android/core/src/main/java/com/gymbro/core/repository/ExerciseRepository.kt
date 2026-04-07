@@ -7,4 +7,6 @@ interface ExerciseRepository {
     fun getAllExercises(): Flow<List<Exercise>>
     fun getFilteredExercises(muscleGroup: String?, query: String?): Flow<List<Exercise>>
     suspend fun getExerciseById(id: String): Exercise?
+    suspend fun addExercise(exercise: Exercise)
+    suspend fun isExerciseNameTaken(name: String): Boolean
 }

@@ -45,6 +45,7 @@ import com.gymbro.core.model.Exercise
 import com.gymbro.core.model.ExerciseCategory
 import com.gymbro.core.model.MuscleGroup
 import com.gymbro.core.preferences.UserPreferences
+import com.gymbro.feature.exerciselibrary.CreateExerciseRoute
 import com.gymbro.feature.exerciselibrary.ExerciseLibraryRoute
 import com.gymbro.feature.history.HistoryDetailRoute
 import com.gymbro.feature.history.HistoryListRoute
@@ -136,12 +137,22 @@ fun GymBroNavGraph(
                         onNavigateToDetail = { exerciseId ->
                             navController.navigate("exercise_detail/$exerciseId")
                         },
+                        onNavigateToCreateExercise = {
+                            navController.navigate("create_exercise")
+                        },
                     )
                 }
             }
         }
         composable("exercise_detail/{exerciseId}") {
             PlaceholderScreen(title = "Exercise Detail")
+        }
+        composable("create_exercise") {
+            CreateExerciseRoute(
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+            )
         }
         composable("active_workout") { backStackEntry ->
             val savedStateHandle = backStackEntry.savedStateHandle
