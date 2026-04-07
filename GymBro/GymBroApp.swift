@@ -7,14 +7,12 @@ import GymBroUI
 struct GymBroApp: App {
     @State private var authService = AuthenticationService()
     @State private var syncService = CloudKitSyncService()
-    @State private var conflictService = ConflictResolutionService()
 
     var body: some Scene {
         WindowGroup {
             ContentView(
                 authService: authService,
-                syncService: syncService,
-                conflictService: conflictService
+                syncService: syncService
             )
                 .task {
                     await authService.checkExistingCredential()

@@ -1,3 +1,8 @@
+// DEFERRED: v1.1 — requires Watch app target and WatchKit pairing setup.
+// WatchConnectivityService is fully implemented but not activated anywhere;
+// no Watch app target exists yet. Wire via WatchConnectivityService.shared.activate()
+// in GymBroApp once the GymBroWatch target ships.
+
 import Foundation
 import WatchConnectivity
 import os
