@@ -74,6 +74,7 @@ private val fullDateFormatter = DateTimeFormatter.ofPattern("MMM d, yyyy")
 @Composable
 fun ProgressRoute(
     onNavigateToWorkoutDetail: (String) -> Unit = {},
+    onNavigateToAnalytics: () -> Unit = {},
 ) {
     val viewModel: ProgressViewModel = hiltViewModel()
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -90,6 +91,7 @@ fun ProgressRoute(
     ProgressScreen(
         state = state,
         onEvent = viewModel::onEvent,
+        onNavigateToAnalytics = onNavigateToAnalytics,
     )
 }
 
@@ -97,6 +99,7 @@ fun ProgressRoute(
 private fun ProgressScreen(
     state: ProgressState,
     onEvent: (ProgressEvent) -> Unit,
+    onNavigateToAnalytics: () -> Unit = {},
 ) {
     if (state.isLoading) {
         FullScreenLoading(message = "Loading progress...")
@@ -115,6 +118,11 @@ private fun ProgressScreen(
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
+        // Analytics Card
+        item {
+            AnalyticsNavigationCard(onClick = onNavigateToAnalytics)
+        }
+        
         // Section: Personal Records
         if (state.personalRecords.isNotEmpty()) {
             item {
@@ -195,6 +203,53 @@ private fun EmptyProgressState() {
         title = "No workouts yet",
         subtitle = "Start training to see your progress!",
     )
+}
+
+@Composable
+private fun AnalyticsNavigationCard(onClick: () -> Unit) {
+    Card(
+        onClick = onClick,
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = SurfaceColor),
+        shape = RoundedCornerShape(12.dp),
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = "📊",
+                    fontSize = 24.sp,
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                Column {
+                    Text(
+                        text = "Advanced Analytics",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        fontWeight = FontWeight.Bold,
+                    )
+                    Text(
+                        text = "View detailed training insights",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ShowChart,
+                contentDescription = null,
+                tint = AccentGreen,
+                modifier = Modifier.size(24.dp),
+            )
+        }
+    }
 }
 
 @Composable
