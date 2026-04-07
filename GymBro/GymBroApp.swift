@@ -1,6 +1,7 @@
 import SwiftUI
 import SwiftData
 import GymBroCore
+import GymBroUI
 
 @main
 struct GymBroApp: App {
@@ -15,7 +16,9 @@ struct GymBroApp: App {
             Program.self,
             ProgramDay.self,
             UserProfile.self,
-            ChatMessage.self
+            ChatMessage.self,
+            HealthMetric.self,
+            HealthBaseline.self
         ])
     }
 }
