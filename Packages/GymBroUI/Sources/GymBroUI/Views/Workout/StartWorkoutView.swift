@@ -1,8 +1,11 @@
 import SwiftUI
 import SwiftData
 import GymBroCore
+import os
 
 public struct StartWorkoutView: View {
+    private static let logger = Logger(subsystem: "com.gymbro", category: "StartWorkout")
+
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     
@@ -149,7 +152,7 @@ public struct StartWorkoutView: View {
             )
             showingActiveWorkout = true
         } catch {
-            print("Failed to create workout: \(error)")
+            Self.logger.error("Failed to create workout: \(error.localizedDescription)")
         }
     }
 }

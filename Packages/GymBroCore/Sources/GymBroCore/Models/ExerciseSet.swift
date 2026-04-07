@@ -2,26 +2,26 @@ import Foundation
 import SwiftData
 
 @Model
-final class ExerciseSet {
-    var id: UUID
-    var createdAt: Date
-    var updatedAt: Date
-    var completedAt: Date?
+public public final class ExerciseSet {
+    public var id: UUID
+    public var createdAt: Date
+    public var updatedAt: Date
+    public var completedAt: Date?
     
     @Relationship(deleteRule: .nullify)
-    var exercise: Exercise?
+    public var exercise: Exercise?
     
     @Relationship(deleteRule: .nullify)
-    var workout: Workout?
+    public var workout: Workout?
     
-    var weightKg: Double
-    var reps: Int
-    var rpe: Double?
-    var restSeconds: Int
-    var setType: SetType
-    var setNumber: Int
+    public var weightKg: Double
+    public var reps: Int
+    public var rpe: Double?
+    public var restSeconds: Int
+    public var setType: SetType
+    public var setNumber: Int
     
-    init(
+    public init(
         id: UUID = UUID(),
         exercise: Exercise? = nil,
         workout: Workout? = nil,
@@ -45,20 +45,20 @@ final class ExerciseSet {
         self.setNumber = setNumber
     }
     
-    var isWarmup: Bool {
+    public var isWarmup: Bool {
         setType == .warmup
     }
     
-    var volume: Double {
+    public var volume: Double {
         Double(reps) * weightKg
     }
     
-    var estimatedOneRepMax: Double {
+    public var estimatedOneRepMax: Double {
         guard reps > 0 else { return weightKg }
         return weightKg * (1 + Double(reps) / 30.0)
     }
     
-    func weightInUnit(_ unit: UnitSystem) -> Double {
+    public func weightInUnit(_ unit: UnitSystem) -> Double {
         switch unit {
         case .metric:
             return weightKg
@@ -68,7 +68,7 @@ final class ExerciseSet {
     }
 }
 
-enum SetType: String, Codable {
+public public enum SetType: String, Codable {
     case warmup
     case working
     case drop

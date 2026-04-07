@@ -2,26 +2,26 @@ import Foundation
 import SwiftData
 
 @Model
-final class Workout {
-    var id: UUID
-    var createdAt: Date
-    var updatedAt: Date
+public public final class Workout {
+    public var id: UUID
+    public var createdAt: Date
+    public var updatedAt: Date
     
-    var date: Date
-    var startTime: Date?
-    var endTime: Date?
-    var notes: String
+    public var date: Date
+    public var startTime: Date?
+    public var endTime: Date?
+    public var notes: String
     
     @Relationship(deleteRule: .cascade, inverse: \ExerciseSet.workout)
-    var sets: [ExerciseSet]
+    public var sets: [ExerciseSet]
     
     @Relationship(deleteRule: .nullify)
-    var program: Program?
+    public var program: Program?
     
     @Relationship(deleteRule: .nullify)
-    var programDay: ProgramDay?
+    public var programDay: ProgramDay?
     
-    init(
+    public init(
         id: UUID = UUID(),
         date: Date = Date(),
         notes: String = "",
@@ -38,16 +38,16 @@ final class Workout {
         self.programDay = programDay
     }
     
-    var duration: TimeInterval? {
+    public var duration: TimeInterval? {
         guard let start = startTime, let end = endTime else { return nil }
         return end.timeIntervalSince(start)
     }
     
-    var totalVolume: Double {
+    public var totalVolume: Double {
         sets.reduce(0) { $0 + $1.volume }
     }
     
-    var totalSets: Int {
+    public var totalSets: Int {
         sets.filter { !$0.isWarmup }.count
     }
 }

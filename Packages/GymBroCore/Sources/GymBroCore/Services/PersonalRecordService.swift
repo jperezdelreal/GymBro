@@ -1,5 +1,6 @@
 import Foundation
 import SwiftData
+import os
 
 public struct PersonalRecord {
     public let exerciseSet: ExerciseSet

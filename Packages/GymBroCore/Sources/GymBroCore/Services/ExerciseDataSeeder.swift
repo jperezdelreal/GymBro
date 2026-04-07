@@ -1,7 +1,9 @@
 import Foundation
 import SwiftData
+import os
 
 public struct ExerciseDataSeeder {
+    private static let logger = Logger(subsystem: "com.gymbro", category: "ExerciseDataSeeder")
     private struct ExerciseSeedData: Codable {
         let name: String
         let category: String
@@ -19,20 +21,20 @@ public struct ExerciseDataSeeder {
         let alreadySeeded = try modelContext.fetch(FetchDescriptor<Exercise>()).count > 0
         
         guard !alreadySeeded else {
-            print("Exercises already seeded, skipping...")
+            logger.info("Exercises already seeded, skipping...")
             return
         }
         
         guard let url = Bundle.main.url(forResource: "exercises-seed", withExtension: "json"),
               let data = try? Data(contentsOf: url) else {
-            print("Failed to load exercises-seed.json")
+            logger.error("Failed to load exercises-seed.json")
             return
         }
         
         let decoder = JSONDecoder()
         let seedData = try decoder.decode([ExerciseSeedData].self, from: data)
         
-        print("Seeding \(seedData.count) exercises...")
+        logger.info("Seeding \(seedData.count) exercises...")
         
         for exerciseData in seedData {
             let exercise = Exercise(
@@ -50,6 +52,6 @@ public struct ExerciseDataSeeder {
         }
         
         try modelContext.save()
-        print("Successfully seeded \(seedData.count) exercises")
+        logger.info("Successfully seeded \(seedData.count) exercises")
     }
 }
