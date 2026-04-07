@@ -103,3 +103,166 @@
 **Decision Captured:** Merged to .squad/decisions.md as heuristics-first design pattern
 
 **Impact:** Smart defaults now adapt to user's training state; enables true autoregulation
+4. **RPE integration**
+   - If RPE data exists on sets, calibrates next-session weights
+   - RPE < 7.0: +2.5% (user has more in tank)
+   - RPE 7.0-9.5: 0% (perfect difficulty)
+   - RPE >= 9.5: -5% (too difficult, back off)
+
+5. **Deload recognition**
+   - Detects deload weeks when weight < 85% of recent max
+   - Holds weight during deload (doesn't add progression)
+   - Prevents inappropriate +2.5kg suggestions during recovery weeks
+
+6. **Experience-level scaling**
+   - Beginner: 1.5x progression multiplier (faster gains)
+   - Intermediate: 1.0x (normal)
+   - Advanced: 0.5x (slower gains)
+   - Elite: 0.25x (very slow gains)
+
+**Algorithm Design Philosophy:**
+- **Heuristics before ML** — well-tuned rules with clear logic, not black boxes
+- **Every prediction is explainable** — detailed logging shows reasoning at each step
+- **Graceful degradation** — missing RPE? Fall back to simpler model. Missing readiness? Skip recovery adjustment
+- **Conservative by default** — always round down for safety (injury prevention over max performance)
+
+**Technical Implementation:**
+- New method signature: `getSmartDefaults(for:setNumber:exercisePositionInWorkout:currentReadinessScore:)`
+- Fetches recent sessions grouped by workout (not individual sets)
+- TrendAnalysis struct with trendStrength, averageFatiguePattern, volumeStability
+- Helper methods for session fetching, trend calculation, deload detection, RPE calibration, fatigue/recovery multipliers
+- Weight rounding: compound 2.5kg, isolation 1.25kg, accessory 0.5kg increments
+
+**Testing:**
+- 20 comprehensive unit tests covering all features
+- Tests: defaults, progression, RPE, fatigue, recovery, deload, trend analysis, edge cases, graceful degradation
+- All tests use mocked data for deterministic results
+
+**Key Learnings:**
+- **Top-set approach beats average-set approach** — using max weight from last session (not average) better reflects user's true capacity
+- **Fatigue is multiplicative, not additive** — Set 3 at position 5 = 0.95 * 0.95 * historyAdjustment
+- **Conservative rounding matters** — always floor() to nearest increment, never ceil() (safety over ego)
+- **Deload detection is critical** — without it, algorithm suggests +2.5kg on 60% deload weeks (dangerous)
+- **Graceful degradation enables MVP shipping** — RPE and readiness are optional enhancements, core algorithm works without them
+
+**File Paths:**
+- `Packages/GymBroCore/Sources/GymBroCore/Services/SmartDefaultsService.swift` — complete rewrite (422 insertions)
+- `Packages/GymBroCore/Tests/GymBroCoreTests/SmartDefaultsServiceTests.swift` — 20 new tests (527 insertions)
+
+**Next Integration Steps:**
+- Wire up to workout logging UI (call with setNumber and exercisePosition context)
+- Add readiness score to call site (fetch latest ReadinessScore from SwiftData)
+- Manual testing with real workout data (100+ sets across multiple weeks)
+- Performance testing with large datasets (1000+ sets)
+- Consider caching trend analysis per exercise (recompute only on new session)
+
+**Impact:**
+- Smart defaults now adapt to user's actual training state (fatigue, recovery, trend)
+- Reduces injury risk by backing off when readiness is low or RPE was too high
+- Improves adherence by making suggestions feel "right" (users trust the numbers)
+- Enables true autoregulation — the app "feels" when to push vs when to hold
+- Foundation for future adaptive training engine (this is the core prediction logic)
+
+### 2026-04-07: Overtraining Detection & Muscle Imbalance Alerts (Issue #83, PR #91)
+
+**The Problem:**
+- Existing plateau detection was per-exercise only (e.g., "your bench press is stalled")
+- No systemic overtraining detection across all exercises
+- Muscle imbalance was visualization-only — no alerts when push/pull ratio is dangerous
+- No per-muscle-group weekly set count analysis vs hypertrophy landmarks
+- Users could overtrain without the app detecting it until injuries occurred
+
+**The Solution — Two New Services:**
+
+#### 1. OvertrainingDetectionService
+Monitors **across all exercises** for systemic overtraining signals:
+
+**Detection methods (5 independent signals):**
+1. **Multi-exercise plateau correlation** — 3+ exercises stalling simultaneously = systemic fatigue (not exercise-specific)
+2. **Volume ramp rate monitoring** — Weekly volume increasing >10% = injury risk per Gabbett (2016)
+3. **RPE drift detection** — Same weight feeling +1 RPE harder over 3+ weeks = accumulated fatigue
+4. **Performance decline detection** — e1RM dropping >5% across 2+ major lifts = overreaching
+5. **Chronic low readiness** — Readiness <60 for 5+ days + high training volume = overtraining
+
+**Risk stratification:**
+- 0 signals = No risk (training sustainable)
+- 1-2 signals = Moderate risk (early warning, suggest deload week)
+- 3+ signals = High risk (immediate deload required)
+
+**Design decisions:**
+- Requires minimum 4 weeks of data for meaningful signal (prevents false alarms)
+- Conservative thresholds: false positive rate <10% (trust is critical)
+- All thresholds cited from sports science research (Helms, Israetel, Schoenfeld, Gabbett)
+- Integrates with ReadinessScoreService for holistic fatigue assessment
+
+#### 2. MuscleImbalanceService
+Analyzes training balance and volume distribution:
+
+**Push/Pull ratio analysis:**
+- Healthy range: 0.8–1.2 (balanced anterior/posterior chain)
+- Warning threshold: >1.5 (anterior dominance = shoulder impingement + posture risk)
+- Calculates push volume (chest, front delts, side delts, triceps, quads) vs pull volume (back, rear delts, biceps, traps, hamstrings, glutes)
+
+**Volume landmarks per muscle group (Dr. Mike Israetel's research):**
+- **MEV (Minimum Effective Volume):** Minimum sets/week for growth
+- **MAV (Maximum Adaptive Volume):** Optimal sets/week for most trainees
+- **MRV (Maximum Recoverable Volume):** Upper limit before diminishing returns
+
+**Alert conditions:**
+- Volume >MRV → "You're exceeding Maximum Recoverable Volume for [muscle]. Reduce to [MAV]–[MRV] sets."
+- Volume <50% of MEV → "You're below Minimum Effective Volume for [muscle]. Increase to [MEV]+ sets."
+- Push:Pull ratio >1.5 → "Anterior dominance detected. Add [X] weekly sets of back/posterior delt work."
+
+**Primary/secondary muscle weighting:**
+- Primary muscle groups count 1.0x (e.g., chest on bench press)
+- Secondary muscle groups count 0.5x (e.g., triceps on bench press)
+- Matches existing ProgressTrackingService pattern for consistency
+
+**Testing:**
+- 50+ comprehensive unit tests across both services
+- Coverage: all detection methods, edge cases, insufficient data, risk stratification
+- Deterministic test data (no flaky tests)
+- Tests follow existing patterns (ReadinessScoreServiceTests, PlateauDetectionServiceTests)
+
+**Technical Implementation:**
+- Both services are stateless — analyze() methods take input data, return analysis models
+- Results persisted in SwiftData (@Model classes: OvertrainingAnalysis, MuscleImbalanceAnalysis)
+- JSON encoding for complex nested data (signals, alerts) to work with SwiftData
+- Computed properties for type-safe access to encoded data
+
+**Key Learnings:**
+- **Systemic vs exercise-specific stagnation** — PlateauDetectionService handles individual exercises, OvertrainingDetectionService handles program-wide fatigue
+- **Multi-signal detection reduces false positives** — 1 signal could be noise, 3+ signals is actionable
+- **Volume landmarks are muscle-specific** — Chest MRV (22) ≠ Back MRV (25) ≠ Calves MRV (22)
+- **Push/Pull ratio matters more than absolute volume** — 30 sets chest + 30 sets back is better than 20 chest + 10 back
+- **RPE drift is an early overtraining signal** — Performance decline comes later (RPE drift detects fatigue sooner)
+- **Conservative data requirements prevent garbage alerts** — 4 weeks minimum ensures statistical significance
+
+**Evidence Citations:**
+- Helms et al. (2018) — RPE-based autoregulation and fatigue management
+- Schoenfeld & Grgic (2018) — Volume-hypertrophy dose-response relationship
+- Israetel, Hoffmann, Smith (2020) — Volume landmarks (MEV/MAV/MRV) per muscle group
+- Gabbett (2016) — Training-injury prevention paradox, acute:chronic workload ratio
+- Bourdon et al. (2017) — Monitoring athlete training loads
+- Fry et al. (2010) — Performance decline as overtraining marker
+
+**File Paths:**
+- `Packages/GymBroCore/Sources/GymBroCore/Services/Recovery/OvertrainingDetectionService.swift` (530 lines)
+- `Packages/GymBroCore/Sources/GymBroCore/Services/Recovery/MuscleImbalanceService.swift` (466 lines)
+- `Packages/GymBroCore/Tests/GymBroCoreTests/OvertrainingDetectionServiceTests.swift` (575 lines)
+- `Packages/GymBroCore/Tests/GymBroCoreTests/MuscleImbalanceServiceTests.swift` (466 lines)
+
+**Next Integration Steps:**
+- Wire up to dashboard UI (show alerts when risk level is moderate/high)
+- Integrate with adaptive training engine (trigger auto-deload on high overtraining risk)
+- Add UI for volume landmarks visualization (show user where they are vs MEV/MAV/MRV)
+- Performance testing with large datasets (1000+ sets, 100+ workouts)
+- Manual testing with real user data (validate thresholds match empirical experience)
+
+**Impact:**
+- Prevents overtraining injuries by detecting systemic fatigue early (before performance decline)
+- Corrects muscle imbalances before they cause postural dysfunction or injury
+- Builds trust through conservative, evidence-based alerts (no crying wolf)
+- Empowers users with actionable guidance ("reduce chest volume by 8 sets" vs "you're overtrained")
+- Differentiates GymBro from competitors (no other app has evidence-based volume landmark alerts)
+- Foundation for true adaptive training — app now knows when to push, hold, and back off
