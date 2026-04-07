@@ -54,6 +54,7 @@ import com.gymbro.core.model.E1RMDataPoint
 import com.gymbro.core.model.PersonalRecord
 import com.gymbro.core.model.RecordType
 import com.gymbro.core.model.WorkoutHistoryItem
+import com.gymbro.feature.common.EmptyState
 import com.gymbro.feature.common.FullScreenLoading
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -186,32 +187,11 @@ private fun ProgressScreen(
 
 @Composable
 private fun EmptyProgressState() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center,
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Icon(
-                Icons.AutoMirrored.Filled.ShowChart,
-                contentDescription = null,
-                modifier = Modifier.size(64.dp),
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                text = "No Progress Data Yet",
-                style = MaterialTheme.typography.headlineSmall,
-                color = MaterialTheme.colorScheme.onBackground,
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = "Complete a few workouts to see your\nprogress trends and personal records here.",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(horizontal = 32.dp),
-            )
-        }
-    }
+    EmptyState(
+        icon = Icons.Default.EmojiEvents,
+        title = "No workouts yet",
+        subtitle = "Start training to see your progress!",
+    )
 }
 
 @Composable
