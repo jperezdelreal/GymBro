@@ -26,7 +26,7 @@ public final class AzureOpenAICoachService: AICoachService {
     // MARK: - AICoachService
 
     public func sendMessage(_ message: String, context: CoachContext) async throws -> String {
-        try rateLimiter.checkLimit()
+        try await rateLimiter.checkLimit()
 
         let safetyCheck = safetyFilter.checkUserMessage(message)
         if case .flagged(_, let advisory) = safetyCheck {
@@ -43,15 +43,15 @@ public final class AzureOpenAICoachService: AICoachService {
             throw AICoachError.emptyResponse
         }
 
-        rateLimiter.recordRequest()
+        await rateLimiter.recordRequest()
         return safetyFilter.appendDisclaimerIfNeeded(content)
     }
 
     public func streamMessage(_ message: String, context: CoachContext) -> AsyncThrowingStream<String, Error> {
         AsyncThrowingStream { continuation in
-            Task {
+            let task = Task {
                 do {
-                    try self.rateLimiter.checkLimit()
+                    try await self.rateLimiter.checkLimit()
 
                     let safetyCheck = self.safetyFilter.checkUserMessage(message)
                     if case .flagged(_, let advisory) = safetyCheck {
@@ -67,6 +67,7 @@ public final class AzureOpenAICoachService: AICoachService {
 
                     var buffer = ""
                     for try await line in bytes.lines {
+                        try Task.checkCancellation()
                         guard line.hasPrefix("data: ") else { continue }
                         let jsonStr = String(line.dropFirst(6))
                         if jsonStr == "[DONE]" { break }
@@ -81,7 +82,7 @@ public final class AzureOpenAICoachService: AICoachService {
                         continuation.yield(delta)
                     }
 
-                    self.rateLimiter.recordRequest()
+                    await self.rateLimiter.recordRequest()
 
                     // Append disclaimer as final token
                     let disclaimer = "\n\n*⚠️ AI suggestions are not medical advice. Consult a qualified professional for health concerns.*"
@@ -90,6 +91,10 @@ public final class AzureOpenAICoachService: AICoachService {
                 } catch {
                     continuation.finish(throwing: error)
                 }
+            }
+
+            continuation.onTermination = { _ in
+                task.cancel()
             }
         }
     }
@@ -187,8 +192,8 @@ private struct StreamChunk: Decodable {
 
 // MARK: - Rate Limiter
 
-/// Simple in-memory rate limiter. Tracks requests per minute.
-final class RateLimiter {
+/// Thread-safe rate limiter using actor isolation. Tracks requests per minute.
+actor RateLimiter {
     private var timestamps: [Date] = []
     private let maxRequestsPerMinute: Int = 20
 

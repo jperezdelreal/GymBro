@@ -1,5 +1,6 @@
 import UIKit
 
+@MainActor
 public final class HapticFeedbackService {
     public static let shared = HapticFeedbackService()
     
@@ -26,11 +27,11 @@ public final class HapticFeedbackService {
     
     public func personalRecordAchieved() {
         notificationGenerator.notificationOccurred(.success)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
-            self?.notificationGenerator.notificationOccurred(.success)
-        }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
-            self?.notificationGenerator.notificationOccurred(.success)
+        Task { @MainActor in
+            try? await Task.sleep(for: .milliseconds(100))
+            notificationGenerator.notificationOccurred(.success)
+            try? await Task.sleep(for: .milliseconds(100))
+            notificationGenerator.notificationOccurred(.success)
         }
     }
     

@@ -12,7 +12,7 @@ final class UserProfile {
     var experienceLevel: ExperienceLevel
     
     // Body metrics history
-    @Relationship(deleteRule: .cascade)
+    @Relationship(deleteRule: .cascade, inverse: \BodyweightEntry.userProfile)
     var bodyweightHistory: [BodyweightEntry]
     
     // Default rest timer preferences
@@ -51,6 +51,9 @@ final class BodyweightEntry {
     var id: UUID
     var date: Date
     var weightKg: Double
+    
+    @Relationship(deleteRule: .nullify)
+    var userProfile: UserProfile?
     
     init(id: UUID = UUID(), date: Date, weightKg: Double) {
         self.id = id

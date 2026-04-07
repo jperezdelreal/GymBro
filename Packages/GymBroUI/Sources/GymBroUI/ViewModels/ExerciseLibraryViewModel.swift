@@ -1,9 +1,12 @@
 import Foundation
+import Observation
 import SwiftData
 import GymBroCore
 
-public class ExerciseLibraryViewModel: ObservableObject {
-    @Published var exercises: [Exercise] = []
+@MainActor
+@Observable
+public final class ExerciseLibraryViewModel {
+    var exercises: [Exercise] = []
     private var modelContext: ModelContext?
     
     public init() {}

@@ -65,7 +65,7 @@ public struct ActiveWorkoutView: View {
                 WorkoutSummaryView(summary: summary)
             }
         }
-        .onAppear {
+        .task {
             HapticFeedbackService.shared.prepare()
         }
     }
