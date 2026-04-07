@@ -42,12 +42,15 @@ import com.gymbro.core.model.Equipment
 import com.gymbro.core.model.Exercise
 import com.gymbro.core.model.ExerciseCategory
 import com.gymbro.core.model.MuscleGroup
+import com.gymbro.core.preferences.UserPreferences
 import com.gymbro.feature.exerciselibrary.ExerciseLibraryRoute
+import com.gymbro.feature.onboarding.OnboardingRoute
 import com.gymbro.feature.profile.ProfileRoute
 import com.gymbro.feature.progress.ProgressRoute
 import com.gymbro.feature.recovery.RecoveryRoute
 import com.gymbro.feature.workout.ActiveWorkoutRoute
 import com.gymbro.feature.workout.WorkoutSummaryScreen
+import androidx.hilt.navigation.compose.hiltViewModel
 
 private val AccentGreen = Color(0xFF00FF87)
 
@@ -64,17 +67,34 @@ private enum class BottomNavTab(
 }
 
 @Composable
-fun GymBroNavGraph() {
+fun GymBroNavGraph(
+    userPreferences: UserPreferences = hiltViewModel<GymBroNavGraphViewModel>().userPreferences,
+) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
 
     val showBottomBar = currentDestination?.route in BottomNavTab.entries.map { it.route }
 
+    val startDestination = if (userPreferences.hasCompletedOnboarding()) {
+        "exercise_library"
+    } else {
+        "onboarding"
+    }
+
     NavHost(
         navController = navController,
-        startDestination = "exercise_library",
+        startDestination = startDestination,
     ) {
+        composable("onboarding") {
+            OnboardingRoute(
+                onNavigateToMain = {
+                    navController.navigate("exercise_library") {
+                        popUpTo("onboarding") { inclusive = true }
+                    }
+                },
+            )
+        }
         composable("exercise_library") {
             Scaffold(
                 bottomBar = {
