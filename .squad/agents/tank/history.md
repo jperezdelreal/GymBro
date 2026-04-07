@@ -437,3 +437,23 @@ This foundation unblocks all Phase-1 work:
 
 **PR Status:** Draft PR #141 opened against master
 
+
+### 2025-07-04: Repo Restructure for Dual-Platform (#133)
+
+**What:** Restructured monorepo from flat iOS layout to dual-platform (ios/, android/, shared/).
+
+**Changes:**
+- Moved all iOS code (GymBro, GymBroWatch, GymBroWidgets, Packages, Package.swift) into `ios/`
+- Created `android/` directory with placeholder README
+- Created `shared/data/` for future cross-platform seed data
+- Reorganized `.squad/skills/` into `ios/` (26 skills), `android/` (existing), `shared/` (13 skills)
+- Updated root README.md with dual-platform structure
+
+**Key findings:**
+- Package.swift relative paths preserved — no code changes needed
+- Seed JSON files referenced by Swift `Bundle.module` — cannot move without breaking build
+- No .xcodeproj/.xcworkspace — SPM only, simplifies restructure
+- CI workflow will need follow-up update to build from `ios/` directory
+
+**PR:** Draft PR #142 opened against master
+**Decision doc:** `.squad/decisions/inbox/tank-repo-restructure.md`
