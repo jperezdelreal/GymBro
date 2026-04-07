@@ -17,6 +17,7 @@ private val GymBroDarkColorScheme = darkColorScheme(
     background = Background,
     surface = Surface,
     surfaceVariant = SurfaceVariant,
+    surfaceTint = SurfacePrimary,
     onBackground = OnBackground,
     onSurface = OnSurface,
     onSurfaceVariant = OnSurfaceVariant,
