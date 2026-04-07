@@ -24,6 +24,13 @@ public final class Exercise {
     public var wgerId: Int?
     public var lastSyncedAt: Date?
     
+    /// URL to exercise image (from wger.de or local asset catalog)
+    public var imageURL: String?
+    /// Curated YouTube video link for form demonstration
+    public var videoURL: String?
+    /// URL to muscle diagram SVG from wger.de
+    public var muscleImageURL: String?
+    
     public init(
         id: UUID = UUID(),
         name: String,
@@ -34,7 +41,10 @@ public final class Exercise {
         isCustom: Bool = false,
         defaultRestSeconds: Int? = nil,
         source: ExerciseSource = .seed,
-        wgerId: Int? = nil
+        wgerId: Int? = nil,
+        imageURL: String? = nil,
+        videoURL: String? = nil,
+        muscleImageURL: String? = nil
     ) {
         self.id = id
         self.createdAt = Date()
@@ -50,6 +60,9 @@ public final class Exercise {
         self.source = source
         self.wgerId = wgerId
         self.lastSyncedAt = nil
+        self.imageURL = imageURL
+        self.videoURL = videoURL
+        self.muscleImageURL = muscleImageURL
     }
     
     public var restTime: Int {

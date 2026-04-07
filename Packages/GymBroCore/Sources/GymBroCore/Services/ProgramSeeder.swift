@@ -73,7 +73,10 @@ public struct ProgramSeeder {
                 frequencyPerWeek: programData.frequencyPerWeek,
                 periodizationType: PeriodizationType(rawValue: programData.periodizationType) ?? .linear,
                 isActive: false,
-                isCustom: false
+                isCustom: false,
+                targetAudience: programData.targetAudience,
+                expectedOutcome: programData.expectedOutcome,
+                progressionScheme: programData.progressionScheme
             )
             
             modelContext.insert(program)

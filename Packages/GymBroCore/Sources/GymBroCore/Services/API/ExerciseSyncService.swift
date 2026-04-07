@@ -59,6 +59,9 @@ public actor ExerciseSyncService {
         let existing = try fetchExistingExerciseNames(modelContext: modelContext)
         var importCount = 0
 
+        // Build wgerId → exercise lookup for image mapping later
+        var wgerIdToExercise: [Int: Exercise] = [:]
+
         for wgerExercise in allExercises {
             let normalizedName = wgerExercise.name.trimmingCharacters(in: .whitespacesAndNewlines)
             guard !normalizedName.isEmpty else { continue }
@@ -76,6 +79,11 @@ public actor ExerciseSyncService {
                 muscleLookup: muscles
             )
 
+            // Build muscle image URL from the first primary muscle
+            let muscleImgURL: String? = wgerExercise.primaryMuscleIds.first.map {
+                WgerAPIService.muscleImageURL(for: $0)
+            }
+
             let exercise = Exercise(
                 name: normalizedName,
                 category: category,
@@ -84,19 +92,84 @@ public actor ExerciseSyncService {
                 muscleGroups: muscleGroups,
                 isCustom: false,
                 source: .wger,
-                wgerId: wgerExercise.wgerId
+                wgerId: wgerExercise.wgerId,
+                muscleImageURL: muscleImgURL
             )
             exercise.lastSyncedAt = Date()
 
             modelContext.insert(exercise)
+            wgerIdToExercise[wgerExercise.wgerId] = exercise
             importCount += 1
         }
+
+        // Sync exercise images from wger.de
+        await syncExerciseImages(
+            wgerIdToExercise: wgerIdToExercise,
+            modelContext: modelContext
+        )
 
         if importCount > 0 {
             try modelContext.save()
         }
 
         return importCount
+    }
+
+    // MARK: - Image Sync
+
+    /// Fetches exercise images from wger.de and maps them to local exercises by wgerId.
+    /// Only updates exercises that don't already have an imageURL (never overwrites).
+    private func syncExerciseImages(
+        wgerIdToExercise: [Int: Exercise],
+        modelContext: ModelContext
+    ) async {
+        guard !wgerIdToExercise.isEmpty else { return }
+
+        do {
+            var allImages: [WgerExerciseImageData] = []
+            var currentPage: Int? = 1
+
+            while let page = currentPage {
+                let (images, nextPage) = try await apiService.fetchExerciseImages(page: page)
+                allImages.append(contentsOf: images)
+                currentPage = nextPage
+
+                if nextPage != nil {
+                    try await Task.sleep(for: .milliseconds(300))
+                }
+            }
+
+            Self.logger.info("Fetched \(allImages.count) exercise images for mapping")
+
+            // Also map images to existing exercises that have wgerId but no imageURL
+            let existingExercises = try fetchExercisesWithWgerId(modelContext: modelContext)
+            var combinedLookup = wgerIdToExercise
+            for exercise in existingExercises where exercise.imageURL == nil {
+                if let wgerId = exercise.wgerId {
+                    combinedLookup[wgerId] = exercise
+                }
+            }
+
+            var imageCount = 0
+            for imageData in allImages where imageData.isMain {
+                if let exercise = combinedLookup[imageData.exerciseBaseId],
+                   exercise.imageURL == nil {
+                    exercise.imageURL = imageData.imageURL
+                    exercise.updatedAt = Date()
+                    imageCount += 1
+                }
+            }
+
+            Self.logger.info("Mapped \(imageCount) images to exercises")
+        } catch {
+            // Image sync failures are non-blocking — exercises still import fine
+            Self.logger.warning("Image sync failed (non-blocking): \(error.localizedDescription)")
+        }
+    }
+
+    private func fetchExercisesWithWgerId(modelContext: ModelContext) throws -> [Exercise] {
+        let descriptor = FetchDescriptor<Exercise>()
+        return try modelContext.fetch(descriptor).filter { $0.wgerId != nil }
     }
 
     // MARK: - Throttle

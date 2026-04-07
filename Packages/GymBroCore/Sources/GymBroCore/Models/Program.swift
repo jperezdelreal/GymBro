@@ -14,6 +14,10 @@ public final class Program {
     public var periodizationType: PeriodizationType
     public var isActive: Bool
     public var isCustom: Bool
+    public var targetAudience: String
+    public var expectedOutcome: String
+    public var progressionScheme: String
+    public var startDate: Date?
     
     @Relationship(deleteRule: .cascade, inverse: \ProgramDay.program)
     public var days: [ProgramDay]
@@ -29,7 +33,11 @@ public final class Program {
         frequencyPerWeek: Int,
         periodizationType: PeriodizationType = .linear,
         isActive: Bool = false,
-        isCustom: Bool = true
+        isCustom: Bool = true,
+        targetAudience: String = "",
+        expectedOutcome: String = "",
+        progressionScheme: String = "",
+        startDate: Date? = nil
     ) {
         self.id = id
         self.createdAt = Date()
@@ -41,8 +49,40 @@ public final class Program {
         self.periodizationType = periodizationType
         self.isActive = isActive
         self.isCustom = isCustom
+        self.targetAudience = targetAudience
+        self.expectedOutcome = expectedOutcome
+        self.progressionScheme = progressionScheme
+        self.startDate = startDate
         self.days = []
         self.workouts = []
+    }
+    
+    /// Current week number based on startDate (1-indexed).
+    public var currentWeekNumber: Int {
+        guard let startDate else { return 1 }
+        let daysSinceStart = Calendar.current.dateComponents([.day], from: startDate, to: Date()).day ?? 0
+        return min((daysSinceStart / 7) + 1, durationWeeks)
+    }
+    
+    /// The ProgramDay for today based on the active schedule rotation.
+    public var todaysProgramDay: ProgramDay? {
+        guard isActive, let startDate else { return nil }
+        let daysSinceStart = Calendar.current.dateComponents([.day], from: startDate, to: Date()).day ?? 0
+        let sortedDays = days.sorted { $0.dayNumber < $1.dayNumber }
+        guard !sortedDays.isEmpty else { return nil }
+        let dayIndex = daysSinceStart % sortedDays.count
+        return sortedDays[dayIndex]
+    }
+    
+    /// Difficulty level derived from periodization and frequency.
+    public var difficulty: String {
+        switch (periodizationType, frequencyPerWeek) {
+        case (.linear, 1...3): return "Beginner"
+        case (.linear, _): return "Intermediate"
+        case (.undulating, _): return "Intermediate"
+        case (.block, _): return "Advanced"
+        case (.autoregulated, _): return "Advanced"
+        }
     }
 }
 
@@ -51,79 +91,13 @@ public enum PeriodizationType: String, Codable {
     case undulating
     case block
     case autoregulated
-}
-
-@Model
-public final class ProgramDay {
-    public var id: UUID
-    public var createdAt: Date
-    public var updatedAt: Date
     
-    public var dayNumber: Int
-    public var name: String
-    public var dayDescription: String
-    
-    @Relationship(deleteRule: .nullify)
-    public var program: Program?
-    
-    @Relationship(deleteRule: .cascade, inverse: \PlannedExercise.programDay)
-    public var plannedExercises: [PlannedExercise]
-    
-    @Relationship(deleteRule: .nullify, inverse: \Workout.programDay)
-    public var workouts: [Workout]
-    
-    public init(
-        id: UUID = UUID(),
-        dayNumber: Int,
-        name: String,
-        dayDescription: String = "",
-        program: Program? = nil
-    ) {
-        self.id = id
-        self.createdAt = Date()
-        self.updatedAt = Date()
-        self.dayNumber = dayNumber
-        self.name = name
-        self.dayDescription = dayDescription
-        self.program = program
-        self.plannedExercises = []
-        self.workouts = []
-    }
-}
-
-@Model
-public final class PlannedExercise {
-    public var id: UUID
-    public var order: Int
-    
-    @Relationship(deleteRule: .nullify)
-    public var exercise: Exercise?
-    
-    @Relationship(deleteRule: .nullify)
-    public var programDay: ProgramDay?
-    
-    public var targetSets: Int
-    public var targetReps: String
-    public var targetRPE: Double?
-    public var notes: String
-    
-    public init(
-        id: UUID = UUID(),
-        order: Int,
-        exercise: Exercise? = nil,
-        programDay: ProgramDay? = nil,
-        targetSets: Int,
-        targetReps: String,
-        targetRPE: Double? = nil,
-        notes: String = ""
-    ) {
-        self.id = id
-        self.order = order
-        self.exercise = exercise
-        self.programDay = programDay
-        self.targetSets = targetSets
-        self.targetReps = targetReps
-        self.targetRPE = targetRPE
-        self.notes = notes
+    public var displayName: String {
+        switch self {
+        case .linear: return "Linear"
+        case .undulating: return "Undulating"
+        case .block: return "Block"
+        case .autoregulated: return "Autoregulated"
+        }
     }
 }
