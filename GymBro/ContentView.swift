@@ -10,7 +10,21 @@ struct ContentView: View {
     @State private var resumedWorkoutViewModel: ActiveWorkoutViewModel?
     @State private var showResumedWorkout = false
 
+    let authService: AuthenticationService
+    let syncService: CloudKitSyncService
+
     var body: some View {
+        Group {
+            if authService.authState == .unknown {
+                ProgressView("Loading…")
+            } else {
+                mainTabView
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var mainTabView: some View {
         TabView {
             Tab("Workout", systemImage: "figure.strengthtraining.traditional") {
                 NavigationStack {
@@ -36,7 +50,9 @@ struct ContentView: View {
             }
 
             Tab("Profile", systemImage: "person.circle") {
-                ProfileTab()
+                NavigationStack {
+                    ProfileView(authService: authService, syncService: syncService)
+                }
             }
         }
         .task {
@@ -118,15 +134,9 @@ struct CoachTab: View {
     }
 }
 
-struct ProfileTab: View {
-    var body: some View {
-        NavigationStack {
-            Text("Profile")
-                .navigationTitle("Profile")
-        }
-    }
-}
-
 #Preview {
-    ContentView()
+    ContentView(
+        authService: AuthenticationService(),
+        syncService: CloudKitSyncService()
+    )
 }
