@@ -86,3 +86,22 @@
 - ACWR sweet spot 0.8-1.3; TSB < -25 triggers deload recommendation
 - Graceful degradation: empty input returns neutral 50.0, single-factor inputs redistribute full weight
 - ReadinessScore cached in SwiftData for instant dashboard rendering
+
+### 2026-04-07: Week-Level Variation Support (Issue #81, PR #93)
+**What was implemented:**
+- `ProgramWeek` model as first-class entity enabling block periodization programs (5/3/1, DUP variants)
+- 3-level hierarchy: Program → ProgramWeek → ProgramDay → PlannedExercise
+- Week-level intensity/volume specification separate from day-level exercise selection
+- Compliance tracking per week (track which weeks were completed vs deloaded)
+- Backward compatible: existing programs without weeks continue working via ProgramDay.plannedExercises
+
+**Design rationale:**
+- Block periodization requires per-week variation: different reps/percentages each week
+- Avoids hardcoding week branching logic ("if week == 1...") in model or ViewModel layer
+- Clean separation: data model handles structure, service layer handles logic
+- Enables AI coach to inject periodization recommendations with specific week targets
+
+**Impact on readiness/adaptive engine:**
+- Readiness score can now trigger week-level adjustments (skip deload week, extend accumulation)
+- Progression algorithm can reference current week intensity tier for decision-making
+- Foundation for future ML-based periodization optimization
