@@ -53,6 +53,7 @@ import com.gymbro.feature.onboarding.OnboardingRoute
 import com.gymbro.feature.profile.ProfileRoute
 import com.gymbro.feature.programs.ProgramsRoute
 import com.gymbro.feature.progress.ProgressRoute
+import com.gymbro.feature.analytics.AnalyticsRoute
 import com.gymbro.feature.recovery.RecoveryRoute
 import com.gymbro.feature.settings.SettingsRoute
 import com.gymbro.feature.workout.ActiveWorkoutRoute
@@ -327,9 +328,16 @@ fun GymBroNavGraph(
                 containerColor = MaterialTheme.colorScheme.background,
             ) { innerPadding ->
                 Box(modifier = Modifier.padding(innerPadding)) {
-                    ProgressRoute()
+                    ProgressRoute(
+                        onNavigateToAnalytics = { navController.navigate("analytics") }
+                    )
                 }
             }
+        }
+        composable("analytics") {
+            AnalyticsRoute(
+                onNavigateBack = { navController.navigateUp() }
+            )
         }
         composable("recovery") {
             Scaffold(
