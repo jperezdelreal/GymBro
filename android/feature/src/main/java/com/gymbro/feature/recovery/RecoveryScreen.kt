@@ -43,6 +43,10 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -103,6 +107,7 @@ internal fun RecoveryScreen(
                 style = MaterialTheme.typography.headlineMedium,
                 color = Color.White,
                 fontWeight = FontWeight.Bold,
+                modifier = Modifier.semantics { heading() }
             )
             if (state.permissionsGranted) {
                 IconButton(onClick = { onEvent(RecoveryEvent.RefreshData) }) {
@@ -202,8 +207,10 @@ private fun ReadinessScoreCard(score: Int, label: String) {
             Spacer(modifier = Modifier.height(16.dp))
 
             // Circular score indicator
-            Box(contentAlignment = Alignment.Center) {
-                Canvas(modifier = Modifier.size(140.dp)) {
+            Box(contentAlignment = Alignment.Center, modifier = Modifier.semantics {
+                contentDescription = "Readiness score: $score out of 100, $label"
+            }) {
+                Canvas(modifier = Modifier.size(140.dp).clearAndSetSemantics { }) {
                     // Background arc
                     drawArc(
                         color = Color(0xFF2A2A2A),
@@ -312,7 +319,9 @@ private fun MetricCard(
     iconTint: Color,
 ) {
     Card(
-        modifier = modifier,
+        modifier = modifier.semantics(mergeDescendants = true) { 
+            contentDescription = "$label: $value"
+        },
         colors = CardDefaults.cardColors(containerColor = CardBackground),
         shape = RoundedCornerShape(16.dp),
     ) {
