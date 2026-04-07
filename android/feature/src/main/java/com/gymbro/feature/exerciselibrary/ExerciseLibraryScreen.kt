@@ -58,6 +58,8 @@ private val AccentRed = Color(0xFFCF6679)
 fun ExerciseLibraryRoute(
     viewModel: ExerciseLibraryViewModel = hiltViewModel(),
     onNavigateToDetail: (String) -> Unit = {},
+    onExercisePicked: ((Exercise) -> Unit)? = null,
+    isPickerMode: Boolean = false,
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle()
 
@@ -73,7 +75,14 @@ fun ExerciseLibraryRoute(
 
     ExerciseLibraryScreen(
         state = state.value,
-        onEvent = viewModel::onEvent,
+        onEvent = { event ->
+            if (isPickerMode && event is ExerciseLibraryEvent.ExerciseClicked) {
+                onExercisePicked?.invoke(event.exercise)
+            } else {
+                viewModel.onEvent(event)
+            }
+        },
+        isPickerMode = isPickerMode,
     )
 }
 
@@ -82,13 +91,14 @@ fun ExerciseLibraryRoute(
 fun ExerciseLibraryScreen(
     state: ExerciseLibraryState,
     onEvent: (ExerciseLibraryEvent) -> Unit,
+    isPickerMode: Boolean = false,
 ) {
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
                     Text(
-                        text = "Exercise Library",
+                        text = if (isPickerMode) "Pick Exercise" else "Exercise Library",
                         style = MaterialTheme.typography.headlineMedium,
                     )
                 },
