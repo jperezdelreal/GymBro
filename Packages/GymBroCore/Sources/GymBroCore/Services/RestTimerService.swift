@@ -133,6 +133,8 @@ extension RestTimerService {
             return 90  // 90 seconds
         case .accessory:
             return 60  // 60 seconds
+        case .cardio:
+            return 30  // 30 seconds
         }
     }
 }
