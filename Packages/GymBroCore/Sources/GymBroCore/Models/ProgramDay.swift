@@ -17,6 +17,9 @@ final class ProgramDay {
     @Relationship(deleteRule: .cascade, inverse: \PlannedExercise.programDay)
     var plannedExercises: [PlannedExercise]
     
+    @Relationship(deleteRule: .cascade, inverse: \ProgramWeek.programDay)
+    var weeks: [ProgramWeek]
+    
     @Relationship(deleteRule: .nullify, inverse: \Workout.programDay)
     var workouts: [Workout]
     
@@ -35,6 +38,7 @@ final class ProgramDay {
         self.dayDescription = dayDescription
         self.program = program
         self.plannedExercises = []
+        self.weeks = []
         self.workouts = []
     }
 }

@@ -49,8 +49,8 @@ final class ExerciseSeedDataTests: XCTestCase {
     }
 
     func testSeedFileContainsMinimumExercises() {
-        XCTAssertGreaterThanOrEqual(seedData.count, 30,
-            "Seed data should contain at least 30 exercises for a usable exercise library")
+        XCTAssertGreaterThanOrEqual(seedData.count, 200,
+            "Seed data should contain at least 200 exercises for a comprehensive exercise library")
     }
 
     // MARK: - Name Uniqueness
@@ -132,6 +132,24 @@ final class ExerciseSeedDataTests: XCTestCase {
             XCTAssertFalse(exercise.instructions.trimmingCharacters(in: .whitespaces).isEmpty,
                 "'\(exercise.name)' must have non-empty instructions")
         }
+    }
+    
+    func testInstructionsAreDetailed() {
+        // Target: 200+ chars average (significantly more detailed than original 80 chars)
+        let shortInstructions = seedData.filter { $0.instructions.count < 150 }
+        
+        // Allow some exercises to have shorter instructions, but most should be detailed
+        let percentageShort = Double(shortInstructions.count) / Double(seedData.count)
+        XCTAssertLessThan(percentageShort, 0.2,
+            "More than 20% of exercises have instructions under 150 chars. Short instructions: \(shortInstructions.map { "\($0.name) (\($0.instructions.count) chars)" }.joined(separator: ", "))")
+    }
+    
+    func testAverageInstructionLength() {
+        let totalLength = seedData.reduce(0) { $0 + $1.instructions.count }
+        let average = Double(totalLength) / Double(seedData.count)
+        
+        XCTAssertGreaterThanOrEqual(average, 180.0,
+            "Average instruction length should be at least 180 chars (currently: \(Int(average)) chars)")
     }
 
     // MARK: - Key Exercises Present

@@ -17,11 +17,23 @@ public final class UserProfile {
     // Default rest timer preferences
     public var defaultRestSeconds: Int
     
+    // Onboarding data
+    public var hasCompletedOnboarding: Bool
+    public var trainingGoals: [String]
+    public var trainingFrequency: Int
+    public var equipmentAvailability: EquipmentType
+    public var injuriesOrLimitations: String?
+    
     public init(
         id: UUID = UUID(),
         unitSystem: UnitSystem = .metric,
         experienceLevel: ExperienceLevel = .intermediate,
-        defaultRestSeconds: Int = 120
+        defaultRestSeconds: Int = 120,
+        hasCompletedOnboarding: Bool = false,
+        trainingGoals: [String] = [],
+        trainingFrequency: Int = 3,
+        equipmentAvailability: EquipmentType = .fullGym,
+        injuriesOrLimitations: String? = nil
     ) {
         self.id = id
         self.createdAt = Date()
@@ -30,6 +42,11 @@ public final class UserProfile {
         self.experienceLevel = experienceLevel
         self.bodyweightHistory = []
         self.defaultRestSeconds = defaultRestSeconds
+        self.hasCompletedOnboarding = hasCompletedOnboarding
+        self.trainingGoals = trainingGoals
+        self.trainingFrequency = trainingFrequency
+        self.equipmentAvailability = equipmentAvailability
+        self.injuriesOrLimitations = injuriesOrLimitations
     }
 }
 
@@ -43,6 +60,36 @@ public enum ExperienceLevel: String, Codable {
     case intermediate
     case advanced
     case elite
+    
+    public var description: String {
+        switch self {
+        case .beginner:
+            return "New to strength training (< 1 year)"
+        case .intermediate:
+            return "Regular lifter (1-3 years)"
+        case .advanced:
+            return "Experienced athlete (3+ years)"
+        case .elite:
+            return "Competitive athlete / coach"
+        }
+    }
+}
+
+public enum EquipmentType: String, Codable {
+    case fullGym
+    case homeGym
+    case bodyweightOnly
+    
+    public var displayName: String {
+        switch self {
+        case .fullGym:
+            return "Full gym access"
+        case .homeGym:
+            return "Home gym (limited equipment)"
+        case .bodyweightOnly:
+            return "Bodyweight only"
+        }
+    }
 }
 
 @Model
