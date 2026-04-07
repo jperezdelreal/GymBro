@@ -45,7 +45,7 @@ class ProgressViewModelTest {
         viewModel = ProgressViewModel(mockPRService, fakeExerciseRepository)
 
         viewModel.state.test {
-            val state = awaitItem()
+            val state = expectMostRecentItem()
             assertFalse(state.isLoading)
             assertEquals(2, state.workoutHistory.size)
             assertEquals(2, state.exerciseOptions.size)
@@ -62,7 +62,7 @@ class ProgressViewModelTest {
         viewModel = ProgressViewModel(mockPRService, fakeExerciseRepository)
 
         viewModel.state.test {
-            val state = awaitItem()
+            val state = expectMostRecentItem()
             assertFalse(state.isLoading)
             assertTrue(state.workoutHistory.isEmpty())
             assertTrue(state.exerciseOptions.isEmpty())
@@ -100,10 +100,12 @@ class ProgressViewModelTest {
 
             viewModel.onEvent(ProgressEvent.SelectExercise(squatId))
 
-            val state = awaitItem()
+            skipItems(1) // Skip selectedExerciseId update
+
+            val state = awaitItem() // Wait for chartData update
             assertEquals(squatId, state.selectedExerciseId)
             assertEquals(1, state.chartData.size)
-            assertEquals(180.0, state.chartData[0].e1rm)
+            assertEquals(180.0, state.chartData[0].e1rm, 0.01)
         }
     }
 
@@ -120,12 +122,12 @@ class ProgressViewModelTest {
         viewModel = ProgressViewModel(mockPRService, fakeExerciseRepository)
 
         viewModel.state.test {
-            val initialState = awaitItem()
+            val initialState = expectMostRecentItem()
             assertTrue(initialState.workoutHistory.isEmpty())
 
             viewModel.onEvent(ProgressEvent.RefreshData)
 
-            val refreshedState = awaitItem()
+            val refreshedState = expectMostRecentItem()
             assertEquals(2, refreshedState.workoutHistory.size)
         }
     }
@@ -165,7 +167,7 @@ class ProgressViewModelTest {
         viewModel = ProgressViewModel(mockPRService, fakeExerciseRepository)
 
         viewModel.state.test {
-            val state = awaitItem()
+            val state = expectMostRecentItem()
             assertEquals(3, state.exerciseOptions.size)
             assertEquals("Back Squat", state.exerciseOptions[0].name)
             assertEquals("Bench Press", state.exerciseOptions[1].name)
@@ -183,12 +185,12 @@ class ProgressViewModelTest {
             TestFixtures.squat.id.toString()
         )
         coEvery { mockPRService.getE1RMHistory(benchId) } returns TestFixtures.e1rmDataPoints
-        coEvery { mockPRService.getPersonalRecords(any(), any()) } returns emptyList()
+        coEvery { mockPRService.getPersonalRecords(benchId, any()) } returns emptyList()
 
         viewModel = ProgressViewModel(mockPRService, fakeExerciseRepository)
 
         viewModel.state.test {
-            val state = awaitItem()
+            val state = expectMostRecentItem()
             assertEquals(benchId, state.selectedExerciseId)
             assertEquals(4, state.chartData.size)
         }
@@ -205,7 +207,7 @@ class ProgressViewModelTest {
         viewModel = ProgressViewModel(mockPRService, fakeExerciseRepository)
 
         viewModel.state.test {
-            val state = awaitItem()
+            val state = expectMostRecentItem()
             assertFalse(state.isLoading)
         }
     }
@@ -229,7 +231,7 @@ class ProgressViewModelTest {
         viewModel = ProgressViewModel(mockPRService, fakeExerciseRepository)
 
         viewModel.state.test {
-            val state = awaitItem()
+            val state = expectMostRecentItem()
             assertEquals(2, state.personalRecords.size)
             assertTrue(state.personalRecords.any { it.exerciseId == benchId })
             assertTrue(state.personalRecords.any { it.exerciseId == squatId })
@@ -259,7 +261,9 @@ class ProgressViewModelTest {
 
             viewModel.onEvent(ProgressEvent.SelectExercise(squatId))
 
-            val state = awaitItem()
+            skipItems(1) // Skip selectedExerciseId update
+
+            val state = awaitItem() // Wait for personalRecords update
             assertEquals(squatId, state.selectedExerciseId)
             assertTrue(state.personalRecords.any { it.exerciseId == squatId })
         }

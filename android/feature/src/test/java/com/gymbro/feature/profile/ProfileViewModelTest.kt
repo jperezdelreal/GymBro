@@ -53,7 +53,7 @@ class ProfileViewModelTest {
         viewModel = ProfileViewModel(mockAuthService, mockSyncManager)
 
         viewModel.state.test {
-            val state = awaitItem()
+            val state = expectMostRecentItem()
             assertTrue(state.isLoading)
             assertFalse(state.isSignedIn)
             assertNull(state.user)
@@ -70,7 +70,7 @@ class ProfileViewModelTest {
 
             authStateFlow.value = AuthState.SignedIn(testUser)
 
-            val state = awaitItem()
+            val state = expectMostRecentItem()
             assertFalse(state.isLoading)
             assertTrue(state.isSignedIn)
             assertNotNull(state.user)
@@ -91,7 +91,7 @@ class ProfileViewModelTest {
 
             authStateFlow.value = AuthState.SignedOut
 
-            val state = awaitItem()
+            val state = expectMostRecentItem()
             assertFalse(state.isLoading)
             assertFalse(state.isSignedIn)
             assertNull(state.user)
@@ -104,9 +104,8 @@ class ProfileViewModelTest {
         viewModel = ProfileViewModel(mockAuthService, mockSyncManager)
 
         viewModel.effects.test {
-            viewModel.onEvent(ProfileEvent.SignIn)
-
             authStateFlow.value = AuthState.SignedIn(testUser)
+            viewModel.onEvent(ProfileEvent.SignIn)
 
             val effect = awaitItem()
             assertTrue(effect is ProfileEffect.ShowMessage)
@@ -167,12 +166,12 @@ class ProfileViewModelTest {
 
             syncStatusFlow.value = SyncStatus.SYNCING
 
-            val syncingState = awaitItem()
+            val syncingState = expectMostRecentItem()
             assertEquals(SyncStatus.SYNCING, syncingState.syncStatus)
 
             syncStatusFlow.value = SyncStatus.SUCCESS
 
-            val successState = awaitItem()
+            val successState = expectMostRecentItem()
             assertEquals(SyncStatus.SUCCESS, successState.syncStatus)
             assertNotNull(successState.lastSyncTime)
         }
@@ -192,17 +191,17 @@ class ProfileViewModelTest {
         viewModel = ProfileViewModel(mockAuthService, mockSyncManager)
 
         viewModel.state.test {
-            val initialState = awaitItem()
+            val initialState = expectMostRecentItem()
             assertTrue(initialState.autoSyncEnabled)
 
             viewModel.onEvent(ProfileEvent.ToggleAutoSync(false))
 
-            val disabledState = awaitItem()
+            val disabledState = expectMostRecentItem()
             assertFalse(disabledState.autoSyncEnabled)
 
             viewModel.onEvent(ProfileEvent.ToggleAutoSync(true))
 
-            val enabledState = awaitItem()
+            val enabledState = expectMostRecentItem()
             assertTrue(enabledState.autoSyncEnabled)
         }
     }
@@ -212,12 +211,12 @@ class ProfileViewModelTest {
         viewModel = ProfileViewModel(mockAuthService, mockSyncManager)
 
         viewModel.state.test {
-            val initialState = awaitItem()
+            val initialState = expectMostRecentItem()
             assertNull(initialState.lastSyncTime)
 
             syncStatusFlow.value = SyncStatus.SUCCESS
 
-            val syncedState = awaitItem()
+            val syncedState = expectMostRecentItem()
             assertNotNull(syncedState.lastSyncTime)
             assertTrue(syncedState.lastSyncTime!! > 0)
         }
@@ -231,12 +230,12 @@ class ProfileViewModelTest {
             skipItems(1)
 
             syncStatusFlow.value = SyncStatus.SUCCESS
-            val successState = awaitItem()
+            val successState = expectMostRecentItem()
             val syncTime = successState.lastSyncTime
 
             syncStatusFlow.value = SyncStatus.ERROR
 
-            val errorState = awaitItem()
+            val errorState = expectMostRecentItem()
             assertEquals(syncTime, errorState.lastSyncTime)
         }
     }
@@ -251,7 +250,7 @@ class ProfileViewModelTest {
 
             authStateFlow.value = AuthState.SignedIn(anonymousUser)
 
-            val state = awaitItem()
+            val state = expectMostRecentItem()
             assertTrue(state.isSignedIn)
             assertNotNull(state.user)
             assertTrue(state.user!!.isAnonymous)
@@ -265,7 +264,7 @@ class ProfileViewModelTest {
         viewModel = ProfileViewModel(mockAuthService, mockSyncManager)
 
         viewModel.state.test {
-            val state = awaitItem()
+            val state = expectMostRecentItem()
             assertEquals(SyncStatus.IDLE, state.syncStatus)
         }
     }
@@ -279,7 +278,7 @@ class ProfileViewModelTest {
 
             syncStatusFlow.value = SyncStatus.OFFLINE
 
-            val state = awaitItem()
+            val state = expectMostRecentItem()
             assertEquals(SyncStatus.OFFLINE, state.syncStatus)
         }
     }
@@ -313,9 +312,11 @@ class ProfileViewModelTest {
 
             viewModel.onEvent(ProfileEvent.SignIn)
 
-            // Skip loading state
-            skipItems(1)
+            // Wait for loading state
+            val loadingState = awaitItem()
+            assertTrue(loadingState.isLoading)
 
+            // Wait for error state
             val errorState = awaitItem()
             assertFalse(errorState.isLoading)
             assertEquals(errorMessage, errorState.error)

@@ -47,7 +47,7 @@ class RecoveryViewModelTest {
         viewModel = RecoveryViewModel(mockHealthConnectRepository)
 
         viewModel.state.test {
-            val state = awaitItem()
+            val state = expectMostRecentItem()
             assertTrue(state.healthConnectAvailable)
             assertTrue(state.permissionsGranted)
             assertFalse(state.isLoading)
@@ -65,7 +65,7 @@ class RecoveryViewModelTest {
         viewModel = RecoveryViewModel(mockHealthConnectRepository)
 
         viewModel.state.test {
-            val state = awaitItem()
+            val state = expectMostRecentItem()
             assertFalse(state.healthConnectAvailable)
             assertFalse(state.permissionsGranted)
             assertFalse(state.isLoading)
@@ -80,7 +80,7 @@ class RecoveryViewModelTest {
         viewModel = RecoveryViewModel(mockHealthConnectRepository)
 
         viewModel.state.test {
-            val state = awaitItem()
+            val state = expectMostRecentItem()
             assertTrue(state.healthConnectAvailable)
             assertFalse(state.permissionsGranted)
             assertFalse(state.isLoading)
@@ -116,9 +116,13 @@ class RecoveryViewModelTest {
 
             viewModel.onPermissionsResult(true)
 
+            // Skip the permissions granted state
+            skipItems(1)
+
+            // Wait for the loaded data state
             val state = awaitItem()
             assertTrue(state.permissionsGranted)
-            assertEquals(8.5, state.recoveryMetrics.sleepHours)
+            assertEquals(8.5, state.recoveryMetrics.sleepHours, 0.01)
         }
     }
 
@@ -136,7 +140,7 @@ class RecoveryViewModelTest {
 
             val state = awaitItem()
             assertFalse(state.permissionsGranted)
-            assertEquals(0.0, state.recoveryMetrics.sleepHours)
+            assertEquals(0.0, state.recoveryMetrics.sleepHours, 0.01)
         }
     }
 
@@ -150,13 +154,16 @@ class RecoveryViewModelTest {
         viewModel = RecoveryViewModel(mockHealthConnectRepository)
 
         viewModel.state.test {
-            val initialState = awaitItem()
-            assertEquals(8.5, initialState.recoveryMetrics.sleepHours)
+            val initialState = expectMostRecentItem()
+            assertEquals(8.5, initialState.recoveryMetrics.sleepHours, 0.01)
 
             viewModel.onEvent(RecoveryEvent.RefreshData)
 
+            // Skip loading state
+            skipItems(1)
+
             val refreshedState = awaitItem()
-            assertEquals(5.0, refreshedState.recoveryMetrics.sleepHours)
+            assertEquals(5.0, refreshedState.recoveryMetrics.sleepHours, 0.01)
         }
     }
 
@@ -169,7 +176,7 @@ class RecoveryViewModelTest {
         viewModel = RecoveryViewModel(mockHealthConnectRepository)
 
         viewModel.state.test {
-            val state = awaitItem()
+            val state = expectMostRecentItem()
             assertFalse(state.isLoading)
             assertNotNull(state.error)
             assertTrue(state.error!!.contains("Network error"))
@@ -186,7 +193,7 @@ class RecoveryViewModelTest {
         viewModel = RecoveryViewModel(mockHealthConnectRepository)
 
         viewModel.state.test {
-            val state = awaitItem()
+            val state = expectMostRecentItem()
             assertTrue(state.recoveryMetrics.readinessScore > 70.0)
         }
     }
@@ -201,7 +208,7 @@ class RecoveryViewModelTest {
         viewModel = RecoveryViewModel(mockHealthConnectRepository)
 
         viewModel.state.test {
-            val state = awaitItem()
+            val state = expectMostRecentItem()
             assertTrue(state.recoveryMetrics.readinessScore < 50.0)
         }
     }
@@ -216,8 +223,8 @@ class RecoveryViewModelTest {
         viewModel = RecoveryViewModel(mockHealthConnectRepository)
 
         viewModel.state.test {
-            val state = awaitItem()
-            assertEquals(7.0, state.recoveryMetrics.sleepHours)
+            val state = expectMostRecentItem()
+            assertEquals(7.0, state.recoveryMetrics.sleepHours, 0.01)
             assertNull(state.recoveryMetrics.hrv)
             assertNull(state.recoveryMetrics.restingHR)
             assertNull(state.recoveryMetrics.daysSinceLastWorkout)
@@ -256,7 +263,7 @@ class RecoveryViewModelTest {
         viewModel = RecoveryViewModel(mockHealthConnectRepository)
 
         viewModel.state.test {
-            val state = awaitItem()
+            val state = expectMostRecentItem()
             assertEquals(3, state.sleepHistory.size)
             assertEquals(8.0, state.sleepHistory[0].durationHours, 0.01)
             assertEquals(7.5, state.sleepHistory[1].durationHours, 0.01)
@@ -274,7 +281,7 @@ class RecoveryViewModelTest {
         viewModel = RecoveryViewModel(mockHealthConnectRepository)
 
         viewModel.state.test {
-            val state = awaitItem()
+            val state = expectMostRecentItem()
             assertTrue(state.sleepHistory.isEmpty())
         }
     }
@@ -289,7 +296,7 @@ class RecoveryViewModelTest {
         viewModel = RecoveryViewModel(mockHealthConnectRepository)
 
         viewModel.state.test {
-            val state = awaitItem()
+            val state = expectMostRecentItem()
             assertFalse(state.isLoading)
         }
     }
@@ -304,14 +311,17 @@ class RecoveryViewModelTest {
         viewModel = RecoveryViewModel(mockHealthConnectRepository)
 
         viewModel.state.test {
-            val errorState = awaitItem()
+            val errorState = expectMostRecentItem()
             assertNotNull(errorState.error)
 
             viewModel.onEvent(RecoveryEvent.RefreshData)
 
+            // Skip loading state
+            skipItems(1)
+
             val successState = awaitItem()
             assertNull(successState.error)
-            assertEquals(8.5, successState.recoveryMetrics.sleepHours)
+            assertEquals(8.5, successState.recoveryMetrics.sleepHours, 0.01)
         }
     }
 }

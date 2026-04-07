@@ -35,7 +35,7 @@ class ExerciseLibraryViewModelTest {
         viewModel = ExerciseLibraryViewModel(fakeExerciseRepository)
 
         viewModel.state.test {
-            val state = awaitItem()
+            val state = expectMostRecentItem()
             assertEquals(4, state.exercises.size)
             assertFalse(state.isLoading)
             assertEquals("", state.searchQuery)
@@ -49,7 +49,7 @@ class ExerciseLibraryViewModelTest {
         viewModel = ExerciseLibraryViewModel(fakeExerciseRepository)
 
         viewModel.state.test {
-            val state = awaitItem()
+            val state = expectMostRecentItem()
             assertTrue(state.exercises.isEmpty())
             assertFalse(state.isLoading)
         }
@@ -70,7 +70,7 @@ class ExerciseLibraryViewModelTest {
 
             viewModel.onEvent(ExerciseLibraryEvent.MuscleGroupSelected(MuscleGroup.CHEST))
 
-            val state = awaitItem()
+            val state = expectMostRecentItem()
             assertEquals(1, state.exercises.size)
             assertEquals(TestFixtures.benchPress.id, state.exercises[0].id)
             assertEquals(MuscleGroup.CHEST, state.selectedMuscleGroup)
@@ -87,7 +87,7 @@ class ExerciseLibraryViewModelTest {
 
             viewModel.onEvent(ExerciseLibraryEvent.MuscleGroupSelected(MuscleGroup.TRICEPS))
 
-            val state = awaitItem()
+            val state = expectMostRecentItem()
             assertTrue(state.exercises.isEmpty())
             assertEquals(MuscleGroup.TRICEPS, state.selectedMuscleGroup)
         }
@@ -108,7 +108,7 @@ class ExerciseLibraryViewModelTest {
 
             viewModel.onEvent(ExerciseLibraryEvent.SearchQueryChanged("bench"))
 
-            val state = awaitItem()
+            val state = expectMostRecentItem()
             assertEquals(1, state.exercises.size)
             assertEquals(TestFixtures.benchPress.id, state.exercises[0].id)
             assertEquals("bench", state.searchQuery)
@@ -129,7 +129,7 @@ class ExerciseLibraryViewModelTest {
 
             viewModel.onEvent(ExerciseLibraryEvent.SearchQueryChanged("conventional"))
 
-            val state = awaitItem()
+            val state = expectMostRecentItem()
             assertEquals(1, state.exercises.size)
             assertEquals(TestFixtures.deadlift.id, state.exercises[0].id)
         }
@@ -145,7 +145,7 @@ class ExerciseLibraryViewModelTest {
 
             viewModel.onEvent(ExerciseLibraryEvent.SearchQueryChanged("leg extension"))
 
-            val state = awaitItem()
+            val state = expectMostRecentItem()
             assertTrue(state.exercises.isEmpty())
             assertEquals("leg extension", state.searchQuery)
         }
@@ -168,7 +168,7 @@ class ExerciseLibraryViewModelTest {
 
             viewModel.onEvent(ExerciseLibraryEvent.MuscleGroupSelected(null))
 
-            val state = awaitItem()
+            val state = expectMostRecentItem()
             assertEquals(3, state.exercises.size)
             assertEquals(null, state.selectedMuscleGroup)
         }
@@ -192,7 +192,7 @@ class ExerciseLibraryViewModelTest {
 
             viewModel.onEvent(ExerciseLibraryEvent.SearchQueryChanged("press"))
 
-            val state = awaitItem()
+            val state = expectMostRecentItem()
             assertEquals(1, state.exercises.size)
             assertEquals(TestFixtures.benchPress.id, state.exercises[0].id)
             assertEquals("press", state.searchQuery)
@@ -227,7 +227,7 @@ class ExerciseLibraryViewModelTest {
 
             viewModel.onEvent(ExerciseLibraryEvent.SearchQueryChanged("BENCH"))
 
-            val state = awaitItem()
+            val state = expectMostRecentItem()
             assertEquals(1, state.exercises.size)
             assertEquals(TestFixtures.benchPress.id, state.exercises[0].id)
         }
@@ -249,7 +249,7 @@ class ExerciseLibraryViewModelTest {
 
             viewModel.onEvent(ExerciseLibraryEvent.SearchQueryChanged(""))
 
-            val state = awaitItem()
+            val state = expectMostRecentItem()
             assertEquals(2, state.exercises.size)
             assertEquals("", state.searchQuery)
         }
