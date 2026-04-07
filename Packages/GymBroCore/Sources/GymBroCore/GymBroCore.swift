@@ -41,3 +41,21 @@ public typealias AICoachConfiguration = AICoachConfiguration
 public typealias UsageLimiter = UsageLimiter
 public typealias CoachContext = CoachContext
 public typealias AICoachError = AICoachError
+// Progress Tracking (Issue #8)
+public typealias E1RMCalculator = E1RMCalculator
+public typealias E1RMFormula = E1RMFormula
+public typealias ProgressTrackingService = ProgressTrackingService
+public typealias E1RMDataPoint = E1RMDataPoint
+public typealias VolumeDataPoint = VolumeDataPoint
+public typealias FrequencyDataPoint = FrequencyDataPoint
+public typealias MuscleGroupBalance = MuscleGroupBalance
+public typealias PREvent = PREvent
+public typealias TimeWindow = TimeWindow
+
+// Plateau Detection (Issue #9)
+public typealias PlateauDetectionService = PlateauDetectionService
+public typealias PlateauAnalysis = PlateauAnalysis
+public typealias ProgressState = ProgressState
+public typealias RollingAverageAnalyzer = RollingAverageAnalyzer
+public typealias ChangePointDetector = ChangePointDetector
+public typealias TrendForecaster = TrendForecaster
