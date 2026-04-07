@@ -14,7 +14,8 @@ struct GymBroApp: App {
             ExerciseSet.self,
             Program.self,
             ProgramDay.self,
-            UserProfile.self
+            UserProfile.self,
+            ChatMessage.self
         ])
     }
 }
