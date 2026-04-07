@@ -10,6 +10,8 @@ data class ExerciseEntity(
     val id: String = UUID.randomUUID().toString(),
     val name: String,
     val muscleGroup: String,
+    val category: String = "COMPOUND",
     val equipment: String = "BARBELL",
-    val instructions: String = "",
+    val description: String = "",
+    val youtubeUrl: String? = null,
 )
