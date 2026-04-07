@@ -2,39 +2,27 @@ import SwiftUI
 import GymBroUI
 
 struct ContentView: View {
-    @State private var selectedTab = 0
-    
     var body: some View {
-        TabView(selection: $selectedTab) {
-            WorkoutTab()
-                .tabItem {
-                    Label("Workout", systemImage: "figure.strengthtraining.traditional")
-                }
-                .tag(0)
-            
-            HistoryTab()
-                .tabItem {
-                    Label("History", systemImage: "chart.line.uptrend.xyaxis")
-                }
-                .tag(1)
-            
-            ProgramsTab()
-                .tabItem {
-                    Label("Programs", systemImage: "calendar")
-                }
-                .tag(2)
-            
-            CoachTab()
-                .tabItem {
-                    Label("Coach", systemImage: "brain.head.profile")
-                }
-                .tag(3)
-            
-            ProfileTab()
-                .tabItem {
-                    Label("Profile", systemImage: "person.circle")
-                }
-                .tag(4)
+        TabView {
+            Tab("Workout", systemImage: "figure.strengthtraining.traditional") {
+                WorkoutTab()
+            }
+
+            Tab("History", systemImage: "chart.line.uptrend.xyaxis") {
+                HistoryTab()
+            }
+
+            Tab("Programs", systemImage: "calendar") {
+                ProgramsTab()
+            }
+
+            Tab("Coach", systemImage: "brain.head.profile") {
+                CoachTab()
+            }
+
+            Tab("Profile", systemImage: "person.circle") {
+                ProfileTab()
+            }
         }
     }
 }

@@ -40,14 +40,14 @@ public struct TonnageChartView: View {
         }
         .padding()
         .background(Color(.systemBackground))
-        .cornerRadius(12)
+        .clipShape(RoundedRectangle(cornerRadius: 12))
         .shadow(radius: 1)
     }
 
     private var emptyState: some View {
         Text("Log more workouts to see tonnage trends")
             .font(.caption)
-            .foregroundColor(.secondary)
+            .foregroundStyle(.secondary)
             .frame(height: 200)
             .frame(maxWidth: .infinity)
     }
@@ -58,7 +58,7 @@ public struct TonnageChartView: View {
                 VStack(alignment: .leading) {
                     Text("Peak Tonnage")
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                     Text("\(max.totalTonnage, specifier: "%.0f") kg")
                         .font(.title3.bold())
                 }
@@ -67,7 +67,7 @@ public struct TonnageChartView: View {
             VStack(alignment: .trailing) {
                 Text("Total Tonnage")
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
                 let total = data.reduce(0.0) { $0 + $1.totalTonnage }
                 Text("\(total, specifier: "%.0f") kg")
                     .font(.title3.bold())

@@ -6,6 +6,9 @@ import GymBroCore
 public struct CoachChatView: View {
     @State private var viewModel = CoachChatViewModel()
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    @ScaledMetric(relativeTo: .largeTitle) private var welcomeIconSize: CGFloat = 48
 
     public init() {}
 
@@ -32,7 +35,7 @@ public struct CoachChatView: View {
                 }
                 .onChange(of: viewModel.messages.count) {
                     if let last = viewModel.messages.last {
-                        withAnimation(.easeOut(duration: 0.3)) {
+                        withAnimation(reduceMotion ? nil : .easeOut(duration: 0.3)) {
                             proxy.scrollTo(last.id, anchor: .bottom)
                         }
                     }
@@ -60,6 +63,9 @@ public struct CoachChatView: View {
                 Text("AI Coach")
                     .font(.headline)
                 HStack(spacing: 4) {
+                    Image(systemName: viewModel.isOfflineMode ? "wifi.slash" : "wifi")
+                        .font(.caption2)
+                        .foregroundStyle(viewModel.isOfflineMode ? .orange : .green)
                     Circle()
                         .fill(viewModel.isOfflineMode ? Color.orange : Color.green)
                         .frame(width: 8, height: 8)
@@ -78,6 +84,7 @@ public struct CoachChatView: View {
                     Image(systemName: "trash")
                         .foregroundStyle(.secondary)
                 }
+                .accessibilityLabel("Clear chat history") // [VERIFY]
             }
         }
         .padding(.horizontal, 16)
@@ -88,7 +95,7 @@ public struct CoachChatView: View {
     private var welcomeMessage: some View {
         VStack(spacing: 16) {
             Image(systemName: "brain.head.profile")
-                .font(.system(size: 48))
+                .font(.system(size: welcomeIconSize))
                 .foregroundStyle(.tint)
 
             Text("GymBro Coach")
@@ -164,6 +171,7 @@ public struct CoachChatView: View {
                         .font(.title2)
                         .foregroundStyle(viewModel.inputText.isEmpty ? .secondary : .tint)
                 }
+                .accessibilityLabel(viewModel.isLoading ? "Stop" : "Send message") // [VERIFY]
                 .disabled(viewModel.inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !viewModel.isLoading)
             }
             .padding(.horizontal, 16)

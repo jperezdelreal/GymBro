@@ -27,7 +27,7 @@ public struct MuscleBalanceChart: View {
                     .annotation(position: .trailing) {
                         Text("\(item.percentage, specifier: "%.0f")%")
                             .font(.caption2)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                     }
                 }
                 .chartLegend(.hidden)
@@ -37,14 +37,14 @@ public struct MuscleBalanceChart: View {
         }
         .padding()
         .background(Color(.systemBackground))
-        .cornerRadius(12)
+        .clipShape(RoundedRectangle(cornerRadius: 12))
         .shadow(radius: 1)
     }
 
     private var emptyState: some View {
         Text("Log workouts with exercises to see muscle balance")
             .font(.caption)
-            .foregroundColor(.secondary)
+            .foregroundStyle(.secondary)
             .frame(height: 150)
             .frame(maxWidth: .infinity)
     }

@@ -6,7 +6,11 @@ public struct ExerciseSetRow: View {
     let setNumber: Int
     let unitSystem: UnitSystem
     let onTap: () -> Void
-    
+
+    @ScaledMetric(relativeTo: .title3) private var setNumberSize: CGFloat = 20
+    @ScaledMetric(relativeTo: .body) private var valueSize: CGFloat = 18
+    @ScaledMetric(relativeTo: .title3) private var checkSize: CGFloat = 24
+
     public init(
         set: ExerciseSet,
         setNumber: Int,
@@ -26,17 +30,18 @@ public struct ExerciseSetRow: View {
     }
     
     public var body: some View {
-        HStack(spacing: 16) {
+        Button(action: onTap) {
+            HStack(spacing: 16) {
             // Set number
             Text("\(setNumber)")
-                .font(.system(size: 20, weight: .bold, design: .rounded))
+                .font(.system(size: setNumberSize, weight: .bold, design: .rounded))
                 .foregroundStyle(set.isWarmup ? .secondary : .primary)
                 .frame(width: 40)
             
             // Weight
             VStack(alignment: .leading, spacing: 2) {
                 Text(weightString)
-                    .font(.system(size: 18, weight: .semibold))
+                    .font(.system(size: valueSize, weight: .semibold))
                     .foregroundStyle(set.completedAt != nil ? .primary : .secondary)
                 Text("Weight")
                     .font(.caption2)
@@ -47,7 +52,7 @@ public struct ExerciseSetRow: View {
             // Reps
             VStack(alignment: .leading, spacing: 2) {
                 Text("\(set.reps)")
-                    .font(.system(size: 18, weight: .semibold))
+                    .font(.system(size: valueSize, weight: .semibold))
                     .foregroundStyle(set.completedAt != nil ? .primary : .secondary)
                 Text("Reps")
                     .font(.caption2)
@@ -59,7 +64,7 @@ public struct ExerciseSetRow: View {
             if let rpe = set.rpe {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(String(format: "%.0f", rpe))
-                        .font(.system(size: 18, weight: .semibold))
+                        .font(.system(size: valueSize, weight: .semibold))
                         .foregroundStyle(.orange)
                     Text("RPE")
                         .font(.caption2)
@@ -71,7 +76,7 @@ public struct ExerciseSetRow: View {
             // Completion indicator
             if set.completedAt != nil {
                 Image(systemName: "checkmark.circle.fill")
-                    .font(.system(size: 24))
+                    .font(.system(size: checkSize))
                     .foregroundStyle(.green)
             }
         }
@@ -88,9 +93,7 @@ public struct ExerciseSetRow: View {
                     lineWidth: 2
                 )
         )
-        .contentShape(Rectangle())
-        .onTapGesture {
-            onTap()
         }
+        .buttonStyle(.plain)
     }
 }

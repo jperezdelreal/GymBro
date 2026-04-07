@@ -47,14 +47,14 @@ public struct E1RMChartView: View {
         }
         .padding()
         .background(Color(.systemBackground))
-        .cornerRadius(12)
+        .clipShape(RoundedRectangle(cornerRadius: 12))
         .shadow(radius: 1)
     }
 
     private var emptyState: some View {
         Text("Log more workouts to see e1RM trends")
             .font(.caption)
-            .foregroundColor(.secondary)
+            .foregroundStyle(.secondary)
             .frame(height: 200)
             .frame(maxWidth: .infinity)
     }
@@ -65,7 +65,7 @@ public struct E1RMChartView: View {
                 VStack(alignment: .leading) {
                     Text("Best e1RM")
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                     Text("\(best.e1rm, specifier: "%.1f") kg")
                         .font(.title3.bold())
                 }
@@ -76,10 +76,13 @@ public struct E1RMChartView: View {
                 VStack(alignment: .trailing) {
                     Text("Change")
                         .font(.caption)
-                        .foregroundColor(.secondary)
-                    Text("\(change >= 0 ? "+" : "")\(change, specifier: "%.1f") kg")
-                        .font(.title3.bold())
-                        .foregroundColor(change >= 0 ? .green : .red)
+                        .foregroundStyle(.secondary)
+                    HStack(spacing: 2) {
+                        Image(systemName: change >= 0 ? "arrow.up.right" : "arrow.down.right")
+                        Text("\(change >= 0 ? "+" : "")\(change, specifier: "%.1f") kg")
+                    }
+                    .font(.title3.bold())
+                    .foregroundStyle(change >= 0 ? .green : .red)
                 }
             }
         }

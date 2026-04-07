@@ -52,6 +52,7 @@ public struct ChatMessageBubble: View {
             .frame(width: 28, height: 28)
             .background(Color.accentColor)
             .clipShape(Circle())
+            .accessibilityHidden(true)
     }
 
     private var bubbleBackground: some ShapeStyle {
