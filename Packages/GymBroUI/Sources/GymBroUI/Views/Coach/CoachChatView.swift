@@ -53,6 +53,10 @@ public struct CoachChatView: View {
                 }
             }
 
+            if viewModel.isRetrying {
+                retryingBanner
+            }
+
             if let error = viewModel.errorMessage {
                 errorBanner(error)
             }
@@ -156,6 +160,21 @@ public struct CoachChatView: View {
             .padding(.horizontal, GymBroSpacing.md)
         }
         .padding(.vertical, GymBroSpacing.xxl)
+    }
+
+    private var retryingBanner: some View {
+        HStack(spacing: GymBroSpacing.sm) {
+            ProgressView()
+                .tint(GymBroColors.accentCyan)
+                .controlSize(.small)
+            Text("Retrying...")
+                .font(GymBroTypography.caption)
+                .foregroundStyle(GymBroColors.textSecondary)
+            Spacer()
+        }
+        .padding(.horizontal, GymBroSpacing.md)
+        .padding(.vertical, GymBroSpacing.sm)
+        .background(GymBroColors.accentCyan.opacity(0.08))
     }
 
     private func errorBanner(_ message: String) -> some View {
