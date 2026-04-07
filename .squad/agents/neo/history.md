@@ -103,6 +103,99 @@
 **Decision Captured:** Merged to .squad/decisions.md as heuristics-first design pattern
 
 **Impact:** Smart defaults now adapt to user's training state; enables true autoregulation
+### 2026-04-07: Pre-built Program Templates + Compliance Tracking (Issue #81, PR #93)
+
+**What was built:**
+- **ProgramWeek model** — Supports week-level variation essential for block periodization (5/3/1, etc.)
+- **Extended PlannedExercise** — Added programWeek relationship for week-specific exercise prescriptions
+- **Extended ProgramDay** — Added weeks array to contain multiple week variations
+- **programs-seed.json** — 6 pre-built program templates with 1626 lines of evidence-based training protocols:
+  - 5/3/1 Wendler Method: 4-week block periodization with BBB accessories, deload week
+  - PPL Hypertrophy Focus: 6-day linear progression split
+  - GZCL Method: T1/T2/T3 tier structure (heavy/moderate/accessory)
+  - Starting Strength: 3-day beginner LP with A/B alternating workouts
+  - Upper/Lower 4-Day Split: Daily Undulating Periodization (power/hypertrophy)
+  - Full Body 3x: Intermediate strength + hypertrophy with compound focus
+- **ProgramSeeder service** — Loads templates from JSON, creates Program → ProgramDay → ProgramWeek → PlannedExercise hierarchy. Follows ExerciseDataSeeder pattern. Only seeds once (checks for existing non-custom programs).
+- **ProgramComplianceService** — Tracks workout adherence by comparing actual to planned:
+  - Base adherence: % of planned exercises completed
+  - RPE deviation penalty: >1.5 RPE off target = -5% adherence
+  - Volume deviation penalty: >20% sets off target = -5% adherence
+  - Extra exercise penalty: each extra exercise = -2% adherence
+  - 4-level compliance rating: Excellent (90%+), Good (75-89%), Moderate (60-74%), Poor (<60%)
+- 21 unit tests across 2 test files (ProgramSeeder, ProgramComplianceService)
+
+**Key design decisions:**
+- **Week-level variation is first-class** — 5/3/1 requires different percentages per week (Week 1: 5x65/75/85%, Week 2: 3x70/80/90%, Week 3: 5/3/1x75/85/95%, Week 4: Deload 40/50/60%). ProgramWeek enables this without complex branching logic.
+- **Evidence-based RPE targets** — All RPE values cite Helms and Zourdos research. Conservative thresholds (no crying wolf).
+- **Real exercises only** — All templates use exercises from exercises-seed.json. Seeder validates exercise names exist before creating PlannedExercise objects.
+- **Compliance scoring is lenient** — Penalties are small (2-5%) to encourage adherence without micromanagement. Philosophy: trust over control.
+- **Graceful degradation** — Compliance works without RPE data (optional enhancement). If user doesn't log RPE, base adherence (exercise completion) is still calculated.
+- **Seeder follows established pattern** — Matches ExerciseDataSeeder structure (static methods, Logger, Codable seed data, single-run guard).
+
+**Technical implementation:**
+- ProgramWeek: @Model with weekNumber, programDay relationship, plannedExercises array
+- PlannedExercise: Added programWeek optional relationship (backward compatible)
+- ProgramDay: Added weeks array (cascade delete)
+- ProgramSeeder: Fetches exercises by name, maps to seed data, creates full hierarchy
+- ProgramComplianceService: Stateless analyze() methods, returns ComplianceResult struct
+- JSON structure: Array<ProgramSeedData> with nested days → weekVariations → exercises
+
+**Evidence citations:**
+- Helms et al. (2018) — RPE-based autoregulation
+- Zourdos et al. (2016) — RPE scale validation
+- Wendler (2009) — 5/3/1 methodology
+- Israetel, Hoffmann, Smith (2020) — Volume landmarks per muscle group
+
+**File paths:**
+- \Packages/GymBroCore/Sources/GymBroCore/Models/ProgramWeek.swift\ (25 lines)
+- \Packages/GymBroCore/Sources/GymBroCore/Resources/programs-seed.json\ (1626 lines)
+- \Packages/GymBroCore/Sources/GymBroCore/Services/ProgramSeeder.swift\ (131 lines)
+- \Packages/GymBroCore/Sources/GymBroCore/Services/ProgramComplianceService.swift\ (164 lines)
+- \Packages/GymBroCore/Tests/GymBroCoreTests/ProgramSeederTests.swift\ (222 lines)
+- \Packages/GymBroCore/Tests/GymBroCoreTests/ProgramComplianceServiceTests.swift\ (388 lines)
+
+**Next integration steps (Trinity handles UI):**
+- Wire up ProgramSeeder to app initialization (call after ExerciseDataSeeder)
+- Display program templates in program selection UI
+- Show compliance metrics in workout summary
+- Add program recommendation logic based on user experience level
+- Performance testing with full seeded data (10+ programs, 100+ workouts)
+
+**Impact:**
+- **No more placeholder UI** — Users can now select real, evidence-based programs
+- **Week-level progression works** — Block periodization programs (5/3/1, GZCL) now have proper data model support
+- **Adherence feedback loop** — Compliance tracking enables future adaptive training engine (if user consistently misses accessories, program can adapt)
+- **Foundation for auto-periodization** — Compliance + ReadinessScore + PlateauDetection = inputs for intelligent program switching
+- **Differentiation from competitors** — No other app has evidence-based program templates with compliance tracking at this granularity
+
+### 2026-04-07: Smart Defaults Overhaul (Issue #84, PR #90)
+**The Problem:**
+- Original SmartDefaultsService was naive: `weight = avg(last_workout) + increment`, `reps = avg(last_workout_reps)`
+- Ignored fatigue, RPE, recovery state, historical trends, plateaus, deloads, and exercise order
+- Resulted in poor weight suggestions that didn't adapt to user's actual training state
+
+**The Solution — Sophisticated Heuristics-First Algorithm:**
+Completely rewrote SmartDefaultsService with 6 major enhancements:
+
+1. **Intra-session fatigue detection**
+   - Accounts for rep drop-off from set 1→3 (Set 1: 1.0x, Set 2: 0.975x, Set 3: 0.95x)
+   - Considers exercise position in workout (Exercise 1-2: 1.0x, 3-4: 0.98x, 5+: 0.95x)
+   - Analyzes historical fatigue pattern (ratio of last set reps to first set reps across sessions)
+
+2. **Recovery-aware predictions**
+   - Integrates ReadinessScoreService for context-aware load adjustment
+   - Readiness >= 80: +2.5% weight (push intensity)
+   - Readiness 60-79: 0% (normal training)
+   - Readiness 40-59: -10% (reduce load)
+   - Readiness < 40: -20% (rest day — minimal load)
+
+3. **Historical trend analysis**
+   - Uses last 3-5 sessions instead of just the last one
+   - Calculates linear trend of e1RM progression (slope normalized to -1.0 to +1.0)
+   - Positive trend: full progression, negative trend: half progression (plateau detection)
+   - Tracks volume stability using coefficient of variation
+
 4. **RPE integration**
    - If RPE data exists on sets, calibrates next-session weights
    - RPE < 7.0: +2.5% (user has more in tank)

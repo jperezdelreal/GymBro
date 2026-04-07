@@ -11,6 +11,7 @@ struct ContentView: View {
     @State private var resumedWorkoutViewModel: ActiveWorkoutViewModel?
     @State private var showResumedWorkout = false
     @State private var selectedTab = "workout"
+    @State private var needsOnboarding = false
 
     let authService: AuthenticationService
     let syncService: CloudKitSyncService
@@ -20,11 +21,29 @@ struct ContentView: View {
             if authService.authState == .unknown {
                 ProgressView("Loading…")
                     .tint(GymBroColors.accentGreen)
+            } else if needsOnboarding {
+                OnboardingFlowView {
+                    needsOnboarding = false
+                }
             } else {
                 mainTabView
             }
         }
         .preferredColorScheme(.dark)
+        .task {
+            checkOnboardingStatus()
+        }
+    }
+    
+    private func checkOnboardingStatus() {
+        let descriptor = FetchDescriptor<UserProfile>()
+        let profiles = (try? modelContext.fetch(descriptor)) ?? []
+        
+        if let profile = profiles.first {
+            needsOnboarding = !profile.hasCompletedOnboarding
+        } else {
+            needsOnboarding = true
+        }
     }
 
     @ViewBuilder
@@ -107,17 +126,38 @@ struct ContentView: View {
 }
 
 struct WorkoutTab: View {
+    @State private var showStartWorkout = false
+    
     var body: some View {
-        Text("Workout")
+        NavigationStack {
+            EmptyStateView(
+                icon: "figure.strengthtraining.traditional",
+                title: "Ready to train?",
+                message: "Start your first workout and let's build something amazing",
+                actionTitle: "Start Workout"
+            ) {
+                showStartWorkout = true
+            }
             .navigationTitle("Workout")
+            .sheet(isPresented: $showStartWorkout) {
+                StartWorkoutView()
+            }
+        }
     }
 }
 
 struct HistoryTab: View {
     var body: some View {
         NavigationStack {
-            Text("History")
-                .navigationTitle("History")
+            EmptyStateView(
+                icon: "chart.line.uptrend.xyaxis",
+                title: "No history yet",
+                message: "Complete your first workout to see your progress here",
+                actionTitle: "View Workout Tab"
+            ) {
+                // Switch to workout tab
+            }
+            .navigationTitle("History")
         }
     }
 }
@@ -125,8 +165,15 @@ struct HistoryTab: View {
 struct ProgramsTab: View {
     var body: some View {
         NavigationStack {
-            Text("Programs")
-                .navigationTitle("Programs")
+            EmptyStateView(
+                icon: "calendar",
+                title: "No programs yet",
+                message: "Create a custom program or let the AI coach build one for you",
+                actionTitle: "Ask Coach"
+            ) {
+                // Switch to coach tab
+            }
+            .navigationTitle("Programs")
         }
     }
 }

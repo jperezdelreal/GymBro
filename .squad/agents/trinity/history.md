@@ -193,7 +193,15 @@
 - **Thumb zone**: All primary actions (Complete Set button, rest timer, weight/rep steppers) remain in bottom 40% of screen. Existing button tap preserved as fallback — gestures are pure enhancement.
 - **Accessibility**: All swipeable rows have `.accessibilityAction` equivalents for Complete, Undo, and Options.
 
-### 2026-04-07: AI Coach UX -- Conversation History, Prompts, Voice Input (Issue #70)
+### 2026-04-07: AI Coach Context Fix (Neo, Issue #82)
+**CRITICAL: CoachChatViewModel.buildContext() Now Populated**
+- Neo fixed the missing data pipeline — CoachChatView can now surface context-aware responses
+- AI coach receives: user profile (experience level, bodyweight), recent 10 workouts (grouped by exercise), active program (with week calculation), top 20 personal records
+- PromptBuilder receives rich context from ViewModel → system prompt now includes user's training history, program phase, PRs
+- Impact for Trinity: CoachChatView was ready but blind. Now it can show responses like "You've hit a plateau on squat" with actual user data backing it
+- Ready to polish: styling on context indicator bar, smooth chat bubble animations, voice input streaming UX
+- Files affected: CoachChatViewModel (added 4 fetch methods + buildContext() impl), 7 new unit tests
+- PR #88 ready for review
 **Implementation highlights:**
 - **Persistent conversation history**: SwiftData ChatMessage with list UI in CoachChatView. LazyVStack with ScrollViewReader auto-scrolls on new messages. History loads last 50 messages on configure().
 - **Suggested prompt chips**: SuggestedPromptsBar -- horizontal ScrollView of capsule-shaped chips with SF Symbol icons. 6 contextual defaults. Shown both on welcome screen (vertical list) and above input area (horizontal scroll) after conversation starts.
@@ -222,3 +230,28 @@
 **Decision Captured:** Merged to .squad/decisions.md as progressive disclosure pattern
 
 **Related:** Feeds user profile data into Neo's SmartDefaults (experience level for scaling)
+### 2026-04-07: Onboarding Flow — Fitness Questionnaire & First Workout (Issue #87)
+**Progressive Disclosure Onboarding:**
+- **7-step flow**: Welcome → Goals → Experience → Frequency → Equipment → Limitations → Summary. Each step = one screen, minimal input (tap selections, not text). Progress bar shows position in flow.
+- **Target completion time**: Under 2 minutes. Skip option available but explains what user will miss. All transitions gated on `reduceMotion` check.
+- **UserProfile model extended**: Added `hasCompletedOnboarding: Bool`, `trainingGoals: [String]`, `trainingFrequency: Int`, `equipmentAvailability: EquipmentType`, `injuriesOrLimitations: String?`.
+- **EquipmentType enum**: Three options — fullGym, homeGym, bodyweightOnly. Each with displayName computed property.
+- **ExperienceLevel descriptions**: Extended existing enum with descriptions ("New to strength training (< 1 year)", "Regular lifter (1-3 years)", "Experienced athlete (3+ years)", "Competitive athlete / coach").
+- **TrainingGoal enum**: Five multi-select options (Strength, Muscle Growth, Endurance, General Fitness, Athletic Performance) with SF Symbol icons.
+- **Onboarding gate**: ContentView checks UserProfile.hasCompletedOnboarding on launch via FetchDescriptor. If false or no profile exists, shows OnboardingFlowView sheet. Uses .task {} modifier for async check.
+- **First workout suggestion**: Rule-based logic in SummaryStepView. Suggests workout name and 4 exercises matching user's goals/equipment/experience. Bodyweight-only gets push-ups/pull-ups/squats/plank. Strength-focused with full gym gets Squat/Bench/Deadlift/OHP.
+- **Empty state component**: Created reusable EmptyStateView with icon, title, message, CTA button. Applied to WorkoutTab, HistoryTab, ProgramsTab with contextual messaging ("Ready to train?", "No history yet", "No programs yet").
+- **Design system applied**: GymBroColors.background (#0A0A0A), accentGreen (#00FF87) for CTAs and progress bar. All spacing/typography/button styles use design tokens. Haptic feedback (light impact on card selection, medium on level selection, heavy on completion).
+- **Accessibility**: VoiceOver labels on all steps. Dynamic Type support. Reduce motion gates all transitions. Skip option clearly explained.
+- **Step-by-step components**: WelcomeStepView (hero icon, features list, "Get Started" CTA), GoalsStepView (multi-select cards with checkmarks), ExperienceStepView (single-select with descriptions), FrequencyStepView (2-6 days/week), EquipmentStepView (3 options with icons), LimitationsStepView (common selections + free text field), SummaryStepView (profile recap + first workout preview + "Let's Go!" CTA).
+- **Navigation pattern**: Back/Continue buttons in bottom button tray. Continue disabled on GoalsStepView until at least one goal selected. All other steps allow forward navigation.
+- **PR #89 opened (draft), closes #87.**
+
+**Learnings:**
+- **Progressive disclosure >> All-at-once forms**: Breaking onboarding into 7 single-focus steps reduces cognitive load vs one long form. 2-minute target requires forcing brevity on each step.
+- **Multi-select UX pattern**: HStack with checkmark.circle.fill (selected) vs strokeBorder Circle (unselected) is clearer than toggle switches for grouped choices. Light haptic on toggle reinforces selection.
+- **Rule-based > AI-generated for first workout**: For MVP, deterministic first workout based on goals/equipment/experience is faster and more predictable than waiting for LLM suggestion. Can enhance with AI in v1.1.
+- **Empty states drive engagement**: Placeholder text ("Workout", "History") creates dead-end UX. EmptyStateView with clear CTA ("Start Workout", "View Workout Tab") guides new users to first action.
+- **Onboarding gate timing**: Check hasCompletedOnboarding after auth is known but before mainTabView renders. Use .task {} on Group, not on TabView, to avoid double-execution per tab.
+- **FetchDescriptor pattern for single-item checks**: `FetchDescriptor<UserProfile>()` with try? fetch returns empty array on failure. First profile = current user (single-user app). More reliable than relying on implicit fetch.
+

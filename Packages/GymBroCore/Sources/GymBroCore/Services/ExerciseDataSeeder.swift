@@ -18,6 +18,8 @@ public struct ExerciseDataSeeder {
     }
     
     public static func seedExercises(modelContext: ModelContext) async throws {
+        // Only seed if there are NO exercises in the database yet
+        // This ensures we never overwrite user's custom exercises
         let alreadySeeded = try modelContext.fetch(FetchDescriptor<Exercise>()).count > 0
         
         guard !alreadySeeded else {

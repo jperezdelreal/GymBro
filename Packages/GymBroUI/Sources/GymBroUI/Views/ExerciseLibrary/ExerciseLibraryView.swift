@@ -30,8 +30,14 @@ public struct ExerciseLibraryView: View {
                     }
                 } else {
                     List(viewModel.exercises) { exercise in
-                        Text(exercise.name)
+                        NavigationLink(destination: ExerciseDetailView(exercise: exercise)) {
+                            ExerciseLibraryRow(exercise: exercise)
+                        }
+                        .listRowBackground(GymBroColors.background)
+                        .listRowSeparatorTint(GymBroColors.border)
                     }
+                    .listStyle(.plain)
+                    .scrollContentBackground(.hidden)
                 }
             }
             .searchable(text: $searchText)

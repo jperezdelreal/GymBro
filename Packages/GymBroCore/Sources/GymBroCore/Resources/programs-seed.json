@@ -1,0 +1,1626 @@
+[
+  {
+    "name": "5/3/1 - Wendler Method",
+    "programDescription": "Classic 4-week strength program with main lifts at prescribed percentages and Boring But Big accessories. Designed for intermediate-advanced lifters seeking steady strength gains. 4-day split with main lift + 5x10 supplemental work + accessories.",
+    "durationWeeks": 4,
+    "frequencyPerWeek": 4,
+    "periodizationType": "block",
+    "targetAudience": "Intermediate to Advanced (2+ years)",
+    "expectedOutcome": "5-10lb monthly increases on main lifts",
+    "progressionScheme": "Week 1: 5x65/75/85%, Week 2: 3x70/80/90%, Week 3: 5/3/1x75/85/95%, Week 4: Deload 40/50/60%",
+    "days": [
+      {
+        "dayNumber": 1,
+        "name": "Day 1 - Squat",
+        "dayDescription": "Main: Back Squat, Supplemental: 5x10 BBB Squat, Accessories: Leg Press + Ab Wheel",
+        "weekVariations": [
+          {
+            "weekNumber": 1,
+            "exercises": [
+              {
+                "order": 1,
+                "exerciseName": "Barbell Back Squat",
+                "targetSets": 3,
+                "targetReps": "5/5/5+",
+                "targetRPE": 8.5,
+                "notes": "Week 1: 65%x5, 75%x5, 85%x5+. AMRAP on final set."
+              },
+              {
+                "order": 2,
+                "exerciseName": "Barbell Back Squat",
+                "targetSets": 5,
+                "targetReps": "10",
+                "targetRPE": 6.5,
+                "notes": "BBB: 5x10 at 50-60% of training max"
+              },
+              {
+                "order": 3,
+                "exerciseName": "Leg Press",
+                "targetSets": 3,
+                "targetReps": "12-15",
+                "targetRPE": 7.5,
+                "notes": "Accessory work"
+              },
+              {
+                "order": 4,
+                "exerciseName": "Ab Wheel Rollout",
+                "targetSets": 3,
+                "targetReps": "10-15",
+                "targetRPE": 7.0,
+                "notes": "Core work"
+              }
+            ]
+          },
+          {
+            "weekNumber": 2,
+            "exercises": [
+              {
+                "order": 1,
+                "exerciseName": "Barbell Back Squat",
+                "targetSets": 3,
+                "targetReps": "3/3/3+",
+                "targetRPE": 9.0,
+                "notes": "Week 2: 70%x3, 80%x3, 90%x3+. AMRAP on final set."
+              },
+              {
+                "order": 2,
+                "exerciseName": "Barbell Back Squat",
+                "targetSets": 5,
+                "targetReps": "10",
+                "targetRPE": 6.5,
+                "notes": "BBB: 5x10 at 50-60% of training max"
+              },
+              {
+                "order": 3,
+                "exerciseName": "Leg Press",
+                "targetSets": 3,
+                "targetReps": "12-15",
+                "targetRPE": 7.5,
+                "notes": "Accessory work"
+              },
+              {
+                "order": 4,
+                "exerciseName": "Ab Wheel Rollout",
+                "targetSets": 3,
+                "targetReps": "10-15",
+                "targetRPE": 7.0,
+                "notes": "Core work"
+              }
+            ]
+          },
+          {
+            "weekNumber": 3,
+            "exercises": [
+              {
+                "order": 1,
+                "exerciseName": "Barbell Back Squat",
+                "targetSets": 3,
+                "targetReps": "5/3/1+",
+                "targetRPE": 9.5,
+                "notes": "Week 3: 75%x5, 85%x3, 95%x1+. AMRAP on final set."
+              },
+              {
+                "order": 2,
+                "exerciseName": "Barbell Back Squat",
+                "targetSets": 5,
+                "targetReps": "10",
+                "targetRPE": 6.5,
+                "notes": "BBB: 5x10 at 50-60% of training max"
+              },
+              {
+                "order": 3,
+                "exerciseName": "Leg Press",
+                "targetSets": 3,
+                "targetReps": "12-15",
+                "targetRPE": 7.5,
+                "notes": "Accessory work"
+              },
+              {
+                "order": 4,
+                "exerciseName": "Ab Wheel Rollout",
+                "targetSets": 3,
+                "targetReps": "10-15",
+                "targetRPE": 7.0,
+                "notes": "Core work"
+              }
+            ]
+          },
+          {
+            "weekNumber": 4,
+            "exercises": [
+              {
+                "order": 1,
+                "exerciseName": "Barbell Back Squat",
+                "targetSets": 3,
+                "targetReps": "5",
+                "targetRPE": 5.0,
+                "notes": "Deload Week: 40%x5, 50%x5, 60%x5"
+              },
+              {
+                "order": 2,
+                "exerciseName": "Leg Press",
+                "targetSets": 3,
+                "targetReps": "12-15",
+                "targetRPE": 6.0,
+                "notes": "Light accessory work"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayNumber": 2,
+        "name": "Day 2 - Bench Press",
+        "dayDescription": "Main: Bench Press, Supplemental: 5x10 BBB Bench, Accessories: DB Rows + Tricep Extensions",
+        "weekVariations": [
+          {
+            "weekNumber": 1,
+            "exercises": [
+              {
+                "order": 1,
+                "exerciseName": "Barbell Bench Press",
+                "targetSets": 3,
+                "targetReps": "5/5/5+",
+                "targetRPE": 8.5,
+                "notes": "Week 1: 65%x5, 75%x5, 85%x5+. AMRAP on final set."
+              },
+              {
+                "order": 2,
+                "exerciseName": "Barbell Bench Press",
+                "targetSets": 5,
+                "targetReps": "10",
+                "targetRPE": 6.5,
+                "notes": "BBB: 5x10 at 50-60% of training max"
+              },
+              {
+                "order": 3,
+                "exerciseName": "Dumbbell Row",
+                "targetSets": 3,
+                "targetReps": "12-15",
+                "targetRPE": 7.5,
+                "notes": "Antagonist work"
+              },
+              {
+                "order": 4,
+                "exerciseName": "Tricep Rope Pushdown",
+                "targetSets": 3,
+                "targetReps": "12-15",
+                "targetRPE": 7.0,
+                "notes": "Accessory work"
+              }
+            ]
+          },
+          {
+            "weekNumber": 2,
+            "exercises": [
+              {
+                "order": 1,
+                "exerciseName": "Barbell Bench Press",
+                "targetSets": 3,
+                "targetReps": "3/3/3+",
+                "targetRPE": 9.0,
+                "notes": "Week 2: 70%x3, 80%x3, 90%x3+. AMRAP on final set."
+              },
+              {
+                "order": 2,
+                "exerciseName": "Barbell Bench Press",
+                "targetSets": 5,
+                "targetReps": "10",
+                "targetRPE": 6.5,
+                "notes": "BBB: 5x10 at 50-60% of training max"
+              },
+              {
+                "order": 3,
+                "exerciseName": "Dumbbell Row",
+                "targetSets": 3,
+                "targetReps": "12-15",
+                "targetRPE": 7.5,
+                "notes": "Antagonist work"
+              },
+              {
+                "order": 4,
+                "exerciseName": "Tricep Rope Pushdown",
+                "targetSets": 3,
+                "targetReps": "12-15",
+                "targetRPE": 7.0,
+                "notes": "Accessory work"
+              }
+            ]
+          },
+          {
+            "weekNumber": 3,
+            "exercises": [
+              {
+                "order": 1,
+                "exerciseName": "Barbell Bench Press",
+                "targetSets": 3,
+                "targetReps": "5/3/1+",
+                "targetRPE": 9.5,
+                "notes": "Week 3: 75%x5, 85%x3, 95%x1+. AMRAP on final set."
+              },
+              {
+                "order": 2,
+                "exerciseName": "Barbell Bench Press",
+                "targetSets": 5,
+                "targetReps": "10",
+                "targetRPE": 6.5,
+                "notes": "BBB: 5x10 at 50-60% of training max"
+              },
+              {
+                "order": 3,
+                "exerciseName": "Dumbbell Row",
+                "targetSets": 3,
+                "targetReps": "12-15",
+                "targetRPE": 7.5,
+                "notes": "Antagonist work"
+              },
+              {
+                "order": 4,
+                "exerciseName": "Tricep Rope Pushdown",
+                "targetSets": 3,
+                "targetReps": "12-15",
+                "targetRPE": 7.0,
+                "notes": "Accessory work"
+              }
+            ]
+          },
+          {
+            "weekNumber": 4,
+            "exercises": [
+              {
+                "order": 1,
+                "exerciseName": "Barbell Bench Press",
+                "targetSets": 3,
+                "targetReps": "5",
+                "targetRPE": 5.0,
+                "notes": "Deload Week: 40%x5, 50%x5, 60%x5"
+              },
+              {
+                "order": 2,
+                "exerciseName": "Dumbbell Row",
+                "targetSets": 3,
+                "targetReps": "12-15",
+                "targetRPE": 6.0,
+                "notes": "Light accessory work"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayNumber": 3,
+        "name": "Day 3 - Deadlift",
+        "dayDescription": "Main: Deadlift, Supplemental: 5x10 BBB Deadlift, Accessories: Bulgarian Split Squat + Hanging Leg Raise",
+        "weekVariations": [
+          {
+            "weekNumber": 1,
+            "exercises": [
+              {
+                "order": 1,
+                "exerciseName": "Conventional Deadlift",
+                "targetSets": 3,
+                "targetReps": "5/5/5+",
+                "targetRPE": 8.5,
+                "notes": "Week 1: 65%x5, 75%x5, 85%x5+. AMRAP on final set."
+              },
+              {
+                "order": 2,
+                "exerciseName": "Romanian Deadlift",
+                "targetSets": 5,
+                "targetReps": "10",
+                "targetRPE": 6.5,
+                "notes": "BBB substitute: 5x10 RDL at moderate weight"
+              },
+              {
+                "order": 3,
+                "exerciseName": "Bulgarian Split Squat",
+                "targetSets": 3,
+                "targetReps": "10-12",
+                "targetRPE": 7.5,
+                "notes": "Per leg"
+              },
+              {
+                "order": 4,
+                "exerciseName": "Hanging Leg Raise",
+                "targetSets": 3,
+                "targetReps": "10-15",
+                "targetRPE": 7.0,
+                "notes": "Core work"
+              }
+            ]
+          },
+          {
+            "weekNumber": 2,
+            "exercises": [
+              {
+                "order": 1,
+                "exerciseName": "Conventional Deadlift",
+                "targetSets": 3,
+                "targetReps": "3/3/3+",
+                "targetRPE": 9.0,
+                "notes": "Week 2: 70%x3, 80%x3, 90%x3+. AMRAP on final set."
+              },
+              {
+                "order": 2,
+                "exerciseName": "Romanian Deadlift",
+                "targetSets": 5,
+                "targetReps": "10",
+                "targetRPE": 6.5,
+                "notes": "BBB substitute: 5x10 RDL at moderate weight"
+              },
+              {
+                "order": 3,
+                "exerciseName": "Bulgarian Split Squat",
+                "targetSets": 3,
+                "targetReps": "10-12",
+                "targetRPE": 7.5,
+                "notes": "Per leg"
+              },
+              {
+                "order": 4,
+                "exerciseName": "Hanging Leg Raise",
+                "targetSets": 3,
+                "targetReps": "10-15",
+                "targetRPE": 7.0,
+                "notes": "Core work"
+              }
+            ]
+          },
+          {
+            "weekNumber": 3,
+            "exercises": [
+              {
+                "order": 1,
+                "exerciseName": "Conventional Deadlift",
+                "targetSets": 3,
+                "targetReps": "5/3/1+",
+                "targetRPE": 9.5,
+                "notes": "Week 3: 75%x5, 85%x3, 95%x1+. AMRAP on final set."
+              },
+              {
+                "order": 2,
+                "exerciseName": "Romanian Deadlift",
+                "targetSets": 5,
+                "targetReps": "10",
+                "targetRPE": 6.5,
+                "notes": "BBB substitute: 5x10 RDL at moderate weight"
+              },
+              {
+                "order": 3,
+                "exerciseName": "Bulgarian Split Squat",
+                "targetSets": 3,
+                "targetReps": "10-12",
+                "targetRPE": 7.5,
+                "notes": "Per leg"
+              },
+              {
+                "order": 4,
+                "exerciseName": "Hanging Leg Raise",
+                "targetSets": 3,
+                "targetReps": "10-15",
+                "targetRPE": 7.0,
+                "notes": "Core work"
+              }
+            ]
+          },
+          {
+            "weekNumber": 4,
+            "exercises": [
+              {
+                "order": 1,
+                "exerciseName": "Conventional Deadlift",
+                "targetSets": 3,
+                "targetReps": "5",
+                "targetRPE": 5.0,
+                "notes": "Deload Week: 40%x5, 50%x5, 60%x5"
+              },
+              {
+                "order": 2,
+                "exerciseName": "Bulgarian Split Squat",
+                "targetSets": 3,
+                "targetReps": "10-12",
+                "targetRPE": 6.0,
+                "notes": "Light accessory work"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayNumber": 4,
+        "name": "Day 4 - Overhead Press",
+        "dayDescription": "Main: OHP, Supplemental: 5x10 BBB OHP, Accessories: Chin-ups + Lateral Raises",
+        "weekVariations": [
+          {
+            "weekNumber": 1,
+            "exercises": [
+              {
+                "order": 1,
+                "exerciseName": "Barbell Overhead Press",
+                "targetSets": 3,
+                "targetReps": "5/5/5+",
+                "targetRPE": 8.5,
+                "notes": "Week 1: 65%x5, 75%x5, 85%x5+. AMRAP on final set."
+              },
+              {
+                "order": 2,
+                "exerciseName": "Barbell Overhead Press",
+                "targetSets": 5,
+                "targetReps": "10",
+                "targetRPE": 6.5,
+                "notes": "BBB: 5x10 at 50-60% of training max"
+              },
+              {
+                "order": 3,
+                "exerciseName": "Chin-Up",
+                "targetSets": 3,
+                "targetReps": "8-12",
+                "targetRPE": 7.5,
+                "notes": "Antagonist work"
+              },
+              {
+                "order": 4,
+                "exerciseName": "Dumbbell Lateral Raise",
+                "targetSets": 3,
+                "targetReps": "12-15",
+                "targetRPE": 7.0,
+                "notes": "Side delt focus"
+              }
+            ]
+          },
+          {
+            "weekNumber": 2,
+            "exercises": [
+              {
+                "order": 1,
+                "exerciseName": "Barbell Overhead Press",
+                "targetSets": 3,
+                "targetReps": "3/3/3+",
+                "targetRPE": 9.0,
+                "notes": "Week 2: 70%x3, 80%x3, 90%x3+. AMRAP on final set."
+              },
+              {
+                "order": 2,
+                "exerciseName": "Barbell Overhead Press",
+                "targetSets": 5,
+                "targetReps": "10",
+                "targetRPE": 6.5,
+                "notes": "BBB: 5x10 at 50-60% of training max"
+              },
+              {
+                "order": 3,
+                "exerciseName": "Chin-Up",
+                "targetSets": 3,
+                "targetReps": "8-12",
+                "targetRPE": 7.5,
+                "notes": "Antagonist work"
+              },
+              {
+                "order": 4,
+                "exerciseName": "Dumbbell Lateral Raise",
+                "targetSets": 3,
+                "targetReps": "12-15",
+                "targetRPE": 7.0,
+                "notes": "Side delt focus"
+              }
+            ]
+          },
+          {
+            "weekNumber": 3,
+            "exercises": [
+              {
+                "order": 1,
+                "exerciseName": "Barbell Overhead Press",
+                "targetSets": 3,
+                "targetReps": "5/3/1+",
+                "targetRPE": 9.5,
+                "notes": "Week 3: 75%x5, 85%x3, 95%x1+. AMRAP on final set."
+              },
+              {
+                "order": 2,
+                "exerciseName": "Barbell Overhead Press",
+                "targetSets": 5,
+                "targetReps": "10",
+                "targetRPE": 6.5,
+                "notes": "BBB: 5x10 at 50-60% of training max"
+              },
+              {
+                "order": 3,
+                "exerciseName": "Chin-Up",
+                "targetSets": 3,
+                "targetReps": "8-12",
+                "targetRPE": 7.5,
+                "notes": "Antagonist work"
+              },
+              {
+                "order": 4,
+                "exerciseName": "Dumbbell Lateral Raise",
+                "targetSets": 3,
+                "targetReps": "12-15",
+                "targetRPE": 7.0,
+                "notes": "Side delt focus"
+              }
+            ]
+          },
+          {
+            "weekNumber": 4,
+            "exercises": [
+              {
+                "order": 1,
+                "exerciseName": "Barbell Overhead Press",
+                "targetSets": 3,
+                "targetReps": "5",
+                "targetRPE": 5.0,
+                "notes": "Deload Week: 40%x5, 50%x5, 60%x5"
+              },
+              {
+                "order": 2,
+                "exerciseName": "Chin-Up",
+                "targetSets": 3,
+                "targetReps": "8-12",
+                "targetRPE": 6.0,
+                "notes": "Light accessory work"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "PPL - Hypertrophy Focus",
+    "programDescription": "6-day Push/Pull/Legs split optimized for muscle growth. Linear progression on compounds, volume-focused accessories. Ideal for intermediate lifters in a growth phase with good recovery capacity.",
+    "durationWeeks": 8,
+    "frequencyPerWeek": 6,
+    "periodizationType": "linear",
+    "targetAudience": "Intermediate (2-4 years)",
+    "expectedOutcome": "2-4kg muscle gain per month with proper nutrition",
+    "progressionScheme": "Linear: +2.5kg on compounds when hitting top rep range, +1.25kg on accessories",
+    "days": [
+      {
+        "dayNumber": 1,
+        "name": "Push A - Chest Focus",
+        "dayDescription": "Heavy bench, incline work, overhead pressing, triceps",
+        "weekVariations": [
+          {
+            "weekNumber": 1,
+            "exercises": [
+              {
+                "order": 1,
+                "exerciseName": "Barbell Bench Press",
+                "targetSets": 4,
+                "targetReps": "6-8",
+                "targetRPE": 8.5,
+                "notes": "Main compound - progressive overload"
+              },
+              {
+                "order": 2,
+                "exerciseName": "Incline Dumbbell Press",
+                "targetSets": 3,
+                "targetReps": "8-12",
+                "targetRPE": 8.0,
+                "notes": "Upper chest emphasis"
+              },
+              {
+                "order": 3,
+                "exerciseName": "Barbell Overhead Press",
+                "targetSets": 3,
+                "targetReps": "8-10",
+                "targetRPE": 8.0,
+                "notes": "Shoulder mass builder"
+              },
+              {
+                "order": 4,
+                "exerciseName": "Dumbbell Lateral Raise",
+                "targetSets": 3,
+                "targetReps": "12-15",
+                "targetRPE": 7.5,
+                "notes": "Side delt volume"
+              },
+              {
+                "order": 5,
+                "exerciseName": "Tricep Rope Pushdown",
+                "targetSets": 3,
+                "targetReps": "12-15",
+                "targetRPE": 7.5,
+                "notes": "Tricep isolation"
+              },
+              {
+                "order": 6,
+                "exerciseName": "Overhead Tricep Extension",
+                "targetSets": 3,
+                "targetReps": "12-15",
+                "targetRPE": 7.5,
+                "notes": "Long head emphasis"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayNumber": 2,
+        "name": "Pull A - Back Thickness",
+        "dayDescription": "Deadlifts, rows, pulldowns, biceps",
+        "weekVariations": [
+          {
+            "weekNumber": 1,
+            "exercises": [
+              {
+                "order": 1,
+                "exerciseName": "Conventional Deadlift",
+                "targetSets": 4,
+                "targetReps": "5-8",
+                "targetRPE": 8.5,
+                "notes": "Main compound - progressive overload"
+              },
+              {
+                "order": 2,
+                "exerciseName": "Barbell Row",
+                "targetSets": 4,
+                "targetReps": "8-12",
+                "targetRPE": 8.0,
+                "notes": "Mid-back mass"
+              },
+              {
+                "order": 3,
+                "exerciseName": "Lat Pulldown",
+                "targetSets": 3,
+                "targetReps": "10-12",
+                "targetRPE": 7.5,
+                "notes": "Lat width"
+              },
+              {
+                "order": 4,
+                "exerciseName": "Dumbbell Row",
+                "targetSets": 3,
+                "targetReps": "10-12",
+                "targetRPE": 7.5,
+                "notes": "Unilateral work"
+              },
+              {
+                "order": 5,
+                "exerciseName": "Barbell Curl",
+                "targetSets": 3,
+                "targetReps": "8-12",
+                "targetRPE": 7.5,
+                "notes": "Bicep mass"
+              },
+              {
+                "order": 6,
+                "exerciseName": "Hammer Curl",
+                "targetSets": 3,
+                "targetReps": "10-15",
+                "targetRPE": 7.0,
+                "notes": "Brachialis + forearm"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayNumber": 3,
+        "name": "Legs A - Quad Focus",
+        "dayDescription": "Heavy squats, quad isolation, hamstrings, calves",
+        "weekVariations": [
+          {
+            "weekNumber": 1,
+            "exercises": [
+              {
+                "order": 1,
+                "exerciseName": "Barbell Back Squat",
+                "targetSets": 4,
+                "targetReps": "6-10",
+                "targetRPE": 8.5,
+                "notes": "Main compound - progressive overload"
+              },
+              {
+                "order": 2,
+                "exerciseName": "Romanian Deadlift",
+                "targetSets": 3,
+                "targetReps": "8-12",
+                "targetRPE": 8.0,
+                "notes": "Hamstring/glute emphasis"
+              },
+              {
+                "order": 3,
+                "exerciseName": "Leg Press",
+                "targetSets": 3,
+                "targetReps": "12-15",
+                "targetRPE": 8.0,
+                "notes": "Quad volume"
+              },
+              {
+                "order": 4,
+                "exerciseName": "Leg Extension",
+                "targetSets": 3,
+                "targetReps": "12-15",
+                "targetRPE": 7.5,
+                "notes": "Quad isolation"
+              },
+              {
+                "order": 5,
+                "exerciseName": "Lying Leg Curl",
+                "targetSets": 3,
+                "targetReps": "12-15",
+                "targetRPE": 7.5,
+                "notes": "Hamstring isolation"
+              },
+              {
+                "order": 6,
+                "exerciseName": "Standing Calf Raise",
+                "targetSets": 4,
+                "targetReps": "12-15",
+                "targetRPE": 7.5,
+                "notes": "Calf work"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayNumber": 4,
+        "name": "Push B - Shoulder Focus",
+        "dayDescription": "OHP, dumbbell pressing, flyes, rear delts, triceps",
+        "weekVariations": [
+          {
+            "weekNumber": 1,
+            "exercises": [
+              {
+                "order": 1,
+                "exerciseName": "Barbell Overhead Press",
+                "targetSets": 4,
+                "targetReps": "6-8",
+                "targetRPE": 8.5,
+                "notes": "Main compound - progressive overload"
+              },
+              {
+                "order": 2,
+                "exerciseName": "Incline Dumbbell Press",
+                "targetSets": 4,
+                "targetReps": "8-12",
+                "targetRPE": 8.0,
+                "notes": "Upper chest + front delts"
+              },
+              {
+                "order": 3,
+                "exerciseName": "Dumbbell Lateral Raise",
+                "targetSets": 4,
+                "targetReps": "12-15",
+                "targetRPE": 7.5,
+                "notes": "Side delt volume"
+              },
+              {
+                "order": 4,
+                "exerciseName": "Cable Flye",
+                "targetSets": 3,
+                "targetReps": "12-15",
+                "targetRPE": 7.5,
+                "notes": "Chest isolation"
+              },
+              {
+                "order": 5,
+                "exerciseName": "Rear Delt Flye",
+                "targetSets": 3,
+                "targetReps": "15-20",
+                "targetRPE": 7.0,
+                "notes": "Rear delt health"
+              },
+              {
+                "order": 6,
+                "exerciseName": "Overhead Tricep Extension",
+                "targetSets": 3,
+                "targetReps": "12-15",
+                "targetRPE": 7.5,
+                "notes": "Tricep volume"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayNumber": 5,
+        "name": "Pull B - Back Width",
+        "dayDescription": "Pullups, cable rows, rear delts, biceps",
+        "weekVariations": [
+          {
+            "weekNumber": 1,
+            "exercises": [
+              {
+                "order": 1,
+                "exerciseName": "Pull-Up",
+                "targetSets": 4,
+                "targetReps": "6-10",
+                "targetRPE": 8.5,
+                "notes": "Weighted if possible"
+              },
+              {
+                "order": 2,
+                "exerciseName": "Seated Cable Row",
+                "targetSets": 4,
+                "targetReps": "10-12",
+                "targetRPE": 8.0,
+                "notes": "Mid-back thickness"
+              },
+              {
+                "order": 3,
+                "exerciseName": "Lat Pulldown",
+                "targetSets": 3,
+                "targetReps": "10-12",
+                "targetRPE": 7.5,
+                "notes": "Lat pump work"
+              },
+              {
+                "order": 4,
+                "exerciseName": "Face Pull",
+                "targetSets": 3,
+                "targetReps": "15-20",
+                "targetRPE": 7.0,
+                "notes": "Rear delt/upper back health"
+              },
+              {
+                "order": 5,
+                "exerciseName": "Incline Dumbbell Curl",
+                "targetSets": 3,
+                "targetReps": "10-12",
+                "targetRPE": 7.5,
+                "notes": "Long head bicep"
+              },
+              {
+                "order": 6,
+                "exerciseName": "Cable Curl",
+                "targetSets": 3,
+                "targetReps": "12-15",
+                "targetRPE": 7.0,
+                "notes": "Bicep pump"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayNumber": 6,
+        "name": "Legs B - Hamstring Focus",
+        "dayDescription": "Front squats, RDLs, lunges, calves",
+        "weekVariations": [
+          {
+            "weekNumber": 1,
+            "exercises": [
+              {
+                "order": 1,
+                "exerciseName": "Front Squat",
+                "targetSets": 4,
+                "targetReps": "8-12",
+                "targetRPE": 8.0,
+                "notes": "Quad emphasis, upright torso"
+              },
+              {
+                "order": 2,
+                "exerciseName": "Romanian Deadlift",
+                "targetSets": 4,
+                "targetReps": "8-12",
+                "targetRPE": 8.0,
+                "notes": "Hamstring/glute mass"
+              },
+              {
+                "order": 3,
+                "exerciseName": "Walking Lunge",
+                "targetSets": 3,
+                "targetReps": "12-15",
+                "targetRPE": 7.5,
+                "notes": "Per leg, quad/glute work"
+              },
+              {
+                "order": 4,
+                "exerciseName": "Lying Leg Curl",
+                "targetSets": 3,
+                "targetReps": "12-15",
+                "targetRPE": 7.5,
+                "notes": "Hamstring isolation"
+              },
+              {
+                "order": 5,
+                "exerciseName": "Leg Extension",
+                "targetSets": 3,
+                "targetReps": "15-20",
+                "targetRPE": 7.0,
+                "notes": "Quad pump"
+              },
+              {
+                "order": 6,
+                "exerciseName": "Seated Calf Raise",
+                "targetSets": 4,
+                "targetReps": "15-20",
+                "targetRPE": 7.5,
+                "notes": "Soleus emphasis"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "GZCL Method - Linear Periodization",
+    "programDescription": "Evidence-based T1/T2/T3 tier structure. T1 = heavy compounds (85%+), T2 = moderate compounds (65-85%), T3 = high-rep accessories. Autoregulated rep schemes. 4-day upper/lower split.",
+    "durationWeeks": 12,
+    "frequencyPerWeek": 4,
+    "periodizationType": "linear",
+    "targetAudience": "Intermediate to Advanced (2+ years)",
+    "expectedOutcome": "Balanced strength and hypertrophy gains",
+    "progressionScheme": "T1: 5x3+ → 6x2+ → 10x1+. T2: 3x10 → 3x8 → 3x6. T3: 3xMRS (max rep sets)",
+    "days": [
+      {
+        "dayNumber": 1,
+        "name": "Day 1 - Squat Focus",
+        "dayDescription": "T1: Squat, T2: Bench, T3: Accessories",
+        "weekVariations": [
+          {
+            "weekNumber": 1,
+            "exercises": [
+              {
+                "order": 1,
+                "exerciseName": "Barbell Back Squat",
+                "targetSets": 5,
+                "targetReps": "3+",
+                "targetRPE": 8.5,
+                "notes": "T1: 85% of 5RM, AMRAP last set"
+              },
+              {
+                "order": 2,
+                "exerciseName": "Barbell Bench Press",
+                "targetSets": 3,
+                "targetReps": "10",
+                "targetRPE": 7.5,
+                "notes": "T2: 65% of 5RM"
+              },
+              {
+                "order": 3,
+                "exerciseName": "Lat Pulldown",
+                "targetSets": 3,
+                "targetReps": "15+",
+                "targetRPE": 7.0,
+                "notes": "T3: Max rep set, 2 min rest"
+              },
+              {
+                "order": 4,
+                "exerciseName": "Dumbbell Lateral Raise",
+                "targetSets": 3,
+                "targetReps": "15+",
+                "targetRPE": 7.0,
+                "notes": "T3: Max rep set"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayNumber": 2,
+        "name": "Day 2 - Bench Focus",
+        "dayDescription": "T1: Bench, T2: Squat, T3: Accessories",
+        "weekVariations": [
+          {
+            "weekNumber": 1,
+            "exercises": [
+              {
+                "order": 1,
+                "exerciseName": "Barbell Bench Press",
+                "targetSets": 5,
+                "targetReps": "3+",
+                "targetRPE": 8.5,
+                "notes": "T1: 85% of 5RM, AMRAP last set"
+              },
+              {
+                "order": 2,
+                "exerciseName": "Barbell Back Squat",
+                "targetSets": 3,
+                "targetReps": "10",
+                "targetRPE": 7.5,
+                "notes": "T2: 65% of 5RM"
+              },
+              {
+                "order": 3,
+                "exerciseName": "Dumbbell Row",
+                "targetSets": 3,
+                "targetReps": "15+",
+                "targetRPE": 7.0,
+                "notes": "T3: Max rep set per arm"
+              },
+              {
+                "order": 4,
+                "exerciseName": "Tricep Rope Pushdown",
+                "targetSets": 3,
+                "targetReps": "15+",
+                "targetRPE": 7.0,
+                "notes": "T3: Max rep set"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayNumber": 3,
+        "name": "Day 3 - Deadlift Focus",
+        "dayDescription": "T1: Deadlift, T2: OHP, T3: Accessories",
+        "weekVariations": [
+          {
+            "weekNumber": 1,
+            "exercises": [
+              {
+                "order": 1,
+                "exerciseName": "Conventional Deadlift",
+                "targetSets": 5,
+                "targetReps": "3+",
+                "targetRPE": 8.5,
+                "notes": "T1: 85% of 5RM, AMRAP last set"
+              },
+              {
+                "order": 2,
+                "exerciseName": "Barbell Overhead Press",
+                "targetSets": 3,
+                "targetReps": "10",
+                "targetRPE": 7.5,
+                "notes": "T2: 65% of 5RM"
+              },
+              {
+                "order": 3,
+                "exerciseName": "Leg Press",
+                "targetSets": 3,
+                "targetReps": "15+",
+                "targetRPE": 7.0,
+                "notes": "T3: Max rep set"
+              },
+              {
+                "order": 4,
+                "exerciseName": "Hanging Leg Raise",
+                "targetSets": 3,
+                "targetReps": "15+",
+                "targetRPE": 7.0,
+                "notes": "T3: Core work"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayNumber": 4,
+        "name": "Day 4 - OHP Focus",
+        "dayDescription": "T1: OHP, T2: Deadlift, T3: Accessories",
+        "weekVariations": [
+          {
+            "weekNumber": 1,
+            "exercises": [
+              {
+                "order": 1,
+                "exerciseName": "Barbell Overhead Press",
+                "targetSets": 5,
+                "targetReps": "3+",
+                "targetRPE": 8.5,
+                "notes": "T1: 85% of 5RM, AMRAP last set"
+              },
+              {
+                "order": 2,
+                "exerciseName": "Conventional Deadlift",
+                "targetSets": 3,
+                "targetReps": "10",
+                "targetRPE": 7.5,
+                "notes": "T2: 65% of 5RM"
+              },
+              {
+                "order": 3,
+                "exerciseName": "Chin-Up",
+                "targetSets": 3,
+                "targetReps": "15+",
+                "targetRPE": 7.0,
+                "notes": "T3: Max rep set (assisted if needed)"
+              },
+              {
+                "order": 4,
+                "exerciseName": "Barbell Curl",
+                "targetSets": 3,
+                "targetReps": "15+",
+                "targetRPE": 7.0,
+                "notes": "T3: Max rep set"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Starting Strength - Linear Progression",
+    "programDescription": "Classic beginner LP program. 3 days/week with A/B alternating workouts. Focus on the big 5 lifts with rapid progression. Ideal for novices with <1 year training experience.",
+    "durationWeeks": 12,
+    "frequencyPerWeek": 3,
+    "periodizationType": "linear",
+    "targetAudience": "Beginner (<1 year)",
+    "expectedOutcome": "Rapid strength gains: +10-20kg squat, +5-10kg bench/press per month",
+    "progressionScheme": "Add 2.5kg to bench/press each session, 5kg to squat/deadlift. Reset if 3 failures.",
+    "days": [
+      {
+        "dayNumber": 1,
+        "name": "Workout A",
+        "dayDescription": "Squat, Press, Deadlift",
+        "weekVariations": [
+          {
+            "weekNumber": 1,
+            "exercises": [
+              {
+                "order": 1,
+                "exerciseName": "Barbell Back Squat",
+                "targetSets": 3,
+                "targetReps": "5",
+                "targetRPE": 8.0,
+                "notes": "3x5 across. Add 5kg each session."
+              },
+              {
+                "order": 2,
+                "exerciseName": "Barbell Overhead Press",
+                "targetSets": 3,
+                "targetReps": "5",
+                "targetRPE": 8.0,
+                "notes": "3x5 across. Add 2.5kg each session."
+              },
+              {
+                "order": 3,
+                "exerciseName": "Conventional Deadlift",
+                "targetSets": 1,
+                "targetReps": "5",
+                "targetRPE": 8.5,
+                "notes": "1x5 only. Add 5kg each session."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayNumber": 2,
+        "name": "Workout B",
+        "dayDescription": "Squat, Bench, Deadlift",
+        "weekVariations": [
+          {
+            "weekNumber": 1,
+            "exercises": [
+              {
+                "order": 1,
+                "exerciseName": "Barbell Back Squat",
+                "targetSets": 3,
+                "targetReps": "5",
+                "targetRPE": 8.0,
+                "notes": "3x5 across. Add 5kg each session."
+              },
+              {
+                "order": 2,
+                "exerciseName": "Barbell Bench Press",
+                "targetSets": 3,
+                "targetReps": "5",
+                "targetRPE": 8.0,
+                "notes": "3x5 across. Add 2.5kg each session."
+              },
+              {
+                "order": 3,
+                "exerciseName": "Conventional Deadlift",
+                "targetSets": 1,
+                "targetReps": "5",
+                "targetRPE": 8.5,
+                "notes": "1x5 only. Add 5kg each session."
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Upper/Lower 4-Day Split",
+    "programDescription": "Balanced 4-day split with 2 upper, 2 lower days. Mix of strength and hypertrophy work. Ideal for intermediate lifters who want flexibility and balanced development.",
+    "durationWeeks": 8,
+    "frequencyPerWeek": 4,
+    "periodizationType": "undulating",
+    "targetAudience": "Intermediate (1-3 years)",
+    "expectedOutcome": "Balanced strength and size gains",
+    "progressionScheme": "Double progression: add reps until top range, then add weight and drop to bottom range",
+    "days": [
+      {
+        "dayNumber": 1,
+        "name": "Upper Power",
+        "dayDescription": "Heavy pressing and pulling (4-6 rep range)",
+        "weekVariations": [
+          {
+            "weekNumber": 1,
+            "exercises": [
+              {
+                "order": 1,
+                "exerciseName": "Barbell Bench Press",
+                "targetSets": 4,
+                "targetReps": "4-6",
+                "targetRPE": 8.5,
+                "notes": "Heavy strength work"
+              },
+              {
+                "order": 2,
+                "exerciseName": "Barbell Row",
+                "targetSets": 4,
+                "targetReps": "4-6",
+                "targetRPE": 8.5,
+                "notes": "Heavy pulling"
+              },
+              {
+                "order": 3,
+                "exerciseName": "Barbell Overhead Press",
+                "targetSets": 3,
+                "targetReps": "6-8",
+                "targetRPE": 8.0,
+                "notes": "Moderate shoulder work"
+              },
+              {
+                "order": 4,
+                "exerciseName": "Chin-Up",
+                "targetSets": 3,
+                "targetReps": "6-8",
+                "targetRPE": 8.0,
+                "notes": "Weighted if possible"
+              },
+              {
+                "order": 5,
+                "exerciseName": "Barbell Curl",
+                "targetSets": 2,
+                "targetReps": "8-10",
+                "targetRPE": 7.5,
+                "notes": "Bicep work"
+              },
+              {
+                "order": 6,
+                "exerciseName": "Tricep Rope Pushdown",
+                "targetSets": 2,
+                "targetReps": "8-10",
+                "targetRPE": 7.5,
+                "notes": "Tricep work"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayNumber": 2,
+        "name": "Lower Power",
+        "dayDescription": "Heavy squats and deadlifts (4-6 rep range)",
+        "weekVariations": [
+          {
+            "weekNumber": 1,
+            "exercises": [
+              {
+                "order": 1,
+                "exerciseName": "Barbell Back Squat",
+                "targetSets": 4,
+                "targetReps": "4-6",
+                "targetRPE": 8.5,
+                "notes": "Heavy strength work"
+              },
+              {
+                "order": 2,
+                "exerciseName": "Romanian Deadlift",
+                "targetSets": 3,
+                "targetReps": "6-8",
+                "targetRPE": 8.0,
+                "notes": "Hamstring/glute work"
+              },
+              {
+                "order": 3,
+                "exerciseName": "Leg Press",
+                "targetSets": 3,
+                "targetReps": "8-10",
+                "targetRPE": 7.5,
+                "notes": "Quad volume"
+              },
+              {
+                "order": 4,
+                "exerciseName": "Lying Leg Curl",
+                "targetSets": 3,
+                "targetReps": "10-12",
+                "targetRPE": 7.5,
+                "notes": "Hamstring isolation"
+              },
+              {
+                "order": 5,
+                "exerciseName": "Standing Calf Raise",
+                "targetSets": 4,
+                "targetReps": "8-12",
+                "targetRPE": 7.5,
+                "notes": "Calf work"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayNumber": 3,
+        "name": "Upper Hypertrophy",
+        "dayDescription": "Volume pressing and pulling (8-12 rep range)",
+        "weekVariations": [
+          {
+            "weekNumber": 1,
+            "exercises": [
+              {
+                "order": 1,
+                "exerciseName": "Incline Dumbbell Press",
+                "targetSets": 4,
+                "targetReps": "8-12",
+                "targetRPE": 8.0,
+                "notes": "Upper chest focus"
+              },
+              {
+                "order": 2,
+                "exerciseName": "Lat Pulldown",
+                "targetSets": 4,
+                "targetReps": "8-12",
+                "targetRPE": 8.0,
+                "notes": "Lat width"
+              },
+              {
+                "order": 3,
+                "exerciseName": "Dumbbell Lateral Raise",
+                "targetSets": 3,
+                "targetReps": "12-15",
+                "targetRPE": 7.5,
+                "notes": "Side delt volume"
+              },
+              {
+                "order": 4,
+                "exerciseName": "Seated Cable Row",
+                "targetSets": 3,
+                "targetReps": "10-12",
+                "targetRPE": 7.5,
+                "notes": "Mid-back thickness"
+              },
+              {
+                "order": 5,
+                "exerciseName": "Cable Flye",
+                "targetSets": 3,
+                "targetReps": "12-15",
+                "targetRPE": 7.0,
+                "notes": "Chest isolation"
+              },
+              {
+                "order": 6,
+                "exerciseName": "Face Pull",
+                "targetSets": 3,
+                "targetReps": "15-20",
+                "targetRPE": 7.0,
+                "notes": "Rear delt/upper back health"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayNumber": 4,
+        "name": "Lower Hypertrophy",
+        "dayDescription": "Volume leg work (10-15 rep range)",
+        "weekVariations": [
+          {
+            "weekNumber": 1,
+            "exercises": [
+              {
+                "order": 1,
+                "exerciseName": "Front Squat",
+                "targetSets": 4,
+                "targetReps": "8-12",
+                "targetRPE": 8.0,
+                "notes": "Quad emphasis"
+              },
+              {
+                "order": 2,
+                "exerciseName": "Romanian Deadlift",
+                "targetSets": 3,
+                "targetReps": "10-12",
+                "targetRPE": 7.5,
+                "notes": "Hamstring volume"
+              },
+              {
+                "order": 3,
+                "exerciseName": "Bulgarian Split Squat",
+                "targetSets": 3,
+                "targetReps": "10-12",
+                "targetRPE": 7.5,
+                "notes": "Per leg, unilateral work"
+              },
+              {
+                "order": 4,
+                "exerciseName": "Leg Extension",
+                "targetSets": 3,
+                "targetReps": "12-15",
+                "targetRPE": 7.0,
+                "notes": "Quad isolation"
+              },
+              {
+                "order": 5,
+                "exerciseName": "Lying Leg Curl",
+                "targetSets": 3,
+                "targetReps": "12-15",
+                "targetRPE": 7.0,
+                "notes": "Hamstring isolation"
+              },
+              {
+                "order": 6,
+                "exerciseName": "Seated Calf Raise",
+                "targetSets": 4,
+                "targetReps": "15-20",
+                "targetRPE": 7.5,
+                "notes": "Soleus focus"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Full Body 3x - Strength & Size",
+    "programDescription": "3-day full body split with compound focus. Each session trains all major muscle groups. Ideal for intermediates with limited training days who want balanced development.",
+    "durationWeeks": 8,
+    "frequencyPerWeek": 3,
+    "periodizationType": "undulating",
+    "targetAudience": "Intermediate (1-3 years)",
+    "expectedOutcome": "Balanced strength and hypertrophy with 3x/week frequency",
+    "progressionScheme": "DUP: Heavy (4-6), Moderate (8-10), Light (12-15) rotated across exercises",
+    "days": [
+      {
+        "dayNumber": 1,
+        "name": "Day 1 - Squat Heavy",
+        "dayDescription": "Heavy squat, moderate bench, light deadlift variation",
+        "weekVariations": [
+          {
+            "weekNumber": 1,
+            "exercises": [
+              {
+                "order": 1,
+                "exerciseName": "Barbell Back Squat",
+                "targetSets": 4,
+                "targetReps": "4-6",
+                "targetRPE": 8.5,
+                "notes": "Heavy strength day"
+              },
+              {
+                "order": 2,
+                "exerciseName": "Barbell Bench Press",
+                "targetSets": 3,
+                "targetReps": "8-10",
+                "targetRPE": 8.0,
+                "notes": "Moderate volume"
+              },
+              {
+                "order": 3,
+                "exerciseName": "Romanian Deadlift",
+                "targetSets": 3,
+                "targetReps": "12-15",
+                "targetRPE": 7.5,
+                "notes": "Light hamstring work"
+              },
+              {
+                "order": 4,
+                "exerciseName": "Lat Pulldown",
+                "targetSets": 3,
+                "targetReps": "10-12",
+                "targetRPE": 7.5,
+                "notes": "Back work"
+              },
+              {
+                "order": 5,
+                "exerciseName": "Dumbbell Lateral Raise",
+                "targetSets": 3,
+                "targetReps": "12-15",
+                "targetRPE": 7.0,
+                "notes": "Shoulder accessory"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayNumber": 2,
+        "name": "Day 2 - Bench Heavy",
+        "dayDescription": "Heavy bench, moderate deadlift, light squat variation",
+        "weekVariations": [
+          {
+            "weekNumber": 1,
+            "exercises": [
+              {
+                "order": 1,
+                "exerciseName": "Barbell Bench Press",
+                "targetSets": 4,
+                "targetReps": "4-6",
+                "targetRPE": 8.5,
+                "notes": "Heavy strength day"
+              },
+              {
+                "order": 2,
+                "exerciseName": "Conventional Deadlift",
+                "targetSets": 3,
+                "targetReps": "6-8",
+                "targetRPE": 8.0,
+                "notes": "Moderate volume"
+              },
+              {
+                "order": 3,
+                "exerciseName": "Front Squat",
+                "targetSets": 3,
+                "targetReps": "12-15",
+                "targetRPE": 7.5,
+                "notes": "Light quad work"
+              },
+              {
+                "order": 4,
+                "exerciseName": "Barbell Row",
+                "targetSets": 3,
+                "targetReps": "8-10",
+                "targetRPE": 7.5,
+                "notes": "Back work"
+              },
+              {
+                "order": 5,
+                "exerciseName": "Barbell Curl",
+                "targetSets": 3,
+                "targetReps": "10-12",
+                "targetRPE": 7.0,
+                "notes": "Bicep work"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayNumber": 3,
+        "name": "Day 3 - Deadlift Heavy",
+        "dayDescription": "Heavy deadlift, moderate squat, light bench variation",
+        "weekVariations": [
+          {
+            "weekNumber": 1,
+            "exercises": [
+              {
+                "order": 1,
+                "exerciseName": "Conventional Deadlift",
+                "targetSets": 4,
+                "targetReps": "3-5",
+                "targetRPE": 8.5,
+                "notes": "Heavy strength day"
+              },
+              {
+                "order": 2,
+                "exerciseName": "Barbell Back Squat",
+                "targetSets": 3,
+                "targetReps": "8-10",
+                "targetRPE": 8.0,
+                "notes": "Moderate volume"
+              },
+              {
+                "order": 3,
+                "exerciseName": "Incline Dumbbell Press",
+                "targetSets": 3,
+                "targetReps": "12-15",
+                "targetRPE": 7.5,
+                "notes": "Light chest work"
+              },
+              {
+                "order": 4,
+                "exerciseName": "Pull-Up",
+                "targetSets": 3,
+                "targetReps": "6-10",
+                "targetRPE": 7.5,
+                "notes": "Back work, weighted if possible"
+              },
+              {
+                "order": 5,
+                "exerciseName": "Barbell Overhead Press",
+                "targetSets": 3,
+                "targetReps": "8-10",
+                "targetRPE": 7.5,
+                "notes": "Shoulder work"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]
