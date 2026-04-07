@@ -6,6 +6,7 @@ import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.gymbro.core.database.GymBroDatabase
 import com.gymbro.core.database.dao.ExerciseDao
+import com.gymbro.core.database.dao.WorkoutDao
 import com.gymbro.core.database.entity.ExerciseEntity
 import dagger.Module
 import dagger.Provides
@@ -38,6 +39,11 @@ object DatabaseModule {
     @Provides
     fun provideExerciseDao(database: GymBroDatabase): ExerciseDao {
         return database.exerciseDao()
+    }
+
+    @Provides
+    fun provideWorkoutDao(database: GymBroDatabase): WorkoutDao {
+        return database.workoutDao()
     }
 }
 
