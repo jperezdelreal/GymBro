@@ -25,4 +25,6 @@ public typealias PeriodizationType = PeriodizationType
 public typealias RestTimerService = RestTimerService
 public typealias NotificationService = NotificationService
 public typealias NextSetInfo = NextSetInfo
-
+public typealias PersonalRecord = PersonalRecord
+public typealias PersonalRecordService = PersonalRecordService
+public typealias ExerciseDataSeeder = ExerciseDataSeeder
