@@ -146,3 +146,41 @@ This foundation unblocks all Phase-1 work:
 - Azure Functions proxy for production (rate limiting, prompt versioning server-side) — not implemented yet, using direct client→Azure OpenAI for MVP
 - Conversation history size management — currently fetches last 50 messages; may need cleanup strategy for long-running users
 - Multi-turn context: currently each request sends only system + user message; should we send conversation history for multi-turn coherence?
+
+### 2026-04-07: HealthKit Integration (Issue #11, PR #56)
+
+**Architecture Decisions:**
+- **Protocol-based HealthKitService:** `HealthKitService` protocol with `HealthKitManager` (real) and `MockHealthKitService` (testing) implementations. Same pattern as AI coach — swap implementations cleanly.
+- **Read-only Access:** GymBro only reads health data (sleep, HRV, resting HR, active energy). No writes to HealthKit — keeps App Review simple and privacy posture clean.
+- **Offline-first Cache:** `HealthMetric` and `HealthBaseline` SwiftData models cache HealthKit readings locally. Expensive HK queries run once, cached results served until stale (1hr default).
+- **User's Own Baseline:** 30-day rolling average with standard deviation. Z-score comparison against user's own history, not population averages. This is critical for recovery signals — a 45ms HRV means different things for different athletes.
+
+**Data Types Requested:**
+- `.restingHeartRate` — daily resting HR (discrete average)
+- `.heartRateVariabilitySDNN` — HRV in ms (discrete average)
+- `.sleepAnalysis` — category samples with stage breakdown (inBed, awake, core, deep, REM, unspecified)
+- `.activeEnergyBurned` — daily kcal (cumulative sum)
+
+**Key Implementation Details:**
+- `HKStatisticsCollectionQuery` for time-series daily aggregates (RHR, HRV, energy)
+- `HKSampleQuery` for sleep analysis (category samples need stage-level granularity)
+- Sleep samples grouped by "night" — shifted by -12h to bucket overnight sessions correctly
+- Background delivery: `enableBackgroundDelivery` + `HKObserverQuery` with `defer { completionHandler() }` pattern
+- Graceful degradation: `HKHealthStore.isHealthDataAvailable()` checked before every operation, returns empty/cached data on iPad
+
+**Files Created (7 files, ~1130 lines):**
+- Models: `HealthMetric.swift` (HealthMetric, HealthBaseline, SleepStageBreakdown, HealthMetricType)
+- Services: `HealthKitService.swift` (protocol + DTOs), `HealthKitManager.swift` (real impl), `MockHealthKitService.swift` (testing), `HealthKitDataSync.swift` (SwiftData cache sync)
+- Tests: `HealthKitManagerTests.swift` (20 tests)
+- Modified: `GymBroApp.swift` (added HealthMetric + HealthBaseline to ModelContainer)
+
+**Privacy:**
+- Health data never leaves device — not sent to cloud AI or CloudKit
+- Only request types actually used by the app (App Review rejects over-requesting)
+- Info.plist needs NSHealthShareUsageDescription (to be configured in Xcode project)
+
+**Open Questions:**
+- Background delivery frequency: `.hourly` for all types — might want `.immediate` for sleep if recovery score needs to update faster
+- HealthKit entitlement + Info.plist usage descriptions: need Xcode project file configuration (currently SPM-only repo)
+- Stale data cleanup: currently inserts new HealthMetric rows on each sync — need a cleanup strategy to prevent unbounded growth
+- Integration with recovery/readiness score engine (downstream consumer of this data)
