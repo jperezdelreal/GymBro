@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.gymbro.feature.exerciselibrary.ExerciseLibraryRoute
 
 @Composable
 fun GymBroNavGraph() {
@@ -17,8 +18,18 @@ fun GymBroNavGraph() {
 
     NavHost(
         navController = navController,
-        startDestination = "workout",
+        startDestination = "exercise_library",
     ) {
+        composable("exercise_library") {
+            ExerciseLibraryRoute(
+                onNavigateToDetail = { exerciseId ->
+                    navController.navigate("exercise_detail/$exerciseId")
+                },
+            )
+        }
+        composable("exercise_detail/{exerciseId}") {
+            PlaceholderScreen(title = "Exercise Detail")
+        }
         composable("workout") {
             PlaceholderScreen(title = "Workout")
         }

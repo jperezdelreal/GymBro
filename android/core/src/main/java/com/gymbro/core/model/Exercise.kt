@@ -6,23 +6,32 @@ data class Exercise(
     val id: UUID = UUID.randomUUID(),
     val name: String,
     val muscleGroup: MuscleGroup,
+    val category: ExerciseCategory = ExerciseCategory.COMPOUND,
     val equipment: Equipment = Equipment.BARBELL,
-    val instructions: String = "",
+    val description: String = "",
+    val youtubeUrl: String? = null,
 )
 
-enum class MuscleGroup {
-    CHEST,
-    BACK,
-    SHOULDERS,
-    BICEPS,
-    TRICEPS,
-    QUADRICEPS,
-    HAMSTRINGS,
-    GLUTES,
-    CALVES,
-    CORE,
-    FOREARMS,
-    FULL_BODY,
+enum class MuscleGroup(val displayName: String) {
+    CHEST("Chest"),
+    BACK("Back"),
+    SHOULDERS("Shoulders"),
+    BICEPS("Biceps"),
+    TRICEPS("Triceps"),
+    QUADRICEPS("Quadriceps"),
+    HAMSTRINGS("Hamstrings"),
+    GLUTES("Glutes"),
+    CALVES("Calves"),
+    CORE("Core"),
+    FOREARMS("Forearms"),
+    FULL_BODY("Full Body"),
+}
+
+enum class ExerciseCategory(val displayName: String) {
+    COMPOUND("Compound"),
+    ISOLATION("Isolation"),
+    ACCESSORY("Accessory"),
+    CARDIO("Cardio"),
 }
 
 enum class Equipment {
