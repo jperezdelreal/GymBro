@@ -5,13 +5,19 @@ import GymBroCore
 public struct ProfileView: View {
     private let authService: AuthenticationService
     private let syncService: CloudKitSyncService
+    private let conflictService: ConflictResolutionService?
 
     @State private var showSignOutConfirmation = false
     @State private var deleteDataOnSignOut = false
 
-    public init(authService: AuthenticationService, syncService: CloudKitSyncService) {
+    public init(
+        authService: AuthenticationService,
+        syncService: CloudKitSyncService,
+        conflictService: ConflictResolutionService? = nil
+    ) {
         self.authService = authService
         self.syncService = syncService
+        self.conflictService = conflictService
     }
 
     public var body: some View {
@@ -29,6 +35,26 @@ public struct ProfileView: View {
             if authService.isSignedIn {
                 Section("iCloud Sync") {
                     SyncStatusView(syncService: syncService)
+
+                    if let conflictService {
+                        NavigationLink {
+                            ConflictResolutionView(conflictService: conflictService)
+                        } label: {
+                            HStack {
+                                Label("Sync Conflicts", systemImage: "arrow.triangle.2.circlepath")
+                                Spacer()
+                                if conflictService.conflictsResolvedCount > 0 {
+                                    Text("\(conflictService.conflictsResolvedCount)")
+                                        .font(.caption2)
+                                        .foregroundStyle(.white)
+                                        .padding(.horizontal, 6)
+                                        .padding(.vertical, 2)
+                                        .background(GymBroColors.accentAmber)
+                                        .clipShape(Capsule())
+                                }
+                            }
+                        }
+                    }
                 }
             }
 
