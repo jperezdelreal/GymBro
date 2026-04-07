@@ -44,6 +44,7 @@ import com.gymbro.core.model.ExerciseCategory
 import com.gymbro.core.model.MuscleGroup
 import com.gymbro.core.preferences.UserPreferences
 import com.gymbro.feature.exerciselibrary.ExerciseLibraryRoute
+import com.gymbro.feature.history.HistoryDetailRoute
 import com.gymbro.feature.onboarding.OnboardingRoute
 import com.gymbro.feature.profile.ProfileRoute
 import com.gymbro.feature.progress.ProgressRoute
@@ -228,6 +229,18 @@ fun GymBroNavGraph(
                         popUpTo("exercise_library") { inclusive = true }
                     }
                 },
+            )
+        }
+        composable(
+            route = "history/{workoutId}",
+            arguments = listOf(
+                navArgument("workoutId") { type = NavType.StringType },
+            ),
+        ) { backStackEntry ->
+            val workoutId = backStackEntry.arguments?.getString("workoutId") ?: ""
+            HistoryDetailRoute(
+                workoutId = workoutId,
+                onNavigateBack = { navController.popBackStack() },
             )
         }
         composable("history") {
