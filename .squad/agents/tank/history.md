@@ -237,6 +237,88 @@ This foundation unblocks all Phase-1 work:
 **Testing Strategy:**
 - Mock `URLProtocol` subclass injects fake HTTP responses — no real network calls in tests.
 - Tests cover: successful decoding, pagination extraction, rate limit handling, HTTP errors, decoding errors, empty results, language/page params, muscle/equipment endpoints, ExerciseSource codability.
+
+### 2026-01-07: wger.de API Integration for Exercise Library Expansion (Issue #77)
+
+**Problem:** Limited exercise library (80 seed exercises). Need runtime expandability without maintaining a massive static JSON file.
+
+**Solution — wger.de REST API Integration:**
+- **WgerAPIService:** Actor-based HTTP client for wger.de API endpoints (/exercise/, /muscle/, /equipment/)
+  - Pagination support (API returns 20 results per page)
+  - Rate limit detection (429 handling)
+  - English language filter (language=2)
+  - Comprehensive error handling (network, HTTP, decoding)
+  - Returns normalized data structures for downstream processing
+
+- **ExerciseSyncService:** Orchestrates sync between wger.de and local SwiftData cache
+  - 24-hour sync throttle (UserDefaults-backed) to be good API citizen
+  - Fetches metadata first (muscles, equipment) to build lookup tables
+  - Pagination loop with 10-page cap (~200 exercises per sync)
+  - Deduplication by lowercase name comparison against existing exercises
+  - Quality filters: skip test data, require min 3-char name + 10-char description
+  - HTML tag stripping from wger descriptions (many include <p>, <strong>, etc.)
+  - Muscle group mapping: wger's 15 muscle groups → GymBro's 19 muscle groups
+    - e.g., "Biceps brachii" → "Biceps", "Quadriceps femoris" → "Quadriceps"
+    - Handles primary vs secondary muscle designations
+  - Equipment mapping: 13 wger types → 8 GymBro enums (.barbell, .dumbbell, etc.)
+  - Category heuristic: bodyweight → accessory, 2+ primary muscles → compound, else isolation
+  - NEVER modifies user custom exercises (isCustom flag protection)
+
+- **Exercise Model Extension:**
+  - Added ExerciseSource enum: .seed, .wger, .custom
+  - Added source: ExerciseSource field to track origin
+  - Added optional wgerId: Int? for wger.de exercise ID reference
+  - Added optional lastSyncedAt: Date? for incremental sync capability (future enhancement)
+
+**Offline-First Architecture:**
+- Local SwiftData is source of truth — API sync is background enhancement, not a blocker
+- App works fully without internet
+- Cached wger exercises persist locally, available offline
+- Sync failures are logged but don't crash or show errors to user
+
+**Testing Strategy:**
+- 15 unit tests using MockURLProtocol (not URLSession subclass — proper mocking)
+- Coverage: successful fetch, pagination, empty results, rate limits, HTTP errors, network failures, decoding errors
+- Codable conformance tests for all data structures
+- No live API calls in tests (fully mocked HTTP layer)
+
+**Design Decisions:**
+- **Actor isolation:** WgerAPIService is an actor to prevent race conditions on session state
+- **Max 10 pages per sync:** Safety cap to prevent runaway API consumption if wger.de pagination breaks
+- **Case-insensitive name deduplication:** "Barbell Bench Press" matches "barbell bench press" (prevents near-duplicates)
+- **HTML stripping:** wger.de descriptions often include markup — strip it for clean display
+- **Muscle mapping is incomplete:** Only 15 of wger's muscles mapped (enough for MVP). Rest will get skipped (empty muscle array check).
+- **Equipment fallback:** Unmapped equipment defaults to .other rather than failing
+
+**Future Enhancements (not in this PR):**
+- Incremental sync using lastSyncedAt timestamps
+- User preference for auto-sync on/off
+- Sync progress UI (currently silent background operation)
+- More comprehensive muscle mapping coverage
+- Image support (wger.de has exercise images, but we skip them for MVP)
+- wger.de workout templates (separate API endpoint, defer to v2.0)
+
+**Files Changed:**
+- Packages/GymBroCore/Sources/GymBroCore/Models/Exercise.swift — added source tracking
+- Packages/GymBroCore/Sources/GymBroCore/Services/API/WgerAPIService.swift — 231 lines
+- Packages/GymBroCore/Sources/GymBroCore/Services/API/ExerciseSyncService.swift — 291 lines
+- Packages/GymBroCore/Tests/GymBroCoreTests/API/WgerAPIServiceTests.swift — 257 lines (15 tests)
+
+**Branch:** squad/77-wger-api-integration  
+**PR:** #94 (draft)  
+**Next Steps:** CI will validate build, then merge to master
+
+### 2026-04-07: Round 4 Summary and Team Integration
+
+**Neo Collaboration (Week-Level Variation):**
+- Neo's ProgramWeek model (issue #81, PR #93) provides the data structure that AI coach now injects periodization recommendations into
+- Tank's PromptBuilder now accepts CoachContext with currentWeek, weekIntensity, and plannedProgression data
+- Downstream: Readiness-driven week adjustments become possible (skip deload week, extend accumulation if user is fresh)
+
+**Switch Quality Audit (Findings Documented):**
+- Switch's peer review (issue #29) filed 6 critical/high issues: 78% test coverage gap, 2 @MainActor violations, concurrency bugs
+- Tank acknowledges: CoachChatViewModel and ActiveWorkoutViewModel are @Observable but missing @MainActor — data race risk on every chat/workout
+- Next sprint: Tank will handle concurrency fixes as blocking work before MVP ship
 ### 2026-04-07: AI Coach Context Pipeline Complete (Neo, Issue #82)
 **No Schema Changes Needed — Uses Existing Models**
 - Neo completed the three-layer data pipeline: ViewModel → Snapshots → PromptBuilder

@@ -87,6 +87,64 @@
 - Graceful degradation: empty input returns neutral 50.0, single-factor inputs redistribute full weight
 - ReadinessScore cached in SwiftData for instant dashboard rendering
 
+### 2026-04-07: Week-Level Variation Support (Issue #81, PR #93)
+**What was implemented:**
+- `ProgramWeek` model as first-class entity enabling block periodization programs (5/3/1, DUP variants)
+- 3-level hierarchy: Program → ProgramWeek → ProgramDay → PlannedExercise
+- Week-level intensity/volume specification separate from day-level exercise selection
+- Compliance tracking per week (track which weeks were completed vs deloaded)
+- Backward compatible: existing programs without weeks continue working via ProgramDay.plannedExercises
+
+**Design rationale:**
+- Block periodization requires per-week variation: different reps/percentages each week
+- Avoids hardcoding week branching logic ("if week == 1...") in model or ViewModel layer
+- Clean separation: data model handles structure, service layer handles logic
+- Enables AI coach to inject periodization recommendations with specific week targets
+
+**Impact on readiness/adaptive engine:**
+- Readiness score can now trigger week-level adjustments (skip deload week, extend accumulation)
+- Progression algorithm can reference current week intensity tier for decision-making
+- Foundation for future ML-based periodization optimization
+
+### 2026-04-07: Muscle Recovery & Anomaly Detection (Issue #86, PR #96)
+**What was built:**
+- **MuscleRecoveryService**: Per-muscle-group recovery tracking with evidence-based recovery times
+  - Tracks volume (sets × reps × weight) per muscle group from workout history
+  - Recovery time factors: muscle size (legs 72h, chest/back 48h, arms 36h), volume, intensity, training recency
+  - Three states: Fresh (>recovery time), Recovering (50-100% recovered), Fatigued (<50% recovered)
+  - High volume (>1.5x baseline) extends recovery by 30%, high intensity (RPE 8+) by 20%
+  - Returns recovery map with status, hours since trained, recent volume, recovery percentage per muscle
+  - Exposes heat map data for UI visualization (green/yellow/red status indicators)
+- **ReadinessAnomalyDetector**: Statistical anomaly detection with conservative thresholds
+  - HRV drop detection: >20% below 7-day baseline triggers medium alert, >30% triggers high alert
+  - RHR spike detection: >10% above baseline = medium, >20% = high
+  - Sleep drop detection: >25 point score drop (≈2+ hours duration loss)
+  - Multi-factor decline: 2+ factors simultaneously degraded = medium, 3+ = high severity
+  - Returns anomalies with type, severity, date, message, recommendation, affected metrics
+  - High specificity design to avoid false alarms (e.g., uses 7-day baseline, not population norms)
+- **ReadinessProgramIntegration**: Readiness-aware workout recommendations
+  - Readiness < 40 → rest day recommendation (overrides program)
+  - Readiness < 60 + heavy day → lighter variant (intensity -20 to -40%, volume -15 to -35%)
+  - Muscle fatigue detection → skip or modify exercises targeting fatigued muscles (-40% intensity)
+  - Returns action (proceedAsPlanned/lighterVariant/modifyExercises/restDay) with rationale and adjustments
+  - Priority: rest day > lighter variant > muscle-specific > proceed as planned
+- **Comprehensive unit tests**: 3 test suites with 50+ test cases covering:
+  - MuscleRecoveryServiceTests: recovery states, volume tracking, time calculations, multiple muscles, edge cases
+  - ReadinessAnomalyDetectorTests: all anomaly types, severity scaling, multi-factor detection, missing data handling
+  - ReadinessProgramIntegrationTests: all actions, intensity/volume scaling, priority order, edge cases
+
+**Key design decisions:**
+- Evidence-based recovery windows from exercise science literature (not arbitrary)
+- Conservative anomaly thresholds to minimize false positives
+- User always has final say (recommendations, not mandates)
+- Graceful degradation when HealthKit data unavailable
+- Maintains program structure when possible (swap variants vs skip entirely)
+
+**Integration points:**
+- MuscleRecoveryService uses Workout, ExerciseSet, Exercise, MuscleGroup models
+- ReadinessAnomalyDetector uses ReadinessScore, HealthMetric models
+- ReadinessProgramIntegration bridges recovery services with Program/ProgramDay models
+- All services designed for UI consumption (heat maps, alerts, recommendations)
 ### 2026-04-07: Smart Defaults Overhaul Complete (Issue #84, PR #90)
 
 **Complete rewrite of SmartDefaultsService with adaptive features**

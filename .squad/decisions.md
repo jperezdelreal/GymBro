@@ -794,3 +794,131 @@ For future onboarding-like flows, use same pattern for program creation wizard, 
 - All meaningful changes require team consensus
 - Document architectural decisions here
 - Keep history focused on work, decisions focused on direction
+
+---
+
+## Decision: Week-Level Variation Support for Program Templates (2026-04-07)
+
+**Author:** Neo (AI/ML Engineer)  
+**Context:** Issue #81 — Pre-built program templates  
+**PR:** #93  
+
+### Decision
+
+Added **ProgramWeek** model as a first-class entity in the data model to support week-level variation in program templates.
+
+### Rationale
+
+Block periodization programs like 5/3/1 require different intensities per week:
+- Week 1: 5 reps at 65/75/85% of training max
+- Week 2: 3 reps at 70/80/90% of training max
+- Week 3: 5/3/1 reps at 75/85/95% of training max
+- Week 4: Deload at 40/50/60% of training max
+
+Without ProgramWeek, we'd need complex branching logic ("if weekNumber == 1, use these exercises, else if weekNumber == 2..."). With ProgramWeek, each week is a discrete data entity with its own PlannedExercise objects.
+
+### Alternatives Considered
+
+1. **Store week-level metadata in PlannedExercise** — Rejected. Would require multiple PlannedExercise objects per exercise per week, polluting the plannedExercises array.
+2. **Use computed properties based on weekNumber** — Rejected. Would require hardcoding program logic in the model layer (violates separation of concerns).
+3. **Store JSON blob of week variations** — Rejected. Not queryable, breaks SwiftData relationships.
+
+### Impact
+
+- **Positive:** Clean data model, supports complex periodization, enables compliance tracking per week
+- **Negative:** Slightly more complex seeding logic (3-level hierarchy instead of 2-level)
+- **Migration:** Backward compatible — existing programs without weeks continue to work via ProgramDay.plannedExercises
+
+### Related Files
+
+- `Packages/GymBroCore/Sources/GymBroCore/Models/ProgramWeek.swift`
+- `Packages/GymBroCore/Sources/GymBroCore/Models/PlannedExercise.swift` (added programWeek relationship)
+- `Packages/GymBroCore/Sources/GymBroCore/Models/ProgramDay.swift` (added weeks array)
+
+---
+
+## Decision: AI Coach Backend Architecture (2026-04-07)
+
+**Author:** Tank (Backend Dev)  
+**Context:** Issue #77 — wger.de API integration  
+**PR:** #94  
+**Status:** Implemented
+
+### Decisions Made
+
+#### 1. Protocol-Based LLM Abstraction
+**Decision:** `AICoachService` protocol with cloud and offline implementations.  
+**Rationale:** Future-proofs for on-device LLM migration (Core AI / iOS 27) without touching ViewModel or UI code. Swap the implementation, not the interface.
+
+#### 2. Environment-Based API Configuration
+**Decision:** No hardcoded API keys. `AICoachConfiguration.fromEnvironment()` reads from `ProcessInfo.processInfo.environment`.  
+**Rationale:** Security best practice. Xcode schemes, .xcconfig files, or CI env vars can supply credentials. Never in source control.
+
+#### 3. Safety-First Filter Pipeline
+**Decision:** Client-side `SafetyFilter` intercepts medical/dangerous queries before they hit the API, plus mandatory disclaimers on all responses.  
+**Rationale:** Saves API costs on filtered queries. Dual-layer safety (client filter + system prompt instructions) prevents unsafe outputs even if one layer fails.
+
+#### 4. Lightweight Snapshot DTOs
+**Decision:** Created `UserProfileSnapshot`, `WorkoutSnapshot`, etc. instead of passing `@Model` objects to AI services.  
+**Rationale:** SwiftData `@Model` objects aren't `Sendable` and are bound to their `ModelContext` thread. Snapshots are plain structs, thread-safe, and testable without a database.
+
+#### 5. Streaming-First Response Design
+**Decision:** Both cloud and offline services implement `AsyncThrowingStream<String, Error>`.  
+**Rationale:** Consistent UX — users see tokens arriving regardless of backend. Offline simulates streaming with word-level delays.
+
+#### 6. wger.de API Integration Strategy
+**Decision:** Attempt API pull for latest exercise library; fall back to bundled seed data if API unavailable.  
+**Rationale:** Network resilience. Users without internet get offline-mode experience. Periodic syncs keep library current.
+
+### Team Impact
+- **Trinity:** CoachChatView is functional but minimal. Trinity should polish styling, animations, and keyboard handling.
+- **Neo:** PromptBuilder is ready for richer context — plateau detection data, periodization recommendations can be injected via `CoachContext`.
+- **Switch:** 24 unit tests provided as foundation. Integration tests needed for wger.de API connectivity.
+- **Morpheus:** Freemium tier (5 questions/week) and premium (unlimited) are enforced. Pricing decision implemented.
+
+### Open Items for Team
+- Azure Functions proxy (server-side rate limiting, prompt versioning) — deferred to production hardening
+- Multi-turn conversation context (sending chat history to API) — needs team decision on token budget
+- On-device LLM timeline — depends on Apple's Core AI announcements at WWDC 2026
+
+---
+
+## Decision: Code Quality Audit Findings (2026-04-07)
+
+**Author:** Switch (QA/Testing Lead)  
+**Date:** 2026-04-07  
+**Scope:** All Swift code on master — GymBroCore, GymBroUI, App entry  
+**Status:** Findings documented, issues filed for team triage
+
+### Executive Summary
+
+The codebase has solid foundations in the tested areas (plateau detection, E1RM, progress tracking, safety filter) but has **critical gaps** in concurrency safety, test coverage, and edge case handling. **78% of source files have zero tests.** Two of three @Observable ViewModels lack @MainActor, creating data race risks on every AI chat interaction and workout session.
+
+### Key Metrics
+
+- **Test coverage:** 22% of files (11/50)
+- **Concurrency issues:** 6 findings (2 critical)
+- **Performance risks:** 6 findings
+- **Code smells:** 6 findings
+- **Edge case gaps:** 7 findings
+
+### Issues Filed
+
+| # | Title | Priority | Labels |
+|---|-------|----------|--------|
+| #25 | Critical test coverage gaps — 78% untested | 🔴 CRITICAL | squad, mvp, testing |
+| #26 | Concurrency safety violations — missing @MainActor, data races | 🔴 CRITICAL | squad, mvp, testing |
+| #27 | Test quality issues — flaky timers, no mocking, missing edge cases | 🟡 HIGH | squad, mvp, testing |
+| #28 | SwiftUI performance risks — heavy body computation, oversized views | 🟡 HIGH | squad, mvp, testing, frontend |
+| #29 | Code smells — force unwraps, inconsistent access control | 🟠 MEDIUM | squad, mvp, testing |
+| #30 | Edge cases & robustness — nil crashes, missing empty states | 🟡 HIGH | squad, mvp, testing |
+
+### Top 3 Blockers for MVP Ship
+
+1. **@MainActor on CoachChatViewModel and ActiveWorkoutViewModel** — data races will cause random crashes in production
+2. **PersonalRecordService force unwrap in predicate (line 68)** — will crash on any set with nil completedAt
+3. **Test coverage for SmartDefaultsService and PersonalRecordService** — core features with zero verification
+
+### Recommendation
+
+Do NOT ship MVP without fixing #26 (concurrency) and the PersonalRecordService crash in #30. Test coverage (#25) should reach 60%+ before beta.
