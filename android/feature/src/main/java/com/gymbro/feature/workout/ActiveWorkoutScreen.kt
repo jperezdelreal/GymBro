@@ -72,7 +72,7 @@ private val SurfaceDark = Color(0xFF0A0A0A)
 fun ActiveWorkoutRoute(
     viewModel: ActiveWorkoutViewModel = hiltViewModel(),
     onNavigateToExercisePicker: () -> Unit = {},
-    onNavigateToSummary: (Long, Double, Int, Int, Int) -> Unit = { _, _, _, _, _ -> },
+    onNavigateToSummary: (Long, Double, Int, Int, List<com.gymbro.core.model.PersonalRecord>) -> Unit = { _, _, _, _, _ -> },
     onNavigateBack: () -> Unit = {},
     pickedExercise: Exercise? = null,
 ) {
@@ -94,7 +94,7 @@ fun ActiveWorkoutRoute(
                     effect.totalVolume,
                     effect.totalSets,
                     effect.exerciseCount,
-                    effect.prsCount,
+                    effect.personalRecords,
                 )
                 is ActiveWorkoutEffect.NavigateBack -> onNavigateBack()
                 is ActiveWorkoutEffect.RestTimerFinished -> { /* vibration/sound handled externally */ }

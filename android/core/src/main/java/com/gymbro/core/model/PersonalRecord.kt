@@ -1,7 +1,10 @@
 package com.gymbro.core.model
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 import java.time.Instant
 
+@Parcelize
 data class PersonalRecord(
     val exerciseId: String,
     val exerciseName: String,
@@ -9,7 +12,7 @@ data class PersonalRecord(
     val value: Double,
     val date: Instant,
     val previousValue: Double?,
-)
+) : Parcelable
 
 enum class RecordType(val displayName: String, val emoji: String) {
     MAX_WEIGHT("Max Weight", "🏋️"),

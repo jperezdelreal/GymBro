@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.gymbro.core.model.Exercise
 import com.gymbro.core.model.ExerciseSet
 import com.gymbro.core.repository.WorkoutRepository
+import com.gymbro.core.service.PersonalRecordService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
@@ -21,6 +22,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ActiveWorkoutViewModel @Inject constructor(
     private val workoutRepository: WorkoutRepository,
+    private val personalRecordService: PersonalRecordService,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ActiveWorkoutState())
@@ -262,13 +264,28 @@ class ActiveWorkoutViewModel @Inject constructor(
             restTimerJob?.cancel()
 
             val exerciseCount = currentState.exercises.size
+            
+            // Check for PRs
+            val allPRs = mutableListOf<com.gymbro.core.model.PersonalRecord>()
+            currentState.exercises.forEach { exerciseUi ->
+                val exercisePRs = personalRecordService.getPersonalRecords(
+                    exerciseId = exerciseUi.exercise.id.toString(),
+                    exerciseName = exerciseUi.exercise.name,
+                )
+                // Filter to only newly set PRs (where previous value exists and is less than current)
+                val newPRs = exercisePRs.filter { pr ->
+                    pr.previousValue == null || pr.previousValue!! < pr.value
+                }
+                allPRs.addAll(newPRs)
+            }
+            
             _effect.send(
                 ActiveWorkoutEffect.NavigateToSummary(
                     durationSeconds = currentState.elapsedSeconds,
                     totalVolume = currentState.totalVolume,
                     totalSets = currentState.totalSets,
                     exerciseCount = exerciseCount,
-                    prsCount = 0, // placeholder
+                    personalRecords = allPRs,
                 ),
             )
         }
