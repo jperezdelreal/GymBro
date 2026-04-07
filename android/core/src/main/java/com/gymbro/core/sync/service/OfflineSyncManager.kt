@@ -1,23 +1,27 @@
 package com.gymbro.core.sync.service
 
 import android.content.Context
-import android.net.ConnectivityManager
-import android.net.Network
-import android.net.NetworkCapabilities
-import android.net.NetworkRequest
+import android.content.SharedPreferences
 import android.util.Log
+import com.gymbro.core.sync.ConnectivityObserver
 import com.gymbro.core.sync.model.FirestoreUserProfile
+import com.gymbro.core.sync.model.SyncStatusModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
+
+sealed class SyncOperation {
+    data object Exercises : SyncOperation()
+    data object Workouts : SyncOperation()
+    data object Profile : SyncOperation()
+}
 
 /**
  * Queues sync operations when offline and flushes them when connectivity resumes.
@@ -27,33 +31,124 @@ import javax.inject.Singleton
 class OfflineSyncManager @Inject constructor(
     @ApplicationContext private val context: Context,
     private val cloudSyncService: CloudSyncService,
+    private val connectivityObserver: ConnectivityObserver,
 ) {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-    private val pendingQueue = Channel<SyncOperation>(Channel.UNLIMITED)
+    private val pendingQueue = mutableListOf<SyncOperation>()
+    private val prefs: SharedPreferences = context.getSharedPreferences("sync_queue", Context.MODE_PRIVATE)
+    
+    @Volatile
+    private var _pendingProfile: FirestoreUserProfile? = null
+    
+    private val _syncStatusModel = MutableStateFlow<SyncStatusModel>(SyncStatusModel.Idle)
+    val syncStatusModel: StateFlow<SyncStatusModel> = _syncStatusModel.asStateFlow()
 
-    private val _isOnline = MutableStateFlow(false)
-    val isOnline: StateFlow<Boolean> = _isOnline.asStateFlow()
+    val isOnline: StateFlow<Boolean> = connectivityObserver.isConnected
 
     private val _syncStatus = MutableStateFlow(SyncStatus.IDLE)
     val syncStatus: StateFlow<SyncStatus> = _syncStatus.asStateFlow()
 
     init {
-        monitorConnectivity()
-        processQueue()
+        loadQueueFromDisk()
+        observeConnectivity()
+    }
+
+    private fun loadQueueFromDisk() {
+        try {
+            val exercises = prefs.getBoolean("queue_exercises", false)
+            val workouts = prefs.getBoolean("queue_workouts", false)
+            val profile = prefs.getBoolean("queue_profile", false)
+            
+            synchronized(pendingQueue) {
+                pendingQueue.clear()
+                if (exercises) pendingQueue.add(SyncOperation.Exercises)
+                if (workouts) pendingQueue.add(SyncOperation.Workouts)
+                if (profile) pendingQueue.add(SyncOperation.Profile)
+            }
+            Log.d(TAG, "Loaded ${pendingQueue.size} operations from disk")
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to load queue from disk", e)
+        }
+    }
+
+    private fun saveQueueToDisk() {
+        try {
+            val editor = prefs.edit()
+            var hasExercises = false
+            var hasWorkouts = false
+            var hasProfile = false
+            
+            synchronized(pendingQueue) {
+                pendingQueue.forEach { op ->
+                    when (op) {
+                        is SyncOperation.Exercises -> hasExercises = true
+                        is SyncOperation.Workouts -> hasWorkouts = true
+                        is SyncOperation.Profile -> hasProfile = true
+                    }
+                }
+            }
+            
+            editor.putBoolean("queue_exercises", hasExercises)
+            editor.putBoolean("queue_workouts", hasWorkouts)
+            editor.putBoolean("queue_profile", hasProfile)
+            editor.apply()
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to save queue to disk", e)
+        }
+    }
+
+    private fun observeConnectivity() {
+        scope.launch {
+            connectivityObserver.onConnectivityRestored.collect { timestamp ->
+                if (timestamp > 0) {
+                    Log.d(TAG, "Connectivity restored, flushing queue")
+                    cloudSyncService.resolveConflicts()
+                    processQueue()
+                }
+            }
+        }
     }
 
     fun queueExerciseSync() {
-        pendingQueue.trySend(SyncOperation.EXERCISES)
+        addToQueue(SyncOperation.Exercises)
     }
 
     fun queueWorkoutSync() {
-        pendingQueue.trySend(SyncOperation.WORKOUTS)
+        addToQueue(SyncOperation.Workouts)
     }
 
     fun queueProfileSync(profile: FirestoreUserProfile) {
-        pendingQueue.trySend(SyncOperation.PROFILE)
-        // Store profile for when we actually process
         _pendingProfile = profile
+        addToQueue(SyncOperation.Profile)
+    }
+
+    private fun addToQueue(operation: SyncOperation) {
+        synchronized(pendingQueue) {
+            val alreadyQueued = pendingQueue.any { existing ->
+                when {
+                    existing is SyncOperation.Exercises && operation is SyncOperation.Exercises -> true
+                    existing is SyncOperation.Workouts && operation is SyncOperation.Workouts -> true
+                    existing is SyncOperation.Profile && operation is SyncOperation.Profile -> true
+                    else -> false
+                }
+            }
+            
+            if (!alreadyQueued) {
+                if (pendingQueue.size >= MAX_QUEUE_SIZE) {
+                    Log.w(TAG, "Queue at max size ($MAX_QUEUE_SIZE), removing oldest operation")
+                    pendingQueue.removeAt(0)
+                }
+                pendingQueue.add(operation)
+                saveQueueToDisk()
+            }
+        }
+        
+        if (connectivityObserver.isConnected.value) {
+            processQueue()
+        } else {
+            _syncStatus.value = SyncStatus.OFFLINE
+            _syncStatusModel.value = SyncStatusModel.Offline
+        }
     }
 
     fun syncNow() {
@@ -61,24 +156,31 @@ class OfflineSyncManager @Inject constructor(
         queueWorkoutSync()
     }
 
-    @Volatile
-    private var _pendingProfile: FirestoreUserProfile? = null
-
     private fun processQueue() {
         scope.launch {
-            for (operation in pendingQueue) {
-                if (!_isOnline.value) {
+            synchronized(pendingQueue) {
+                if (pendingQueue.isEmpty()) return@launch
+            }
+            
+            while (true) {
+                val operation = synchronized(pendingQueue) {
+                    pendingQueue.firstOrNull()
+                } ?: break
+                
+                if (!connectivityObserver.isConnected.value) {
                     _syncStatus.value = SyncStatus.OFFLINE
-                    // Re-queue and wait for connectivity
-                    pendingQueue.trySend(operation)
-                    continue
+                    _syncStatusModel.value = SyncStatusModel.Offline
+                    Log.d(TAG, "No connectivity, pausing queue processing")
+                    break
                 }
 
                 _syncStatus.value = SyncStatus.SYNCING
+                _syncStatusModel.value = SyncStatusModel.Syncing
+                
                 val result = when (operation) {
-                    SyncOperation.EXERCISES -> cloudSyncService.syncExercises()
-                    SyncOperation.WORKOUTS -> cloudSyncService.syncWorkouts()
-                    SyncOperation.PROFILE -> {
+                    is SyncOperation.Exercises -> cloudSyncService.syncExercises()
+                    is SyncOperation.Workouts -> cloudSyncService.syncWorkouts()
+                    is SyncOperation.Profile -> {
                         val profile = _pendingProfile
                         if (profile != null) {
                             cloudSyncService.syncUserProfile(profile)
@@ -88,51 +190,30 @@ class OfflineSyncManager @Inject constructor(
                     }
                 }
 
-                _syncStatus.value = if (result.isSuccess) {
-                    SyncStatus.SUCCESS
+                if (result.isSuccess) {
+                    synchronized(pendingQueue) {
+                        pendingQueue.remove(operation)
+                        saveQueueToDisk()
+                    }
+                    _syncStatus.value = SyncStatus.SUCCESS
+                    _syncStatusModel.value = SyncStatusModel.Success(System.currentTimeMillis())
+                    Log.d(TAG, "Sync operation succeeded: $operation")
                 } else {
-                    Log.e(TAG, "Sync failed for $operation", result.exceptionOrNull())
-                    SyncStatus.ERROR
+                    val error = result.exceptionOrNull()
+                    Log.e(TAG, "Sync failed for $operation", error)
+                    _syncStatus.value = SyncStatus.ERROR
+                    _syncStatusModel.value = SyncStatusModel.Error(
+                        message = error?.message ?: "Unknown error",
+                        retryable = true
+                    )
+                    break
                 }
             }
         }
     }
 
-    private fun monitorConnectivity() {
-        val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-
-        // Check current state
-        val activeNetwork = cm.activeNetwork
-        val capabilities = activeNetwork?.let { cm.getNetworkCapabilities(it) }
-        _isOnline.value = capabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true
-
-        val request = NetworkRequest.Builder()
-            .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-            .build()
-
-        cm.registerNetworkCallback(request, object : ConnectivityManager.NetworkCallback() {
-            override fun onAvailable(network: Network) {
-                _isOnline.value = true
-                // Flush pending operations
-                scope.launch {
-                    cloudSyncService.resolveConflicts()
-                }
-            }
-
-            override fun onLost(network: Network) {
-                _isOnline.value = false
-                _syncStatus.value = SyncStatus.OFFLINE
-            }
-        })
-    }
-
-    private enum class SyncOperation {
-        EXERCISES,
-        WORKOUTS,
-        PROFILE,
-    }
-
     companion object {
         private const val TAG = "OfflineSyncManager"
+        private const val MAX_QUEUE_SIZE = 100
     }
 }
