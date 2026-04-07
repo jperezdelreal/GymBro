@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 private val AccentGreen = Color(0xFF00FF87)
-private val SurfaceColor = Color(0xFF1A1A1A)
+private val SurfaceColor = Color(0xFF1C1C1E)
 private val BackgroundColor = Color(0xFF0A0A0A)
 
 /**
