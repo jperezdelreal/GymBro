@@ -2,11 +2,16 @@ import Foundation
 import Observation
 import SwiftData
 import GymBroCore
+import os
 
 @MainActor
 @Observable
 public final class WorkoutHistoryViewModel {
+    private static let logger = Logger(subsystem: "com.gymbro", category: "WorkoutHistory")
+
     var workouts: [Workout] = []
+    var isLoading: Bool = false
+    var errorMessage: String?
     private var modelContext: ModelContext?
     
     public init() {}
@@ -19,6 +24,9 @@ public final class WorkoutHistoryViewModel {
     private func loadWorkouts() {
         guard let modelContext = modelContext else { return }
         
+        isLoading = true
+        errorMessage = nil
+        
         let descriptor = FetchDescriptor<Workout>(
             sortBy: [SortDescriptor(\.date, order: .reverse)]
         )
@@ -26,8 +34,14 @@ public final class WorkoutHistoryViewModel {
         do {
             workouts = try modelContext.fetch(descriptor)
         } catch {
-            print("Failed to fetch workouts: \(error)")
+            errorMessage = "Could not load workout history. Pull down to retry."
             workouts = []
         }
+        
+        isLoading = false
+    }
+    
+    func retry() {
+        loadWorkouts()
     }
 }

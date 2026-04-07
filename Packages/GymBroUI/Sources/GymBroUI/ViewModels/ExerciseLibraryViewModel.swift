@@ -2,11 +2,16 @@ import Foundation
 import Observation
 import SwiftData
 import GymBroCore
+import os
 
 @MainActor
 @Observable
 public final class ExerciseLibraryViewModel {
+    private static let logger = Logger(subsystem: "com.gymbro", category: "ExerciseLibrary")
+
     var exercises: [Exercise] = []
+    var isLoading: Bool = false
+    var errorMessage: String?
     private var modelContext: ModelContext?
     
     public init() {}
@@ -19,6 +24,9 @@ public final class ExerciseLibraryViewModel {
     private func loadExercises() {
         guard let modelContext = modelContext else { return }
         
+        isLoading = true
+        errorMessage = nil
+        
         let descriptor = FetchDescriptor<Exercise>(
             sortBy: [SortDescriptor(\.name, order: .forward)]
         )
@@ -26,9 +34,15 @@ public final class ExerciseLibraryViewModel {
         do {
             exercises = try modelContext.fetch(descriptor)
         } catch {
-            print("Failed to fetch exercises: \(error)")
+            errorMessage = "Could not load exercises. Pull down to retry."
             exercises = []
         }
+        
+        isLoading = false
+    }
+    
+    func retry() {
+        loadExercises()
     }
     
     func filteredExercises(
