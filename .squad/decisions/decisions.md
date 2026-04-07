@@ -4,6 +4,61 @@ Team decisions, policy directives, and architectural guidance.
 
 ---
 
+## 2026-04-07T14-05-fitbod-teardown: FitBod Competitive Teardown
+
+**Decision by:** Morpheus (Lead/Architect)  
+**Date:** 2025-07-18  
+**Context:** User is an active FitBod subscriber. This teardown informs GymBro's roadmap priorities and answers the question: *What will it take to cancel FitBod?*
+
+### What FitBod Does Better
+1. **Data Moat** — 400M+ logged data points informing recommendations
+2. **Exercise Library** — 1,000+ HD video exercises vs. GymBro's 200+ text-based
+3. **Auto Workout Generation** — One-tap full session creation (GymBro lacks this)
+4. **Muscle Recovery Heat Map** — Intuitive visual UI (GymBro has data, not visualization)
+5. **Cross-Platform** — iOS + Android (GymBro iOS-only)
+6. **Equipment Profiles** — Multi-profile switching (GymBro single profile)
+7. **UX Polish** — 9 years of iteration vs. weeks for GymBro
+
+### What GymBro Does Better
+1. **Conversational AI Coach** — Explainable, context-aware (FitBod has no LLM)
+2. **True Periodization** — Mesocycle architecture vs. session-by-session
+3. **Proactive Plateau Detection** — Change point analysis, trend forecasting
+4. **Overtraining & Imbalance Alerts** — Systematic warnings (FitBod doesn't)
+5. **Advanced Recovery Intelligence** — HealthKit biometrics vs. volume-based fatigue
+6. **Supersets & Rest-Pause Sets** — First-class support
+7. **Dynamic Island & Live Activities** — Active workout widgets
+8. **Offline-First + CloudKit Sync** — Property-level conflict resolution
+9. **Privacy-First AI** — On-device inference option
+10. **Open Exercise Library** — wger.de API integration
+
+### Top 5 Strategic Recommendations
+
+| Rank | Feature | Why | Effort |
+|------|---------|-----|--------|
+| #1 | **Auto Workout Generation** | Closes biggest gap (P0) | Medium |
+| #2 | **Exercise Video Content** | Closes perceived quality gap (P1) | Medium |
+| #3 | **Custom Exercise Creation** | Power user need (P1) | Low |
+| #4 | **Muscle Recovery Visualization** | We have data, need UI (P2) | Low |
+| #5 | **Equipment Profile Switching** | QoL improvement (P2) | Low |
+
+### What NOT to Do
+- ❌ Build 400M-data-point engine (time/scale mismatch)
+- ❌ Chase Android (not yet; iOS-first wins)
+- ❌ Add social features (unnecessary)
+- ❌ Compete on library size (quality > quantity)
+
+### Where to Double Down
+- 🔥 **AI Coach as primary interface** — Our moat, not FitBod's
+- 🔥 **Recovery intelligence** — Biometric depth FitBod can't match
+- 🔥 **Transparency** — Explained AI > black box
+- 🔥 **Free tier generosity** — Trust before money
+- 🔥 **Program fidelity** — Serious lifters need real periodization
+
+### Strategic Reality
+GymBro is a **specialist for serious lifters**, not a generalist. We don't need to beat FitBod at everything — only at program fidelity, transparent AI coaching, recovery intelligence, and logging speed. **We're already ahead or architecturally positioned to win on those axes.**
+
+---
+
 ## 2026-04-07T15-06-17Z: User Directive — Repo Hygiene
 
 **By:** Copilot (via user request)
