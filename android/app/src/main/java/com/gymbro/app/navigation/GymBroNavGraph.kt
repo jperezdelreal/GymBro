@@ -56,6 +56,7 @@ import com.gymbro.feature.progress.ProgressRoute
 import com.gymbro.feature.recovery.RecoveryRoute
 import com.gymbro.feature.settings.SettingsRoute
 import com.gymbro.feature.workout.ActiveWorkoutRoute
+import com.gymbro.feature.workout.SmartWorkoutRoute
 import com.gymbro.feature.workout.WorkoutSummaryScreen
 import com.gymbro.core.model.PersonalRecord
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -194,6 +195,21 @@ fun GymBroNavGraph(
                     navController.popBackStack()
                 },
                 pickedExercise = pickedExercise,
+            )
+        }
+        composable("smart_workout") {
+            SmartWorkoutRoute(
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+                onStartWorkout = { exercises ->
+                    navController.navigate("active_workout")
+                    exercises.forEach { exercise ->
+                        navController.currentBackStackEntry
+                            ?.savedStateHandle
+                            ?.set("smart_workout_exercise_${exercise.id}", exercise)
+                    }
+                },
             )
         }
         composable("exercise_picker") {
