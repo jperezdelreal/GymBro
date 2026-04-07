@@ -41,9 +41,10 @@ class OnboardingViewModel @Inject constructor(
 
     private fun completeOnboarding() {
         viewModelScope.launch {
-            userPreferences.setPreferredUnit(_state.value.selectedUnit)
-            userPreferences.setUserName(_state.value.userName.takeIf { it.isNotBlank() })
-            userPreferences.setOnboardingComplete()
+            userPreferences.setWeightUnit(_state.value.selectedUnit)
+            val userName = _state.value.userName.takeIf { it.isNotBlank() } ?: ""
+            userPreferences.setUserName(userName)
+            userPreferences.setOnboardingComplete(true)
             _effects.send(OnboardingEffect.NavigateToMain)
         }
     }

@@ -1,6 +1,6 @@
 package com.gymbro.feature.onboarding
 
-import com.gymbro.core.preferences.WeightUnit
+import com.gymbro.core.preferences.UserPreferences.WeightUnit
 
 data class OnboardingState(
     val currentPage: Int = 0,

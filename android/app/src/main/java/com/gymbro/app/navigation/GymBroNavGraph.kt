@@ -51,6 +51,7 @@ import com.gymbro.feature.history.HistoryDetailRoute
 import com.gymbro.feature.history.HistoryListRoute
 import com.gymbro.feature.onboarding.OnboardingRoute
 import com.gymbro.feature.profile.ProfileRoute
+import com.gymbro.feature.programs.ProgramsRoute
 import com.gymbro.feature.progress.ProgressRoute
 import com.gymbro.feature.recovery.RecoveryRoute
 import com.gymbro.feature.settings.SettingsRoute
@@ -340,7 +341,36 @@ fun GymBroNavGraph(
             }
         }
         composable("programs") {
-            PlaceholderScreen(title = "Programs")
+            Scaffold(
+                bottomBar = {
+                    if (showBottomBar) {
+                        GymBroBottomNavBar(
+                            currentRoute = currentDestination?.route,
+                            onTabSelected = { tab ->
+                                navController.navigate(tab.route) {
+                                    popUpTo(navController.graph.findStartDestination().id) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
+                            },
+                        )
+                    }
+                },
+                containerColor = MaterialTheme.colorScheme.background,
+            ) { innerPadding ->
+                Box(modifier = Modifier.padding(innerPadding)) {
+                    ProgramsRoute(
+                        onNavigateToCreateTemplate = { templateId ->
+                            // TODO: Navigate to create/edit template screen
+                        },
+                        onNavigateToActiveWorkout = { template ->
+                            navController.navigate("active_workout")
+                        },
+                    )
+                }
+            }
         }
         composable("coach") {
             PlaceholderScreen(title = "Coach")
