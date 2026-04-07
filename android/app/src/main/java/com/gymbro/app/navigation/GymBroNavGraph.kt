@@ -13,6 +13,8 @@ import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.MonitorHeart
 import androidx.compose.material.icons.outlined.FitnessCenter
 import androidx.compose.material.icons.outlined.MonitorHeart
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -41,6 +43,7 @@ import com.gymbro.core.model.Exercise
 import com.gymbro.core.model.ExerciseCategory
 import com.gymbro.core.model.MuscleGroup
 import com.gymbro.feature.exerciselibrary.ExerciseLibraryRoute
+import com.gymbro.feature.profile.ProfileRoute
 import com.gymbro.feature.progress.ProgressRoute
 import com.gymbro.feature.recovery.RecoveryRoute
 import com.gymbro.feature.workout.ActiveWorkoutRoute
@@ -57,6 +60,7 @@ private enum class BottomNavTab(
     LIBRARY("exercise_library", "Library", Icons.Filled.FitnessCenter, Icons.Outlined.FitnessCenter),
     PROGRESS("progress", "Progress", Icons.AutoMirrored.Filled.ShowChart, Icons.AutoMirrored.Outlined.ShowChart),
     RECOVERY("recovery", "Recovery", Icons.Filled.MonitorHeart, Icons.Outlined.MonitorHeart),
+    PROFILE("profile", "Profile", Icons.Filled.Person, Icons.Outlined.Person),
 }
 
 @Composable
@@ -266,7 +270,29 @@ fun GymBroNavGraph() {
             PlaceholderScreen(title = "Coach")
         }
         composable("profile") {
-            PlaceholderScreen(title = "Profile")
+            Scaffold(
+                bottomBar = {
+                    if (showBottomBar) {
+                        GymBroBottomNavBar(
+                            currentRoute = currentDestination?.route,
+                            onTabSelected = { tab ->
+                                navController.navigate(tab.route) {
+                                    popUpTo(navController.graph.findStartDestination().id) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
+                            },
+                        )
+                    }
+                },
+                containerColor = MaterialTheme.colorScheme.background,
+            ) { innerPadding ->
+                Box(modifier = Modifier.padding(innerPadding)) {
+                    ProfileRoute()
+                }
+            }
         }
     }
 }

@@ -47,6 +47,11 @@ dependencies {
     // Health Connect
     implementation(libs.health.connect)
 
+    // Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.firestore)
+    implementation(libs.firebase.auth)
+
     // Coroutines
     implementation(libs.coroutines.core)
     implementation(libs.coroutines.android)

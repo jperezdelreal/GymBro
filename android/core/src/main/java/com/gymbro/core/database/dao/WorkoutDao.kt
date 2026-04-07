@@ -78,4 +78,10 @@ interface WorkoutDao {
 
     @Query("SELECT MAX(completedAt) FROM workouts WHERE completed = 1")
     suspend fun getLastCompletedTimestamp(): Long?
+
+    @Query("SELECT * FROM workouts ORDER BY startedAt DESC")
+    suspend fun getAllWorkoutsOnce(): List<WorkoutEntity>
+
+    @Query("SELECT * FROM workout_sets WHERE workoutId = :workoutId")
+    suspend fun getSetsForWorkout(workoutId: String): List<WorkoutSetEntity>
 }
