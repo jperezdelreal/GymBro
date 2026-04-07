@@ -178,7 +178,7 @@ final class ActiveWorkoutViewModelTests: XCTestCase {
             equipment: .barbell
         )
         modelContext.insert(newExercise)
-        try! modelContext.save()
+        try modelContext.save()
         
         viewModel.setActiveExercise(newExercise)
         

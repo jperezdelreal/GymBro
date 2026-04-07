@@ -1,12 +1,15 @@
 import Foundation
 import SwiftData
 import GymBroCore
+import os
 
 /// ViewModel for the AI Coach chat interface.
 /// Manages conversation state, message history, and AI service coordination.
 @MainActor
 @Observable
 public final class CoachChatViewModel {
+
+    private static let logger = Logger(subsystem: "com.gymbro", category: "CoachChat")
 
     // MARK: - Published State
 
@@ -138,10 +141,13 @@ public final class CoachChatViewModel {
     // MARK: - Private
 
     private func selectService() -> AICoachService {
-        if isOfflineMode || cloudService == nil {
+        if isOfflineMode {
             return fallbackService
         }
-        return cloudService!
+        guard let service = cloudService else {
+            return fallbackService
+        }
+        return service
     }
 
     private func buildContext() -> CoachContext {
@@ -166,7 +172,11 @@ public final class CoachChatViewModel {
     private func persistMessage(_ message: ChatMessage) {
         guard let ctx = modelContext else { return }
         ctx.insert(message)
-        try? ctx.save()
+        do {
+            try ctx.save()
+        } catch {
+            Self.logger.error("Failed to persist chat message: \(error.localizedDescription)")
+        }
     }
 
     private func handleError(_ error: Error, messageId: UUID) {

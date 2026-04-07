@@ -1,7 +1,10 @@
 import Foundation
 import UserNotifications
+import os
 
 public final class NotificationService {
+    private static let logger = Logger(subsystem: "com.gymbro", category: "Notifications")
+
     public static let shared = NotificationService()
     
     private let notificationCenter = UNUserNotificationCenter.current()
@@ -14,7 +17,7 @@ public final class NotificationService {
         do {
             return try await notificationCenter.requestAuthorization(options: [.alert, .sound, .badge])
         } catch {
-            print("Notification authorization failed: \(error)")
+            Self.logger.error("Notification authorization failed: \(error.localizedDescription)")
             return false
         }
     }
@@ -40,7 +43,7 @@ public final class NotificationService {
         
         notificationCenter.add(request) { error in
             if let error = error {
-                print("Failed to schedule rest timer notification: \(error)")
+                Self.logger.error("Failed to schedule rest timer notification: \(error.localizedDescription)")
             }
         }
     }

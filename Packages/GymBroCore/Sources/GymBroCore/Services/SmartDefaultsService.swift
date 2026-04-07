@@ -1,7 +1,10 @@
 import Foundation
 import SwiftData
+import os
 
 public final class SmartDefaultsService {
+    private static let logger = Logger(subsystem: "com.gymbro", category: "SmartDefaults")
+
     private let modelContext: ModelContext
     
     public init(modelContext: ModelContext) {
@@ -18,8 +21,15 @@ public final class SmartDefaultsService {
             sortBy: [SortDescriptor(\.completedAt, order: .reverse)]
         )
         
-        guard let recentSets = try? modelContext.fetch(descriptor),
-              !recentSets.isEmpty else {
+        let recentSets: [ExerciseSet]
+        do {
+            recentSets = try modelContext.fetch(descriptor)
+        } catch {
+            Self.logger.error("Failed to fetch smart defaults: \(error.localizedDescription)")
+            return defaultValues(for: exercise)
+        }
+        
+        guard !recentSets.isEmpty else {
             return defaultValues(for: exercise)
         }
         
