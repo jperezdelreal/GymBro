@@ -484,3 +484,30 @@ This foundation unblocks all Phase-1 work:
 
 **PR:** Draft PR #142 opened against master
 **Decision doc:** `.squad/decisions/inbox/tank-repo-restructure.md`
+
+### Issue #143: Firebase Firestore Cloud Sync Infrastructure
+
+**Date:** 2026-04-07
+**Branch:** squad/143-firebase-sync
+
+**What was built:**
+- Firebase BOM 33.15.0, Firestore, Auth, and Messaging added to version catalog
+- google-services plugin conditionally applied — build passes without google-services.json
+- FIREBASE_ENABLED BuildConfig flag for runtime detection
+- Firestore data models: FirestoreExercise, FirestoreWorkout, FirestoreUserProfile
+- Converter utilities between Room entities and Firestore documents
+- CloudSyncService interface + FirestoreSyncService implementation
+- OfflineSyncManager — queues changes offline, flushes on connectivity
+- AuthService interface + FirebaseAuthService (anonymous auth for MVP)
+- Hilt DI module wiring all Firebase dependencies
+- ProfileScreen with sync status, auth actions, auto-sync toggle
+- Profile tab added to bottom navigation
+- WorkoutDao extended with getAllWorkoutsOnce() and getSetsForWorkout()
+
+**Key decisions:**
+- Firebase is fully optional — no google-services.json = no Firebase, app still compiles
+- Last-write-wins conflict resolution for MVP simplicity
+- Anonymous auth for MVP — upgrade path to email/Google planned
+- Firestore documents denormalized (workout embeds sets) for efficient reads
+
+**Verification:** assembleDebug passes clean (105 tasks, 0 errors)

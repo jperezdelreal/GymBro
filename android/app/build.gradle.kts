@@ -6,6 +6,12 @@ plugins {
     alias(libs.plugins.hilt)
 }
 
+// Only apply google-services plugin when google-services.json is present.
+// This lets the project compile and run without a Firebase project configured.
+if (file("google-services.json").exists()) {
+    apply(plugin = libs.plugins.google.services.get().pluginId)
+}
+
 android {
     namespace = "com.gymbro.app"
     compileSdk = 36
@@ -18,6 +24,13 @@ android {
         versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // Build config flag so code can check at runtime
+        buildConfigField(
+            "boolean",
+            "FIREBASE_ENABLED",
+            "${file("google-services.json").exists()}",
+        )
     }
 
     buildTypes {
@@ -75,6 +88,12 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
     implementation(libs.hilt.navigation.compose)
+
+    // Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.firestore)
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.messaging)
 
     // Networking
     implementation(libs.retrofit)
