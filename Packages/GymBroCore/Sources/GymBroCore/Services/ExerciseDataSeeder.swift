@@ -10,6 +10,9 @@ public struct ExerciseDataSeeder {
         let equipment: String
         let instructions: String
         let muscleGroups: [MuscleGroupSeed]
+        let videoURL: String?
+        let imageURL: String?
+        let muscleImageURL: String?
     }
     
     private struct MuscleGroupSeed: Codable {
@@ -47,7 +50,10 @@ public struct ExerciseDataSeeder {
                 muscleGroups: exerciseData.muscleGroups.map { 
                     MuscleGroup(name: $0.name, isPrimary: $0.isPrimary)
                 },
-                isCustom: false
+                isCustom: false,
+                imageURL: exerciseData.imageURL,
+                videoURL: exerciseData.videoURL,
+                muscleImageURL: exerciseData.muscleImageURL
             )
             
             modelContext.insert(exercise)
