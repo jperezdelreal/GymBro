@@ -164,17 +164,7 @@ struct HistoryTab: View {
 
 struct ProgramsTab: View {
     var body: some View {
-        NavigationStack {
-            EmptyStateView(
-                icon: "calendar",
-                title: "No programs yet",
-                message: "Create a custom program or let the AI coach build one for you",
-                actionTitle: "Ask Coach"
-            ) {
-                // Switch to coach tab
-            }
-            .navigationTitle("Programs")
-        }
+        ProgramsTabView()
     }
 }
 

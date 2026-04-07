@@ -11,6 +11,9 @@ final class ExerciseSeedDataTests: XCTestCase {
         let equipment: String
         let instructions: String
         let muscleGroups: [MuscleGroupSeed]
+        let videoURL: String?
+        let imageURL: String?
+        let muscleImageURL: String?
     }
 
     private struct MuscleGroupSeed: Codable {
@@ -181,5 +184,39 @@ final class ExerciseSeedDataTests: XCTestCase {
             XCTAssertNotNil(parsed,
                 "Equipment '\(exercise.equipment)' for '\(exercise.name)' must parse to Equipment enum")
         }
+    }
+
+    // MARK: - Media Fields
+
+    func testVideoURLsAreValidWhenPresent() {
+        let withVideo = seedData.filter { $0.videoURL != nil }
+        XCTAssertGreaterThanOrEqual(withVideo.count, 50,
+            "At least 50 exercises should have curated video URLs")
+
+        for exercise in withVideo {
+            guard let url = exercise.videoURL else { continue }
+            XCTAssertTrue(url.hasPrefix("https://www.youtube.com/watch?v="),
+                "'\(exercise.name)' videoURL must be a valid YouTube watch URL, got: \(url)")
+        }
+    }
+
+    func testTopCompoundsHaveVideoURLs() {
+        let requiredCompounds = [
+            "Barbell Back Squat", "Barbell Bench Press", "Conventional Deadlift",
+            "Barbell Overhead Press", "Barbell Row", "Pull-Up"
+        ]
+        for name in requiredCompounds {
+            let exercise = seedData.first { $0.name == name }
+            XCTAssertNotNil(exercise, "Seed data must contain '\(name)'")
+            XCTAssertNotNil(exercise?.videoURL,
+                "'\(name)' must have a curated video URL")
+        }
+    }
+
+    func testMediaFieldsAreOptional() {
+        // Verify the JSON decodes correctly with null media fields
+        let withoutImage = seedData.filter { $0.imageURL == nil }
+        XCTAssertFalse(withoutImage.isEmpty,
+            "Some exercises should have nil imageURL (populated by wger sync)")
     }
 }
