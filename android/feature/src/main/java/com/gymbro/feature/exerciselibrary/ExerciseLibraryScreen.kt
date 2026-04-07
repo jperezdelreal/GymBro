@@ -51,6 +51,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gymbro.core.model.Exercise
 import com.gymbro.core.model.ExerciseCategory
 import com.gymbro.core.model.MuscleGroup
+import com.gymbro.feature.common.EmptyState
 import com.gymbro.feature.common.FullScreenLoading
 import com.gymbro.feature.common.ObserveErrors
 
@@ -304,29 +305,9 @@ private fun CategoryBadge(category: ExerciseCategory) {
 
 @Composable
 private fun EmptyExercisesView() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center,
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Icon(
-                Icons.Default.Search,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.size(48.dp),
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                text = "No exercises found",
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onBackground,
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = "Try adjusting your search or filters",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-    }
+    EmptyState(
+        icon = Icons.Default.Search,
+        title = "No exercises found",
+        subtitle = "Try adjusting your search or filters",
+    )
 }
