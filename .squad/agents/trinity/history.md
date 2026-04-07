@@ -215,6 +215,21 @@
 - **Architecture**: CoachContextService in GymBroCore/Services/AI queries SwiftData. VoiceInputService in same folder. New views: TypingIndicatorView, ContextIndicatorBar, SuggestedPromptsBar, MessageReactionBar, VoiceInputButton in Views/Coach/.
 - **PR opened, closes #70.**
 
+### 2026-04-07: Onboarding Flow Complete (Issue #87, PR #89)
+
+**7-Step Progressive Disclosure Questionnaire**
+
+- **Sequence:** Welcome → Goals → Experience → Frequency → Equipment → Limitations → Summary
+- **Components:** EmptyStateView (generic "no data"), OnboardingFlowView (multi-step coordinator)
+- **UX:** Single-focus per screen, < 2 min completion, progress bar (mobile-first)
+- **Profile Extended:** Goals, experience level, frequency, equipment, limitations
+- **Reusable Pattern:** Can extend to program creation, body composition setup, etc.
+
+**Files Modified:** 11 files, 1300+ lines, design system integrated
+
+**Decision Captured:** Merged to .squad/decisions.md as progressive disclosure pattern
+
+**Related:** Feeds user profile data into Neo's SmartDefaults (experience level for scaling)
 ### 2026-04-07: Onboarding Flow — Fitness Questionnaire & First Workout (Issue #87)
 **Progressive Disclosure Onboarding:**
 - **7-step flow**: Welcome → Goals → Experience → Frequency → Equipment → Limitations → Summary. Each step = one screen, minimal input (tap selections, not text). Progress bar shows position in flow.
