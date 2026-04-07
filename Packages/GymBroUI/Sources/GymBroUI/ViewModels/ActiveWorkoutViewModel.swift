@@ -11,6 +11,7 @@ public final class ActiveWorkoutViewModel {
 
     private let modelContext: ModelContext
     private let smartDefaultsService: SmartDefaultsService
+    private let supersetService = SupersetService.shared
     
     public private(set) var workout: Workout
     public private(set) var activeExercise: Exercise?
@@ -143,7 +144,11 @@ public final class ActiveWorkoutViewModel {
         activeSetNumber += 1
         
         if !isWarmup {
-            startRestTimer()
+            // Check if we should start rest timer (normal behavior or after completing superset round)
+            let lastSet = workout.sets.last
+            if lastSet != nil && supersetService.shouldStartRestTimer(after: lastSet!, in: workout) {
+                startRestTimer()
+            }
         }
         
         if isWarmup {
@@ -333,6 +338,106 @@ public final class ActiveWorkoutViewModel {
         workout.sets.filter { set in
             isPR(set: set)
         }.count
+    }
+    
+    // MARK: - Superset Support
+    
+    /// Create a superset group linking the active exercise with another exercise
+    public func createSuperset(with exercise: Exercise) {
+        guard let activeEx = activeExercise else { return }
+        
+        let group = supersetService.createSupersetGroup(
+            exercises: [activeEx, exercise],
+            workout: workout,
+            modelContext: modelContext
+        )
+        
+        // Add existing sets to the superset group
+        let existingSets = workout.sets.filter { 
+            $0.exercise?.id == activeEx.id || $0.exercise?.id == exercise.id 
+        }
+        for set in existingSets {
+            supersetService.addSetToSuperset(set: set, group: group)
+        }
+        
+        workout.updatedAt = Date()
+        do {
+            try modelContext.save()
+        } catch {
+            Self.logger.error("Failed to create superset: \(error.localizedDescription)")
+            saveError = "Failed to create superset."
+        }
+        HapticFeedbackService.shared.mediumImpact()
+    }
+    
+    /// Remove an exercise from its superset group
+    public func removeFromSuperset(exercise: Exercise) {
+        let sets = workout.sets.filter { $0.exercise?.id == exercise.id }
+        for set in sets {
+            supersetService.removeSetFromSuperset(set: set, modelContext: modelContext)
+        }
+        
+        workout.updatedAt = Date()
+        do {
+            try modelContext.save()
+        } catch {
+            Self.logger.error("Failed to remove from superset: \(error.localizedDescription)")
+            saveError = "Failed to remove from superset."
+        }
+        HapticFeedbackService.shared.lightImpact()
+    }
+    
+    /// Get exercises supersetted with the given exercise
+    public func getSupersetPartners(for exercise: Exercise) -> [Exercise] {
+        supersetService.getSupersetPartners(for: exercise, in: workout)
+    }
+    
+    // MARK: - Rest-Pause Support
+    
+    /// Complete a rest-pause set with sub-set reps
+    public func completeRestPauseSet(subSetReps: [Int]) {
+        guard let exercise = activeExercise else { return }
+        
+        if !isWorkoutStarted {
+            startWorkout()
+        }
+        
+        let totalReps = subSetReps.reduce(0, +)
+        
+        let set = ExerciseSet(
+            exercise: exercise,
+            workout: workout,
+            weightKg: currentWeight,
+            reps: totalReps,
+            rpe: currentRPE,
+            restSeconds: restTimerSeconds,
+            setType: .restPause,
+            setNumber: activeSetNumber,
+            subSetReps: subSetReps
+        )
+        set.completedAt = Date()
+        
+        modelContext.insert(set)
+        workout.sets.append(set)
+        workout.updatedAt = Date()
+        
+        do {
+            try modelContext.save()
+        } catch {
+            Self.logger.error("Failed to save rest-pause set: \(error.localizedDescription)")
+            saveError = "Failed to save set. Your data may not be persisted."
+        }
+        
+        HapticFeedbackService.shared.setCompleted()
+        
+        if isPR(set: set) {
+            HapticFeedbackService.shared.personalRecordAchieved()
+        }
+        
+        activeSetNumber += 1
+        startRestTimer()
+        
+        updateLiveActivityState()
     }
 }
 

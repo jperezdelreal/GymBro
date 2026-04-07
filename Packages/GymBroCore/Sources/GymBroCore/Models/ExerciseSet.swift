@@ -21,6 +21,13 @@ public public final class ExerciseSet {
     public var setType: SetType
     public var setNumber: Int
     
+    /// For rest-pause sets: stores sub-set reps (e.g., [8, 4, 2])
+    /// Total reps = sum of subSetReps
+    public var subSetReps: [Int]?
+    
+    @Relationship(deleteRule: .nullify)
+    public var supersetGroup: SupersetGroup?
+    
     public init(
         id: UUID = UUID(),
         exercise: Exercise? = nil,
@@ -30,7 +37,9 @@ public public final class ExerciseSet {
         rpe: Double? = nil,
         restSeconds: Int = 120,
         setType: SetType = .working,
-        setNumber: Int = 1
+        setNumber: Int = 1,
+        subSetReps: [Int]? = nil,
+        supersetGroup: SupersetGroup? = nil
     ) {
         self.id = id
         self.createdAt = Date()
@@ -43,10 +52,24 @@ public public final class ExerciseSet {
         self.restSeconds = restSeconds
         self.setType = setType
         self.setNumber = setNumber
+        self.subSetReps = subSetReps
+        self.supersetGroup = supersetGroup
     }
     
     public var isWarmup: Bool {
         setType == .warmup
+    }
+    
+    public var isRestPause: Bool {
+        setType == .restPause
+    }
+    
+    /// Total reps for display (sum of sub-sets for rest-pause, otherwise reps)
+    public var totalReps: Int {
+        if isRestPause, let subReps = subSetReps, !subReps.isEmpty {
+            return subReps.reduce(0, +)
+        }
+        return reps
     }
     
     public var volume: Double {
@@ -74,4 +97,5 @@ public public enum SetType: String, Codable {
     case drop
     case backoff
     case amrap
+    case restPause
 }
