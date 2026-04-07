@@ -137,7 +137,9 @@ public final class AzureOpenAICoachService: AICoachService {
         switch http.statusCode {
         case 200...299:
             return
-        case 401:
+        case 400:
+            throw AICoachError.invalidConfiguration("Bad request (HTTP 400)")
+        case 401, 403:
             throw AICoachError.authenticationFailed
         case 429:
             throw AICoachError.rateLimited
@@ -224,6 +226,7 @@ public enum AICoachError: LocalizedError {
     case serverError(Int)
     case emptyResponse
     case offlineUnavailable
+    case retriesExhausted(lastError: Error)
 
     public var errorDescription: String? {
         switch self {
@@ -234,6 +237,67 @@ public enum AICoachError: LocalizedError {
         case .serverError(let code): return "Server error (HTTP \(code)). Try again later."
         case .emptyResponse: return "AI returned an empty response."
         case .offlineUnavailable: return "This feature requires an internet connection."
+        case .retriesExhausted: return "Unable to reach AI coach after multiple attempts. Using offline mode."
         }
     }
+
+    /// Whether this error is transient and worth retrying.
+    public var isTransient: Bool {
+        switch self {
+        case .rateLimited, .emptyResponse:
+            return true
+        case .serverError(let code):
+            return [500, 502, 503].contains(code)
+        case .networkError:
+            return true
+        case .authenticationFailed, .invalidConfiguration,
+             .offlineUnavailable, .retriesExhausted:
+            return false
+        }
+    }
+
+    /// Classify any `Error` as transient for retry decisions.
+    /// Handles both `AICoachError` and Foundation `URLError` cases.
+    public static func isTransientError(_ error: Error) -> Bool {
+        if let coachError = error as? AICoachError {
+            return coachError.isTransient
+        }
+        if let urlError = error as? URLError {
+            switch urlError.code {
+            case .timedOut, .networkConnectionLost, .notConnectedToInternet,
+                 .cannotConnectToHost, .dnsLookupFailed:
+                return true
+            default:
+                return false
+            }
+        }
+        return false
+    }
+}
+
+// MARK: - Retry Policy
+
+/// Configures exponential backoff retry behavior for transient AI coach errors.
+public struct RetryPolicy: Sendable {
+    public let maxAttempts: Int
+    public let delays: [Duration]
+
+    public init(
+        maxAttempts: Int = 3,
+        delays: [Duration] = [.milliseconds(100), .seconds(1), .seconds(5)]
+    ) {
+        self.maxAttempts = maxAttempts
+        self.delays = delays
+    }
+
+    /// Returns the backoff delay for the given attempt (0-indexed).
+    public func delay(forAttempt attempt: Int) -> Duration {
+        guard attempt < delays.count else {
+            return delays.last ?? .seconds(5)
+        }
+        return delays[attempt]
+    }
+
+    /// Default policy: 100ms → 1s → 5s, 3 attempts max.
+    public static let `default` = RetryPolicy()
 }
