@@ -143,20 +143,57 @@ struct ContentView: View {
 
 struct WorkoutTab: View {
     @State private var showStartWorkout = false
-    
+    @State private var smartWorkoutVM: ActiveWorkoutViewModel?
+    @State private var navigateToSmartWorkout = false
+
     var body: some View {
         NavigationStack {
-            EmptyStateView(
-                icon: "figure.strengthtraining.traditional",
-                title: "Ready to train?",
-                message: "Start your first workout and let's build something amazing",
-                actionTitle: "Start Workout"
-            ) {
-                showStartWorkout = true
+            ScrollView {
+                VStack(spacing: GymBroSpacing.lg) {
+                    SmartWorkoutHeroCard { vm in
+                        smartWorkoutVM = vm
+                        navigateToSmartWorkout = true
+                    }
+
+                    Button {
+                        showStartWorkout = true
+                    } label: {
+                        HStack(spacing: GymBroSpacing.sm) {
+                            Image(systemName: "plus.circle.fill")
+                                .foregroundStyle(GymBroColors.textSecondary)
+                            Text("Empty Workout")
+                                .font(GymBroTypography.subheadline)
+                                .foregroundStyle(GymBroColors.textSecondary)
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .font(.system(size: 12))
+                                .foregroundStyle(GymBroColors.textTertiary)
+                        }
+                        .padding(GymBroSpacing.md)
+                        .background(
+                            RoundedRectangle(cornerRadius: GymBroRadius.md)
+                                .fill(GymBroColors.surfaceSecondary)
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: GymBroRadius.md)
+                                .strokeBorder(GymBroColors.border, lineWidth: 1)
+                        )
+                    }
+                    .buttonStyle(.plain)
+                }
+                .padding(.horizontal, GymBroSpacing.md)
+                .padding(.top, GymBroSpacing.md)
+                .padding(.bottom, GymBroSpacing.xxl)
             }
+            .gymBroDarkBackground()
             .navigationTitle("Workout")
             .sheet(isPresented: $showStartWorkout) {
                 StartWorkoutView()
+            }
+            .navigationDestination(isPresented: $navigateToSmartWorkout) {
+                if let vm = smartWorkoutVM {
+                    ActiveWorkoutView(viewModel: vm)
+                }
             }
         }
     }

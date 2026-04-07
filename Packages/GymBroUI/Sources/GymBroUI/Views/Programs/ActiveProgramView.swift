@@ -9,6 +9,10 @@ public struct ActiveProgramView: View {
     let program: Program
 
     @State private var viewModel: ProgramsTabViewModel?
+    @State private var showWorkoutPreview = false
+    @State private var generatorVM: WorkoutGeneratorViewModel?
+    @State private var activeWorkoutVM: ActiveWorkoutViewModel?
+    @State private var navigateToWorkout = false
     @ScaledMetric private var statSize: CGFloat = 36
 
     public init(program: Program) {
@@ -35,6 +39,20 @@ public struct ActiveProgramView: View {
                 let vm = ProgramsTabViewModel(modelContext: modelContext)
                 vm.loadPrograms()
                 viewModel = vm
+            }
+        }
+        .sheet(isPresented: $showWorkoutPreview) {
+            if let vm = generatorVM {
+                WorkoutPreviewSheet(generatorVM: vm) { workoutVM in
+                    activeWorkoutVM = workoutVM
+                    navigateToWorkout = true
+                }
+                .presentationDetents([.large])
+            }
+        }
+        .navigationDestination(isPresented: $navigateToWorkout) {
+            if let vm = activeWorkoutVM {
+                ActiveWorkoutView(viewModel: vm)
             }
         }
     }
@@ -157,6 +175,18 @@ public struct ActiveProgramView: View {
 
             if let today = program.todaysProgramDay {
                 todayCard(day: today)
+
+                Button {
+                    let vm = WorkoutGeneratorViewModel(modelContext: modelContext)
+                    generatorVM = vm
+                    showWorkoutPreview = true
+                } label: {
+                    HStack(spacing: GymBroSpacing.sm) {
+                        Image(systemName: "wand.and.stars")
+                        Text("Start Smart Workout")
+                    }
+                }
+                .buttonStyle(.gymBroPrimary)
             } else {
                 GymBroCard {
                     HStack(spacing: GymBroSpacing.md) {
