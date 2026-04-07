@@ -323,6 +323,23 @@ This foundation unblocks all Phase-1 work:
 **No Schema Changes Needed — Uses Existing Models**
 - Neo completed the three-layer data pipeline: ViewModel → Snapshots → PromptBuilder
 - `CoachChatViewModel.buildContext()` now fetches user profile, recent workouts, active program, personal records
+
+### 2026-04-07: Android Skills Deep Analysis (Morpheus, Issue #134)
+**Cross-Agent Note from Scribe:** Morpheus's analysis recommends 5 specific Android skills to install immediately (P0):
+1. **compose-expert** (aldefy/compose-skill) — Premier Compose skill. 17 files + androidx source backing. Replaces 6 redundant Compose sub-skills.
+2. **android-architecture** (new-silvermoon) — Clean Architecture + Hilt + modularization. Maps to GymBro iOS structure.
+3. **android-data-layer** (new-silvermoon) — Repository + Room + offline-first. Aligns with Tank's offline-first philosophy.
+4. **kotlin-mvi** (Meet-Miyani) — Event/State/Effect pattern. Matches iOS ViewModel approach (similar to Tank's MVVM).
+5. **android-testing** (new-silvermoon) — Unit/Hilt/Screenshot testing. Enables Android TDD parity (mirrors Swift testing work).
+
+**P1 Deferred (Sprint 2):**
+- android-gradle, health-connect (GAP), firebase-android (GAP), workmanager (GAP)
+
+**Key Insight for Tank:** Android's offline-first + MVI pattern directly complements iOS MVVM + SwiftData approach. No architectural conflicts—consistent data layer strategy across platforms (both are local-first with cloud sync).
+
+**Critical Gaps Identified:** Health Connect (recovery data), Firebase (cloud/push), WorkManager (background sync) not in source repos—need separate skills.
+
+**Documentation:** See decisions.md, orchestration-log/2026-04-07T17-06-morpheus.md
 - All fetching done efficiently via SwiftData predicates (not in-memory iteration)
 - Uses existing Workout, ExerciseSet, Program, UserProfile models — no new @Model types
 - PromptBuilder infrastructure confirmed working; ready to receive rich context
@@ -394,4 +411,29 @@ This foundation unblocks all Phase-1 work:
 - `Packages/GymBroCore/Tests/GymBroCoreTests/ExerciseSeedDataTests.swift` — updated test requirements
 
 **PR Status:** Draft PR #92 opened, ready for review
+
+### 2026-XX-XX: Android Skills Installation (Issue #134)
+
+**Task:** Installed 5 P0 Android agent skills for dual-platform expansion, as recommended by Morpheus's analysis.
+
+**Skills Installed:**
+
+| Skill | Source Repo | Path |
+|-------|------------|------|
+| compose-expert | [aldefy/compose-skill](https://github.com/aldefy/compose-skill) | `.squad/skills/android/compose-expert/` |
+| android-architecture | [new-silvermoon/awesome-android-agent-skills](https://github.com/new-silvermoon/awesome-android-agent-skills) | `.squad/skills/android/android-architecture/` |
+| android-data-layer | [new-silvermoon/awesome-android-agent-skills](https://github.com/new-silvermoon/awesome-android-agent-skills) | `.squad/skills/android/android-data-layer/` |
+| kotlin-mvi | [Meet-Miyani/compose-skill](https://github.com/Meet-Miyani/compose-skill) | `.squad/skills/android/kotlin-mvi/` |
+| android-testing | [new-silvermoon/awesome-android-agent-skills](https://github.com/new-silvermoon/awesome-android-agent-skills) | `.squad/skills/android/android-testing/` |
+
+**compose-expert reference files (4):** state-management.md, performance.md, navigation.md, production-crash-playbook.md
+
+**Notes:**
+- All content sourced directly from upstream repos via GitHub API — nothing fabricated
+- Added GymBro-specific notes to architecture, data-layer, testing, and MVI skills (mapping iOS patterns to Android equivalents)
+- aldefy/compose-skill is the premier Compose skill — includes actual androidx source code analysis
+- Meet-Miyani/compose-skill is MVI-focused with Ktor, Paging, Room integration guidance
+- new-silvermoon/awesome-android-agent-skills provides Clean Architecture, Hilt, Room, and testing patterns
+
+**PR Status:** Draft PR #141 opened against master
 
