@@ -159,6 +159,50 @@ public final class ActiveWorkoutViewModel {
             setActiveExercise(exercise)
         }
     }
+
+    /// Undo a completed set — clears completedAt, re-adjusts set counter.
+    public func undoSetCompletion(_ set: ExerciseSet) {
+        set.completedAt = nil
+        set.updatedAt = Date()
+        workout.updatedAt = Date()
+        do {
+            try modelContext.save()
+        } catch {
+            Self.logger.error("Failed to undo set: \(error.localizedDescription)")
+            saveError = "Failed to undo set."
+        }
+        activeSetNumber = (completedSetsForActiveExercise.last?.setNumber ?? 0) + 1
+        HapticFeedbackService.shared.lightImpact()
+    }
+
+    /// Change the type of a completed set (drop, warmup, amrap, etc).
+    public func changeSetType(_ set: ExerciseSet, to newType: SetType) {
+        set.setType = newType
+        set.updatedAt = Date()
+        workout.updatedAt = Date()
+        do {
+            try modelContext.save()
+        } catch {
+            Self.logger.error("Failed to change set type: \(error.localizedDescription)")
+            saveError = "Failed to update set type."
+        }
+        HapticFeedbackService.shared.lightImpact()
+    }
+
+    /// Delete a set from the workout.
+    public func deleteSet(_ set: ExerciseSet) {
+        workout.sets.removeAll { $0.id == set.id }
+        modelContext.delete(set)
+        workout.updatedAt = Date()
+        do {
+            try modelContext.save()
+        } catch {
+            Self.logger.error("Failed to delete set: \(error.localizedDescription)")
+            saveError = "Failed to delete set."
+        }
+        activeSetNumber = (completedSetsForActiveExercise.last?.setNumber ?? 0) + 1
+        HapticFeedbackService.shared.mediumImpact()
+    }
     
     public func finishWorkout() -> WorkoutSummary {
         workout.endTime = Date()

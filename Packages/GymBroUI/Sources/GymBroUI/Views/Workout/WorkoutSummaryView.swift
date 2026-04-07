@@ -4,6 +4,10 @@ import GymBroCore
 public struct WorkoutSummaryView: View {
     let summary: WorkoutSummary
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var showConfetti = false
+    @State private var celebrationScale: CGFloat = 0.5
+    @State private var celebrationOpacity: Double = 0
 
     @ScaledMetric(relativeTo: .largeTitle) private var celebrationIconSize: CGFloat = 80
     @ScaledMetric(relativeTo: .title) private var titleSize: CGFloat = 32
@@ -16,17 +20,20 @@ public struct WorkoutSummaryView: View {
     
     public var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(spacing: 32) {
-                    // Celebration icon
-                    Image(systemName: "checkmark.circle.fill")
-                        .font(.system(size: celebrationIconSize))
-                        .foregroundStyle(.green)
-                        .padding(.top, 40)
-                        .accessibilityHidden(true)
-                    
-                    Text("Workout Complete!")
-                        .font(.system(size: titleSize, weight: .bold))
+            ZStack {
+                ScrollView {
+                    VStack(spacing: 32) {
+                        // Celebration icon with scale animation
+                        Image(systemName: "checkmark.circle.fill")
+                            .font(.system(size: celebrationIconSize))
+                            .foregroundStyle(.green)
+                            .padding(.top, 40)
+                            .accessibilityHidden(true)
+                            .scaleEffect(celebrationScale)
+                            .opacity(celebrationOpacity)
+                        
+                        Text("Workout Complete!")
+                            .font(.system(size: titleSize, weight: .bold))
                     
                     // Stats grid
                     VStack(spacing: 20) {
@@ -80,9 +87,34 @@ public struct WorkoutSummaryView: View {
                     .padding(.top, 20)
                 }
                 .padding(.bottom, 40)
+                }
+
+                // Confetti overlay for PR celebrations
+                if showConfetti && summary.personalRecords > 0 {
+                    ConfettiCelebrationView(particleCount: min(summary.personalRecords * 30, 100))
+                        .allowsHitTesting(false)
+                        .ignoresSafeArea()
+                }
             }
             .navigationTitle("Summary")
             .navigationBarTitleDisplayMode(.inline)
+            .onAppear {
+                if reduceMotion {
+                    celebrationScale = 1
+                    celebrationOpacity = 1
+                    showConfetti = summary.personalRecords > 0
+                } else {
+                    withAnimation(.spring(response: 0.5, dampingFraction: 0.5).delay(0.2)) {
+                        celebrationScale = 1
+                        celebrationOpacity = 1
+                    }
+                    if summary.personalRecords > 0 {
+                        withAnimation(.easeOut.delay(0.5)) {
+                            showConfetti = true
+                        }
+                    }
+                }
+            }
         }
     }
     

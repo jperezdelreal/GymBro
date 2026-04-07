@@ -5,10 +5,12 @@ import GymBroUI
 
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var unfinishedWorkout: Workout?
     @State private var showRecoverySheet = false
     @State private var resumedWorkoutViewModel: ActiveWorkoutViewModel?
     @State private var showResumedWorkout = false
+    @State private var selectedTab = "workout"
 
     let authService: AuthenticationService
     let syncService: CloudKitSyncService
@@ -25,8 +27,8 @@ struct ContentView: View {
 
     @ViewBuilder
     private var mainTabView: some View {
-        TabView {
-            Tab("Workout", systemImage: "figure.strengthtraining.traditional") {
+        TabView(selection: $selectedTab) {
+            Tab("Workout", systemImage: "figure.strengthtraining.traditional", value: "workout") {
                 NavigationStack {
                     WorkoutTab()
                         .navigationDestination(isPresented: $showResumedWorkout) {
@@ -37,24 +39,25 @@ struct ContentView: View {
                 }
             }
 
-            Tab("History", systemImage: "chart.line.uptrend.xyaxis") {
+            Tab("History", systemImage: "chart.line.uptrend.xyaxis", value: "history") {
                 HistoryTab()
             }
 
-            Tab("Programs", systemImage: "calendar") {
+            Tab("Programs", systemImage: "calendar", value: "programs") {
                 ProgramsTab()
             }
 
-            Tab("Coach", systemImage: "brain.head.profile") {
+            Tab("Coach", systemImage: "brain.head.profile", value: "coach") {
                 CoachTab()
             }
 
-            Tab("Profile", systemImage: "person.circle") {
+            Tab("Profile", systemImage: "person.circle", value: "profile") {
                 NavigationStack {
                     ProfileView(authService: authService, syncService: syncService)
                 }
             }
         }
+        .animation(reduceMotion ? nil : .easeInOut(duration: 0.25), value: selectedTab)
         .task {
             checkForUnfinishedWorkout()
         }

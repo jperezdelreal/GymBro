@@ -148,3 +148,21 @@
 - **ActiveWorkoutViewModel integration**: Live Activity starts on `startWorkout()`, updates on `completeSet()`, rest timer pushed to Dynamic Island on `startRestTimer()`, cleared on `skipRestTimer()`, ended on `finishWorkout()`, dismissed on `cancelWorkout()`.
 - **Rest timer in Dynamic Island**: Uses `Text(timerInterval:countsDown:)` for system-native countdown that works even when app is backgrounded.
 - **Tests**: WorkoutActivityAttributes tests (defaults, Codable, Hashable, LiveActivityService singleton), WidgetDataProvider data type tests.
+
+### 2026-04-07: Animations & Gesture-Based Workout Logging (Issues #65 & #66)
+**Animations (#65):**
+- **CheckmarkAnimationView**: Custom `Shape` path with `.trim(from:to:)` draw animation + spring scale bounce on set completion. Reused in ExerciseSetRow.
+- **ConfettiCelebrationView**: Canvas + TimelineView particle system — spawns 60 particles with randomized velocity, rotation, drift, lifetime. Renders colored rectangles and circles. Triggered on WorkoutSummaryView when PRs detected.
+- **Rest timer gradient stroke**: AngularGradient applied to the circular progress arc in RestTimerView for visual depth. easeInOut timing replaces linear.
+- **Tab switching animation**: ContentView TabView selection bound to `@State` with `.animation(.easeInOut)` gated on reduceMotion.
+- **Set list transitions**: `.asymmetric(insertion: .move(edge: .trailing), removal: .move(edge: .leading))` for completed sets.
+- **Rest timer appearance**: `.transition(.move(edge: .bottom).combined(with: .opacity))` on inline rest timer bar.
+- **ALL animations gated on `@Environment(\.accessibilityReduceMotion)`** — confetti falls back to static star icon, all `.animation()` calls pass `nil` when reduceMotion is true.
+
+**Gesture-Based Workout Logging (#66):**
+- **SwipeableSetRow**: Wraps ExerciseSetRow with DragGesture (80pt threshold). Swipe LEFT to complete, RIGHT to undo. Background reveal shows green "Complete" or orange "Undo" during drag. `@GestureState` for auto-reset.
+- **Long-press options**: `.simultaneousGesture(LongPressGesture)` triggers confirmationDialog with set type options (drop, warmup, AMRAP, back-off, delete).
+- **RepeatButton**: Custom view using `onLongPressGesture(minimumDuration: .infinity, pressing:)` to detect hold state. `Task.sleep` loop fires action + haptic at 120ms intervals after 400ms initial delay. Used for weight/rep steppers.
+- **ViewModel additions**: `undoSetCompletion(_:)`, `changeSetType(_:to:)`, `deleteSet(_:)` — all persist via SwiftData with error logging.
+- **Thumb zone**: All primary actions (Complete Set button, rest timer, weight/rep steppers) remain in bottom 40% of screen. Existing button tap preserved as fallback — gestures are pure enhancement.
+- **Accessibility**: All swipeable rows have `.accessibilityAction` equivalents for Complete, Undo, and Options.

@@ -18,16 +18,21 @@ public struct RestTimerView: View {
                     .stroke(Color.gray.opacity(0.2), lineWidth: 12)
                     .frame(width: 200, height: 200)
                 
-                // Progress circle
+                // Progress circle with gradient stroke
                 Circle()
                     .trim(from: 0, to: progress)
                     .stroke(
-                        timerColor,
+                        AngularGradient(
+                            colors: [timerColor.opacity(0.6), timerColor],
+                            center: .center,
+                            startAngle: .degrees(0),
+                            endAngle: .degrees(360 * progress)
+                        ),
                         style: StrokeStyle(lineWidth: 12, lineCap: .round)
                     )
                     .frame(width: 200, height: 200)
                     .rotationEffect(.degrees(-90))
-                    .animation(reduceMotion ? nil : .linear(duration: 1), value: progress)
+                    .animation(reduceMotion ? nil : .easeInOut(duration: 1), value: progress)
                 
                 // Time remaining
                 VStack(spacing: 4) {

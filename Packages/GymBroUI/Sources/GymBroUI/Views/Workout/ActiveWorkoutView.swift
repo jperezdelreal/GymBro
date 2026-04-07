@@ -7,6 +7,7 @@ public struct ActiveWorkoutView: View {
     @State private var showingRPEPicker = false
     @State private var showingSummary = false
     @State private var workoutSummary: WorkoutSummary?
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     @ScaledMetric(relativeTo: .title3) private var statFontSize: CGFloat = 20
     @ScaledMetric(relativeTo: .title) private var exerciseNameSize: CGFloat = 24
@@ -126,7 +127,7 @@ public struct ActiveWorkoutView: View {
                 Spacer()
             }
             
-            // Weight & Reps adjusters
+            // Weight & Reps adjusters — with RepeatButton for haptic hold-to-repeat
             HStack(spacing: 20) {
                 // Weight
                 VStack(alignment: .leading, spacing: 8) {
@@ -135,28 +136,24 @@ public struct ActiveWorkoutView: View {
                         .foregroundStyle(.secondary)
                     
                     HStack(spacing: 12) {
-                        Button {
+                        RepeatButton(
+                            systemImage: "minus.circle.fill",
+                            accessibilityLabel: "Decrease weight"
+                        ) {
                             adjustWeight(-2.5)
-                        } label: {
-                            Image(systemName: "minus.circle.fill")
-                                .font(.system(size: adjustButtonSize))
-                                .foregroundStyle(.blue)
                         }
-                        .accessibilityLabel("Decrease weight") // [VERIFY]
                         
                         Text(formatWeight(viewModel.currentWeight))
                             .font(.system(size: adjustValueSize, weight: .bold, design: .rounded))
                             .frame(minWidth: 100)
                             .multilineTextAlignment(.center)
                         
-                        Button {
+                        RepeatButton(
+                            systemImage: "plus.circle.fill",
+                            accessibilityLabel: "Increase weight"
+                        ) {
                             adjustWeight(2.5)
-                        } label: {
-                            Image(systemName: "plus.circle.fill")
-                                .font(.system(size: adjustButtonSize))
-                                .foregroundStyle(.blue)
                         }
-                        .accessibilityLabel("Increase weight") // [VERIFY]
                     }
                 }
                 .frame(maxWidth: .infinity)
@@ -168,30 +165,24 @@ public struct ActiveWorkoutView: View {
                         .foregroundStyle(.secondary)
                     
                     HStack(spacing: 12) {
-                        Button {
+                        RepeatButton(
+                            systemImage: "minus.circle.fill",
+                            accessibilityLabel: "Decrease reps"
+                        ) {
                             viewModel.updateReps(viewModel.currentReps - 1)
-                            HapticFeedbackService.shared.valueChanged()
-                        } label: {
-                            Image(systemName: "minus.circle.fill")
-                                .font(.system(size: adjustButtonSize))
-                                .foregroundStyle(.blue)
                         }
-                        .accessibilityLabel("Decrease reps") // [VERIFY]
                         
                         Text("\(viewModel.currentReps)")
                             .font(.system(size: adjustValueSize, weight: .bold, design: .rounded))
                             .frame(minWidth: 60)
                             .multilineTextAlignment(.center)
                         
-                        Button {
+                        RepeatButton(
+                            systemImage: "plus.circle.fill",
+                            accessibilityLabel: "Increase reps"
+                        ) {
                             viewModel.updateReps(viewModel.currentReps + 1)
-                            HapticFeedbackService.shared.valueChanged()
-                        } label: {
-                            Image(systemName: "plus.circle.fill")
-                                .font(.system(size: adjustButtonSize))
-                                .foregroundStyle(.blue)
                         }
-                        .accessibilityLabel("Increase reps") // [VERIFY]
                     }
                 }
                 .frame(maxWidth: .infinity)
@@ -254,13 +245,30 @@ public struct ActiveWorkoutView: View {
                 .foregroundStyle(.secondary)
             
             ForEach(Array(viewModel.completedSetsForActiveExercise.enumerated()), id: \.element.id) { index, set in
-                ExerciseSetRow(
+                SwipeableSetRow(
                     set: set,
                     setNumber: set.setNumber,
-                    unitSystem: unitSystem
+                    unitSystem: unitSystem,
+                    onComplete: {
+                        viewModel.completeSet()
+                    },
+                    onUndo: {
+                        viewModel.undoSetCompletion(set)
+                    },
+                    onSetType: { newType in
+                        viewModel.changeSetType(set, to: newType)
+                    },
+                    onDelete: {
+                        viewModel.deleteSet(set)
+                    }
                 )
+                .transition(reduceMotion ? .opacity : .asymmetric(
+                    insertion: .move(edge: .trailing).combined(with: .opacity),
+                    removal: .move(edge: .leading).combined(with: .opacity)
+                ))
             }
         }
+        .animation(reduceMotion ? nil : .spring(response: 0.35, dampingFraction: 0.8), value: viewModel.completedSetsForActiveExercise.count)
     }
     
     private var emptyStateView: some View {
@@ -291,14 +299,15 @@ public struct ActiveWorkoutView: View {
     
     private var bottomActionBar: some View {
         VStack(spacing: 12) {
-            // Rest timer
+            // Rest timer with smooth appearance animation
             if viewModel.isRestTimerActive, let endTime = viewModel.restTimerEndTime {
                 InlineRestTimerView(endTime: endTime) {
                     viewModel.skipRestTimer()
                 }
+                .transition(reduceMotion ? .opacity : .move(edge: .bottom).combined(with: .opacity))
             }
             
-            // Complete set button
+            // Complete set button — primary action in thumb zone
             Button {
                 viewModel.completeSet()
             } label: {
@@ -325,6 +334,7 @@ public struct ActiveWorkoutView: View {
             Color(.systemBackground)
                 .ignoresSafeArea(edges: .bottom)
         )
+        .animation(reduceMotion ? nil : .spring(response: 0.3, dampingFraction: 0.8), value: viewModel.isRestTimerActive)
     }
     
     private func adjustWeight(_ delta: Double) {
