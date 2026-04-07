@@ -17,6 +17,9 @@ public public final class Workout {
     @Relationship(deleteRule: .cascade, inverse: \ExerciseSet.workout)
     public var sets: [ExerciseSet]
     
+    @Relationship(deleteRule: .cascade, inverse: \SupersetGroup.workout)
+    public var supersetGroups: [SupersetGroup]
+    
     @Relationship(deleteRule: .nullify)
     public var program: Program?
     
@@ -38,6 +41,7 @@ public public final class Workout {
         self.isActive = false
         self.isCancelled = false
         self.sets = []
+        self.supersetGroups = []
         self.program = program
         self.programDay = programDay
     }

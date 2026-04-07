@@ -102,6 +102,7 @@ public struct SwipeableSetRow: View {
             Button("Warmup Set") { onSetType(.warmup) }
             Button("AMRAP Set") { onSetType(.amrap) }
             Button("Back-off Set") { onSetType(.backoff) }
+            Button("Rest-Pause Set") { onSetType(.restPause) }
             Button("Delete Set", role: .destructive) { onDelete() }
         }
         .accessibilityAction(named: "Complete Set") { onComplete() }
