@@ -20,6 +20,9 @@ public final class Exercise {
     public var sets: [ExerciseSet]
     
     public var isCustom: Bool
+    public var source: ExerciseSource
+    public var wgerId: Int?
+    public var lastSyncedAt: Date?
     
     public init(
         id: UUID = UUID(),
@@ -29,7 +32,9 @@ public final class Exercise {
         instructions: String = "",
         muscleGroups: [MuscleGroup] = [],
         isCustom: Bool = false,
-        defaultRestSeconds: Int? = nil
+        defaultRestSeconds: Int? = nil,
+        source: ExerciseSource = .seed,
+        wgerId: Int? = nil
     ) {
         self.id = id
         self.createdAt = Date()
@@ -42,6 +47,9 @@ public final class Exercise {
         self.sets = []
         self.isCustom = isCustom
         self.defaultRestSeconds = defaultRestSeconds
+        self.source = source
+        self.wgerId = wgerId
+        self.lastSyncedAt = nil
     }
     
     public var restTime: Int {
@@ -58,6 +66,12 @@ public final class Exercise {
             return 60  // 60 seconds
         }
     }
+}
+
+public enum ExerciseSource: String, Codable {
+    case seed
+    case wger
+    case custom
 }
 
 public enum ExerciseCategory: String, Codable {
