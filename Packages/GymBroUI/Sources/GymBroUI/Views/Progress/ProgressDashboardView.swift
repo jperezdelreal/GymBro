@@ -17,13 +17,19 @@ public struct ProgressDashboardView: View {
 
                     if viewModel.isLoading {
                         ProgressView("Calculating...")
+                    } else if viewModel.availableExercises.isEmpty && viewModel.volumeData.isEmpty {
+                        ContentUnavailableView {
+                            Label("No Progress Data", systemImage: "chart.bar")
+                        } description: {
+                            Text("Complete a few workouts to see your progress trends here.")
+                        }
                     } else {
-                        plateauAlerts
+                        PlateauAlertsSection(analyses: viewModel.plateauAnalyses)
                         E1RMChartView(data: viewModel.e1rmData)
                         VolumeChartView(data: viewModel.volumeData)
                         TonnageChartView(data: viewModel.tonnageData)
                         MuscleBalanceChart(data: viewModel.muscleBalance)
-                        prTimeline
+                        PRTimelineSection(events: viewModel.prEvents)
                     }
                 }
                 .padding()
@@ -57,11 +63,15 @@ public struct ProgressDashboardView: View {
             }
         }
     }
+}
 
-    // MARK: - Plateau Alerts
+// MARK: - Extracted Subviews
 
-    private var plateauAlerts: some View {
-        ForEach(viewModel.plateauAnalyses) { analysis in
+private struct PlateauAlertsSection: View {
+    let analyses: [PlateauAnalysis]
+
+    var body: some View {
+        ForEach(analyses) { analysis in
             if analysis.isPlateaued {
                 VStack(alignment: .leading, spacing: 8) {
                     Label("Plateau Detected", systemImage: "exclamationmark.triangle.fill")
@@ -82,42 +92,42 @@ public struct ProgressDashboardView: View {
             }
         }
     }
+}
 
-    // MARK: - PR Timeline
+private struct PRTimelineSection: View {
+    let events: [PREvent]
 
-    private var prTimeline: some View {
-        Group {
-            if !viewModel.prEvents.isEmpty {
-                VStack(alignment: .leading, spacing: 12) {
-                    Text("Personal Records")
-                        .font(.headline)
+    var body: some View {
+        if !events.isEmpty {
+            VStack(alignment: .leading, spacing: 12) {
+                Text("Personal Records")
+                    .font(.headline)
 
-                    ForEach(viewModel.prEvents.suffix(10)) { pr in
-                        HStack {
-                            Image(systemName: "trophy.fill")
-                                .foregroundStyle(.yellow)
-                            VStack(alignment: .leading) {
-                                Text("\(pr.recordType): \(pr.value, specifier: "%.1f") kg")
-                                    .font(.subheadline.bold())
-                                Text(pr.date, style: .date)
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                            }
-                            Spacer()
-                            HStack(spacing: 2) {
-                                Image(systemName: "arrow.up.right")
-                                Text("+\(pr.value - pr.previousBest, specifier: "%.1f")")
-                            }
-                            .font(.caption.bold())
-                            .foregroundStyle(.green)
+                ForEach(events.suffix(10)) { pr in
+                    HStack {
+                        Image(systemName: "trophy.fill")
+                            .foregroundStyle(.yellow)
+                        VStack(alignment: .leading) {
+                            Text("\(pr.recordType): \(pr.value, specifier: "%.1f") kg")
+                                .font(.subheadline.bold())
+                            Text(pr.date, style: .date)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
                         }
+                        Spacer()
+                        HStack(spacing: 2) {
+                            Image(systemName: "arrow.up.right")
+                            Text("+\(pr.value - pr.previousBest, specifier: "%.1f")")
+                        }
+                        .font(.caption.bold())
+                        .foregroundStyle(.green)
                     }
                 }
-                .padding()
-                .background(Color(.systemBackground))
-                .clipShape(RoundedRectangle(cornerRadius: 12))
-                .shadow(radius: 1)
             }
+            .padding()
+            .background(Color(.systemBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .shadow(radius: 1)
         }
     }
 }

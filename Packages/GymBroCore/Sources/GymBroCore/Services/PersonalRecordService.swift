@@ -60,12 +60,13 @@ public class PersonalRecordService {
     public func isPR(set: ExerciseSet, for recordType: PersonalRecord.RecordType) throws -> Bool {
         guard let exercise = set.exercise, set.setType == .working else { return false }
         
+        let setDate = set.completedAt ?? Date()
         let descriptor = FetchDescriptor<ExerciseSet>(
             predicate: #Predicate { s in
-                s.exercise?.id == exercise.id && 
+                s.exercise?.id == exercise.id &&
                 s.setType == .working &&
                 s.completedAt != nil &&
-                s.completedAt! < (set.completedAt ?? Date())
+                (s.completedAt ?? Date.distantFuture) < setDate
             }
         )
         

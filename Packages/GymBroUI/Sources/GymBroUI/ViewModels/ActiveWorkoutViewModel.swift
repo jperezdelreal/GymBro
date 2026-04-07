@@ -2,10 +2,13 @@ import Foundation
 import SwiftData
 import Observation
 import GymBroCore
+import os
 
 @MainActor
 @Observable
 public final class ActiveWorkoutViewModel {
+    private static let logger = Logger(subsystem: "com.gymbro", category: "ActiveWorkout")
+
     private let modelContext: ModelContext
     private let smartDefaultsService: SmartDefaultsService
     
@@ -18,6 +21,7 @@ public final class ActiveWorkoutViewModel {
     public private(set) var isWarmup: Bool = false
     public private(set) var restTimerEndTime: Date?
     public private(set) var isRestTimerActive: Bool = false
+    public var saveError: String?
     
     private var restTimerSeconds: Int = 120
     
@@ -65,7 +69,12 @@ public final class ActiveWorkoutViewModel {
         guard workout.startTime == nil else { return }
         workout.startTime = Date()
         workout.updatedAt = Date()
-        try? modelContext.save()
+        do {
+            try modelContext.save()
+        } catch {
+            Self.logger.error("Failed to save workout start: \(error.localizedDescription)")
+            saveError = "Failed to save workout. Please try again."
+        }
     }
     
     public func setActiveExercise(_ exercise: Exercise) {
@@ -75,15 +84,16 @@ public final class ActiveWorkoutViewModel {
     }
     
     public func updateWeight(_ weight: Double) {
-        currentWeight = weight
+        currentWeight = max(0, min(weight, 999))
     }
     
     public func updateReps(_ reps: Int) {
-        currentReps = max(0, reps)
+        currentReps = max(0, min(reps, 999))
     }
     
     public func updateRPE(_ rpe: Double?) {
-        currentRPE = rpe
+        guard let rpe else { currentRPE = nil; return }
+        currentRPE = max(1, min(rpe, 10))
     }
     
     public func toggleWarmup() {
@@ -113,7 +123,12 @@ public final class ActiveWorkoutViewModel {
         workout.sets.append(set)
         workout.updatedAt = Date()
         
-        try? modelContext.save()
+        do {
+            try modelContext.save()
+        } catch {
+            Self.logger.error("Failed to save completed set: \(error.localizedDescription)")
+            saveError = "Failed to save set. Your data may not be persisted."
+        }
         
         HapticFeedbackService.shared.setCompleted()
         
@@ -141,7 +156,12 @@ public final class ActiveWorkoutViewModel {
     public func finishWorkout() -> WorkoutSummary {
         workout.endTime = Date()
         workout.updatedAt = Date()
-        try? modelContext.save()
+        do {
+            try modelContext.save()
+        } catch {
+            Self.logger.error("Failed to save finished workout: \(error.localizedDescription)")
+            saveError = "Failed to save workout. Your data may not be persisted."
+        }
         
         let summary = WorkoutSummary(
             duration: workout.duration ?? 0,
@@ -182,7 +202,11 @@ public final class ActiveWorkoutViewModel {
             }
         )
         
-        guard let historicalSets = try? modelContext.fetch(descriptor) else {
+        let historicalSets: [ExerciseSet]
+        do {
+            historicalSets = try modelContext.fetch(descriptor)
+        } catch {
+            Self.logger.error("Failed to fetch historical sets for PR check: \(error.localizedDescription)")
             return true
         }
         

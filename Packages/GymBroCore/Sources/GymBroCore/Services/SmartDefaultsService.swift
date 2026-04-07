@@ -34,7 +34,8 @@ public final class SmartDefaultsService {
         }
         
         let avgWeight = lastWorkout.map(\.weightKg).reduce(0, +) / Double(lastWorkout.count)
-        let avgReps = lastWorkout.map(\.reps).reduce(0, +) / lastWorkout.count
+        let totalReps = lastWorkout.map(\.reps).reduce(0, +)
+        let avgReps = Int((Double(totalReps) / Double(lastWorkout.count)).rounded())
         
         let progressionWeight = applyProgression(weight: avgWeight, for: exercise)
         

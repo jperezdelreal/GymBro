@@ -2,26 +2,26 @@ import Foundation
 import SwiftData
 
 @Model
-final class Exercise {
-    var id: UUID
-    var createdAt: Date
-    var updatedAt: Date
+public final class Exercise {
+    public var id: UUID
+    public var createdAt: Date
+    public var updatedAt: Date
     
-    var name: String
-    var category: ExerciseCategory
-    var equipment: Equipment
-    var instructions: String
-    var defaultRestSeconds: Int?
+    public var name: String
+    public var category: ExerciseCategory
+    public var equipment: Equipment
+    public var instructions: String
+    public var defaultRestSeconds: Int?
     
     @Relationship(deleteRule: .nullify)
-    var muscleGroups: [MuscleGroup]
+    public var muscleGroups: [MuscleGroup]
     
     @Relationship(deleteRule: .nullify, inverse: \ExerciseSet.exercise)
-    var sets: [ExerciseSet]
+    public var sets: [ExerciseSet]
     
-    var isCustom: Bool
+    public var isCustom: Bool
     
-    init(
+    public init(
         id: UUID = UUID(),
         name: String,
         category: ExerciseCategory,
@@ -44,7 +44,7 @@ final class Exercise {
         self.defaultRestSeconds = defaultRestSeconds
     }
     
-    var restTime: Int {
+    public var restTime: Int {
         if let defaultRestSeconds = defaultRestSeconds {
             return defaultRestSeconds
         }
@@ -60,13 +60,13 @@ final class Exercise {
     }
 }
 
-enum ExerciseCategory: String, Codable {
+public enum ExerciseCategory: String, Codable {
     case compound
     case isolation
     case accessory
 }
 
-enum Equipment: String, Codable {
+public enum Equipment: String, Codable {
     case barbell
     case dumbbell
     case kettlebell
@@ -78,12 +78,12 @@ enum Equipment: String, Codable {
 }
 
 @Model
-final class MuscleGroup {
-    var id: UUID
-    var name: String
-    var isPrimary: Bool
+public final class MuscleGroup {
+    public var id: UUID
+    public var name: String
+    public var isPrimary: Bool
     
-    init(id: UUID = UUID(), name: String, isPrimary: Bool = true) {
+    public init(id: UUID = UUID(), name: String, isPrimary: Bool = true) {
         self.id = id
         self.name = name
         self.isPrimary = isPrimary
