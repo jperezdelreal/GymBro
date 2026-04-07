@@ -39,3 +39,27 @@
 2. Root cause analysis
 3. What should change?
 4. Action items for next iteration
+
+---
+
+## Board Clear Retro
+
+| Field | Value |
+|-------|-------|
+| **Trigger** | auto |
+| **When** | after |
+| **Condition** | Ralph reports "board is clear" (all squad issues/PRs resolved for current wave) |
+| **Facilitator** | lead |
+| **Participants** | all-team |
+| **Time budget** | focused |
+| **Enabled** | ✅ yes |
+
+**Agenda:**
+1. Review what was completed in this wave — summarize closed issues and merged PRs
+2. Identify bugs, gaps, quality issues, or missing coverage from the completed work
+3. Identify technical debt or follow-up improvements
+4. Create GitHub issues for the next wave (bugs found, gaps identified, next features from the roadmap)
+5. Label new issues with `squad` for Ralph to pick up automatically
+
+**Design Intent:**
+This ceremony fires when Ralph's work-check loop finds the board empty, BEFORE Ralph enters idle. The retro output (new issues) feeds directly back into Ralph's loop — Ralph picks up the new issues and keeps going. This creates a continuous improvement cycle: work → clear board → retro → new issues → more work.

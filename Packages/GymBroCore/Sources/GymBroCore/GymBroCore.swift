@@ -20,3 +20,9 @@ public typealias ExerciseCategory = ExerciseCategory
 public typealias Equipment = Equipment
 public typealias SetType = SetType
 public typealias PeriodizationType = PeriodizationType
+
+// Services
+public typealias RestTimerService = RestTimerService
+public typealias NotificationService = NotificationService
+public typealias NextSetInfo = NextSetInfo
+

@@ -1,0 +1,204 @@
+import Foundation
+import SwiftData
+import Observation
+import GymBroCore
+
+@Observable
+public final class ActiveWorkoutViewModel {
+    private let modelContext: ModelContext
+    private let smartDefaultsService: SmartDefaultsService
+    
+    public private(set) var workout: Workout
+    public private(set) var activeExercise: Exercise?
+    public private(set) var activeSetNumber: Int = 1
+    public private(set) var currentWeight: Double = 0
+    public private(set) var currentReps: Int = 0
+    public private(set) var currentRPE: Double?
+    public private(set) var isWarmup: Bool = false
+    public private(set) var restTimerEndTime: Date?
+    public private(set) var isRestTimerActive: Bool = false
+    
+    private var restTimerSeconds: Int = 120
+    
+    public var completedSetsForActiveExercise: [ExerciseSet] {
+        workout.sets
+            .filter { $0.exercise?.id == activeExercise?.id && $0.completedAt != nil }
+            .sorted { $0.setNumber < $1.setNumber }
+    }
+    
+    public var isWorkoutStarted: Bool {
+        workout.startTime != nil
+    }
+    
+    public var workoutDuration: TimeInterval {
+        guard let startTime = workout.startTime else { return 0 }
+        return Date().timeIntervalSince(startTime)
+    }
+    
+    public var totalVolume: Double {
+        workout.totalVolume
+    }
+    
+    public var totalCompletedSets: Int {
+        workout.sets.filter { $0.completedAt != nil && !$0.isWarmup }.count
+    }
+    
+    public init(
+        modelContext: ModelContext,
+        workout: Workout,
+        exercises: [Exercise] = []
+    ) {
+        self.modelContext = modelContext
+        self.workout = workout
+        self.smartDefaultsService = SmartDefaultsService(modelContext: modelContext)
+        
+        if !exercises.isEmpty {
+            self.activeExercise = exercises.first
+            if let exercise = exercises.first {
+                loadSmartDefaults(for: exercise)
+            }
+        }
+    }
+    
+    public func startWorkout() {
+        guard workout.startTime == nil else { return }
+        workout.startTime = Date()
+        workout.updatedAt = Date()
+        try? modelContext.save()
+    }
+    
+    public func setActiveExercise(_ exercise: Exercise) {
+        activeExercise = exercise
+        activeSetNumber = (completedSetsForActiveExercise.last?.setNumber ?? 0) + 1
+        loadSmartDefaults(for: exercise)
+    }
+    
+    public func updateWeight(_ weight: Double) {
+        currentWeight = weight
+    }
+    
+    public func updateReps(_ reps: Int) {
+        currentReps = max(0, reps)
+    }
+    
+    public func updateRPE(_ rpe: Double?) {
+        currentRPE = rpe
+    }
+    
+    public func toggleWarmup() {
+        isWarmup.toggle()
+    }
+    
+    public func completeSet() {
+        guard let exercise = activeExercise else { return }
+        
+        if !isWorkoutStarted {
+            startWorkout()
+        }
+        
+        let set = ExerciseSet(
+            exercise: exercise,
+            workout: workout,
+            weightKg: currentWeight,
+            reps: currentReps,
+            rpe: currentRPE,
+            restSeconds: restTimerSeconds,
+            setType: isWarmup ? .warmup : .working,
+            setNumber: activeSetNumber
+        )
+        set.completedAt = Date()
+        
+        modelContext.insert(set)
+        workout.sets.append(set)
+        workout.updatedAt = Date()
+        
+        try? modelContext.save()
+        
+        HapticFeedbackService.shared.setCompleted()
+        
+        if isPR(set: set) {
+            HapticFeedbackService.shared.personalRecordAchieved()
+        }
+        
+        activeSetNumber += 1
+        
+        if !isWarmup {
+            startRestTimer()
+        }
+        
+        if isWarmup {
+            isWarmup = false
+        }
+    }
+    
+    public func addExercise(_ exercise: Exercise) {
+        if activeExercise == nil {
+            setActiveExercise(exercise)
+        }
+    }
+    
+    public func finishWorkout() -> WorkoutSummary {
+        workout.endTime = Date()
+        workout.updatedAt = Date()
+        try? modelContext.save()
+        
+        let summary = WorkoutSummary(
+            duration: workout.duration ?? 0,
+            totalVolume: workout.totalVolume,
+            totalSets: workout.totalSets,
+            personalRecords: countPersonalRecords()
+        )
+        
+        return summary
+    }
+    
+    private func loadSmartDefaults(for exercise: Exercise) {
+        let defaults = smartDefaultsService.getSmartDefaults(for: exercise)
+        currentWeight = defaults.weight
+        currentReps = defaults.reps
+        currentRPE = nil
+        isWarmup = false
+    }
+    
+    private func startRestTimer() {
+        restTimerEndTime = Date().addingTimeInterval(TimeInterval(restTimerSeconds))
+        isRestTimerActive = true
+    }
+    
+    public func skipRestTimer() {
+        restTimerEndTime = nil
+        isRestTimerActive = false
+    }
+    
+    private func isPR(set: ExerciseSet) -> Bool {
+        guard let exercise = activeExercise else { return false }
+        
+        let descriptor = FetchDescriptor<ExerciseSet>(
+            predicate: #Predicate<ExerciseSet> { historicSet in
+                historicSet.exercise?.id == exercise.id && 
+                historicSet.completedAt != nil &&
+                historicSet.setType == .working
+            }
+        )
+        
+        guard let historicalSets = try? modelContext.fetch(descriptor) else {
+            return true
+        }
+        
+        let maxE1RM = historicalSets.map(\.estimatedOneRepMax).max() ?? 0
+        return set.estimatedOneRepMax > maxE1RM
+    }
+    
+    private func countPersonalRecords() -> Int {
+        workout.sets.filter { set in
+            isPR(set: set)
+        }.count
+    }
+}
+
+public struct WorkoutSummary {
+    public let duration: TimeInterval
+    public let totalVolume: Double
+    public let totalSets: Int
+    public let personalRecords: Int
+}

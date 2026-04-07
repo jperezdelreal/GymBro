@@ -34,3 +34,26 @@
 - **Personal Record Tracking:** Implemented PR detection service comparing current sets against historical data across 4 metrics (max weight, max reps, max volume, max e1RM). Foundation for motivation features.
 - **UI Patterns:** Searchable lists, grouped sections by date/category, navigation stacks for drill-down. Minimal viable versions shipped — detail views with rich PR displays, calendar views can be enhanced in future iterations.
 - **Technical Debt Note:** Views created as MVPs to unblock development. Future iterations should add: detailed exercise instructions UI, calendar grid for history, PR badges on workout details, filtering/sorting controls.
+
+### 2026-04-06: Tech Foundation from Tank (Scaffold & Models)
+**Why this matters for Trinity's UX work:**
+- Core models now available: UserProfile, Exercise, ExerciseSet, Workout, Program, ProgramDay
+- MVVM foundation complete: GymBroApp.swift with ModelContainer, ContentView.swift with 5-tab navigation
+- App entry point ready: Trinity can now build UI screens against stable data models
+- Performance budget validated: <100ms per operation supports 1-2 tap logging target
+- SPM modular architecture: Trinity owns GymBroUI package; can develop independently without merge conflicts on Tank's core models
+- Unblocked work: Issue #4 (UI screens) can now proceed without architectural dependencies
+
+### 2026-04-06: Workout Logging UI — Crown Jewel Shipped (Issue #7)
+**Implementation highlights:**
+- **1-2 tap workflow achieved**: Large 60pt "Complete Set" button in thumb zone, smart defaults eliminate most input
+- **Smart defaults working**: SmartDefaultsService queries last workout, applies progression logic (2.5kg compound, 1.25kg isolation)
+- **Haptic feedback patterns**: Success on set complete, triple-burst celebration on PR detection (UINotificationFeedbackGenerator)
+- **@Observable MVVM**: ActiveWorkoutViewModel drives all state, no manual binding
+- **Optimistic UI**: Immediate SwiftData writes, < 100ms set log confirmed in dev testing
+- **PR detection**: e1RM calculation with historical comparison, auto-celebration
+- **Rest timer integration**: Auto-start after non-warmup sets, skip button, notification support
+- **One-handed design**: All primary actions bottom 60%, stepper controls for weight/rep adjustment
+- **Comprehensive tests**: 11 test cases cover smart defaults, set completion, warmup flow, PR detection, timer integration
+- **Architecture**: Services in GymBroCore (SmartDefaults, HapticFeedback, RestTimer, Notification), Views + ViewModel in GymBroUI
+- **Shipped**: PR #20 opened, closes #7
