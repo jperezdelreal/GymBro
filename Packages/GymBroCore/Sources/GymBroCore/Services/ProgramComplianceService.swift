@@ -26,7 +26,7 @@ public struct ProgramComplianceService {
         programWeek: ProgramWeek
     ) -> ComplianceResult {
         let plannedExercises = programWeek.plannedExercises.sorted { $0.order < $1.order }
-        let actualSets = workout.exerciseSets
+        let actualSets = workout.sets
         
         // Group actual sets by exercise
         let actualExerciseNames = Set(actualSets.compactMap { $0.exercise?.name })

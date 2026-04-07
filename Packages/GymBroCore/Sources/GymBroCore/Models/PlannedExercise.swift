@@ -2,25 +2,25 @@ import Foundation
 import SwiftData
 
 @Model
-final class PlannedExercise {
-    var id: UUID
-    var order: Int
+public final class PlannedExercise {
+    public var id: UUID
+    public var order: Int
     
     @Relationship(deleteRule: .nullify)
-    var exercise: Exercise?
+    public var exercise: Exercise?
     
     @Relationship(deleteRule: .nullify)
-    var programDay: ProgramDay?
+    public var programDay: ProgramDay?
     
     @Relationship(deleteRule: .nullify)
-    var programWeek: ProgramWeek?
+    public var programWeek: ProgramWeek?
     
-    var targetSets: Int
-    var targetReps: String
-    var targetRPE: Double?
-    var notes: String
+    public var targetSets: Int
+    public var targetReps: String
+    public var targetRPE: Double?
+    public var notes: String
     
-    init(
+    public init(
         id: UUID = UUID(),
         order: Int,
         exercise: Exercise? = nil,
