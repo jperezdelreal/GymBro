@@ -131,3 +131,20 @@
 - **Complications**: WidgetKit-based with circular and rectangular families. 30s refresh during active workout.
 - **Architecture**: GymBroCore Package.swift updated to support `.watchOS(.v10)`. Watch source files in `GymBroWatch/` — requires manual Xcode target setup.
 - **Pattern: Offline-resilient messaging** — Set completions use `transferUserInfo` when phone is unreachable.
+
+### 2026-04-07: Widgets + Dynamic Island Implementation (Issues #15 & #16)
+**Widget System (Issue #15):**
+- **GymBroWidgets extension** with 6 widgets registered in `GymBroWidgetBundle`: WorkoutStreakWidget (small + Lock Screen circular/rectangular/inline), NextWorkoutWidget (medium + Lock Screen rectangular), WeeklySummaryWidget (large), ReadinessWidget (Lock Screen circular gauge), LockScreenInlineWidget, StandByWorkoutWidget.
+- **AppIntentTimelineProvider** pattern for all widgets (iOS 17+ configurable widgets). 30-minute refresh interval via `.after()` timeline policy.
+- **WidgetDataProvider** in GymBroCore/Services: queries SwiftData for streak calculation, weekly volume, recent PRs, next scheduled workout. Shared between widget extension and main app.
+- **Deep links**: All widgets use `widgetURL` with `gymbro://` scheme for navigation back into the app.
+- **Placeholder/snapshot views**: Every widget has proper placeholder data for the widget gallery.
+
+**Live Activity + Dynamic Island (Issue #16):**
+- **WorkoutActivityAttributes** in GymBroCore/Models: ActivityAttributes with ContentState containing exercise name, set number, rest timer end date, completed sets, total volume, elapsed time, last weight/reps.
+- **WorkoutLiveActivity** widget: Lock Screen banner + Dynamic Island (compact: timer + set count, expanded: exercise/weight/reps/timer/stats, minimal: timer icon).
+- **LockScreenLiveActivityView**: Shows current exercise, set progress, rest timer countdown (orange highlight), workout stats bar.
+- **LiveActivityService** singleton in GymBroCore/Services: manages full lifecycle — `startWorkoutActivity()`, `updateWorkoutActivity()`, `updateRestTimer()`, `clearRestTimer()`, `endWorkoutActivity()`, `dismissWorkoutActivity()`.
+- **ActiveWorkoutViewModel integration**: Live Activity starts on `startWorkout()`, updates on `completeSet()`, rest timer pushed to Dynamic Island on `startRestTimer()`, cleared on `skipRestTimer()`, ended on `finishWorkout()`, dismissed on `cancelWorkout()`.
+- **Rest timer in Dynamic Island**: Uses `Text(timerInterval:countsDown:)` for system-native countdown that works even when app is backgrounded.
+- **Tests**: WorkoutActivityAttributes tests (defaults, Codable, Hashable, LiveActivityService singleton), WidgetDataProvider data type tests.
