@@ -52,4 +52,27 @@ interface WorkoutDao {
 
     @Query("SELECT MAX(weight) FROM workout_sets WHERE exerciseId = :exerciseId AND reps >= :reps")
     suspend fun getBestWeight(exerciseId: String, reps: Int): Double?
+
+    @Query(
+        """
+        SELECT ws.* FROM workout_sets ws
+        INNER JOIN workouts w ON ws.workoutId = w.id
+        WHERE ws.exerciseId = :exerciseId AND w.completed = 1 AND ws.isWarmup = 0
+        ORDER BY ws.completedAt ASC
+        """
+    )
+    suspend fun getSetsByExercise(exerciseId: String): List<WorkoutSetEntity>
+
+    @Query(
+        """
+        SELECT DISTINCT ws.exerciseId FROM workout_sets ws
+        INNER JOIN workouts w ON ws.workoutId = w.id
+        WHERE w.completed = 1 AND ws.isWarmup = 0
+        """
+    )
+    suspend fun getExerciseIdsWithHistory(): List<String>
+
+    @Transaction
+    @Query("SELECT * FROM workouts WHERE completed = 1 ORDER BY startedAt DESC")
+    suspend fun getAllCompletedWorkouts(): List<WorkoutWithSets>
 }
