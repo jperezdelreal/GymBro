@@ -325,4 +325,118 @@ final class WgerAPIServiceTests: XCTestCase {
 
         _ = try await service.fetchExercises(page: 5)
     }
+
+    // MARK: - Exercise Image Tests
+
+    private func makeExerciseImageJSON(
+        count: Int = 1,
+        next: String? = nil,
+        results: [[String: Any]]? = nil
+    ) -> Data {
+        let defaultResults: [[String: Any]] = [
+            [
+                "id": 100,
+                "exercise_base": 1,
+                "image": "https://wger.de/media/exercise-images/1/bench-press.jpg",
+                "is_main": true
+            ]
+        ]
+        let json: [String: Any] = [
+            "count": count,
+            "next": next as Any,
+            "results": results ?? defaultResults
+        ]
+        return try! JSONSerialization.data(withJSONObject: json)
+    }
+
+    func testFetchExerciseImagesDecodesCorrectly() async throws {
+        let session = makeSession()
+        let service = WgerAPIService(session: session)
+
+        MockURLProtocol.requestHandler = { request in
+            let url = request.url!
+            XCTAssertTrue(url.absoluteString.contains("exerciseimage"))
+            return (self.makeHTTPResponse(url: url), self.makeExerciseImageJSON())
+        }
+
+        let (images, nextPage) = try await service.fetchExerciseImages()
+        XCTAssertEqual(images.count, 1)
+        XCTAssertEqual(images.first?.id, 100)
+        XCTAssertEqual(images.first?.exerciseBaseId, 1)
+        XCTAssertEqual(images.first?.imageURL, "https://wger.de/media/exercise-images/1/bench-press.jpg")
+        XCTAssertTrue(images.first?.isMain ?? false)
+        XCTAssertNil(nextPage)
+    }
+
+    func testFetchExerciseImagesHandlesPagination() async throws {
+        let session = makeSession()
+        let service = WgerAPIService(session: session)
+
+        MockURLProtocol.requestHandler = { request in
+            let url = request.url!
+            let json = self.makeExerciseImageJSON(
+                count: 100,
+                next: "https://wger.de/api/v2/exerciseimage/?page=2"
+            )
+            return (self.makeHTTPResponse(url: url), json)
+        }
+
+        let (_, nextPage) = try await service.fetchExerciseImages()
+        XCTAssertEqual(nextPage, 2)
+    }
+
+    func testFetchExerciseImagesThrowsRateLimited() async throws {
+        let session = makeSession()
+        let service = WgerAPIService(session: session)
+
+        MockURLProtocol.requestHandler = { request in
+            let url = request.url!
+            return (self.makeHTTPResponse(url: url, statusCode: 429), Data())
+        }
+
+        do {
+            _ = try await service.fetchExerciseImages()
+            XCTFail("Expected rateLimited error")
+        } catch let error as WgerAPIService.APIError {
+            if case .rateLimited = error {
+                // Expected
+            } else {
+                XCTFail("Expected rateLimited, got \(error)")
+            }
+        }
+    }
+
+    func testFetchExerciseImagesEmptyResults() async throws {
+        let session = makeSession()
+        let service = WgerAPIService(session: session)
+
+        MockURLProtocol.requestHandler = { request in
+            let url = request.url!
+            let json = self.makeExerciseImageJSON(count: 0, results: [])
+            return (self.makeHTTPResponse(url: url), json)
+        }
+
+        let (images, nextPage) = try await service.fetchExerciseImages()
+        XCTAssertTrue(images.isEmpty)
+        XCTAssertNil(nextPage)
+    }
+
+    func testMuscleImageURLGeneration() {
+        let url = WgerAPIService.muscleImageURL(for: 3)
+        XCTAssertEqual(url, "https://wger.de/static/images/muscles/main/muscle-3.svg")
+    }
+
+    func testWgerExerciseImageDataProperties() {
+        let data = WgerExerciseImageData(
+            id: 42,
+            exerciseBaseId: 7,
+            imageURL: "https://wger.de/media/exercise-images/7/squat.jpg",
+            isMain: true
+        )
+
+        XCTAssertEqual(data.id, 42)
+        XCTAssertEqual(data.exerciseBaseId, 7)
+        XCTAssertEqual(data.imageURL, "https://wger.de/media/exercise-images/7/squat.jpg")
+        XCTAssertTrue(data.isMain)
+    }
 }
