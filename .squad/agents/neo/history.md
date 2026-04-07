@@ -105,7 +105,8 @@
 - Readiness score can now trigger week-level adjustments (skip deload week, extend accumulation)
 - Progression algorithm can reference current week intensity tier for decision-making
 - Foundation for future ML-based periodization optimization
-### 2026-04-06: Muscle Recovery & Anomaly Detection (Issue #86, PR TBD)
+
+### 2026-04-07: Muscle Recovery & Anomaly Detection (Issue #86, PR #96)
 **What was built:**
 - **MuscleRecoveryService**: Per-muscle-group recovery tracking with evidence-based recovery times
   - Tracks volume (sets × reps × weight) per muscle group from workout history
