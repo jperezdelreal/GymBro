@@ -8,27 +8,25 @@ public struct StartWorkoutView: View {
 
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
-    
+
     @State private var selectedProgram: Program?
     @State private var selectedProgramDay: ProgramDay?
     @State private var showingActiveWorkout = false
     @State private var activeWorkoutViewModel: ActiveWorkoutViewModel?
-    
+
     public init() {}
-    
+
     public var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(spacing: 24) {
-                    // Quick Start
+                VStack(spacing: GymBroSpacing.lg) {
                     quickStartSection
-                    
-                    // From Program
                     programSection
                 }
-                .padding(.horizontal, 16)
-                .padding(.top, 20)
+                .padding(.horizontal, GymBroSpacing.md)
+                .padding(.top, GymBroSpacing.md + GymBroSpacing.xs)
             }
+            .gymBroDarkBackground()
             .navigationTitle("Start Workout")
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
@@ -36,6 +34,7 @@ public struct StartWorkoutView: View {
                     Button("Cancel") {
                         dismiss()
                     }
+                    .foregroundStyle(GymBroColors.textSecondary)
                 }
             }
             .navigationDestination(isPresented: $showingActiveWorkout) {
@@ -45,59 +44,65 @@ public struct StartWorkoutView: View {
             }
         }
     }
-    
+
     private var quickStartSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("Quick Start")
-                .font(.title2)
-                .fontWeight(.bold)
-            
+        VStack(alignment: .leading, spacing: GymBroSpacing.md) {
+            Text("QUICK START")
+                .font(GymBroTypography.caption2)
+                .foregroundStyle(GymBroColors.textTertiary)
+                .tracking(1.5)
+
             Button {
                 startEmptyWorkout()
             } label: {
                 HStack {
-                    VStack(alignment: .leading, spacing: 8) {
+                    VStack(alignment: .leading, spacing: GymBroSpacing.sm) {
                         HStack {
                             Image(systemName: "dumbbell.fill")
                                 .font(.title2)
+                                .foregroundStyle(GymBroColors.accentGreen)
                             Text("Empty Workout")
-                                .font(.title3)
-                                .fontWeight(.semibold)
+                                .font(GymBroTypography.title3)
+                                .foregroundStyle(GymBroColors.textPrimary)
                         }
-                        
+
                         Text("Start logging without a program")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
+                            .font(GymBroTypography.subheadline)
+                            .foregroundStyle(GymBroColors.textSecondary)
                     }
-                    
+
                     Spacer()
-                    
+
                     Image(systemName: "arrow.right")
                         .font(.title3)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(GymBroColors.accentGreen)
                 }
-                .padding(20)
+                .padding(GymBroSpacing.md + GymBroSpacing.xs)
                 .background(
-                    RoundedRectangle(cornerRadius: 16)
-                        .fill(Color.blue.opacity(0.1))
+                    RoundedRectangle(cornerRadius: GymBroRadius.lg)
+                        .fill(GymBroColors.accentGreen.opacity(0.08))
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: GymBroRadius.lg)
+                        .strokeBorder(GymBroColors.accentGreen.opacity(0.2), lineWidth: 1)
                 )
             }
             .buttonStyle(.plain)
         }
     }
-    
+
     private var programSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("From Program")
-                .font(.title2)
-                .fontWeight(.bold)
-            
+        VStack(alignment: .leading, spacing: GymBroSpacing.md) {
+            Text("FROM PROGRAM")
+                .font(GymBroTypography.caption2)
+                .foregroundStyle(GymBroColors.textTertiary)
+                .tracking(1.5)
+
             Text("Select a program day to begin")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-            
-            // Placeholder for program selection
-            VStack(spacing: 12) {
+                .font(GymBroTypography.subheadline)
+                .foregroundStyle(GymBroColors.textSecondary)
+
+            VStack(spacing: GymBroSpacing.md) {
                 ForEach(0..<3) { index in
                     programDayCard(
                         title: "Day \(index + 1) - Push",
@@ -110,40 +115,38 @@ public struct StartWorkoutView: View {
             }
         }
     }
-    
+
     private func programDayCard(title: String, exercises: String, onSelect: @escaping () -> Void) -> some View {
         Button {
             onSelect()
         } label: {
-            HStack {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text(title)
-                        .font(.headline)
-                    Text(exercises)
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(2)
+            GymBroCard {
+                HStack {
+                    VStack(alignment: .leading, spacing: GymBroSpacing.sm) {
+                        Text(title)
+                            .font(GymBroTypography.headline)
+                            .foregroundStyle(GymBroColors.textPrimary)
+                        Text(exercises)
+                            .font(GymBroTypography.subheadline)
+                            .foregroundStyle(GymBroColors.textSecondary)
+                            .lineLimit(2)
+                    }
+
+                    Spacer()
+
+                    Image(systemName: "chevron.right")
+                        .foregroundStyle(GymBroColors.textTertiary)
                 }
-                
-                Spacer()
-                
-                Image(systemName: "chevron.right")
-                    .foregroundStyle(.secondary)
             }
-            .padding(16)
-            .background(
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(Color(.systemGray6))
-            )
         }
         .buttonStyle(.plain)
     }
-    
+
     private func startEmptyWorkout() {
         let workout = Workout()
         workout.isActive = true
         modelContext.insert(workout)
-        
+
         do {
             try modelContext.save()
             activeWorkoutViewModel = ActiveWorkoutViewModel(
@@ -156,4 +159,10 @@ public struct StartWorkoutView: View {
             Self.logger.error("Failed to create workout: \(error.localizedDescription)")
         }
     }
+}
+
+// MARK: - Preview
+
+#Preview("Start Workout") {
+    StartWorkoutView()
 }

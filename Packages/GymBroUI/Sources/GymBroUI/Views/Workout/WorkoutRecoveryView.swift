@@ -25,40 +25,35 @@ public struct WorkoutRecoveryView: View {
     }
 
     public var body: some View {
-        VStack(spacing: 28) {
+        VStack(spacing: GymBroSpacing.lg + GymBroSpacing.xs) {
             Spacer()
 
             Image(systemName: "arrow.counterclockwise.circle.fill")
                 .font(.system(size: iconSize))
-                .foregroundStyle(.orange)
+                .foregroundStyle(GymBroColors.accentAmber)
                 .accessibilityHidden(true)
 
-            VStack(spacing: 8) {
+            VStack(spacing: GymBroSpacing.sm) {
                 Text("Unfinished Workout")
-                    .font(.title2)
-                    .fontWeight(.bold)
+                    .font(GymBroTypography.title2)
+                    .foregroundStyle(GymBroColors.textPrimary)
 
                 Text("You have an unfinished workout from \(formattedDate).")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .font(GymBroTypography.subheadline)
+                    .foregroundStyle(GymBroColors.textSecondary)
                     .multilineTextAlignment(.center)
-                    .padding(.horizontal, 32)
+                    .padding(.horizontal, GymBroSpacing.xl)
             }
 
             workoutSummaryCard
 
-            VStack(spacing: 12) {
+            VStack(spacing: GymBroSpacing.md) {
                 Button {
                     onResume(workout)
                 } label: {
                     Label("Resume Workout", systemImage: "play.fill")
-                        .font(.headline)
-                        .foregroundStyle(.white)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 56)
-                        .background(Color.green)
-                        .clipShape(RoundedRectangle(cornerRadius: 14))
                 }
+                .buttonStyle(.gymBroPrimary)
 
                 Button(role: .destructive) {
                     let service = WorkoutRecoveryService(modelContext: modelContext)
@@ -66,55 +61,49 @@ public struct WorkoutRecoveryView: View {
                     onDiscard()
                 } label: {
                     Label("Discard Workout", systemImage: "trash")
-                        .font(.headline)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 56)
-                        .background(Color(.systemGray6))
-                        .clipShape(RoundedRectangle(cornerRadius: 14))
                 }
+                .buttonStyle(.gymBroDestructive)
             }
-            .padding(.horizontal, 24)
+            .padding(.horizontal, GymBroSpacing.lg)
 
             Spacer()
         }
         .padding()
+        .gymBroDarkBackground()
     }
 
     private var workoutSummaryCard: some View {
-        VStack(spacing: 12) {
-            HStack(spacing: 24) {
-                summaryItem(title: "Sets", value: "\(workout.totalSets)")
-                summaryItem(title: "Volume", value: String(format: "%.0f kg", workout.totalVolume))
-                summaryItem(title: "Exercises", value: "\(workout.exercises.count)")
-            }
+        GymBroCard {
+            VStack(spacing: GymBroSpacing.md) {
+                HStack(spacing: GymBroSpacing.lg) {
+                    summaryItem(title: "Sets", value: "\(workout.totalSets)")
+                    summaryItem(title: "Volume", value: String(format: "%.0f kg", workout.totalVolume))
+                    summaryItem(title: "Exercises", value: "\(workout.exercises.count)")
+                }
 
-            if let startTime = workout.startTime {
-                HStack {
-                    Image(systemName: "clock")
-                        .foregroundStyle(.secondary)
-                    Text("Started \(startTime, style: .relative) ago")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                if let startTime = workout.startTime {
+                    HStack {
+                        Image(systemName: "clock")
+                            .foregroundStyle(GymBroColors.textTertiary)
+                        Text("Started \(startTime, style: .relative) ago")
+                            .font(GymBroTypography.caption)
+                            .foregroundStyle(GymBroColors.textSecondary)
+                    }
                 }
             }
         }
-        .padding(20)
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color(.systemGray6))
-        )
-        .padding(.horizontal, 24)
+        .padding(.horizontal, GymBroSpacing.lg)
     }
 
     private func summaryItem(title: String, value: String) -> some View {
-        VStack(spacing: 4) {
+        VStack(spacing: GymBroSpacing.xs) {
             Text(value)
-                .font(.title3)
-                .fontWeight(.bold)
+                .font(GymBroTypography.title3)
                 .fontDesign(.rounded)
+                .foregroundStyle(GymBroColors.textPrimary)
             Text(title)
-                .font(.caption)
-                .foregroundStyle(.secondary)
+                .font(GymBroTypography.caption)
+                .foregroundStyle(GymBroColors.textTertiary)
         }
         .frame(maxWidth: .infinity)
     }

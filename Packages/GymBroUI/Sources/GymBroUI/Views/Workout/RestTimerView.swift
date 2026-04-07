@@ -8,139 +8,129 @@ public struct RestTimerView: View {
     @ScaledMetric(relativeTo: .largeTitle) private var timerFontSize: CGFloat = 56
 
     public init() {}
-    
+
     public var body: some View {
-        VStack(spacing: 24) {
-            // Timer countdown
+        VStack(spacing: GymBroSpacing.lg) {
             ZStack {
-                // Background circle
                 Circle()
-                    .stroke(Color.gray.opacity(0.2), lineWidth: 12)
+                    .stroke(GymBroColors.surfaceElevated, lineWidth: 12)
                     .frame(width: 200, height: 200)
-                
-                // Progress circle with gradient stroke
+
                 Circle()
                     .trim(from: 0, to: progress)
                     .stroke(
-                        AngularGradient(
-                            colors: [timerColor.opacity(0.6), timerColor],
-                            center: .center,
-                            startAngle: .degrees(0),
-                            endAngle: .degrees(360 * progress)
-                        ),
+                        timerColor,
                         style: StrokeStyle(lineWidth: 12, lineCap: .round)
                     )
                     .frame(width: 200, height: 200)
                     .rotationEffect(.degrees(-90))
-                    .animation(reduceMotion ? nil : .easeInOut(duration: 1), value: progress)
-                
-                // Time remaining
-                VStack(spacing: 4) {
+                    .animation(reduceMotion ? nil : .linear(duration: 1), value: progress)
+
+                VStack(spacing: GymBroSpacing.xs) {
                     Text(timeString)
                         .font(.system(size: timerFontSize, weight: .bold, design: .rounded))
                         .monospacedDigit()
-                    
+                        .foregroundStyle(GymBroColors.textPrimary)
+
                     Text("remaining")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .font(GymBroTypography.caption)
+                        .foregroundStyle(GymBroColors.textTertiary)
                 }
             }
-            
-            // Next set preview
+
             if let nextSet = timerService.nextSetInfo {
-                VStack(spacing: 8) {
-                    Text("UP NEXT")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .fontWeight(.semibold)
-                    
-                    Text(nextSet.exerciseName)
-                        .font(.headline)
-                    
-                    HStack(spacing: 16) {
-                        HStack(spacing: 4) {
-                            Text("Set")
-                            Text("\(nextSet.setNumber)")
-                                .fontWeight(.bold)
+                GymBroCard {
+                    VStack(spacing: GymBroSpacing.sm) {
+                        Text("UP NEXT")
+                            .font(GymBroTypography.caption2)
+                            .foregroundStyle(GymBroColors.textTertiary)
+                            .tracking(1.5)
+
+                        Text(nextSet.exerciseName)
+                            .font(GymBroTypography.headline)
+                            .foregroundStyle(GymBroColors.textPrimary)
+
+                        HStack(spacing: GymBroSpacing.md) {
+                            HStack(spacing: GymBroSpacing.xs) {
+                                Text("Set")
+                                    .foregroundStyle(GymBroColors.textSecondary)
+                                Text("\(nextSet.setNumber)")
+                                    .fontWeight(.bold)
+                                    .foregroundStyle(GymBroColors.textPrimary)
+                            }
+
+                            HStack(spacing: GymBroSpacing.xs) {
+                                Text("\(Int(nextSet.targetWeight))")
+                                    .fontWeight(.bold)
+                                    .foregroundStyle(GymBroColors.textPrimary)
+                                Text(nextSet.weightUnit)
+                                    .foregroundStyle(GymBroColors.textSecondary)
+                            }
+
+                            HStack(spacing: GymBroSpacing.xs) {
+                                Text("\(nextSet.targetReps)")
+                                    .fontWeight(.bold)
+                                    .foregroundStyle(GymBroColors.textPrimary)
+                                Text("reps")
+                                    .foregroundStyle(GymBroColors.textSecondary)
+                            }
                         }
-                        
-                        HStack(spacing: 4) {
-                            Text("\(Int(nextSet.targetWeight))")
-                                .fontWeight(.bold)
-                            Text(nextSet.weightUnit)
-                        }
-                        
-                        HStack(spacing: 4) {
-                            Text("\(nextSet.targetReps)")
-                                .fontWeight(.bold)
-                            Text("reps")
-                        }
+                        .font(GymBroTypography.subheadline)
                     }
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
                 }
-                .padding()
-                .background(.quaternary)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
             }
-            
-            // Quick adjust buttons
-            HStack(spacing: 16) {
+
+            HStack(spacing: GymBroSpacing.md) {
                 Button {
                     timerService.addTime(-30)
                 } label: {
                     Label("-30s", systemImage: "minus.circle.fill")
-                        .font(.headline)
                 }
-                .buttonStyle(.bordered)
+                .buttonStyle(GymBroSecondaryButtonStyle(accent: GymBroColors.accentCyan))
                 .disabled(timerService.remainingSeconds <= 30)
-                
+
                 Button {
                     timerService.addTime(30)
                 } label: {
                     Label("+30s", systemImage: "plus.circle.fill")
-                        .font(.headline)
                 }
-                .buttonStyle(.bordered)
+                .buttonStyle(GymBroSecondaryButtonStyle(accent: GymBroColors.accentCyan))
             }
-            
-            // Skip button
+
             Button {
                 timerService.skip()
             } label: {
                 Text("Skip Rest")
-                    .font(.headline)
-                    .frame(maxWidth: .infinity)
             }
-            .buttonStyle(.borderedProminent)
-            .tint(.orange)
+            .buttonStyle(.gymBroPrimary)
         }
         .padding()
+        .gymBroDarkBackground()
     }
-    
+
     private var progress: Double {
         guard timerService.totalSeconds > 0 else { return 0 }
         return Double(timerService.remainingSeconds) / Double(timerService.totalSeconds)
     }
-    
+
     private var timeString: String {
         let minutes = timerService.remainingSeconds / 60
         let seconds = timerService.remainingSeconds % 60
         return String(format: "%d:%02d", minutes, seconds)
     }
-    
+
     private var timerColor: Color {
         if timerService.remainingSeconds <= 10 {
-            return .red
+            return GymBroColors.accentRed
         } else if timerService.remainingSeconds <= 30 {
-            return .orange
+            return GymBroColors.accentAmber
         } else {
-            return .blue
+            return GymBroColors.accentCyan
         }
     }
 }
 
-#Preview {
+#Preview("Rest Timer") {
     RestTimerView()
         .onAppear {
             RestTimerService.shared.start(

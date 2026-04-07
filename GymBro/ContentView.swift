@@ -19,10 +19,12 @@ struct ContentView: View {
         Group {
             if authService.authState == .unknown {
                 ProgressView("Loading…")
+                    .tint(GymBroColors.accentGreen)
             } else {
                 mainTabView
             }
         }
+        .preferredColorScheme(.dark)
     }
 
     @ViewBuilder
@@ -57,6 +59,7 @@ struct ContentView: View {
                 }
             }
         }
+        .tint(GymBroColors.accentGreen)
         .animation(reduceMotion ? nil : .easeInOut(duration: 0.25), value: selectedTab)
         .task {
             checkForUnfinishedWorkout()

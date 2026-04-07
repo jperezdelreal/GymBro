@@ -7,52 +7,47 @@ public struct ActiveWorkoutView: View {
     @State private var showingRPEPicker = false
     @State private var showingSummary = false
     @State private var workoutSummary: WorkoutSummary?
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     @ScaledMetric(relativeTo: .title3) private var statFontSize: CGFloat = 20
     @ScaledMetric(relativeTo: .title) private var exerciseNameSize: CGFloat = 24
     @ScaledMetric(relativeTo: .title) private var adjustButtonSize: CGFloat = 36
     @ScaledMetric(relativeTo: .title2) private var adjustValueSize: CGFloat = 28
-    @ScaledMetric(relativeTo: .title3) private var completeIconSize: CGFloat = 24
-    @ScaledMetric(relativeTo: .title3) private var completeTextSize: CGFloat = 20
     @ScaledMetric(relativeTo: .largeTitle) private var emptyIconSize: CGFloat = 60
 
     private let unitSystem: UnitSystem
-    
+
     public init(viewModel: ActiveWorkoutViewModel, unitSystem: UnitSystem = .metric) {
         self._viewModel = State(initialValue: viewModel)
         self.unitSystem = unitSystem
     }
-    
+
     public var body: some View {
         ZStack {
+            GymBroColors.background.ignoresSafeArea()
+
             VStack(spacing: 0) {
-                // Header
                 workoutHeader
-                
+
                 ScrollView {
-                    VStack(spacing: 24) {
-                        // Current exercise
+                    VStack(spacing: GymBroSpacing.lg) {
                         if let exercise = viewModel.activeExercise {
                             currentExerciseSection(exercise)
                         } else {
                             emptyStateView
                         }
-                        
-                        // Completed sets history
+
                         if !viewModel.completedSetsForActiveExercise.isEmpty {
                             completedSetsSection
                         }
                     }
-                    .padding(.horizontal, 16)
-                    .padding(.top, 20)
+                    .padding(.horizontal, GymBroSpacing.md)
+                    .padding(.top, GymBroSpacing.md + GymBroSpacing.xs)
                     .padding(.bottom, 200)
                 }
-                
+
                 Spacer()
             }
-            
-            // Bottom action bar
+
             VStack {
                 Spacer()
                 bottomActionBar
@@ -65,7 +60,7 @@ public struct ActiveWorkoutView: View {
                 Button("Finish") {
                     finishWorkout()
                 }
-                .foregroundStyle(.red)
+                .foregroundStyle(GymBroColors.accentRed)
                 .disabled(!viewModel.isWorkoutStarted)
             }
         }
@@ -77,155 +72,65 @@ public struct ActiveWorkoutView: View {
         .task {
             HapticFeedbackService.shared.prepare()
         }
+        .preferredColorScheme(.dark)
     }
-    
+
+    // MARK: - Header
+
     private var workoutHeader: some View {
-        VStack(spacing: 8) {
-            HStack(spacing: 24) {
-                statItem(
-                    title: "Duration",
-                    value: formatDuration(viewModel.workoutDuration)
-                )
-                
-                statItem(
-                    title: "Volume",
-                    value: String(format: "%.0f kg", viewModel.totalVolume)
-                )
-                
-                statItem(
-                    title: "Sets",
-                    value: "\(viewModel.totalCompletedSets)"
-                )
-            }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 12)
+        HStack(spacing: GymBroSpacing.lg) {
+            statItem(title: "Duration", value: formatDuration(viewModel.workoutDuration))
+            statItem(title: "Volume", value: String(format: "%.0f kg", viewModel.totalVolume))
+            statItem(title: "Sets", value: "\(viewModel.totalCompletedSets)")
         }
-        .background(Color(.systemGray6))
+        .padding(.horizontal, GymBroSpacing.md)
+        .padding(.vertical, GymBroSpacing.md)
+        .background(GymBroColors.surfacePrimary)
     }
-    
+
     private func statItem(title: String, value: String) -> some View {
-        VStack(spacing: 4) {
+        VStack(spacing: GymBroSpacing.xs) {
             Text(value)
-                .font(.system(size: statFontSize, weight: .bold, design: .rounded))
+                .font(GymBroTypography.monoNumber(size: statFontSize))
+                .foregroundStyle(GymBroColors.textPrimary)
             Text(title)
-                .font(.caption)
-                .foregroundStyle(.secondary)
+                .font(GymBroTypography.caption2)
+                .foregroundStyle(GymBroColors.textTertiary)
         }
         .frame(maxWidth: .infinity)
     }
-    
+
+    // MARK: - Current Exercise
+
     private func currentExerciseSection(_ exercise: Exercise) -> some View {
-        VStack(alignment: .leading, spacing: 16) {
-            HStack {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(exercise.name)
-                        .font(.system(size: exerciseNameSize, weight: .bold))
-                    Text("Set \(viewModel.activeSetNumber)")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                }
-                Spacer()
-            }
-            
-            // Weight & Reps adjusters — with RepeatButton for haptic hold-to-repeat
-            HStack(spacing: 20) {
-                // Weight
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Weight")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                    
-                    HStack(spacing: 12) {
-                        RepeatButton(
-                            systemImage: "minus.circle.fill",
-                            accessibilityLabel: "Decrease weight"
-                        ) {
-                            adjustWeight(-2.5)
-                        }
-                        
-                        Text(formatWeight(viewModel.currentWeight))
-                            .font(.system(size: adjustValueSize, weight: .bold, design: .rounded))
-                            .frame(minWidth: 100)
-                            .multilineTextAlignment(.center)
-                        
-                        RepeatButton(
-                            systemImage: "plus.circle.fill",
-                            accessibilityLabel: "Increase weight"
-                        ) {
-                            adjustWeight(2.5)
-                        }
+        GymBroCard(accent: GymBroColors.accentGreen) {
+            VStack(alignment: .leading, spacing: GymBroSpacing.md) {
+                HStack {
+                    VStack(alignment: .leading, spacing: GymBroSpacing.xs) {
+                        Text(exercise.name)
+                            .font(.system(size: exerciseNameSize, weight: .bold))
+                            .foregroundStyle(GymBroColors.textPrimary)
+                        Text("Set \(viewModel.activeSetNumber)")
+                            .font(GymBroTypography.subheadline)
+                            .foregroundStyle(GymBroColors.accentGreen)
                     }
+                    Spacer()
                 }
-                .frame(maxWidth: .infinity)
-                
-                // Reps
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Reps")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                    
-                    HStack(spacing: 12) {
-                        RepeatButton(
-                            systemImage: "minus.circle.fill",
-                            accessibilityLabel: "Decrease reps"
-                        ) {
-                            viewModel.updateReps(viewModel.currentReps - 1)
-                        }
-                        
-                        Text("\(viewModel.currentReps)")
-                            .font(.system(size: adjustValueSize, weight: .bold, design: .rounded))
-                            .frame(minWidth: 60)
-                            .multilineTextAlignment(.center)
-                        
-                        RepeatButton(
-                            systemImage: "plus.circle.fill",
-                            accessibilityLabel: "Increase reps"
-                        ) {
-                            viewModel.updateReps(viewModel.currentReps + 1)
-                        }
-                    }
+
+                // Weight & Reps
+                HStack(spacing: GymBroSpacing.md + GymBroSpacing.xs) {
+                    weightAdjuster
+                    repsAdjuster
                 }
-                .frame(maxWidth: .infinity)
-            }
-            
-            // Warmup toggle & RPE
-            HStack(spacing: 16) {
-                Button {
-                    viewModel.toggleWarmup()
-                    HapticFeedbackService.shared.lightImpact()
-                } label: {
-                    HStack {
-                        Image(systemName: viewModel.isWarmup ? "checkmark.circle.fill" : "circle")
-                        Text("Warmup Set")
-                    }
-                    .font(.subheadline)
-                    .foregroundStyle(viewModel.isWarmup ? .orange : .secondary)
-                }
-                
-                Spacer()
-                
-                Button {
-                    showingRPEPicker = true
-                } label: {
-                    HStack {
-                        Image(systemName: "gauge.with.needle")
-                        if let rpe = viewModel.currentRPE {
-                            Text("RPE \(Int(rpe))")
-                        } else {
-                            Text("Add RPE")
-                        }
-                    }
-                    .font(.subheadline)
-                    .foregroundStyle(viewModel.currentRPE != nil ? .orange : .secondary)
+
+                // Warmup & RPE
+                HStack(spacing: GymBroSpacing.md) {
+                    warmupToggle
+                    Spacer()
+                    rpeButton
                 }
             }
         }
-        .padding(20)
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color(.systemBackground))
-                .shadow(color: .black.opacity(0.1), radius: 8, y: 4)
-        )
         .confirmationDialog("Select RPE", isPresented: $showingRPEPicker) {
             ForEach(6...10, id: \.self) { rpe in
                 Button("RPE \(rpe)") {
@@ -237,134 +142,214 @@ public struct ActiveWorkoutView: View {
             }
         }
     }
-    
-    private var completedSetsSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Completed Sets")
-                .font(.headline)
-                .foregroundStyle(.secondary)
-            
-            ForEach(Array(viewModel.completedSetsForActiveExercise.enumerated()), id: \.element.id) { index, set in
-                SwipeableSetRow(
-                    set: set,
-                    setNumber: set.setNumber,
-                    unitSystem: unitSystem,
-                    onComplete: {
-                        viewModel.completeSet()
-                    },
-                    onUndo: {
-                        viewModel.undoSetCompletion(set)
-                    },
-                    onSetType: { newType in
-                        viewModel.changeSetType(set, to: newType)
-                    },
-                    onDelete: {
-                        viewModel.deleteSet(set)
-                    }
-                )
-                .transition(reduceMotion ? .opacity : .asymmetric(
-                    insertion: .move(edge: .trailing).combined(with: .opacity),
-                    removal: .move(edge: .leading).combined(with: .opacity)
-                ))
+
+    private var weightAdjuster: some View {
+        VStack(alignment: .leading, spacing: GymBroSpacing.sm) {
+            Text("WEIGHT")
+                .font(GymBroTypography.caption2)
+                .foregroundStyle(GymBroColors.textTertiary)
+                .tracking(1)
+
+            HStack(spacing: GymBroSpacing.md) {
+                Button { adjustWeight(-2.5) } label: {
+                    Image(systemName: "minus.circle.fill")
+                        .font(.system(size: adjustButtonSize))
+                        .foregroundStyle(GymBroColors.accentCyan)
+                }
+                .accessibilityLabel("Decrease weight")
+
+                Text(formatWeight(viewModel.currentWeight))
+                    .font(GymBroTypography.monoNumber(size: adjustValueSize))
+                    .foregroundStyle(GymBroColors.textPrimary)
+                    .frame(minWidth: 100)
+                    .multilineTextAlignment(.center)
+
+                Button { adjustWeight(2.5) } label: {
+                    Image(systemName: "plus.circle.fill")
+                        .font(.system(size: adjustButtonSize))
+                        .foregroundStyle(GymBroColors.accentCyan)
+                }
+                .accessibilityLabel("Increase weight")
             }
         }
-        .animation(reduceMotion ? nil : .spring(response: 0.35, dampingFraction: 0.8), value: viewModel.completedSetsForActiveExercise.count)
+        .frame(maxWidth: .infinity)
     }
-    
+
+    private var repsAdjuster: some View {
+        VStack(alignment: .leading, spacing: GymBroSpacing.sm) {
+            Text("REPS")
+                .font(GymBroTypography.caption2)
+                .foregroundStyle(GymBroColors.textTertiary)
+                .tracking(1)
+
+            HStack(spacing: GymBroSpacing.md) {
+                Button {
+                    viewModel.updateReps(viewModel.currentReps - 1)
+                    HapticFeedbackService.shared.valueChanged()
+                } label: {
+                    Image(systemName: "minus.circle.fill")
+                        .font(.system(size: adjustButtonSize))
+                        .foregroundStyle(GymBroColors.accentCyan)
+                }
+                .accessibilityLabel("Decrease reps")
+
+                Text("\(viewModel.currentReps)")
+                    .font(GymBroTypography.monoNumber(size: adjustValueSize))
+                    .foregroundStyle(GymBroColors.textPrimary)
+                    .frame(minWidth: 60)
+                    .multilineTextAlignment(.center)
+
+                Button {
+                    viewModel.updateReps(viewModel.currentReps + 1)
+                    HapticFeedbackService.shared.valueChanged()
+                } label: {
+                    Image(systemName: "plus.circle.fill")
+                        .font(.system(size: adjustButtonSize))
+                        .foregroundStyle(GymBroColors.accentCyan)
+                }
+                .accessibilityLabel("Increase reps")
+            }
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    private var warmupToggle: some View {
+        Button {
+            viewModel.toggleWarmup()
+            HapticFeedbackService.shared.lightImpact()
+        } label: {
+            HStack {
+                Image(systemName: viewModel.isWarmup ? "checkmark.circle.fill" : "circle")
+                Text("Warmup Set")
+            }
+            .font(GymBroTypography.subheadline)
+            .foregroundStyle(viewModel.isWarmup ? GymBroColors.accentAmber : GymBroColors.textSecondary)
+        }
+    }
+
+    private var rpeButton: some View {
+        Button {
+            showingRPEPicker = true
+        } label: {
+            HStack {
+                Image(systemName: "gauge.with.needle")
+                if let rpe = viewModel.currentRPE {
+                    Text("RPE \(Int(rpe))")
+                } else {
+                    Text("Add RPE")
+                }
+            }
+            .font(GymBroTypography.subheadline)
+            .foregroundStyle(viewModel.currentRPE != nil ? GymBroColors.accentAmber : GymBroColors.textSecondary)
+        }
+    }
+
+    // MARK: - Completed Sets
+
+    private var completedSetsSection: some View {
+        VStack(alignment: .leading, spacing: GymBroSpacing.md) {
+            Text("COMPLETED SETS")
+                .font(GymBroTypography.caption2)
+                .foregroundStyle(GymBroColors.textTertiary)
+                .tracking(1.5)
+
+            ForEach(Array(viewModel.completedSetsForActiveExercise.enumerated()), id: \.element.id) { _, set in
+                ExerciseSetRow(
+                    set: set,
+                    setNumber: set.setNumber,
+                    unitSystem: unitSystem
+                )
+            }
+        }
+    }
+
+    // MARK: - Empty State
+
     private var emptyStateView: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: GymBroSpacing.lg) {
             Image(systemName: "dumbbell")
                 .font(.system(size: emptyIconSize))
-                .foregroundStyle(.secondary)
+                .foregroundStyle(GymBroColors.textTertiary)
                 .accessibilityHidden(true)
-            
-            Text("Add an exercise to begin")
-                .font(.headline)
-                .foregroundStyle(.secondary)
-            
+
+            VStack(spacing: GymBroSpacing.sm) {
+                Text("Ready to Lift")
+                    .font(GymBroTypography.title2)
+                    .foregroundStyle(GymBroColors.textPrimary)
+                Text("Add an exercise to begin your session")
+                    .font(GymBroTypography.subheadline)
+                    .foregroundStyle(GymBroColors.textSecondary)
+            }
+
             Button {
                 showingExercisePicker = true
             } label: {
                 Label("Add Exercise", systemImage: "plus.circle.fill")
-                    .font(.headline)
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, 24)
-                    .padding(.vertical, 12)
-                    .background(Color.blue)
-                    .clipShape(Capsule())
             }
+            .buttonStyle(.gymBroPrimary)
+            .frame(maxWidth: 240)
         }
-        .padding(.top, 60)
+        .padding(.top, GymBroSpacing.xxl)
     }
-    
+
+    // MARK: - Bottom Bar
+
     private var bottomActionBar: some View {
-        VStack(spacing: 12) {
-            // Rest timer with smooth appearance animation
+        VStack(spacing: GymBroSpacing.md) {
             if viewModel.isRestTimerActive, let endTime = viewModel.restTimerEndTime {
                 InlineRestTimerView(endTime: endTime) {
                     viewModel.skipRestTimer()
                 }
-                .transition(reduceMotion ? .opacity : .move(edge: .bottom).combined(with: .opacity))
             }
-            
-            // Complete set button — primary action in thumb zone
+
             Button {
                 viewModel.completeSet()
             } label: {
-                HStack(spacing: 12) {
-                    Image(systemName: "checkmark.circle.fill")
-                        .font(.system(size: completeIconSize))
-                    Text("Complete Set")
-                        .font(.system(size: completeTextSize, weight: .semibold))
-                }
-                .foregroundStyle(.white)
-                .frame(maxWidth: .infinity)
-                .frame(height: 60)
-                .background(
-                    viewModel.activeExercise != nil ? Color.green : Color.gray
-                )
-                .clipShape(RoundedRectangle(cornerRadius: 16))
-                .shadow(color: .black.opacity(0.2), radius: 8, y: 4)
+                Label("Complete Set", systemImage: "checkmark.circle.fill")
             }
+            .buttonStyle(.gymBroPrimary)
             .disabled(viewModel.activeExercise == nil)
         }
-        .padding(.horizontal, 16)
-        .padding(.bottom, 32)
+        .padding(.horizontal, GymBroSpacing.md)
+        .padding(.bottom, GymBroSpacing.xl)
         .background(
-            Color(.systemBackground)
+            GymBroColors.surfacePrimary
                 .ignoresSafeArea(edges: .bottom)
         )
-        .animation(reduceMotion ? nil : .spring(response: 0.3, dampingFraction: 0.8), value: viewModel.isRestTimerActive)
     }
-    
+
+    // MARK: - Helpers
+
     private func adjustWeight(_ delta: Double) {
         viewModel.updateWeight(max(0, viewModel.currentWeight + delta))
         HapticFeedbackService.shared.valueChanged()
     }
-    
+
     private func formatWeight(_ kg: Double) -> String {
         let weight = unitSystem == .metric ? kg : kg * 2.20462
         let unit = unitSystem == .metric ? "kg" : "lb"
         return String(format: "%.1f %@", weight, unit)
     }
-    
+
     private func formatDuration(_ duration: TimeInterval) -> String {
         let hours = Int(duration) / 3600
         let minutes = Int(duration) / 60 % 60
         let seconds = Int(duration) % 60
-        
+
         if hours > 0 {
             return String(format: "%d:%02d:%02d", hours, minutes, seconds)
         } else {
             return String(format: "%d:%02d", minutes, seconds)
         }
     }
-    
+
     private func finishWorkout() {
         workoutSummary = viewModel.finishWorkout()
         showingSummary = true
     }
 }
+
+// MARK: - Inline Rest Timer
 
 struct InlineRestTimerView: View {
     let endTime: Date
@@ -375,28 +360,34 @@ struct InlineRestTimerView: View {
 
     @State private var remainingTime: TimeInterval = 0
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
-    
+
     var body: some View {
         HStack {
             Image(systemName: "timer")
                 .font(.system(size: timerIconSize))
-            
+                .foregroundStyle(GymBroColors.accentCyan)
+
             Text("Rest: \(formatTime(remainingTime))")
-                .font(.system(size: timerTextSize, weight: .semibold, design: .rounded))
-            
+                .font(GymBroTypography.monoNumber(size: timerTextSize, weight: .semibold))
+                .foregroundStyle(GymBroColors.textPrimary)
+
             Spacer()
-            
+
             Button("Skip") {
                 onSkip()
             }
-            .font(.subheadline)
-            .foregroundStyle(.blue)
+            .font(GymBroTypography.subheadline)
+            .foregroundStyle(GymBroColors.accentCyan)
         }
-        .padding(.horizontal, 20)
-        .padding(.vertical, 12)
+        .padding(.horizontal, GymBroSpacing.md + GymBroSpacing.xs)
+        .padding(.vertical, GymBroSpacing.md)
         .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color.blue.opacity(0.1))
+            RoundedRectangle(cornerRadius: GymBroRadius.md)
+                .fill(GymBroColors.accentCyan.opacity(0.1))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: GymBroRadius.md)
+                .strokeBorder(GymBroColors.accentCyan.opacity(0.3), lineWidth: 1)
         )
         .onReceive(timer) { _ in
             remainingTime = max(0, endTime.timeIntervalSinceNow)
@@ -408,7 +399,7 @@ struct InlineRestTimerView: View {
             remainingTime = endTime.timeIntervalSinceNow
         }
     }
-    
+
     private func formatTime(_ seconds: TimeInterval) -> String {
         let mins = Int(seconds) / 60
         let secs = Int(seconds) % 60
