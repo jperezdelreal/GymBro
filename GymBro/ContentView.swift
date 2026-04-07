@@ -164,17 +164,7 @@ struct WorkoutTab: View {
 
 struct HistoryTab: View {
     var body: some View {
-        NavigationStack {
-            EmptyStateView(
-                icon: "chart.line.uptrend.xyaxis",
-                title: "No history yet",
-                message: "Complete your first workout to see your progress here",
-                actionTitle: "View Workout Tab"
-            ) {
-                // Switch to workout tab
-            }
-            .navigationTitle("History")
-        }
+        WorkoutHistoryView()
     }
 }
 
