@@ -192,3 +192,17 @@
 - **ViewModel additions**: `undoSetCompletion(_:)`, `changeSetType(_:to:)`, `deleteSet(_:)` — all persist via SwiftData with error logging.
 - **Thumb zone**: All primary actions (Complete Set button, rest timer, weight/rep steppers) remain in bottom 40% of screen. Existing button tap preserved as fallback — gestures are pure enhancement.
 - **Accessibility**: All swipeable rows have `.accessibilityAction` equivalents for Complete, Undo, and Options.
+
+### 2026-04-07: AI Coach UX -- Conversation History, Prompts, Voice Input (Issue #70)
+**Implementation highlights:**
+- **Persistent conversation history**: SwiftData ChatMessage with list UI in CoachChatView. LazyVStack with ScrollViewReader auto-scrolls on new messages. History loads last 50 messages on configure().
+- **Suggested prompt chips**: SuggestedPromptsBar -- horizontal ScrollView of capsule-shaped chips with SF Symbol icons. 6 contextual defaults. Shown both on welcome screen (vertical list) and above input area (horizontal scroll) after conversation starts.
+- **Context indicator bar**: ContextIndicatorBar queries CoachContextService for workout count, weeks of data, last workout date. Displays workout count and weeks of data between header and chat.
+- **Streaming token display**: TypingIndicatorView with 3 pulsing cyan dots using .repeatForever animation, staggered by 0.2s per dot. Replaces static "Thinking..." text. All animations gated on reduceMotion.
+- **Message reactions**: ChatMessage.reaction (Int: 1=thumbsUp, -1=thumbsDown, 0=none) persisted in SwiftData. MessageReactionBar with toggle behavior -- tap same reaction to clear. Only shown on finalized assistant messages.
+- **Voice input**: VoiceInputService wraps SFSpeechRecognizer with AVAudioEngine. VoiceInputButton with pulse animation during recording. Tap to record, tap to stop -- result populates inputText. Gated on #if canImport(Speech).
+- **Design system applied**: Full dark theme (GymBroColors.background, surfacePrimary, surfaceSecondary). Accent cyan for coach avatar and voice button. Accent green for user bubbles and send button. GymBroTypography and GymBroSpacing tokens throughout.
+- **Accessibility**: TypingIndicatorView labeled "AI is thinking". MessageReactionBar uses .accessibilityAddTraits(.isSelected). ContextIndicatorBar combines children. VoiceInputButton state-dependent label.
+- **Tests**: 10 test cases -- suggested prompts existence/content, context summary defaults, reaction toggle/ignore-user/enum-values, clear history, persisted message loading, ChatMessage default reaction.
+- **Architecture**: CoachContextService in GymBroCore/Services/AI queries SwiftData. VoiceInputService in same folder. New views: TypingIndicatorView, ContextIndicatorBar, SuggestedPromptsBar, MessageReactionBar, VoiceInputButton in Views/Coach/.
+- **PR opened, closes #70.**

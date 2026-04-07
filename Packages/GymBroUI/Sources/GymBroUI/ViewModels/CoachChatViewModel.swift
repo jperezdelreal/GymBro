@@ -4,7 +4,7 @@ import GymBroCore
 import os
 
 /// ViewModel for the AI Coach chat interface.
-/// Manages conversation state, message history, and AI service coordination.
+/// Manages conversation state, message history, context summary, reactions, and voice input.
 @MainActor
 @Observable
 public final class CoachChatViewModel {
@@ -20,6 +20,10 @@ public final class CoachChatViewModel {
     public var errorMessage: String?
     public var remainingFreeMessages: Int = 5
     public var isOfflineMode: Bool = false
+    public var contextSummary: CoachContextSummary = CoachContextSummary()
+
+    /// Contextual suggested prompts based on user data.
+    public var suggestedPrompts: [SuggestedPrompt] = SuggestedPrompt.defaults
 
     // MARK: - Dependencies
 
@@ -28,6 +32,7 @@ public final class CoachChatViewModel {
     private let usageLimiter: UsageLimiter
     private let isPremium: Bool
     private var modelContext: ModelContext?
+    private var contextService: CoachContextService?
 
     public init(isPremium: Bool = false) {
         self.isPremium = isPremium
@@ -49,7 +54,9 @@ public final class CoachChatViewModel {
 
     public func configure(modelContext: ModelContext) {
         self.modelContext = modelContext
+        self.contextService = CoachContextService(modelContext: modelContext)
         loadHistory()
+        refreshContextSummary()
     }
 
     // MARK: - Actions
@@ -122,6 +129,29 @@ public final class CoachChatViewModel {
         isStreaming = false
     }
 
+    /// Send a suggested prompt directly.
+    public func sendSuggestedPrompt(_ prompt: SuggestedPrompt) async {
+        inputText = prompt.text
+        await sendMessage()
+    }
+
+    /// Toggle reaction on an assistant message (thumbs up / thumbs down).
+    public func toggleReaction(_ reaction: MessageReaction, for message: ChatMessage) {
+        guard message.role == .assistant else { return }
+        guard let index = messages.firstIndex(where: { $0.id == message.id }) else { return }
+
+        let current = MessageReaction(rawValue: messages[index].reaction) ?? .none
+        messages[index].reaction = (current == reaction) ? MessageReaction.none.rawValue : reaction.rawValue
+
+        if let ctx = modelContext {
+            do {
+                try ctx.save()
+            } catch {
+                Self.logger.error("Failed to save reaction: \(error.localizedDescription)")
+            }
+        }
+    }
+
     public func clearHistory() {
         messages.removeAll()
         if let ctx = modelContext {
@@ -138,6 +168,11 @@ public final class CoachChatViewModel {
         }
     }
 
+    public func refreshContextSummary() {
+        guard let service = contextService else { return }
+        contextSummary = service.fetchContextSummary()
+    }
+
     // MARK: - Private
 
     private func selectService() -> AICoachService {
@@ -151,8 +186,6 @@ public final class CoachChatViewModel {
     }
 
     private func buildContext() -> CoachContext {
-        // In production, this would query SwiftData for real data.
-        // For now, return empty context — will be enriched as models are populated.
         CoachContext()
     }
 
@@ -186,4 +219,27 @@ public final class CoachChatViewModel {
         }
         errorMessage = error.localizedDescription
     }
+}
+
+// MARK: - Suggested Prompts
+
+public struct SuggestedPrompt: Identifiable, Sendable {
+    public let id: String
+    public let text: String
+    public let icon: String
+
+    public init(id: String = UUID().uuidString, text: String, icon: String) {
+        self.id = id
+        self.text = text
+        self.icon = icon
+    }
+
+    public static let defaults: [SuggestedPrompt] = [
+        SuggestedPrompt(text: "How's my squat progressing?", icon: "chart.line.uptrend.xyaxis"),
+        SuggestedPrompt(text: "Should I deload?", icon: "arrow.down.circle"),
+        SuggestedPrompt(text: "Suggest today's workout", icon: "figure.strengthtraining.traditional"),
+        SuggestedPrompt(text: "What's my weak point?", icon: "exclamationmark.triangle"),
+        SuggestedPrompt(text: "Help me break a plateau", icon: "arrow.up.forward"),
+        SuggestedPrompt(text: "Explain RPE vs RIR", icon: "questionmark.circle"),
+    ]
 }
