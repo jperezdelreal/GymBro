@@ -15,8 +15,13 @@ public struct OnboardingFlowView: View {
     @State private var injuriesText: String = ""
     
     private let onComplete: () -> Void
+    private let onRequestHealthKit: (() async -> Bool)?
     
-    public init(onComplete: @escaping () -> Void) {
+    public init(
+        onRequestHealthKit: (() async -> Bool)? = nil,
+        onComplete: @escaping () -> Void
+    ) {
+        self.onRequestHealthKit = onRequestHealthKit
         self.onComplete = onComplete
     }
     
@@ -63,8 +68,14 @@ public struct OnboardingFlowView: View {
                     case .limitations:
                         LimitationsStepView(
                             injuriesText: $injuriesText,
-                            onNext: { currentStep = .summary },
+                            onNext: { currentStep = .healthKit },
                             onBack: { currentStep = .equipment }
+                        )
+                    case .healthKit:
+                        HealthKitPermissionStepView(
+                            onNext: { currentStep = .summary },
+                            onBack: { currentStep = .limitations },
+                            onRequestPermission: onRequestHealthKit ?? { true }
                         )
                     case .summary:
                         SummaryStepView(
@@ -74,7 +85,7 @@ public struct OnboardingFlowView: View {
                             equipment: equipmentType,
                             limitations: injuriesText,
                             onComplete: completeOnboarding,
-                            onBack: { currentStep = .limitations }
+                            onBack: { currentStep = .healthKit }
                         )
                     }
                 }
@@ -132,6 +143,7 @@ enum OnboardingStep: Int, CaseIterable {
     case frequency
     case equipment
     case limitations
+    case healthKit
     case summary
     
     var progress: CGFloat {

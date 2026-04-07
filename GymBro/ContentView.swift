@@ -15,6 +15,7 @@ struct ContentView: View {
 
     let authService: AuthenticationService
     let syncService: CloudKitSyncService
+    let healthKitCoordinator: HealthKitCoordinator
 
     var body: some View {
         Group {
@@ -22,9 +23,20 @@ struct ContentView: View {
                 ProgressView("Loading…")
                     .tint(GymBroColors.accentGreen)
             } else if needsOnboarding {
-                OnboardingFlowView {
-                    needsOnboarding = false
-                }
+                OnboardingFlowView(
+                    onRequestHealthKit: { [healthKitCoordinator] in
+                        await healthKitCoordinator.requestAuthorization()
+                    },
+                    onComplete: {
+                        needsOnboarding = false
+                        Task {
+                            await healthKitCoordinator.syncAndCalculateReadiness(
+                                modelContext: modelContext
+                            )
+                            await healthKitCoordinator.enableBackgroundSync()
+                        }
+                    }
+                )
             } else {
                 mainTabView
             }
@@ -82,6 +94,10 @@ struct ContentView: View {
         .animation(reduceMotion ? nil : .easeInOut(duration: 0.25), value: selectedTab)
         .task {
             checkForUnfinishedWorkout()
+            await healthKitCoordinator.syncAndCalculateReadiness(
+                modelContext: modelContext
+            )
+            await healthKitCoordinator.enableBackgroundSync()
         }
         .sheet(isPresented: $showRecoverySheet) {
             if let workout = unfinishedWorkout {
@@ -180,6 +196,9 @@ struct CoachTab: View {
 #Preview {
     ContentView(
         authService: AuthenticationService(),
-        syncService: CloudKitSyncService()
+        syncService: CloudKitSyncService(),
+        healthKitCoordinator: HealthKitCoordinator(
+            healthKitService: MockHealthKitService()
+        )
     )
 }

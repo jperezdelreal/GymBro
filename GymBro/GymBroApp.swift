@@ -9,12 +9,16 @@ struct GymBroApp: App {
     @State private var syncService = CloudKitSyncService()
     @State private var conflictService = ConflictResolutionService()
 
+    private let healthKitCoordinator = HealthKitCoordinator(
+        healthKitService: HealthKitManager()
+    )
+
     var body: some Scene {
         WindowGroup {
             ContentView(
                 authService: authService,
                 syncService: syncService,
-                conflictService: conflictService
+                healthKitCoordinator: healthKitCoordinator
             )
                 .task {
                     await authService.checkExistingCredential()
@@ -37,6 +41,8 @@ struct GymBroApp: App {
                 ChatMessage.self,
                 HealthMetric.self,
                 HealthBaseline.self,
+                ReadinessScore.self,
+                SubjectiveCheckIn.self,
                 ConflictResolutionLog.self
             ],
             configurations: CloudKitSyncService.makeModelConfiguration(
