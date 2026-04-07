@@ -99,3 +99,23 @@
 - Used `async throws` test methods with `Task.sleep(for: .seconds())` to validate timer countdown behavior.
 - Tests must be realistic: Timer counting down over 2-3 seconds is acceptable test duration for accuracy validation.
 - Singleton pattern requires careful `setUp()`/`tearDown()` to reset state between tests.
+
+### 2026-04-07: Crash Recovery Implementation (Issue #53)
+**Active Workout State Persistence:**
+- Added `isActive: Bool` and `isCancelled: Bool` flags to Workout model. `isActive` set true when workout starts (or is created), set false when finished or cancelled.
+- WorkoutRecoveryService queries SwiftData for `isActive == true && endTime == nil`, sorted by `updatedAt` descending with `fetchLimit = 1`.
+- On app launch, ContentView checks for unfinished workouts via `.task {}` modifier. If found, presents WorkoutRecoveryView sheet with `.interactiveDismissDisabled()` to force decision.
+- Resume rebuilds `ActiveWorkoutViewModel` from the persisted Workout — all sets, exercises, and set numbers are preserved since they're already in SwiftData.
+- Edge case: multiple stale workouts cleaned up automatically (most recent kept, rest cancelled).
+
+**Recovery UI Pattern:**
+- Sheet-based presentation with `.presentationDetents([.medium, .large])` for flexible sizing.
+- Summary card shows sets, volume, exercise count, and elapsed time since start.
+- Two actions: Resume (green, primary) → navigates to ActiveWorkoutView; Discard (destructive) → marks cancelled.
+
+**Workout.exercises Computed Property:**
+- Added `exercises: [Exercise]` computed property to Workout model that returns unique exercises in insertion order by extracting from sets sorted by `createdAt`. Used by recovery view for context and to restore the last active exercise on resume.
+
+**Testing Pattern:**
+- 11 test cases using in-memory SwiftData container. Tests cover: find/discard/cleanup service methods, ViewModel isActive lifecycle, cancel flow, set preservation on recovery, exercises ordering, and empty-state nil return.
+- PR #57 opened, closes #53.
