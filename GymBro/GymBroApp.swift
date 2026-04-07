@@ -5,20 +5,35 @@ import GymBroUI
 
 @main
 struct GymBroApp: App {
+    @State private var authService = AuthenticationService()
+    @State private var syncService = CloudKitSyncService()
+
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ContentView(authService: authService, syncService: syncService)
+                .task {
+                    await authService.checkExistingCredential()
+                    if authService.isSignedIn {
+                        await syncService.checkAccountStatus()
+                        syncService.startMonitoring()
+                    }
+                }
         }
-        .modelContainer(for: [
-            Workout.self,
-            Exercise.self,
-            ExerciseSet.self,
-            Program.self,
-            ProgramDay.self,
-            UserProfile.self,
-            ChatMessage.self,
-            HealthMetric.self,
-            HealthBaseline.self
-        ])
+        .modelContainer(
+            for: [
+                Workout.self,
+                Exercise.self,
+                ExerciseSet.self,
+                Program.self,
+                ProgramDay.self,
+                UserProfile.self,
+                ChatMessage.self,
+                HealthMetric.self,
+                HealthBaseline.self
+            ],
+            configurations: CloudKitSyncService.makeModelConfiguration(
+                isSignedIn: authService.isSignedIn
+            )
+        )
     }
 }
