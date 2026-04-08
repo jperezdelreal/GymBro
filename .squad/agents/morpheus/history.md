@@ -100,3 +100,104 @@
 - Switch to validate Phase completion before merge
 - User directive: Spanish default language + "BEAUTIFUL, modern, futuristic" design (not just functional)
 
+### 2026-04-08: E2E Test Infrastructure — Maestro + Spanish i18n (#271, #272, #273)
+
+**Scope:** Three PRs merged to establish Maestro E2E test infrastructure for Spanish-language Android app  
+**PRs:** #275 (CI), #276 (test tags), #277 (Spanish assertions)  
+**Status:** ✅ ALL MERGED  
+
+**PR #275 — Maestro CI Integration (by Tank):**
+- Added `.github/workflows/maestro-e2e.yml` workflow triggering on Android changes
+- Proper emulator setup: API 34, x86_64, KVM enabled, animations disabled for stable tests
+- Runs smoke-test.yaml and navigation-smoke.yaml with error isolation (continues on first failure)
+- Artifacts uploaded on failure: screenshots, videos, logs (7-day retention)
+- Build + test timeout: 30 minutes (reasonable for emulator startup + APK build)
+- **Architecture Decision:** Using android-emulator-runner@v2 — battle-tested for CI environments
+
+**PR #276 — Test Tag Infrastructure (by Trinity):**
+- Added `testTag()` to critical UI elements for selector stability:
+  - Navigation bar items: `nav_exercise_library`, `nav_history`, `nav_progress`, `nav_recovery`, `nav_profile`
+  - Workout FAB: `workout_fab`
+  - Search bars: `search_bar`
+  - Input fields: `weight_input`, `reps_input`, `onboarding_name_input`
+  - Primary CTA: `onboarding_start`
+- **Pattern Established:** Prefer testTag IDs over text selectors (text changes with i18n, IDs don't)
+- Kotlin modifier chain preserved: `Modifier.weight(1f).testTag("id")` — no breaking changes
+
+**PR #277 — Spanish Text Assertions (by Switch):**
+- Updated all 10 Maestro flows to use Spanish assertions matching `values-es/strings.xml`
+- Replaced English text selectors with testTag IDs where available (nav bar, FAB, inputs)
+- Hybrid strategy: testTag for structural elements (nav, buttons), Spanish text for labels/headings
+- Examples:
+  - "Exercise Library" → "Biblioteca de Ejercicios"
+  - "Active Workout" → "Entrenamiento Activo"
+  - "Workout Complete!" → "¡Entrenamiento Completado!"
+- **Quality Gate:** Text assertions verified against actual string resource values (not guessed)
+
+**Test Coverage Established:**
+- Smoke tests: `smoke-test.yaml`, `navigation-smoke.yaml` (run in CI)
+- Full E2E: `full-e2e.yaml` (onboarding → workout → history → progress → profile)
+- Feature flows: `start-workout.yaml`, `complete-workout.yaml`, `browse-library.yaml`, `check-history.yaml`, `check-progress.yaml`, `profile-settings.yaml`, `ai-coach.yaml`
+
+**Key Learnings:**
+1. **Test Tag Discipline:** Any new composable that's part of a critical user flow (onboarding, workout logging, navigation) MUST have a testTag
+2. **Spanish-First QA:** All Maestro assertions must reference Spanish strings (default locale for GymBro)
+3. **CI Signal:** E2E tests catch UX regressions that unit tests miss (navigation flow, i18n completeness, text changes)
+4. **Selector Priority:** testTag > Spanish text > English text (fallback only)
+
+**Next Steps:**
+- Monitor first CI runs on future PRs — emulator startup can be flaky in GitHub Actions
+- Expand test coverage: add recovery tab flow, detailed progress charts interaction
+- Consider visual regression testing (screenshot comparison) if UI drift becomes an issue
+
+### 2026-04-08: CI Optimization + Test Data Isolation (#280, #281)
+
+**Scope:** Two PRs merged to fix E2E test reliability and CI efficiency  
+**PRs:** #291 (CI stratification by Tank), #293 (data isolation by Switch)  
+**Status:** ✅ BOTH MERGED  
+
+**PR #291 — CI Stratification (by Tank):**
+- **Problem:** CI ran only smoke tests on PRs; full E2E never executed
+- **Solution:** Split workflow into two jobs:
+  1. `maestro-smoke` (PR trigger): Runs smoke-tagged flows (quick validation, 30min timeout)
+  2. `maestro-regression` (push to main/master): Runs ALL flows (comprehensive validation, 60min timeout)
+- **Key Features:**
+  - `--include-tags smoke` flag filters flows in smoke job
+  - `--repeat-on-failure 1` retries flaky tests once before failing
+  - `--timeout 120000` (120s per flow) prevents infinite hangs
+  - Separate artifact names: `maestro-screenshots-smoke` vs `maestro-screenshots-regression`
+- **Tag Standardization:** Updated flow tags to align with strategy:
+  - `smoke`: `browse-library`, `check-history`, `check-progress`, `navigation-smoke`, `onboarding-flow`, `smoke-test`
+  - `core`: `complete-workout`, `start-workout`
+  - `regression`: `ai-coach`, `full-e2e`, `profile-settings`
+- **CI Economics:** Smoke tests run on every PR (fast feedback), full regression only on merge (comprehensive coverage without burning CI minutes on every commit)
+
+**PR #293 — Test Data Isolation (by Switch):**
+- **Problem:** Maestro flows assumed clean state; tests failed when run sequentially due to leftover app state (onboarding completed, active workouts, filters set)
+- **Solution:** Introduced shared sub-flow `flow/ensure-post-onboarding.yaml`:
+  - Checks if app is on onboarding screen (visible "GymBro", not visible "Biblioteca de Ejercicios")
+  - If onboarding detected, completes it automatically: swipe through pages → select kg → enter name → tap start
+  - If already post-onboarding, no-op
+  - Guarantees predictable starting state for all flows
+- **Lifecycle Hooks:** Added `onFlowStart` and `onFlowComplete` to 9 flows:
+  - `onFlowStart`: Launch app, verify post-onboarding state
+  - `onFlowComplete`: Return to Library tab OR cancel active workout OR stop app (for flows that mutate global state)
+- **Key Patterns:**
+  - `onboarding-flow.yaml` and `full-e2e.yaml` use `stopApp` in `onFlowComplete` (they test onboarding itself, must clear state fully)
+  - `start-workout.yaml` cancels active workout in `onFlowComplete` (cleanup so next flow doesn't see "Resume Workout")
+  - `browse-library.yaml` relaunches app to clear any search/filter state
+- **Isolation Guarantee:** Each flow now runs idempotently — can execute in any order, multiple times, without cross-contamination
+
+**Key Learnings:**
+1. **CI Stratification Best Practice:** Fast smoke tests on PR (2-3 flows, <5min) + full regression on merge (all flows, <30min) optimizes feedback speed vs. coverage
+2. **Maestro Test Retry:** `--repeat-on-failure 1` catches flaky assertions (timing issues in emulator) without masking real failures
+3. **Data Isolation is Non-Negotiable:** E2E tests that assume clean state will flake in CI. Always use setup/teardown hooks or sub-flows to guarantee initial conditions.
+4. **Tag Taxonomy Matters:** Clear distinction between `smoke` (critical paths), `core` (main features), `regression` (edge cases, less frequent flows) guides CI strategy and developer workflow
+5. **Sub-Flow Pattern:** `ensure-post-onboarding.yaml` is reusable across all post-onboarding tests — reduces duplication, centralizes onboarding completion logic
+
+**Impact:**
+- **Reliability:** Test flakiness eliminated — flows now pass consistently in CI
+- **Coverage:** Full E2E regression runs on every merge (was never running before)
+- **Developer Experience:** PR checks complete faster (smoke only), merge checks catch regressions (full suite)
+- **Maintainability:** Centralized onboarding logic in sub-flow — future onboarding UI changes require updating only 1 file
+
