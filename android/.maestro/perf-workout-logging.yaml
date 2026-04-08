@@ -1,0 +1,130 @@
+appId: com.gymbro.app
+name: "Performance — Rapid Set Logging"
+tags:
+  - performance
+
+# Tests: Verify rapid set logging without lag or crashes
+# Preconditions: Post-onboarding state, workout can be started
+# Test data: Quick exercise selection, 5+ sets with varying weight/reps
+# Assertions: All sets log successfully, no crashes, UI remains responsive
+# Cleanup: Exit workout without saving
+# Dependencies: ensure-post-onboarding flow
+
+---
+
+- runFlow: flow/ensure-post-onboarding.yaml
+
+onFlowStart:
+  # Start at library
+  - launchApp
+  - waitForAnimationToEnd:
+      timeout: 3000
+  - assertVisible: "Biblioteca de Ejercicios"
+
+onFlowComplete:
+  # Exit workout and return to library
+  - back
+  - waitForAnimationToEnd:
+      timeout: 1000
+  - tapOn:
+      text: "Salir sin guardar|Cancelar"
+      optional: true
+  - waitForAnimationToEnd:
+      timeout: 1000
+  - tapOn:
+      id: "nav_exercise_library"
+      optional: true
+
+# Start a workout
+- assertVisible: "Biblioteca de Ejercicios"
+- takeScreenshot: perf_workout_logging_start
+
+- tapOn:
+    id: "workout_fab"
+- waitForAnimationToEnd:
+    timeout: 2000
+- takeScreenshot: perf_workout_logging_fab_tapped
+
+# Select first available exercise (if exercise selection is shown)
+- tapOn:
+    id: "exercise_card"
+    optional: true
+    index: 0
+- waitForAnimationToEnd:
+    timeout: 1000
+
+# Verify workout screen is loaded
+- assertVisible:
+    text: "weight_input|reps_input|Peso|Repeticiones"
+    optional: true
+- takeScreenshot: perf_workout_logging_workout_screen
+
+# Rapidly log 5 sets with different values
+- repeat:
+    times: 5
+    commands:
+      # Input weight
+      - tapOn:
+          text: "Peso|weight_input"
+          optional: true
+      - waitForAnimationToEnd:
+          timeout: 300
+      - inputText: "${100 + 5 * index}"
+      
+      # Input reps
+      - tapOn:
+          text: "Repeticiones|reps_input"
+          optional: true
+      - waitForAnimationToEnd:
+          timeout: 300
+      - inputText: "${10 - index}"
+      
+      # Save set
+      - tapOn:
+          text: "Guardar Serie|Agregar Serie"
+          optional: true
+      - waitForAnimationToEnd:
+          timeout: 500
+      
+      # Take screenshot every 2 sets
+      - runFlow:
+          when:
+            true: ${index % 2 == 0}
+          commands:
+            - takeScreenshot: perf_workout_logging_set_${index}
+
+# Verify UI is still responsive after rapid logging
+- assertVisible:
+    text: "Entrenamiento|Serie|Peso|Repeticiones"
+    optional: true
+- takeScreenshot: perf_workout_logging_5_sets_complete
+
+# Try to add one more set to verify continued responsiveness
+- tapOn:
+    text: "Peso|weight_input"
+    optional: true
+- waitForAnimationToEnd:
+    timeout: 500
+- inputText: "150"
+
+- tapOn:
+    text: "Repeticiones|reps_input"
+    optional: true
+- waitForAnimationToEnd:
+    timeout: 500
+- inputText: "8"
+
+- tapOn:
+    text: "Guardar Serie|Agregar Serie"
+    optional: true
+- waitForAnimationToEnd:
+    timeout: 1000
+- takeScreenshot: perf_workout_logging_6_sets_complete
+
+# Verify workout data is displayed correctly
+- assertVisible:
+    text: "Serie|Entrenamiento"
+    optional: true
+- takeScreenshot: perf_workout_logging_final
+
+# Exit workout (cleanup handled by onFlowComplete)

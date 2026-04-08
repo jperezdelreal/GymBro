@@ -1,0 +1,108 @@
+appId: com.gymbro.app
+name: "Performance — Scroll Exercise Library"
+tags:
+  - performance
+
+# Tests: Verify smooth scrolling through exercise library without crashes
+# Preconditions: Post-onboarding state, exercise library populated
+# Test data: Default exercise database
+# Assertions: Scrolling completes without crash, library remains responsive
+# Cleanup: Return to top of library
+# Dependencies: ensure-post-onboarding flow
+
+---
+
+- runFlow: flow/ensure-post-onboarding.yaml
+
+onFlowStart:
+  # Start at library
+  - launchApp
+  - waitForAnimationToEnd:
+      timeout: 3000
+  - assertVisible: "Biblioteca de Ejercicios"
+
+onFlowComplete:
+  # Return to library top
+  - tapOn:
+      id: "nav_exercise_library"
+  - waitForAnimationToEnd:
+      timeout: 1000
+
+# Verify we're on Library screen
+- assertVisible: "Biblioteca de Ejercicios"
+- takeScreenshot: perf_scroll_library_start
+
+# Scroll down rapidly multiple times to test performance
+- scroll:
+    direction: DOWN
+- waitForAnimationToEnd:
+    timeout: 500
+- takeScreenshot: perf_scroll_library_scroll_1
+
+- scroll:
+    direction: DOWN
+- waitForAnimationToEnd:
+    timeout: 500
+- takeScreenshot: perf_scroll_library_scroll_2
+
+- scroll:
+    direction: DOWN
+- waitForAnimationToEnd:
+    timeout: 500
+- takeScreenshot: perf_scroll_library_scroll_3
+
+- scroll:
+    direction: DOWN
+- waitForAnimationToEnd:
+    timeout: 500
+- takeScreenshot: perf_scroll_library_scroll_4
+
+- scroll:
+    direction: DOWN
+- waitForAnimationToEnd:
+    timeout: 500
+- takeScreenshot: perf_scroll_library_scroll_5
+
+# Scroll back up to verify bi-directional scrolling
+- scroll:
+    direction: UP
+- waitForAnimationToEnd:
+    timeout: 500
+- takeScreenshot: perf_scroll_library_scroll_up_1
+
+- scroll:
+    direction: UP
+- waitForAnimationToEnd:
+    timeout: 500
+- takeScreenshot: perf_scroll_library_scroll_up_2
+
+- scroll:
+    direction: UP
+- waitForAnimationToEnd:
+    timeout: 500
+- takeScreenshot: perf_scroll_library_scroll_up_3
+
+# Verify library is still responsive after heavy scrolling
+- assertVisible: "Biblioteca de Ejercicios"
+- assertVisible:
+    id: "search_bar"
+- assertVisible:
+    id: "workout_fab"
+- takeScreenshot: perf_scroll_library_complete
+
+# Try searching to verify library state is intact
+- tapOn:
+    id: "search_bar"
+- waitForAnimationToEnd:
+    timeout: 1000
+- inputText: "Press"
+- waitForAnimationToEnd:
+    timeout: 1000
+- takeScreenshot: perf_scroll_library_search_after_scroll
+
+# Clear search and verify library is still functional
+- back
+- waitForAnimationToEnd:
+    timeout: 1000
+- assertVisible: "Biblioteca de Ejercicios"
+- takeScreenshot: perf_scroll_library_final
