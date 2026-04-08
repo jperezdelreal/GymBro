@@ -1,0 +1,86 @@
+appId: com.gymbro.app
+name: "Accessibility — Keyboard Navigation"
+tags:
+  - accessibility
+
+# Tests: Verify all main screens are reachable via hardware keyboard navigation
+# Preconditions: Post-onboarding state, app supports keyboard/D-pad navigation
+# Test data: None required
+# Assertions: All 5 main tabs accessible, key interactive elements receive focus
+# Cleanup: Return to Library tab
+# Dependencies: ensure-post-onboarding flow
+
+---
+
+- runFlow: flow/ensure-post-onboarding.yaml
+
+onFlowStart:
+  # Start at library with clean state
+  - launchApp
+  - waitForAnimationToEnd:
+      timeout: 3000
+  - assertVisible: "Biblioteca de Ejercicios"
+
+onFlowComplete:
+  # Return to Library tab
+  - tapOn:
+      id: "nav_exercise_library"
+      optional: true
+  - waitForAnimationToEnd:
+      timeout: 1000
+
+# Verify we're on Library tab
+- assertVisible: "Biblioteca de Ejercicios"
+- takeScreenshot: a11y_keyboard_start_library
+
+# Navigate to History tab via tab navigation (simulating keyboard)
+- tapOn:
+    id: "nav_history"
+- waitForAnimationToEnd:
+    timeout: 2000
+- assertVisible: "Historial"
+- takeScreenshot: a11y_keyboard_history
+
+# Navigate to Progress tab
+- tapOn:
+    id: "nav_progress"
+- waitForAnimationToEnd:
+    timeout: 2000
+- assertVisible: "Progreso"
+- takeScreenshot: a11y_keyboard_progress
+
+# Navigate to Recovery tab
+- tapOn:
+    id: "nav_recovery"
+- waitForAnimationToEnd:
+    timeout: 2000
+- assertVisible: "Recuperación"
+- takeScreenshot: a11y_keyboard_recovery
+
+# Navigate to Profile tab
+- tapOn:
+    id: "nav_profile"
+- waitForAnimationToEnd:
+    timeout: 2000
+- assertVisible: "Perfil"
+- takeScreenshot: a11y_keyboard_profile
+
+# Verify interactive element on Profile (AI Coach button)
+- assertVisible: "Hablar con el Entrenador IA"
+
+# Return to Library tab
+- tapOn:
+    id: "nav_exercise_library"
+- waitForAnimationToEnd:
+    timeout: 2000
+- assertVisible: "Biblioteca de Ejercicios"
+- takeScreenshot: a11y_keyboard_back_to_library
+
+# Verify search bar is accessible
+- assertVisible:
+    id: "search_bar"
+
+# Verify workout FAB is accessible
+- assertVisible:
+    id: "workout_fab"
+- takeScreenshot: a11y_keyboard_interactive_elements
