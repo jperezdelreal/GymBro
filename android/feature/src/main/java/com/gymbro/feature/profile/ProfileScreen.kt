@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.CloudOff
 import androidx.compose.material.icons.filled.CloudSync
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.SmartToy
 import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -61,6 +62,7 @@ private val SurfaceDark = Color(0xFF121212)
 @Composable
 fun ProfileRoute(
     onNavigateToSettings: () -> Unit = {},
+    onNavigateToCoach: () -> Unit = {},
     viewModel: ProfileViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -78,6 +80,7 @@ fun ProfileRoute(
         state = state,
         onEvent = viewModel::onEvent,
         onNavigateToSettings = onNavigateToSettings,
+        onNavigateToCoach = onNavigateToCoach,
     )
 }
 
@@ -86,6 +89,7 @@ internal fun ProfileScreen(
     state: ProfileState,
     onEvent: (ProfileEvent) -> Unit,
     onNavigateToSettings: () -> Unit = {},
+    onNavigateToCoach: () -> Unit = {},
 ) {
     Column(
         modifier = Modifier
@@ -145,6 +149,31 @@ internal fun ProfileScreen(
         )
 
         Spacer(modifier = Modifier.height(16.dp))
+
+        // AI Coach Button
+        Button(
+            onClick = onNavigateToCoach,
+            shape = RoundedCornerShape(12.dp),
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = AccentGreen,
+                contentColor = Color.Black,
+            ),
+        ) {
+            Icon(
+                Icons.Default.SmartToy,
+                contentDescription = "AI Coach",
+                modifier = Modifier.size(20.dp),
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = "Talk to AI Coach",
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(vertical = 4.dp),
+            )
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
 
         // Settings Button
         OutlinedButton(

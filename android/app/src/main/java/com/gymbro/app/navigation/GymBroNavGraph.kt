@@ -54,6 +54,7 @@ import com.gymbro.feature.profile.ProfileRoute
 import com.gymbro.feature.programs.ProgramsRoute
 import com.gymbro.feature.progress.ProgressRoute
 import com.gymbro.feature.analytics.AnalyticsRoute
+import com.gymbro.feature.coach.CoachChatRoute
 import com.gymbro.feature.recovery.RecoveryRoute
 import com.gymbro.feature.settings.SettingsRoute
 import com.gymbro.feature.workout.ActiveWorkoutRoute
@@ -397,7 +398,11 @@ fun GymBroNavGraph(
             }
         }
         composable("coach") {
-            PlaceholderScreen(title = "Coach")
+            CoachChatRoute(
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+            )
         }
         composable("profile") {
             Scaffold(
@@ -423,6 +428,9 @@ fun GymBroNavGraph(
                     ProfileRoute(
                         onNavigateToSettings = {
                             navController.navigate("settings")
+                        },
+                        onNavigateToCoach = {
+                            navController.navigate("coach")
                         },
                     )
                 }
