@@ -1,0 +1,115 @@
+appId: com.gymbro.app
+name: "Verify Data Persistence — Cross-screen data verification"
+tags:
+  - core
+  - regression
+---
+
+- runFlow: flow/ensure-post-onboarding.yaml
+
+onFlowStart:
+  # Ensure clean state at library
+  - launchApp
+  - assertVisible: "Biblioteca de Ejercicios"
+
+onFlowComplete:
+  # Return to library
+  - tapOn:
+      id: "nav_exercise_library"
+      optional: true
+
+# Start from Exercise Library
+- assertVisible: "Biblioteca de Ejercicios"
+- takeScreenshot: persistence_flow_start
+
+# STEP 1: Start a workout
+- tapOn:
+    id: "workout_fab"
+- assertVisible: "Entrenamiento Activo"
+- takeScreenshot: persistence_workout_started
+
+# STEP 2: Add an exercise
+- tapOn: "Añadir Ejercicio"
+- assertVisible: "Elegir Ejercicio"
+
+# Pick Squat exercise
+- tapOn:
+    text: "Squat"
+    index: 0
+- assertVisible: "Entrenamiento Activo"
+
+# STEP 3: Log a set
+- tapOn:
+    id: "weight_input"
+    index: 0
+- inputText: "80"
+- hideKeyboard
+
+- tapOn:
+    id: "reps_input"
+    index: 0
+- inputText: "8"
+- hideKeyboard
+
+- takeScreenshot: persistence_set_filled
+
+# Complete the set
+- tapOn:
+    text: "Completar serie 1"
+- takeScreenshot: persistence_set_completed
+
+# STEP 4: Complete the workout
+- tapOn: "Finalizar Entrenamiento"
+- assertVisible: "¡Entrenamiento Completado!"
+- takeScreenshot: persistence_workout_summary
+
+# Return to library
+- tapOn: "Listo"
+- assertVisible: "Biblioteca de Ejercicios"
+
+# VERIFICATION 1: Check History for workout
+- tapOn:
+    id: "nav_history"
+- assertVisible: "Historial de Entrenamientos"
+- takeScreenshot: persistence_verify_history
+
+# Verify Squat workout appears
+- assertVisible: "Squat"
+- takeScreenshot: persistence_workout_found_in_history
+
+# Tap on the workout to see details
+- tapOn: "Squat"
+- assertVisible:
+    text: "80|8"
+    optional: true
+- takeScreenshot: persistence_history_detail
+
+# Go back to history list
+- back
+- assertVisible: "Historial de Entrenamientos"
+
+# VERIFICATION 2: Check Progress for updated stats
+- tapOn:
+    id: "nav_progress"
+- assertVisible:
+    text: "Volumen Semanal|Sin entrenamientos aún"
+- takeScreenshot: persistence_verify_progress
+
+# Verify progress data shows (not empty state)
+- assertVisible: "Volumen Semanal"
+- takeScreenshot: persistence_progress_stats_visible
+
+# Verify PRs section is present (indicates data exists)
+- assertVisible:
+    text: "PRs Recientes"
+    optional: true
+
+# Scroll to see more stats
+- scroll
+- takeScreenshot: persistence_progress_scrolled
+
+# VERIFICATION 3: Return to library and verify state
+- tapOn:
+    id: "nav_exercise_library"
+- assertVisible: "Biblioteca de Ejercicios"
+- takeScreenshot: persistence_flow_complete

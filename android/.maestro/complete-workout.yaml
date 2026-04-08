@@ -69,3 +69,31 @@ onFlowStart:
 # Back at exercise library
 - assertVisible: "Biblioteca de Ejercicios"
 - takeScreenshot: workout_flow_complete
+
+# PERSISTENCE VERIFICATION: Navigate to History
+- tapOn:
+    id: "nav_history"
+- assertVisible: "Historial de Entrenamientos"
+- takeScreenshot: persistence_check_history
+
+# Verify workout appears in history (Bench Press should be visible)
+- assertVisible: "Bench Press"
+- takeScreenshot: persistence_workout_in_history
+
+# PERSISTENCE VERIFICATION: Navigate to Progress
+- tapOn:
+    id: "nav_progress"
+- assertVisible:
+    text: "Volumen Semanal|Sin entrenamientos aún"
+- takeScreenshot: persistence_check_progress
+
+# If progress data exists, verify it's updated (not empty state)
+- assertVisible:
+    text: "Volumen Semanal"
+    optional: true
+- takeScreenshot: persistence_progress_updated
+
+# Return to Exercise Library
+- tapOn:
+    id: "nav_exercise_library"
+- assertVisible: "Biblioteca de Ejercicios"

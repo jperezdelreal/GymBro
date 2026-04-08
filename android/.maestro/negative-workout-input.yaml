@@ -1,0 +1,100 @@
+appId: com.gymbro.app
+name: "Negative — Invalid Workout Inputs (zero/negative/extreme values)"
+tags:
+  - negative
+  - core
+---
+
+- runFlow: flow/ensure-post-onboarding.yaml
+
+onFlowStart:
+  - launchApp
+  - assertVisible: "Biblioteca de Ejercicios"
+
+onFlowComplete:
+  # Clean up any active workout
+  - back
+      optional: true
+  - tapOn:
+      text: "Cancelar Entrenamiento|Descartar"
+      optional: true
+
+# Start workout from Exercise Library
+- assertVisible: "Biblioteca de Ejercicios"
+- tapOn:
+    id: "workout_fab"
+
+# Verify Active Workout screen
+- assertVisible: "Entrenamiento Activo"
+- takeScreenshot: negative_workout_started
+
+# Add an exercise
+- tapOn: "Añadir Ejercicio"
+- assertVisible: "Elegir Ejercicio"
+- tapOn:
+    id: "search_bar"
+- inputText: "Bench"
+- hideKeyboard
+- tapOn:
+    text: "Bench Press"
+    index: 0
+
+# Back on workout screen
+- assertVisible: "Entrenamiento Activo"
+
+# TEST 1: Zero weight
+- tapOn:
+    id: "weight_input"
+    index: 0
+- inputText: "0"
+- tapOn:
+    id: "reps_input"
+    index: 0
+- inputText: "5"
+- hideKeyboard
+- takeScreenshot: negative_zero_weight
+# App should handle gracefully (no crash)
+
+# Clear and try TEST 2: Negative weight
+- tapOn:
+    id: "weight_input"
+    index: 0
+- inputText: "-50"
+- tapOn:
+    id: "reps_input"
+    index: 0
+- inputText: "5"
+- hideKeyboard
+- takeScreenshot: negative_weight
+# App should handle gracefully
+
+# Clear and try TEST 3: Extremely large weight
+- tapOn:
+    id: "weight_input"
+    index: 0
+- inputText: "99999"
+- hideKeyboard
+- takeScreenshot: negative_extreme_weight
+
+# TEST 4: Zero reps
+- tapOn:
+    id: "reps_input"
+    index: 0
+- inputText: "0"
+- hideKeyboard
+- takeScreenshot: negative_zero_reps
+
+# TEST 5: Negative reps
+- tapOn:
+    id: "reps_input"
+    index: 0
+- inputText: "-10"
+- hideKeyboard
+- takeScreenshot: negative_reps
+
+# Verify app is still responsive (no crash)
+- assertVisible: "Entrenamiento Activo"
+
+# Cancel workout to clean up
+- back
+- tapOn: "Cancelar Entrenamiento|Descartar"

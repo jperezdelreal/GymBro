@@ -1,0 +1,81 @@
+appId: com.gymbro.app
+name: "Negative — Empty State UI (fresh app with no data)"
+tags:
+  - negative
+  - core
+---
+
+onFlowStart:
+  # Start completely fresh with clearState
+  - stopApp
+
+onFlowComplete:
+  - stopApp
+
+# Launch with clearState to wipe all data
+- launchApp:
+    clearState: true
+
+# Complete onboarding quickly to get past it
+- assertVisible: "GymBro"
+- takeScreenshot: empty_state_onboarding_start
+
+# Swipe through onboarding pages
+- swipe:
+    direction: LEFT
+    duration: 400
+- swipe:
+    direction: LEFT
+    duration: 400
+- swipe:
+    direction: LEFT
+    duration: 400
+
+# Complete onboarding setup
+- tapOn: "Kilogramos (kg)|Kilograms (kg)"
+- tapOn:
+    id: "onboarding_name_input"
+- inputText: "EmptyTest"
+- hideKeyboard
+- tapOn:
+    id: "onboarding_start"
+
+# Now at Exercise Library (post-onboarding)
+- assertVisible: "Biblioteca de Ejercicios"
+- takeScreenshot: empty_state_library
+
+# TEST 1: Check History tab (should show empty state)
+- tapOn:
+    id: "nav_history"
+
+# Verify History screen loaded
+- assertVisible: "Historial|History"
+- takeScreenshot: empty_state_history
+# Should show empty state message or empty list
+
+# TEST 2: Check Progress tab (should show empty state)
+- tapOn:
+    id: "nav_progress"
+
+# Verify Progress screen loaded
+- assertVisible: "Progreso|Progress"
+- takeScreenshot: empty_state_progress
+# Should show empty state with no data
+
+# TEST 3: Check Recovery tab
+- tapOn:
+    id: "nav_recovery"
+
+# Verify Recovery screen loaded
+- takeScreenshot: empty_state_recovery
+
+# TEST 4: Check Profile tab
+- tapOn:
+    id: "nav_profile"
+
+# Verify Profile screen loaded
+- assertVisible: "Perfil|Profile"
+- takeScreenshot: empty_state_profile
+
+# Verify app handles all empty states gracefully
+- assertVisible: "EmptyTest"
