@@ -1496,3 +1496,174 @@ Package.swift               ios/Package.swift
 - [ ] Update `.github/workflows/ci.yml` to build from `ios/` directory
 - [ ] Create shared data loading layer for cross-platform seed data
 - [ ] Scaffold Android project structure in `android/`
+
+---
+
+## Decision: Theme Primitives Owned by Core Module (Android)
+
+**Author:** Morpheus (Lead/Architect)  
+**Date:** 2026-04-08  
+**Status:** Implemented  
+**PR:** #260  
+
+### Context
+
+Issue #250 — Consolidate theme colors. Duplicate Color.kt files existed in both pp/ui/theme/ and core/ui/theme/, creating risk of theme drift.
+
+### Decision
+
+**Core module owns all design system primitives.** App module consumes them via imports.
+
+**Module Boundary:**
+- core/ui/theme/: Defines colors, typography, shapes, gradients (design tokens)
+- pp/ui/theme/: Composes Material3 theme, applies to app-level composables
+
+### Implementation
+
+- Deleted pp/ui/theme/Color.kt (duplicate)
+- Updated pp/ui/theme/Gradients.kt to import from core
+- pp/ui/theme/Theme.kt verified correct imports
+
+### Rationale
+
+1. **Single Source of Truth:** One place to change colors affects entire app
+2. **Module Hierarchy:** Core is foundational; app depends on core, not vice versa
+3. **Reusability:** Feature modules can import from core without coupling to app
+4. **Android Convention:** Design system lives in lower-level module (similar to Material3 structure)
+
+### Consequences
+
+- **Positive:** Clear ownership, easier maintenance, no duplication
+- **Negative:** None — this is standard Android architecture
+- **Action Required:** Future theme additions go in core/ui/theme/
+
+---
+
+## Decision: Exercise Seed Data Architecture (Android)
+
+**Author:** Tank (Backend Dev)  
+**Date:** 2026-04-08  
+**Status:** Implemented  
+**PR:** #259  
+
+### Context
+
+Issue #256 — Add exercise seed data to Room database. App was showing empty exercise library on fresh install.
+
+### Decision
+
+Use JSON-based seed data loaded from Android assets folder via Room's RoomDatabase.Callback.onCreate().
+
+### Rationale
+
+1. **Offline-First:** App must work without network. Empty library is broken UX.
+2. **Maintainability:** 400+ exercises as hardcoded Kotlin = 8000+ lines of unmaintainable code. JSON is shared with iOS.
+3. **Performance:** onCreate() runs once (first DB creation only), ~100ms insertion, imperceptible to user.
+4. **Duplicate Prevention:** Deterministic UUID generation ensures same exercise from seed and remote sync have same ID. Room's REPLACE conflict strategy handles merges cleanly.
+
+### Implementation
+
+- File: ndroid/core/src/main/assets/exercises-seed.json (126KB, 400+ exercises)
+- Parser: kotlinx.serialization (lightweight, compile-time codegen)
+- Insertion: Bulk insert via ExerciseDao.insertAll() in IO coroutine
+- ID Strategy: UUID.nameUUIDFromBytes(name.toByteArray()) — stable, deterministic
+
+### Implications for Squad
+
+- **Trinity (UI):** Exercise library screen shows data immediately on fresh installs
+- **Neo (AI):** AI coach can reference exercise names from day 1
+- **Morpheus (Product):** Onboarding friction reduced — users see value before creating account
+- **iOS Parity:** Same JSON source as iOS — single source of truth
+
+---
+
+## User Directive: AI Coach + Voice Logging Architecture (Android)
+
+**Captured By:** Squad Coordinator  
+**Date:** 2026-04-08T05:55  
+**By:** Copilot (via CLI)  
+
+### Decision
+
+AI Coach Chat will use **Gemini Flash via Firebase AI** (native Android integration). Voice Logging will use **Android SpeechRecognizer API** (native, works offline).
+
+### Rationale
+
+- Gemini Flash is the path of least resistance with existing Firebase setup
+- SpeechRecognizer is built-in, no external dependency needed
+- Both are native Android APIs with minimal friction
+
+### Implications
+
+- Cloud LLM for AI coach (per directive 2026-04-08T05:50)
+- Wear OS deprioritized per user request
+- Voice logging available on all Android versions without third-party dependencies
+
+---
+
+## User Directive: Wear OS Deprioritization
+
+**Captured By:** Squad Coordinator  
+**Date:** 2026-04-08T05:50  
+**By:** Copilot (via CLI)  
+
+### Decision
+
+Wear OS is **deprioritized**. AI Coach Chat must use cloud LLM (not on-device models).
+
+### Rationale
+
+User request to focus on core features (phone + web) before exploring wearable expansion.
+
+---
+
+## User Directive: Automatic Branch Cleanup
+
+**Captured By:** Squad Coordinator  
+**Date:** 2026-04-08T10:55  
+**By:** Copilot (via CLI)  
+
+### Decision
+
+Branch cleanup must be **automatic after every PR merge.** Delete local branch, prune remote, remove worktree. Never accumulate stale branches.
+
+### Rationale
+
+49 stale branches accumulated because cleanup wasn't automatic. This is part of the CI/CD process, not a manual task.
+
+### Implementation
+
+- GH Actions workflow post-merge hook cleans up source branch
+- Developers run local cleanup script as part of PR merge checklist
+- Quinn (Git Manager) enforces no manual branch accumulation
+
+---
+
+## User Directive: Spanish Default Language + Modern, Beautiful UX
+
+**Captured By:** Squad Coordinator  
+**Date:** 2026-04-08T07:12  
+**By:** Copilot (via CLI)  
+
+### Decision
+
+Spanish should be the **default language**. Settings allow switching to other languages.
+
+### UX Imperative
+
+**The app MUST be BEAUTIFUL, modern, futuristic — not just functional.**
+
+- UX must be polished, simple, comfortable
+- Every screen should evoke quality and attention to detail
+- Polish is non-negotiable for market positioning
+
+### Rationale
+
+User's language preference (Spanish-first). Market positioning requires visual excellence to stand out vs. competitors.
+
+### Implications
+
+- i18n infrastructure must prioritize Spanish strings
+- Design review process must validate "beauty" alongside functionality
+- Polish over speed — ship complete screens, not half-baked features
+

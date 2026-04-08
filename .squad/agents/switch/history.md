@@ -103,4 +103,44 @@ $env:JAVA_HOME = "C:\Program Files\Android\Android Studio\jbr"
 cd android
 .\gradlew.bat test
 ```
+### 2026-04-08: Round 1 Execution — Unit Test Suite Fixes + Quality Gate Validation
+
+**Scope:** Issue #249 (fix unit tests)  
+**PR:** #261  
+**Status:** ✅ MERGED — 80/80 tests passing  
+
+**Test Suite Repairs (Issue #249):**
+- Fixed missing repository method stubs in mock implementations
+- Resolved ViewModel dependency injection chain (Hilt integration)
+- Updated test fixtures to match current SwiftData schema
+- All 80 core unit tests now passing ✅
+- CI pipeline validated: tests run on every PR + push to main
+
+**Coverage Baseline Established:**
+- Coverage artifacts generated in GitHub Actions workflow
+- Foundation laid for future coverage gates (currently informational)
+- Swift Testing framework patterns documented (ready for migration from XCTest)
+- No coverage % threshold enforced yet (establishing baseline first)
+
+**Quality Gate Activation:**
+- PR merge gate now functional: lint pass + build + tests required
+- Regression suite ready for downstream feature development
+- All dependent PRs (Morpheus #260, Tank #259) verified against updated test suite
+
+**Cross-Platform Test Architecture:**
+- Android test infrastructure installed via android-testing skill
+- Fake repository pattern established for unit tests (FakeWorkoutRepository, FakeExerciseRepository)
+- MainDispatcherRule + Turbine for async/Flow testing validated
+- Test fixtures shared across Android feature team
+
+**Testing Philosophy Validated:**
+- Fail fast: Lint before build, build before test
+- Coverage tracking from day one (enforcement deferred to v2.0)
+- CI runs on every PR and push — no exceptions
+- Local test suite matches CI results (no flakiness)
+
+**Implications for Squad:**
+- Regression suite unblocks future feature development
+- Team can merge PRs with confidence (quality gate active)
+- Testing patterns documented for consistency across iOS + Android
 

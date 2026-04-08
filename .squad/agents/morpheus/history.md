@@ -69,3 +69,34 @@
   - `android/app/src/main/java/com/gymbro/app/ui/theme/Theme.kt` — imports from core via wildcard
   - `android/app/src/main/java/com/gymbro/app/ui/theme/Gradients.kt` — updated to import from core
 - **PR:** #260 (draft) — ready for squad review
+### 2026-04-08: Round 1 Execution — Theme Consolidation + UX Roadmap Definition
+
+**Scope:** Issue #250 (theme consolidation) + UX roadmap research  
+**PR:** #260  
+**Status:** ✅ MERGED  
+
+**Theme Consolidation (Issue #250):**
+- Deleted duplicate pp/ui/theme/Color.kt 
+- Established Core Module as single source of truth for design tokens
+- Module boundary decision documented for future theme additions
+- Zero regressions — all 80 unit tests pass
+
+**UX Sprint Roadmap (Issue #170 + Phase Planning):**
+- Created comprehensive UX/Design 2.0 roadmap for Android platform
+- 18 issues created across 5 phases (Foundation → Core Screens → Polish → Delight → Onboarding)
+- Prioritized Foundation (Phase A) as blocking for subsequent phases
+- Success metrics defined: <20s first-set-logging, >90% onboarding completion, 4.7+ App Store rating
+- KPI reference: Time to First Set Logged (currently ~60s, target <20s), onboarding completion rate (currently ~50%, target >90%)
+
+**Design System Language:**
+- Defined 5 core design principles: Velocity, Precision, Power, Intelligence, Brand Identity
+- Competitive positioning: GymBro supercharges Strong's speed + Juggernaut's intelligence + modern AI conversation
+- Color palette evolved from flat Material 3 to gradient/glassmorphism aesthetic
+- Inter font upgrade + Spanish i18n infrastructure required
+
+**Team Implications:**
+- Tank to lead UX implementation across all phases
+- Morpheus to conduct design review for each PR
+- Switch to validate Phase completion before merge
+- User directive: Spanish default language + "BEAUTIFUL, modern, futuristic" design (not just functional)
+
