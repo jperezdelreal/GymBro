@@ -63,6 +63,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.liveRegion
@@ -655,7 +656,7 @@ private fun SetRow(
             value = setUi.weight,
             onValueChange = { onEvent(ActiveWorkoutEvent.UpdateSetWeight(exerciseIndex, setIndex, it)) },
             enabled = !setUi.isCompleted,
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.weight(1f).testTag("weight_input"),
         )
 
         Spacer(modifier = Modifier.width(8.dp))
@@ -665,7 +666,7 @@ private fun SetRow(
             value = setUi.reps,
             onValueChange = { onEvent(ActiveWorkoutEvent.UpdateSetReps(exerciseIndex, setIndex, it)) },
             enabled = !setUi.isCompleted,
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.weight(1f).testTag("reps_input"),
         )
 
         Spacer(modifier = Modifier.width(8.dp))
