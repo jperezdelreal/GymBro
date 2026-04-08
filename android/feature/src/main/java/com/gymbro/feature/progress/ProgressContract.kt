@@ -13,6 +13,15 @@ data class ProgressState(
     val chartData: List<E1RMDataPoint> = emptyList(),
     val plateauAlerts: List<PlateauAlert> = emptyList(),
     val isLoading: Boolean = true,
+    val totalVolume: Double = 0.0,
+    val workoutsThisWeek: Int = 0,
+    val recentPRs: Int = 0,
+    val weeklyVolumeData: List<WeeklyVolume> = emptyList(),
+)
+
+data class WeeklyVolume(
+    val weekNumber: Int,
+    val volume: Double,
 )
 
 data class ExerciseOption(
