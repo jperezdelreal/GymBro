@@ -37,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -124,6 +125,7 @@ fun GymBroNavGraph(
                     containerColor = AccentGreen,
                     contentColor = Color.Black,
                     shape = CircleShape,
+                    modifier = Modifier.testTag("workout_fab")
                 ) {
                     Icon(Icons.Default.Add, contentDescription = stringResource(R.string.workout_start), modifier = Modifier.size(28.dp))
                 }
@@ -410,6 +412,7 @@ private fun GymBroBottomNavBar(
                 NavigationBarItem(
                     selected = selected,
                     onClick = { onTabSelected(tab) },
+                    modifier = Modifier.testTag("nav_${tab.route}"),
                     icon = {
                         Icon(
                             if (selected) tab.selectedIcon else tab.unselectedIcon,

@@ -48,6 +48,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
@@ -191,7 +192,7 @@ fun ExerciseLibraryScreen(
                 TextField(
                     value = state.searchQuery,
                     onValueChange = { onEvent(ExerciseLibraryEvent.SearchQueryChanged(it)) },
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().testTag("search_bar"),
                     placeholder = {
                         Text(stringResource(R.string.exercise_library_search), color = MaterialTheme.colorScheme.onSurfaceVariant)
                     },
@@ -373,7 +374,8 @@ private fun ExerciseCard(
                 isPressed = true
                 haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                 onClick()
-            },
+            }
+            .testTag("exercise_card"),
         accentColor = accentColor,
     ) {
         Row(
