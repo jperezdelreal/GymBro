@@ -190,3 +190,20 @@ cd android
 - Delivery: PR #265 (draft) with formatted commit message and co-author trailer
 - **Value for new devs:** Comprehensive guide eliminates setup friction, explains patterns, provides troubleshooting for blockers
 - Closes #257
+
+### 2026-04-08: Screen Transition Verification After Micro-Animations PR (Issue #255)
+**Headless emulator verification of all NavHost transitions**
+- Verified NavHost transition code in `GymBroNavGraph.kt` — all 4 transition types properly configured:
+  - `enterTransition`: slideIntoContainer(Left) + fadeIn @ 300ms tween
+  - `exitTransition`: slideOutOfContainer(Left) + fadeOut @ 300ms tween
+  - `popEnterTransition`: slideIntoContainer(Right) + fadeIn @ 300ms tween
+  - `popExitTransition`: slideOutOfContainer(Right) + fadeOut @ 300ms tween
+- **Bottom nav transitions (5 tabs):** Library → History → Progress → Recovery → Profile → Library — all clean, zero crashes
+- **Deep navigation:** Profile→Settings, History→HistoryDetail, FAB→ActiveWorkout, Progress→Analytics — all clean
+- **Back navigation:** Back from Settings, HistoryDetail, ActiveWorkout, Analytics — all clean, popEnter/popExit animations fire correctly
+- **Rapid tab switching stress test:** 8 rapid tab switches in <3 seconds — no crashes, no ANRs, no blank screens
+- **Logcat analysis:** Zero FATAL errors, zero AndroidRuntime exceptions, zero NullPointerExceptions across all test scenarios
+- **GPU rendering:** Frame stats too low on headless emulator for meaningful jank analysis (expected for CI environments), but no rendering errors detected
+- **Activity stack:** Single MainActivity with correct Compose navigation — no leaked activities or fragments
+- **Code review note:** Slide+fade combo at 300ms follows Material Design motion guidelines. Bottom nav uses same slide animation as deep nav — could be refined to fade-through for tabs, but not a bug.
+- Closes #255
