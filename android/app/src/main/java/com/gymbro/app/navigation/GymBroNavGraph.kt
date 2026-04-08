@@ -98,34 +98,66 @@ fun GymBroNavGraph(
     val hasCompletedOnboarding by userPreferences.hasCompletedOnboarding.collectAsStateWithLifecycle(initialValue = false)
     val startDestination = if (hasCompletedOnboarding) "exercise_library" else "onboarding"
 
-    NavHost(
-        navController = navController,
-        startDestination = startDestination,
-        enterTransition = {
-            slideIntoContainer(
-                towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                animationSpec = tween(300)
-            ) + fadeIn(animationSpec = tween(300))
+    Scaffold(
+        bottomBar = {
+            if (showBottomBar) {
+                GymBroBottomNavBar(
+                    currentRoute = currentDestination?.route,
+                    onTabSelected = { tab ->
+                        navController.navigate(tab.route) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    },
+                )
+            }
         },
-        exitTransition = {
-            slideOutOfContainer(
-                towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                animationSpec = tween(300)
-            ) + fadeOut(animationSpec = tween(300))
+        floatingActionButton = {
+            if (showBottomBar) {
+                FloatingActionButton(
+                    onClick = { navController.navigate("active_workout") },
+                    containerColor = AccentGreen,
+                    contentColor = Color.Black,
+                    shape = CircleShape,
+                ) {
+                    Icon(Icons.Default.Add, contentDescription = stringResource(R.string.workout_start), modifier = Modifier.size(28.dp))
+                }
+            }
         },
-        popEnterTransition = {
-            slideIntoContainer(
-                towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                animationSpec = tween(300)
-            ) + fadeIn(animationSpec = tween(300))
-        },
-        popExitTransition = {
-            slideOutOfContainer(
-                towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                animationSpec = tween(300)
-            ) + fadeOut(animationSpec = tween(300))
-        },
-    ) {
+        containerColor = MaterialTheme.colorScheme.background,
+    ) { innerPadding ->
+        NavHost(
+            navController = navController,
+            startDestination = startDestination,
+            modifier = Modifier.padding(innerPadding),
+            enterTransition = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(300)
+                ) + fadeIn(animationSpec = tween(300))
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(300)
+                ) + fadeOut(animationSpec = tween(300))
+            },
+            popEnterTransition = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(300)
+                ) + fadeIn(animationSpec = tween(300))
+            },
+            popExitTransition = {
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(300)
+                ) + fadeOut(animationSpec = tween(300))
+            },
+        ) {
         composable("onboarding") {
             OnboardingRoute(
                 onNavigateToMain = {
@@ -136,46 +168,14 @@ fun GymBroNavGraph(
             )
         }
         composable("exercise_library") {
-            Scaffold(
-                bottomBar = {
-                    if (showBottomBar) {
-                        GymBroBottomNavBar(
-                            currentRoute = currentDestination?.route,
-                            onTabSelected = { tab ->
-                                navController.navigate(tab.route) {
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        saveState = true
-                                    }
-                                    launchSingleTop = true
-                                    restoreState = true
-                                }
-                            },
-                        )
-                    }
+            ExerciseLibraryRoute(
+                onNavigateToDetail = { exerciseId ->
+                    navController.navigate("exercise_detail/$exerciseId")
                 },
-                floatingActionButton = {
-                    FloatingActionButton(
-                        onClick = { navController.navigate("active_workout") },
-                        containerColor = AccentGreen,
-                        contentColor = Color.Black,
-                        shape = CircleShape,
-                    ) {
-                        Icon(Icons.Default.Add, contentDescription = stringResource(R.string.workout_start), modifier = Modifier.size(28.dp))
-                    }
+                onNavigateToCreateExercise = {
+                    navController.navigate("create_exercise")
                 },
-                containerColor = MaterialTheme.colorScheme.background,
-            ) { innerPadding ->
-                Box(modifier = Modifier.padding(innerPadding)) {
-                    ExerciseLibraryRoute(
-                        onNavigateToDetail = { exerciseId ->
-                            navController.navigate("exercise_detail/$exerciseId")
-                        },
-                        onNavigateToCreateExercise = {
-                            navController.navigate("create_exercise")
-                        },
-                    )
-                }
-            }
+            )
         }
         composable("exercise_detail/{exerciseId}") {
             PlaceholderScreen(title = "Exercise Detail")
@@ -310,61 +310,17 @@ fun GymBroNavGraph(
             )
         }
         composable("history") {
-            Scaffold(
-                bottomBar = {
-                    if (showBottomBar) {
-                        GymBroBottomNavBar(
-                            currentRoute = currentDestination?.route,
-                            onTabSelected = { tab ->
-                                navController.navigate(tab.route) {
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        saveState = true
-                                    }
-                                    launchSingleTop = true
-                                    restoreState = true
-                                }
-                            },
-                        )
-                    }
+            HistoryListRoute(
+                onNavigateBack = { },
+                onNavigateToDetail = { workoutId ->
+                    navController.navigate("history/$workoutId")
                 },
-                containerColor = MaterialTheme.colorScheme.background,
-            ) { innerPadding ->
-                Box(modifier = Modifier.padding(innerPadding)) {
-                    HistoryListRoute(
-                        onNavigateBack = { },
-                        onNavigateToDetail = { workoutId ->
-                            navController.navigate("history/$workoutId")
-                        },
-                    )
-                }
-            }
+            )
         }
         composable("progress") {
-            Scaffold(
-                bottomBar = {
-                    if (showBottomBar) {
-                        GymBroBottomNavBar(
-                            currentRoute = currentDestination?.route,
-                            onTabSelected = { tab ->
-                                navController.navigate(tab.route) {
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        saveState = true
-                                    }
-                                    launchSingleTop = true
-                                    restoreState = true
-                                }
-                            },
-                        )
-                    }
-                },
-                containerColor = MaterialTheme.colorScheme.background,
-            ) { innerPadding ->
-                Box(modifier = Modifier.padding(innerPadding)) {
-                    ProgressRoute(
-                        onNavigateToAnalytics = { navController.navigate("analytics") }
-                    )
-                }
-            }
+            ProgressRoute(
+                onNavigateToAnalytics = { navController.navigate("analytics") }
+            )
         }
         composable("analytics") {
             AnalyticsRoute(
@@ -372,61 +328,17 @@ fun GymBroNavGraph(
             )
         }
         composable("recovery") {
-            Scaffold(
-                bottomBar = {
-                    if (showBottomBar) {
-                        GymBroBottomNavBar(
-                            currentRoute = currentDestination?.route,
-                            onTabSelected = { tab ->
-                                navController.navigate(tab.route) {
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        saveState = true
-                                    }
-                                    launchSingleTop = true
-                                    restoreState = true
-                                }
-                            },
-                        )
-                    }
-                },
-                containerColor = MaterialTheme.colorScheme.background,
-            ) { innerPadding ->
-                Box(modifier = Modifier.padding(innerPadding)) {
-                    RecoveryRoute()
-                }
-            }
+            RecoveryRoute()
         }
         composable("programs") {
-            Scaffold(
-                bottomBar = {
-                    if (showBottomBar) {
-                        GymBroBottomNavBar(
-                            currentRoute = currentDestination?.route,
-                            onTabSelected = { tab ->
-                                navController.navigate(tab.route) {
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        saveState = true
-                                    }
-                                    launchSingleTop = true
-                                    restoreState = true
-                                }
-                            },
-                        )
-                    }
+            ProgramsRoute(
+                onNavigateToCreateTemplate = { templateId ->
+                    // TODO: Navigate to create/edit template screen
                 },
-                containerColor = MaterialTheme.colorScheme.background,
-            ) { innerPadding ->
-                Box(modifier = Modifier.padding(innerPadding)) {
-                    ProgramsRoute(
-                        onNavigateToCreateTemplate = { templateId ->
-                            // TODO: Navigate to create/edit template screen
-                        },
-                        onNavigateToActiveWorkout = { template ->
-                            navController.navigate("active_workout")
-                        },
-                    )
-                }
-            }
+                onNavigateToActiveWorkout = { template ->
+                    navController.navigate("active_workout")
+                },
+            )
         }
         composable("coach") {
             CoachChatRoute(
@@ -436,36 +348,14 @@ fun GymBroNavGraph(
             )
         }
         composable("profile") {
-            Scaffold(
-                bottomBar = {
-                    if (showBottomBar) {
-                        GymBroBottomNavBar(
-                            currentRoute = currentDestination?.route,
-                            onTabSelected = { tab ->
-                                navController.navigate(tab.route) {
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        saveState = true
-                                    }
-                                    launchSingleTop = true
-                                    restoreState = true
-                                }
-                            },
-                        )
-                    }
+            ProfileRoute(
+                onNavigateToSettings = {
+                    navController.navigate("settings")
                 },
-                containerColor = MaterialTheme.colorScheme.background,
-            ) { innerPadding ->
-                Box(modifier = Modifier.padding(innerPadding)) {
-                    ProfileRoute(
-                        onNavigateToSettings = {
-                            navController.navigate("settings")
-                        },
-                        onNavigateToCoach = {
-                            navController.navigate("coach")
-                        },
-                    )
-                }
-            }
+                onNavigateToCoach = {
+                    navController.navigate("coach")
+                },
+            )
         }
         composable("settings") {
             SettingsRoute(
@@ -473,6 +363,7 @@ fun GymBroNavGraph(
                     navController.popBackStack()
                 },
             )
+        }
         }
     }
 }
