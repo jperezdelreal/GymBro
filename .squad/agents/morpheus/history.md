@@ -57,3 +57,15 @@
 - **Natural Cadence:** Event-driven (fires on board clear) rather than calendar-driven (arbitrary sprint boundaries)
 - **Decision Documented:** `.squad/decisions/inbox/morpheus-board-clear-retro.md` explains rationale, alternatives considered, and success metrics
 - **Implementation Notes:** Ralph's orchestration loop must detect board clear condition and trigger ceremony before entering idle state. Facilitator is always lead (Morpheus), participants are all-team members from the cleared wave.
+
+### 2026-04-08: Android Theme Color Consolidation (#250)
+
+- **Issue:** Duplicate Color.kt files in `app/ui/theme` and `core/ui/theme` caused maintenance overhead and potential inconsistencies
+- **Resolution:** Deleted `app/ui/theme/Color.kt` duplicate, keeping `core/ui/theme/Color.kt` as single source of truth. Updated `Gradients.kt` to import from core module.
+- **Architecture Decision:** Core module owns all design tokens (colors, typography, gradients). App module consumes but never defines theme primitives. This establishes clear module boundaries: core = design system, app = composition.
+- **Build Environment:** Encountered transient Gradle cache issues during verification (Hilt compilation errors, file lock conflicts). Master branch builds cleanly; changes are minimal and architecturally correct—one deletion, one import addition.
+- **Key Files:**
+  - `android/core/src/main/java/com/gymbro/core/ui/theme/Color.kt` — canonical color definitions
+  - `android/app/src/main/java/com/gymbro/app/ui/theme/Theme.kt` — imports from core via wildcard
+  - `android/app/src/main/java/com/gymbro/app/ui/theme/Gradients.kt` — updated to import from core
+- **PR:** #260 (draft) — ready for squad review

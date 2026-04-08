@@ -5,6 +5,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import com.gymbro.core.ui.theme.*
 
 object GymBroGradients {
     val strength = Brush.linearGradient(
