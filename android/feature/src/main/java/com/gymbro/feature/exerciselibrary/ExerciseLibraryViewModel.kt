@@ -3,6 +3,7 @@ package com.gymbro.feature.exerciselibrary
 import androidx.lifecycle.viewModelScope
 import com.gymbro.core.repository.ExerciseRepository
 import com.gymbro.feature.common.BaseViewModel
+import com.gymbro.feature.common.TooltipManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
@@ -17,6 +18,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ExerciseLibraryViewModel @Inject constructor(
     private val exerciseRepository: ExerciseRepository,
+    val tooltipManager: TooltipManager,
 ) : BaseViewModel() {
 
     private val _state = MutableStateFlow(ExerciseLibraryState())

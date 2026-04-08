@@ -99,4 +99,14 @@ class UserPreferences @Inject constructor(
             preferences.clear()
         }
     }
+
+    fun isTooltipShown(id: String): Flow<Boolean> = dataStore.data.map { preferences ->
+        preferences[booleanPreferencesKey("tooltip_shown_$id")] ?: false
+    }
+
+    suspend fun markTooltipShown(id: String) {
+        dataStore.edit { preferences ->
+            preferences[booleanPreferencesKey("tooltip_shown_$id")] = true
+        }
+    }
 }
