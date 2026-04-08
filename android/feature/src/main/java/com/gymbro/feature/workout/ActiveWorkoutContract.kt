@@ -42,6 +42,7 @@ sealed interface ActiveWorkoutEvent {
     data class CompleteSet(val exerciseIndex: Int, val setIndex: Int) : ActiveWorkoutEvent
     data class RemoveSet(val exerciseIndex: Int, val setIndex: Int) : ActiveWorkoutEvent
     data class RemoveExercise(val exerciseIndex: Int) : ActiveWorkoutEvent
+    data class VoiceInput(val exerciseIndex: Int, val setIndex: Int, val weight: String, val reps: String) : ActiveWorkoutEvent
     data object StartRestTimer : ActiveWorkoutEvent
     data object SkipRestTimer : ActiveWorkoutEvent
     data class AdjustRestTimer(val deltaSeconds: Int) : ActiveWorkoutEvent

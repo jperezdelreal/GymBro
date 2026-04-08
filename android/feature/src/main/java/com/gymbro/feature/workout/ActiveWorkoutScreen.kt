@@ -47,6 +47,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -63,6 +64,8 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gymbro.core.model.Exercise
+import com.gymbro.core.preferences.UserPreferences
+import com.gymbro.core.voice.VoiceRecognitionService
 import com.gymbro.feature.common.FullScreenLoading
 
 private val AccentGreen = Color(0xFF00FF87)
@@ -81,6 +84,24 @@ fun ActiveWorkoutRoute(
     pickedExercise: Exercise? = null,
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle()
+    val context = androidx.compose.ui.platform.LocalContext.current
+    
+    // Get services from Hilt through entry point
+    val voiceRecognitionService = remember {
+        dagger.hilt.android.EntryPointAccessors.fromApplication(
+            context.applicationContext,
+            VoiceServiceEntryPoint::class.java
+        ).voiceRecognitionService()
+    }
+    
+    val userPreferences = remember {
+        dagger.hilt.android.EntryPointAccessors.fromApplication(
+            context.applicationContext,
+            PreferencesEntryPoint::class.java
+        ).userPreferences()
+    }
+    
+    val weightUnit = userPreferences.weightUnit.collectAsStateWithLifecycle(initialValue = UserPreferences.WeightUnit.KG)
 
     // Handle picked exercise
     LaunchedEffect(pickedExercise) {
@@ -109,7 +130,21 @@ fun ActiveWorkoutRoute(
     ActiveWorkoutScreen(
         state = state.value,
         onEvent = viewModel::onEvent,
+        voiceRecognitionService = voiceRecognitionService,
+        defaultWeightUnit = weightUnit.value,
     )
+}
+
+@dagger.hilt.EntryPoint
+@dagger.hilt.InstallIn(dagger.hilt.components.SingletonComponent::class)
+interface VoiceServiceEntryPoint {
+    fun voiceRecognitionService(): com.gymbro.core.voice.VoiceRecognitionService
+}
+
+@dagger.hilt.EntryPoint
+@dagger.hilt.InstallIn(dagger.hilt.components.SingletonComponent::class)
+interface PreferencesEntryPoint {
+    fun userPreferences(): com.gymbro.core.preferences.UserPreferences
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -117,6 +152,8 @@ fun ActiveWorkoutRoute(
 fun ActiveWorkoutScreen(
     state: ActiveWorkoutState,
     onEvent: (ActiveWorkoutEvent) -> Unit,
+    voiceRecognitionService: VoiceRecognitionService,
+    defaultWeightUnit: UserPreferences.WeightUnit,
 ) {
     if (state.isLoading) {
         FullScreenLoading(message = "Starting workout...")
@@ -196,6 +233,8 @@ fun ActiveWorkoutScreen(
                             exerciseUi = exerciseUi,
                             exerciseIndex = exerciseIndex,
                             onEvent = onEvent,
+                            voiceRecognitionService = voiceRecognitionService,
+                            defaultWeightUnit = defaultWeightUnit,
                         )
                     }
 
@@ -269,6 +308,8 @@ private fun ExerciseCard(
     exerciseUi: WorkoutExerciseUi,
     exerciseIndex: Int,
     onEvent: (ActiveWorkoutEvent) -> Unit,
+    voiceRecognitionService: com.gymbro.core.voice.VoiceRecognitionService,
+    defaultWeightUnit: com.gymbro.core.preferences.UserPreferences.WeightUnit,
 ) {
     Column(
         modifier = Modifier
@@ -341,6 +382,8 @@ private fun ExerciseCard(
                 exerciseIndex = exerciseIndex,
                 setIndex = setIndex,
                 onEvent = onEvent,
+                voiceRecognitionService = voiceRecognitionService,
+                defaultWeightUnit = defaultWeightUnit,
             )
             if (setIndex < exerciseUi.sets.lastIndex) {
                 Spacer(modifier = Modifier.height(4.dp))
@@ -373,6 +416,8 @@ private fun SetRow(
     exerciseIndex: Int,
     setIndex: Int,
     onEvent: (ActiveWorkoutEvent) -> Unit,
+    voiceRecognitionService: VoiceRecognitionService,
+    defaultWeightUnit: UserPreferences.WeightUnit,
 ) {
     val rowBackground = when {
         setUi.isCompleted -> AccentGreen.copy(alpha = 0.08f)
@@ -432,6 +477,34 @@ private fun SetRow(
         )
 
         Spacer(modifier = Modifier.width(4.dp))
+
+        // Voice input button (only show if not completed)
+        if (!setUi.isCompleted) {
+            IconButton(
+                onClick = { /* Handled by VoiceInputButton */ },
+                modifier = Modifier.size(32.dp),
+                enabled = false // The VoiceInputButton handles its own clicks
+            ) {
+                Box(modifier = Modifier.size(32.dp)) {
+                    VoiceInputButton(
+                        voiceRecognitionService = voiceRecognitionService,
+                        defaultWeightUnit = defaultWeightUnit,
+                        onVoiceResult = { result ->
+                            onEvent(
+                                ActiveWorkoutEvent.VoiceInput(
+                                    exerciseIndex = exerciseIndex,
+                                    setIndex = setIndex,
+                                    weight = result.weight.toString(),
+                                    reps = result.reps.toString()
+                                )
+                            )
+                        },
+                        modifier = Modifier.size(32.dp)
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.width(4.dp))
+        }
 
         // Complete button
         if (setUi.isCompleted) {
