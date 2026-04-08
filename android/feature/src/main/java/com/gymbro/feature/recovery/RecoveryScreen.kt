@@ -56,7 +56,17 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gymbro.core.model.SleepData
+import com.gymbro.core.ui.theme.AccentGreenStart
+import com.gymbro.core.ui.theme.AccentGreenEnd
+import com.gymbro.core.ui.theme.AccentAmberStart
+import com.gymbro.core.ui.theme.AccentAmberEnd
+import com.gymbro.core.ui.theme.AccentRed
+import com.gymbro.core.ui.theme.Background
+import com.gymbro.core.ui.theme.OnSurfaceVariant
 import com.gymbro.feature.common.FullScreenLoading
+import com.gymbro.feature.common.GlassmorphicCard
+import com.gymbro.feature.common.AnimatedProgressCircle
+import androidx.compose.ui.graphics.Brush
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
@@ -94,7 +104,7 @@ internal fun RecoveryScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(SurfaceDark)
+            .background(Background)
             .verticalScroll(rememberScrollState())
             .padding(16.dp),
     ) {
@@ -182,76 +192,59 @@ internal fun RecoveryScreen(
 
 @Composable
 private fun ReadinessScoreCard(score: Int, label: String) {
-    val scoreColor = when {
-        score >= 80 -> AccentGreen
-        score >= 60 -> Color(0xFFFFD600)
-        score >= 40 -> Color(0xFFFF9100)
-        else -> Color(0xFFFF5252)
+    val gradientColors = when {
+        score >= 80 -> listOf(AccentGreenStart, AccentGreenEnd)
+        score >= 60 -> listOf(AccentAmberStart, AccentAmberEnd)
+        else -> listOf(AccentRed, AccentRed)
     }
+    val scoreColor = gradientColors[0]
 
-    Card(
-        colors = CardDefaults.cardColors(containerColor = CardBackground),
-        shape = RoundedCornerShape(20.dp),
+    GlassmorphicCard(
         modifier = Modifier.fillMaxWidth(),
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(24.dp),
+                .padding(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
                 text = stringResource(R.string.recovery_readiness_score),
                 style = MaterialTheme.typography.titleMedium,
-                color = Color(0xFF9E9E9E),
+                color = OnSurfaceVariant,
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Circular score indicator
+            // Large animated progress circle with gradient
             Box(contentAlignment = Alignment.Center, modifier = Modifier.semantics {
                 contentDescription = "Readiness score: $score out of 100, $label"
             }) {
-                Canvas(modifier = Modifier.size(140.dp).clearAndSetSemantics { }) {
-                    // Background arc
-                    drawArc(
-                        color = Color(0xFF2A2A2A),
-                        startAngle = 135f,
-                        sweepAngle = 270f,
-                        useCenter = false,
-                        style = Stroke(width = 12.dp.toPx()),
-                        topLeft = Offset(12.dp.toPx(), 12.dp.toPx()),
-                        size = Size(
-                            size.width - 24.dp.toPx(),
-                            size.height - 24.dp.toPx(),
-                        ),
-                    )
-                    // Score arc
-                    drawArc(
-                        color = scoreColor,
-                        startAngle = 135f,
-                        sweepAngle = 270f * (score / 100f),
-                        useCenter = false,
-                        style = Stroke(width = 12.dp.toPx()),
-                        topLeft = Offset(12.dp.toPx(), 12.dp.toPx()),
-                        size = Size(
-                            size.width - 24.dp.toPx(),
-                            size.height - 24.dp.toPx(),
-                        ),
-                    )
-                }
-
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = "$score",
-                        fontSize = 48.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = scoreColor,
-                    )
+                AnimatedProgressCircle(
+                    progress = score / 100f,
+                    size = 160.dp,
+                    strokeWidth = 16.dp,
+                    gradientColors = gradientColors,
+                    modifier = Modifier.clearAndSetSemantics { }
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = "$score",
+                            fontSize = 56.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White,
+                        )
+                        Text(
+                            text = "%",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = OnSurfaceVariant,
+                        )
+                    }
                 }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             Text(
                 text = label,
@@ -259,6 +252,10 @@ private fun ReadinessScoreCard(score: Int, label: String) {
                 color = scoreColor,
                 fontWeight = FontWeight.SemiBold,
             )
+            
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            RecoveryTips(score = score)
         }
     }
 }
@@ -320,15 +317,13 @@ private fun MetricCard(
     value: String,
     iconTint: Color,
 ) {
-    Card(
+    GlassmorphicCard(
         modifier = modifier.semantics(mergeDescendants = true) { 
             contentDescription = "$label: $value"
         },
-        colors = CardDefaults.cardColors(containerColor = CardBackground),
-        shape = RoundedCornerShape(16.dp),
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(4.dp),
         ) {
             Box(
                 modifier = Modifier
@@ -356,9 +351,44 @@ private fun MetricCard(
             Text(
                 text = label,
                 style = MaterialTheme.typography.bodySmall,
-                color = Color(0xFF9E9E9E),
+                color = OnSurfaceVariant,
             )
         }
+    }
+}
+
+@Composable
+private fun RecoveryTips(score: Int) {
+    val tipText = when {
+        score >= 80 -> stringResource(R.string.recovery_tip_green)
+        score >= 60 -> stringResource(R.string.recovery_tip_amber)
+        else -> stringResource(R.string.recovery_tip_red)
+    }
+    
+    val tipColor = when {
+        score >= 80 -> AccentGreenStart
+        score >= 60 -> AccentAmberStart
+        else -> AccentRed
+    }
+    
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(tipColor.copy(alpha = 0.1f), RoundedCornerShape(12.dp))
+            .padding(16.dp)
+    ) {
+        Text(
+            text = "💡 Recovery Tip",
+            style = MaterialTheme.typography.labelLarge,
+            fontWeight = FontWeight.Bold,
+            color = tipColor,
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = tipText,
+            style = MaterialTheme.typography.bodyMedium,
+            color = Color.White,
+        )
     }
 }
 

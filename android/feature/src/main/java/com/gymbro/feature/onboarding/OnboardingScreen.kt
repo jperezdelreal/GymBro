@@ -1,5 +1,6 @@
 package com.gymbro.feature.onboarding
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -37,6 +38,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.res.stringResource
@@ -47,9 +49,15 @@ import com.gymbro.core.R
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gymbro.core.preferences.UserPreferences.WeightUnit
+import com.gymbro.core.ui.theme.AccentGreenStart
+import com.gymbro.core.ui.theme.AccentGreenEnd
+import com.gymbro.core.ui.theme.Background
+import com.gymbro.core.ui.theme.OnSurfaceVariant
+import com.gymbro.core.ui.theme.GlassOverlay
+import com.gymbro.feature.common.GlassmorphicCard
+import com.gymbro.feature.common.GradientButton
 
 private val AccentGreen = Color(0xFF00FF87)
-private val Background = Color(0xFF0A0A0A)
 private val SurfaceVariant = Color(0xFF2C2C2E)
 
 @Composable
@@ -135,28 +143,38 @@ private fun WelcomePage() {
         Icon(
             imageVector = Icons.Default.FitnessCenter,
             contentDescription = null,
-            tint = AccentGreen,
-            modifier = Modifier.size(120.dp),
+            tint = AccentGreenStart,
+            modifier = Modifier.size(160.dp),
         )
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(40.dp))
+        
+        // Gradient text for app title
         Text(
             text = stringResource(R.string.onboarding_app_title),
-            style = MaterialTheme.typography.displayLarge,
+            style = MaterialTheme.typography.displayLarge.copy(
+                brush = Brush.linearGradient(
+                    colors = listOf(AccentGreenStart, AccentGreenEnd)
+                )
+            ),
             fontWeight = FontWeight.Bold,
-            color = Color.White,
         )
+        
         Spacer(modifier = Modifier.height(16.dp))
+        
         Text(
-            text = stringResource(R.string.onboarding_tagline),
-            style = MaterialTheme.typography.headlineMedium,
-            color = AccentGreen,
+            text = "Tu compañero de gym inteligente",
+            style = MaterialTheme.typography.headlineSmall,
+            color = OnSurfaceVariant,
             fontWeight = FontWeight.Medium,
+            textAlign = TextAlign.Center,
         )
-        Spacer(modifier = Modifier.height(16.dp))
+        
+        Spacer(modifier = Modifier.height(24.dp))
+        
         Text(
             text = stringResource(R.string.onboarding_subtitle),
             style = MaterialTheme.typography.bodyLarge,
-            color = Color(0xFF9E9E9E),
+            color = OnSurfaceVariant,
             textAlign = TextAlign.Center,
         )
     }
@@ -253,13 +271,13 @@ private fun GetStartedPage(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            UnitButton(
+            UnitCard(
                 text = stringResource(R.string.onboarding_unit_kg),
                 isSelected = selectedUnit == WeightUnit.KG,
                 onClick = { onUnitSelected(WeightUnit.KG) },
                 modifier = Modifier.weight(1f),
             )
-            UnitButton(
+            UnitCard(
                 text = stringResource(R.string.onboarding_unit_lbs),
                 isSelected = selectedUnit == WeightUnit.LBS,
                 onClick = { onUnitSelected(WeightUnit.LBS) },
@@ -280,75 +298,66 @@ private fun GetStartedPage(
         OutlinedTextField(
             value = userName,
             onValueChange = onNameChanged,
-            placeholder = { Text(stringResource(R.string.onboarding_name_placeholder), color = Color(0xFF9E9E9E)) },
+            placeholder = { Text(stringResource(R.string.onboarding_name_placeholder), color = OnSurfaceVariant) },
             modifier = Modifier.fillMaxWidth(),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedTextColor = Color.White,
                 unfocusedTextColor = Color.White,
-                focusedBorderColor = AccentGreen,
-                unfocusedBorderColor = Color(0xFF9E9E9E),
-                cursorColor = AccentGreen,
+                focusedBorderColor = AccentGreenStart,
+                unfocusedBorderColor = OnSurfaceVariant,
+                cursorColor = AccentGreenStart,
             ),
             singleLine = true,
         )
 
         Spacer(modifier = Modifier.height(48.dp))
 
-        Button(
+        GradientButton(
+            text = "¡Vamos!",
             onClick = onComplete,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = AccentGreen,
-                contentColor = Color.Black,
-            ),
-            shape = RoundedCornerShape(12.dp),
-        ) {
-            Text(
-                text = stringResource(R.string.onboarding_lets_go),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-            )
-        }
+        )
     }
 }
 
 @Composable
-private fun UnitButton(
+private fun UnitCard(
     text: String,
     isSelected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    if (isSelected) {
-        Button(
-            onClick = onClick,
-            modifier = modifier.height(48.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = AccentGreen,
-                contentColor = Color.Black,
-            ),
-            shape = RoundedCornerShape(12.dp),
-        ) {
-            Text(
-                text = text,
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Bold,
+    GlassmorphicCard(
+        modifier = modifier
+            .height(80.dp)
+            .clip(RoundedCornerShape(16.dp))
+            .background(
+                if (isSelected) {
+                    Brush.linearGradient(
+                        colors = listOf(AccentGreenStart, AccentGreenEnd)
+                    )
+                } else {
+                    Brush.linearGradient(
+                        colors = listOf(GlassOverlay, GlassOverlay)
+                    )
+                }
             )
-        }
-    } else {
-        OutlinedButton(
-            onClick = onClick,
-            modifier = modifier.height(48.dp),
-            colors = ButtonDefaults.outlinedButtonColors(
-                contentColor = Color.White,
+            .clip(RoundedCornerShape(16.dp))
+            .then(
+                Modifier.clickable(onClick = onClick)
             ),
-            shape = RoundedCornerShape(12.dp),
+    ) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center,
         ) {
             Text(
                 text = text,
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                color = if (isSelected) Color.Black else Color.White,
             )
         }
     }
@@ -370,7 +379,7 @@ private fun PageIndicators(
                     .size(if (index == currentPage) 10.dp else 8.dp)
                     .clip(CircleShape)
                     .background(
-                        if (index == currentPage) AccentGreen else Color(0xFF9E9E9E)
+                        if (index == currentPage) AccentGreenStart else GlassOverlay
                     ),
             )
         }

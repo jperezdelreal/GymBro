@@ -102,6 +102,9 @@
     <string name="recovery_permissions_title">Connect Your Health Data</string>
     <string name="recovery_permissions_message">GymBro uses sleep, heart rate, and step data to calculate your recovery readiness and optimize training.</string>
     <string name="recovery_grant_permissions">Grant Permissions</string>
+    <string name="recovery_tip_green">Great recovery! You\'re ready for high-intensity training. Focus on compound lifts and push your limits.</string>
+    <string name="recovery_tip_amber">Moderate recovery. Consider medium-intensity training or focus on technique and volume work.</string>
+    <string name="recovery_tip_red">Low recovery detected. Prioritize rest, light mobility work, or active recovery. Listen to your body.</string>
 
     <!-- Recovery Status Labels -->
     <string name="recovery_status_optimal">Optimal</string>
