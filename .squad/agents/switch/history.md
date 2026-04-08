@@ -249,3 +249,34 @@ cd android
 - Bottom nav tab positions can be found precisely via uiautomator XML bounds on nav label text
 - The FAB's clickable area extends beyond the icon bounds (parent container provides the touch target)
 - Profile screen embeds settings inline (not a separate Settings screen from the tab)
+
+### 2026-04-08: Onboarding i18n Fix + Maestro Flow Corrections (PR #270)
+**Fixed hardcoded strings and Maestro YAML syntax errors across 12 files.**
+
+**Task 1 — Onboarding i18n:**
+- Found 1 hardcoded string in `OnboardingScreen.kt`: `"¡Vamos!"` → replaced with `stringResource(R.string.onboarding_lets_go)`
+- All other onboarding strings already used `stringResource()` correctly
+- Both `values/strings.xml` (English) and `values-es/strings.xml` (Spanish) had complete onboarding translations
+- Build verified: `assembleDebug` passed
+
+**Task 2 — Maestro flow fixes (11 YAML files):**
+- `full-e2e.yaml`: Replaced 3 invalid `swipeLeft` commands → `swipe: { direction: LEFT, duration: 400 }`
+- `onboarding-flow.yaml`: Same swipeLeft fix (3 occurrences) + added `clearState: true`
+- `smoke-test.yaml`: Removed `clearState: true`, used regex assertion `"GymBro|Exercise Library"` for state-agnostic check
+- `browse-library.yaml`: Removed mid-flow `clearState` block that would wipe onboarding; replaced with simple `launchApp`
+- Added explicit `- launchApp` to 7 flows that assumed app was already running (navigation-smoke, start-workout, complete-workout, check-history, check-progress, ai-coach, profile-settings)
+- Updated ALL assertion text from Spanish to English for default-locale emulator compatibility
+- Added `- hideKeyboard` in onboarding flows before tapping "Let's Go" button (keyboard was covering it)
+
+**Maestro test results:**
+- `onboarding-flow.yaml`: ✅ **ALL 25 STEPS PASSED** — swipe syntax correct, all English assertions matched, keyboard dismiss worked
+- `smoke-test.yaml`: ❌ Emulator infrastructure issue (`device offline` / `Unable to launch app`) — YAML syntax valid, runtime failure is emulator instability, not code
+- Emulator (`emulator-5554`) went offline intermittently during Maestro test sessions — affects `launchApp` step consistently
+
+**Key Learnings:**
+- `swipeLeft` / `swipeRight` are NOT valid Maestro commands — must use `swipe: { direction: LEFT, duration: 400 }`
+- Maestro `assertVisible` uses regex matching — `"A|B"` syntax works for OR-matching (useful for state-agnostic assertions)
+- After `inputText` in Maestro, the keyboard covers bottom UI elements — always add `- hideKeyboard` before tapping buttons below the text field
+- The emulator locale is `es-ES` but app shows English strings due to `clearState: true` resetting app locale preferences
+- `clearState` in Maestro clears app data AND forces a fresh install — this means onboarding appears again, which breaks flows that expect post-onboarding state
+- Emulator offline errors are infrastructure issues (ADB TCP forwarding drops) — not YAML or code bugs

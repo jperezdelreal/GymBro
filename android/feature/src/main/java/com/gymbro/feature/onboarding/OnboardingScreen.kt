@@ -317,7 +317,7 @@ private fun GetStartedPage(
         Spacer(modifier = Modifier.height(48.dp))
 
         GradientButton(
-            text = "¡Vamos!",
+            text = stringResource(R.string.onboarding_lets_go),
             onClick = onComplete,
             modifier = Modifier
                 .fillMaxWidth()

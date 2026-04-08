@@ -5,25 +5,27 @@ tags:
   - core
 ---
 
+- launchApp
+
 # Start from Exercise Library
-- assertVisible: "Biblioteca de Ejercicios"
+- assertVisible: "Exercise Library"
 
 # Tap FAB to start new workout
-- tapOn: "Iniciar Entrenamiento"
+- tapOn: "Start Workout"
 
 # Verify Active Workout screen
-- assertVisible: "Entrenamiento Activo"
+- assertVisible: "Active Workout"
 - takeScreenshot: workout_started
 
 # Tap Add Exercise button
-- tapOn: "Añadir Ejercicio"
+- tapOn: "Add Exercise"
 
 # Verify exercise picker opens
-- assertVisible: "Elegir Ejercicio"
+- assertVisible: "Pick Exercise"
 - takeScreenshot: exercise_picker
 
 # Search and select an exercise
-- tapOn: "Buscar ejercicios…"
+- tapOn: "Search exercises…"
 - inputText: "Bench"
 - takeScreenshot: exercise_picker_search
 
@@ -33,7 +35,7 @@ tags:
     index: 0
 
 # Back on workout screen — verify exercise was added
-- assertVisible: "Entrenamiento Activo"
+- assertVisible: "Active Workout"
 - takeScreenshot: workout_exercise_added
 
 # Log a set — enter weight value

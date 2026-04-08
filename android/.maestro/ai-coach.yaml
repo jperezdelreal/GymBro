@@ -5,33 +5,35 @@ tags:
   - ai
 ---
 
+- launchApp
+
 # Navigate to Profile tab first
-- tapOn: "Perfil"
-- assertVisible: "Hablar con Entrenador IA"
+- tapOn: "Profile"
+- assertVisible: "Talk to AI Coach"
 
 # Tap AI Coach button
-- tapOn: "Hablar con Entrenador IA"
+- tapOn: "Talk to AI Coach"
 
 # Verify Coach screen opens
-- assertVisible: "GymBro Entrenador IA"
+- assertVisible: "GymBro AI Coach"
 - takeScreenshot: coach_screen
 
 # Check for welcome message and quick prompts
-- assertVisible: "Tu asesor personal de entrenamiento de fuerza"
-- assertVisible: "Preguntas rápidas:"
+- assertVisible: "Your personal strength training advisor"
+- assertVisible: "Quick prompts:"
 - takeScreenshot: coach_welcome
 
 # Try tapping a quick prompt
-- tapOn: "¿Qué debería entrenar hoy?"
+- tapOn: "What should I train today?"
 - takeScreenshot: coach_prompt_sent
 
 # Wait for response (or loading indicator)
 - assertVisible:
-    text: "El entrenador está pensando...|Entrenador"
+    text: "Coach is thinking...|Coach"
     optional: true
 - takeScreenshot: coach_response
 
 # Navigate back
 - back
-- assertVisible: "Perfil"
+- assertVisible: "Profile"
 - takeScreenshot: coach_back_to_profile

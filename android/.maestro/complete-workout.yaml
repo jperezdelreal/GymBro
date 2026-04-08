@@ -5,18 +5,20 @@ tags:
   - e2e
 ---
 
+- launchApp
+
 # Start from Exercise Library
-- assertVisible: "Biblioteca de Ejercicios"
+- assertVisible: "Exercise Library"
 
 # Tap FAB to start workout
-- tapOn: "Iniciar Entrenamiento"
+- tapOn: "Start Workout"
 
 # Verify active workout
-- assertVisible: "Entrenamiento Activo"
+- assertVisible: "Active Workout"
 
 # Add an exercise
-- tapOn: "Añadir Ejercicio"
-- assertVisible: "Elegir Ejercicio"
+- tapOn: "Add Exercise"
+- assertVisible: "Pick Exercise"
 
 # Pick first available exercise
 - tapOn:
@@ -24,7 +26,7 @@ tags:
     index: 0
 
 # Verify back on workout screen
-- assertVisible: "Entrenamiento Activo"
+- assertVisible: "Active Workout"
 
 # Fill in weight for set 1
 - tapOn:
@@ -42,23 +44,23 @@ tags:
 
 # Complete the set (tap the check/complete button)
 - tapOn:
-    text: "Completar serie 1"
+    text: "Complete set 1"
 
 - takeScreenshot: workout_set1_completed
 
 # Finish the workout
-- tapOn: "Finalizar Entrenamiento"
+- tapOn: "Finish Workout"
 
 # Verify workout summary screen
-- assertVisible: "¡Entrenamiento Completado!"
+- assertVisible: "Workout Complete!"
 - takeScreenshot: workout_summary
 
 # Verify stats are displayed
-- assertVisible: "Estadísticas del Entrenamiento"
+- assertVisible: "Workout Stats"
 
 # Tap Done to return
-- tapOn: "Listo"
+- tapOn: "Done"
 
 # Back at exercise library
-- assertVisible: "Biblioteca de Ejercicios"
+- assertVisible: "Exercise Library"
 - takeScreenshot: workout_flow_complete

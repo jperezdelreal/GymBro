@@ -5,16 +5,18 @@ tags:
   - smoke
 ---
 
+- launchApp
+
 # Navigate to History tab
-- tapOn: "Historial"
+- tapOn: "History"
 - takeScreenshot: history_tab
 
 # Verify History screen loads
-- assertVisible: "Historial de Entrenamientos"
+- assertVisible: "Workout History"
 
 # Check for workout entries or empty state
 - assertVisible:
-    text: "Sin Entrenamientos Aún|Hoy|Ayer"
+    text: "No Workouts Yet|Today|Yesterday"
     optional: true
 - takeScreenshot: history_content
 
