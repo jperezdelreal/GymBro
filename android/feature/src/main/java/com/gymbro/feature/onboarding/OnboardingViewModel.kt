@@ -33,6 +33,9 @@ class OnboardingViewModel @Inject constructor(
             is OnboardingEvent.NameChanged -> {
                 _state.value = _state.value.copy(userName = event.name)
             }
+            is OnboardingEvent.GoalSelected -> {
+                _state.value = _state.value.copy(selectedGoal = event.goal)
+            }
             is OnboardingEvent.CompleteOnboarding -> {
                 completeOnboarding()
             }
