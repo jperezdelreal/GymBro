@@ -24,8 +24,8 @@ import javax.inject.Singleton
 
 @Singleton
 class FirestoreSyncService @Inject constructor(
-    private val firestore: FirebaseFirestore,
-    private val auth: FirebaseAuth,
+    private val firestore: FirebaseFirestore?,
+    private val auth: FirebaseAuth?,
     private val workoutDao: WorkoutDao,
     private val exerciseDao: ExerciseDao,
     private val connectivityObserver: ConnectivityObserver,
@@ -35,9 +35,14 @@ class FirestoreSyncService @Inject constructor(
     private val deviceId: String = android.os.Build.MODEL
 
     private val userId: String?
-        get() = auth.currentUser?.uid
+        get() = auth?.currentUser?.uid
 
     override suspend fun syncExercises(): Result<Unit> {
+        if (firestore == null || auth == null) {
+            _syncStatus.value = SyncStatus.DISABLED
+            return Result.failure(Exception("Firebase is not configured"))
+        }
+
         if (!connectivityObserver.isConnected.value) {
             _syncStatus.value = SyncStatus.OFFLINE
             return Result.failure(Exception("No network connection"))
@@ -72,6 +77,11 @@ class FirestoreSyncService @Inject constructor(
     }
 
     override suspend fun syncWorkouts(): Result<Unit> {
+        if (firestore == null || auth == null) {
+            _syncStatus.value = SyncStatus.DISABLED
+            return Result.failure(Exception("Firebase is not configured"))
+        }
+
         if (!connectivityObserver.isConnected.value) {
             _syncStatus.value = SyncStatus.OFFLINE
             return Result.failure(Exception("No network connection"))
@@ -107,6 +117,11 @@ class FirestoreSyncService @Inject constructor(
     }
 
     override suspend fun syncUserProfile(profile: FirestoreUserProfile): Result<Unit> {
+        if (firestore == null || auth == null) {
+            _syncStatus.value = SyncStatus.DISABLED
+            return Result.failure(Exception("Firebase is not configured"))
+        }
+
         if (!connectivityObserver.isConnected.value) {
             _syncStatus.value = SyncStatus.OFFLINE
             return Result.failure(Exception("No network connection"))
@@ -140,6 +155,12 @@ class FirestoreSyncService @Inject constructor(
     }
 
     override fun observeChanges(): Flow<SyncStatus> = callbackFlow {
+        if (firestore == null || auth == null) {
+            trySend(SyncStatus.DISABLED)
+            close()
+            return@callbackFlow
+        }
+
         val uid = userId
         if (uid == null) {
             trySend(SyncStatus.DISABLED)
