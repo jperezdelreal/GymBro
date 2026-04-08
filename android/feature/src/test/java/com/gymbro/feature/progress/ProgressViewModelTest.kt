@@ -42,7 +42,7 @@ class ProgressViewModelTest {
         )
         coEvery { mockPRService.getE1RMHistory(any()) } returns TestFixtures.e1rmDataPoints
 
-        viewModel = ProgressViewModel(mockPRService, fakeExerciseRepository)
+        viewModel = ProgressViewModel(mockPRService, fakeExerciseRepository, mockk(relaxed = true), mockk(relaxed = true))
 
         viewModel.state.test {
             val state = expectMostRecentItem()
@@ -59,7 +59,7 @@ class ProgressViewModelTest {
         coEvery { mockPRService.getWorkoutHistory() } returns emptyList()
         coEvery { mockPRService.getExerciseIdsWithHistory() } returns emptyList()
 
-        viewModel = ProgressViewModel(mockPRService, fakeExerciseRepository)
+        viewModel = ProgressViewModel(mockPRService, fakeExerciseRepository, mockk(relaxed = true), mockk(relaxed = true))
 
         viewModel.state.test {
             val state = expectMostRecentItem()
@@ -93,7 +93,7 @@ class ProgressViewModelTest {
         coEvery { mockPRService.getE1RMHistory(squatId) } returns squatData
         coEvery { mockPRService.getPersonalRecords(any(), any()) } returns emptyList()
 
-        viewModel = ProgressViewModel(mockPRService, fakeExerciseRepository)
+        viewModel = ProgressViewModel(mockPRService, fakeExerciseRepository, mockk(relaxed = true), mockk(relaxed = true))
 
         viewModel.state.test {
             skipItems(1) // Initial load
@@ -119,7 +119,7 @@ class ProgressViewModelTest {
         coEvery { mockPRService.getE1RMHistory(any()) } returns emptyList()
         coEvery { mockPRService.getPersonalRecords(any(), any()) } returns emptyList()
 
-        viewModel = ProgressViewModel(mockPRService, fakeExerciseRepository)
+        viewModel = ProgressViewModel(mockPRService, fakeExerciseRepository, mockk(relaxed = true), mockk(relaxed = true))
 
         viewModel.state.test {
             val initialState = expectMostRecentItem()
@@ -137,7 +137,7 @@ class ProgressViewModelTest {
         coEvery { mockPRService.getWorkoutHistory() } returns emptyList()
         coEvery { mockPRService.getExerciseIdsWithHistory() } returns emptyList()
 
-        viewModel = ProgressViewModel(mockPRService, fakeExerciseRepository)
+        viewModel = ProgressViewModel(mockPRService, fakeExerciseRepository, mockk(relaxed = true), mockk(relaxed = true))
 
         viewModel.effects.test {
             viewModel.onEvent(ProgressEvent.ViewWorkoutDetail("workout-123"))
@@ -164,7 +164,7 @@ class ProgressViewModelTest {
         coEvery { mockPRService.getE1RMHistory(any()) } returns emptyList()
         coEvery { mockPRService.getPersonalRecords(any(), any()) } returns emptyList()
 
-        viewModel = ProgressViewModel(mockPRService, fakeExerciseRepository)
+        viewModel = ProgressViewModel(mockPRService, fakeExerciseRepository, mockk(relaxed = true), mockk(relaxed = true))
 
         viewModel.state.test {
             val state = expectMostRecentItem()
@@ -187,7 +187,7 @@ class ProgressViewModelTest {
         coEvery { mockPRService.getE1RMHistory(benchId) } returns TestFixtures.e1rmDataPoints
         coEvery { mockPRService.getPersonalRecords(benchId, any()) } returns emptyList()
 
-        viewModel = ProgressViewModel(mockPRService, fakeExerciseRepository)
+        viewModel = ProgressViewModel(mockPRService, fakeExerciseRepository, mockk(relaxed = true), mockk(relaxed = true))
 
         viewModel.state.test {
             val state = expectMostRecentItem()
@@ -204,7 +204,7 @@ class ProgressViewModelTest {
         }
         coEvery { mockPRService.getExerciseIdsWithHistory() } returns emptyList()
 
-        viewModel = ProgressViewModel(mockPRService, fakeExerciseRepository)
+        viewModel = ProgressViewModel(mockPRService, fakeExerciseRepository, mockk(relaxed = true), mockk(relaxed = true))
 
         viewModel.state.test {
             val state = expectMostRecentItem()
@@ -228,7 +228,7 @@ class ProgressViewModelTest {
             mockPRService.getPersonalRecords(squatId, TestFixtures.squat.name) 
         } returns listOf(TestFixtures.squatMaxE1RM)
 
-        viewModel = ProgressViewModel(mockPRService, fakeExerciseRepository)
+        viewModel = ProgressViewModel(mockPRService, fakeExerciseRepository, mockk(relaxed = true), mockk(relaxed = true))
 
         viewModel.state.test {
             val state = expectMostRecentItem()
@@ -254,7 +254,7 @@ class ProgressViewModelTest {
             TestFixtures.squatMaxE1RM
         )
 
-        viewModel = ProgressViewModel(mockPRService, fakeExerciseRepository)
+        viewModel = ProgressViewModel(mockPRService, fakeExerciseRepository, mockk(relaxed = true), mockk(relaxed = true))
 
         viewModel.state.test {
             skipItems(1)
