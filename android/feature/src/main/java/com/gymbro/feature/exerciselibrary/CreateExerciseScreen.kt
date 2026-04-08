@@ -45,10 +45,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.gymbro.core.R
 import com.gymbro.core.model.ExerciseCategory
 import com.gymbro.core.model.Equipment
 import com.gymbro.core.model.MuscleGroup
@@ -99,7 +101,7 @@ fun CreateExerciseScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Create Exercise",
+                        text = stringResource(R.string.create_exercise_title),
                         style = MaterialTheme.typography.headlineMedium,
                         modifier = Modifier.semantics { heading() }
                     )
@@ -108,7 +110,7 @@ fun CreateExerciseScreen(
                     IconButton(onClick = { onEvent(CreateExerciseEvent.CancelClicked) }) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
+                            contentDescription = stringResource(R.string.action_back),
                             tint = MaterialTheme.colorScheme.onBackground,
                         )
                     }
@@ -123,7 +125,7 @@ fun CreateExerciseScreen(
         containerColor = MaterialTheme.colorScheme.background,
     ) { innerPadding ->
         if (state.isLoading) {
-            FullScreenLoading(message = "Creating exercise...")
+            FullScreenLoading(message = stringResource(R.string.create_exercise_loading))
         } else {
             Column(
                 modifier = Modifier
@@ -141,7 +143,7 @@ fun CreateExerciseScreen(
                     // Exercise Name
                     Column {
                         Text(
-                            text = "Exercise Name",
+                            text = stringResource(R.string.create_exercise_name_label),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.onBackground,
@@ -154,7 +156,7 @@ fun CreateExerciseScreen(
                             modifier = Modifier.fillMaxWidth(),
                             placeholder = {
                                 Text(
-                                    "e.g. Dumbbell Chest Press",
+                                    stringResource(R.string.create_exercise_name_placeholder),
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                             },
@@ -176,7 +178,7 @@ fun CreateExerciseScreen(
                     // Muscle Group
                     Column {
                         Text(
-                            text = "Muscle Group",
+                            text = stringResource(R.string.create_exercise_muscle_group),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.onBackground,
@@ -216,7 +218,7 @@ fun CreateExerciseScreen(
                     // Category
                     Column {
                         Text(
-                            text = "Category",
+                            text = stringResource(R.string.create_exercise_category),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.onBackground,
@@ -256,7 +258,7 @@ fun CreateExerciseScreen(
                     // Equipment
                     Column {
                         Text(
-                            text = "Equipment",
+                            text = stringResource(R.string.create_exercise_equipment),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.onBackground,
@@ -361,7 +363,7 @@ fun CreateExerciseScreen(
                         ),
                         enabled = state.exerciseName.isNotBlank(),
                     ) {
-                        Text("Create Exercise", fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.create_exercise_save), fontWeight = FontWeight.Bold)
                     }
                 }
             }

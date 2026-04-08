@@ -36,6 +36,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.res.stringResource
+import com.gymbro.core.R
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
@@ -103,7 +105,7 @@ internal fun RecoveryScreen(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = "Recovery",
+                text = stringResource(R.string.recovery_title),
                 style = MaterialTheme.typography.headlineMedium,
                 color = Color.White,
                 fontWeight = FontWeight.Bold,
@@ -113,7 +115,7 @@ internal fun RecoveryScreen(
                 IconButton(onClick = { onEvent(RecoveryEvent.RefreshData) }) {
                     Icon(
                         Icons.Default.Refresh,
-                        contentDescription = "Refresh",
+                        contentDescription = stringResource(R.string.action_refresh),
                         tint = AccentGreen,
                     )
                 }
@@ -132,7 +134,7 @@ internal fun RecoveryScreen(
                 })
             }
             state.isLoading -> {
-                FullScreenLoading(message = "Loading recovery data...")
+                FullScreenLoading(message = stringResource(R.string.recovery_loading))
             }
             else -> {
                 // Readiness Score Card
@@ -199,7 +201,7 @@ private fun ReadinessScoreCard(score: Int, label: String) {
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
-                text = "Readiness Score",
+                text = stringResource(R.string.recovery_readiness_score),
                 style = MaterialTheme.typography.titleMedium,
                 color = Color(0xFF9E9E9E),
             )
@@ -276,14 +278,14 @@ private fun MetricsGrid(
             MetricCard(
                 modifier = Modifier.weight(1f),
                 icon = Icons.Default.Bedtime,
-                label = "Sleep",
+                label = stringResource(R.string.recovery_sleep_label),
                 value = String.format("%.1fh", sleepHours),
                 iconTint = Color(0xFF7C4DFF),
             )
             MetricCard(
                 modifier = Modifier.weight(1f),
                 icon = Icons.Default.Favorite,
-                label = "Resting HR",
+                label = stringResource(R.string.recovery_resting_hr_label),
                 value = restingHR?.let { String.format("%.0f bpm", it) } ?: "—",
                 iconTint = Color(0xFFFF5252),
             )
@@ -295,14 +297,14 @@ private fun MetricsGrid(
             MetricCard(
                 modifier = Modifier.weight(1f),
                 icon = Icons.Default.MonitorHeart,
-                label = "HRV",
+                label = stringResource(R.string.recovery_hrv_label),
                 value = hrv?.let { String.format("%.0f ms", it) } ?: "—",
                 iconTint = Color(0xFF00BCD4),
             )
             MetricCard(
                 modifier = Modifier.weight(1f),
                 icon = Icons.Default.DirectionsWalk,
-                label = "Steps",
+                label = stringResource(R.string.recovery_steps_label),
                 value = String.format("%,d", steps),
                 iconTint = AccentGreen,
             )
@@ -371,7 +373,7 @@ private fun SleepChartCard(sleepHistory: List<SleepData>) {
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
             Text(
-                text = "Sleep — Last 7 Days",
+                text = stringResource(R.string.recovery_sleep_chart_title),
                 style = MaterialTheme.typography.titleMedium,
                 color = Color.White,
                 fontWeight = FontWeight.SemiBold,
@@ -452,7 +454,7 @@ private fun HealthConnectUnavailableCard() {
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Health Connect Not Available",
+                text = stringResource(R.string.recovery_health_connect_unavailable),
                 style = MaterialTheme.typography.titleMedium,
                 color = Color.White,
                 fontWeight = FontWeight.SemiBold,
@@ -461,7 +463,7 @@ private fun HealthConnectUnavailableCard() {
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Install Health Connect from the Play Store to track your recovery metrics.",
+                text = stringResource(R.string.recovery_health_connect_unavailable_message),
                 style = MaterialTheme.typography.bodyMedium,
                 color = Color(0xFF9E9E9E),
                 textAlign = TextAlign.Center,
@@ -493,7 +495,7 @@ private fun PermissionRequestCard(onRequestPermissions: () -> Unit) {
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Connect Your Health Data",
+                text = stringResource(R.string.recovery_permissions_title),
                 style = MaterialTheme.typography.titleMedium,
                 color = Color.White,
                 fontWeight = FontWeight.SemiBold,
@@ -502,7 +504,7 @@ private fun PermissionRequestCard(onRequestPermissions: () -> Unit) {
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "GymBro uses sleep, heart rate, and step data to calculate your recovery readiness and optimize training.",
+                text = stringResource(R.string.recovery_permissions_message),
                 style = MaterialTheme.typography.bodyMedium,
                 color = Color(0xFF9E9E9E),
                 textAlign = TextAlign.Center,
@@ -520,7 +522,7 @@ private fun PermissionRequestCard(onRequestPermissions: () -> Unit) {
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Text(
-                    text = "Grant Permissions",
+                    text = stringResource(R.string.recovery_grant_permissions),
                     fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.padding(vertical = 4.dp),
                 )

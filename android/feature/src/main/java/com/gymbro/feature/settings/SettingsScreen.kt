@@ -55,6 +55,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.heading
@@ -63,6 +64,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.gymbro.core.R
 import com.gymbro.core.preferences.UserPreferences.WeightUnit
 
 private val AccentGreen = Color(0xFF00FF87)
@@ -109,7 +111,7 @@ internal fun SettingsScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Settings",
+                        text = stringResource(R.string.settings_title),
                         fontWeight = FontWeight.Bold,
                         color = Color.White,
                         modifier = Modifier.semantics { heading() }
@@ -119,7 +121,7 @@ internal fun SettingsScreen(
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
+                            contentDescription = stringResource(R.string.action_back),
                             tint = Color.White,
                         )
                     }
@@ -140,21 +142,21 @@ internal fun SettingsScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             // Account Section
-            SectionTitle("Account")
+            SectionTitle(stringResource(R.string.settings_section_account))
             SettingsCard {
                 Column {
                     SettingsRow(
                         icon = Icons.Default.Person,
-                        title = "Sign In Status",
-                        subtitle = "Manage your account",
+                        title = stringResource(R.string.settings_sign_in_status),
+                        subtitle = stringResource(R.string.settings_sign_in_subtitle),
                         iconTint = AccentGreen,
                         onClick = { },
                     )
                     SettingsDivider()
                     SettingsRow(
                         icon = Icons.Default.Delete,
-                        title = "Clear All Data",
-                        subtitle = "Reset app to defaults",
+                        title = stringResource(R.string.settings_clear_data),
+                        subtitle = stringResource(R.string.settings_clear_data_subtitle),
                         iconTint = Color(0xFFFF5252),
                         onClick = { showClearDataDialog = true },
                     )
@@ -162,7 +164,7 @@ internal fun SettingsScreen(
             }
 
             // Workout Section
-            SectionTitle("Workout Preferences")
+            SectionTitle(stringResource(R.string.settings_section_workout))
             SettingsCard {
                 Column {
                     // Weight Unit
@@ -178,13 +180,13 @@ internal fun SettingsScreen(
                             Spacer(modifier = Modifier.width(12.dp))
                             Column {
                                 Text(
-                                    text = "Weight Unit",
+                                    text = stringResource(R.string.settings_weight_unit),
                                     style = MaterialTheme.typography.titleSmall,
                                     color = Color.White,
                                     fontWeight = FontWeight.Medium,
                                 )
                                 Text(
-                                    text = "Display weights in",
+                                    text = stringResource(R.string.settings_weight_unit_subtitle),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = Color(0xFF9E9E9E),
                                 )
@@ -196,14 +198,14 @@ internal fun SettingsScreen(
                                 onClick = { onEvent(SettingsEvent.SetWeightUnit(WeightUnit.KG)) },
                                 shape = SegmentedButtonDefaults.itemShape(0, 2),
                             ) {
-                                Text("kg", style = MaterialTheme.typography.labelMedium)
+                                Text(stringResource(R.string.settings_weight_unit_kg), style = MaterialTheme.typography.labelMedium)
                             }
                             SegmentedButton(
                                 selected = state.weightUnit == WeightUnit.LBS,
                                 onClick = { onEvent(SettingsEvent.SetWeightUnit(WeightUnit.LBS)) },
                                 shape = SegmentedButtonDefaults.itemShape(1, 2),
                             ) {
-                                Text("lbs", style = MaterialTheme.typography.labelMedium)
+                                Text(stringResource(R.string.settings_weight_unit_lbs), style = MaterialTheme.typography.labelMedium)
                             }
                         }
                     }
@@ -223,13 +225,13 @@ internal fun SettingsScreen(
                             Spacer(modifier = Modifier.width(12.dp))
                             Column {
                                 Text(
-                                    text = "Default Rest Timer",
+                                    text = stringResource(R.string.settings_default_rest_timer),
                                     style = MaterialTheme.typography.titleSmall,
                                     color = Color.White,
                                     fontWeight = FontWeight.Medium,
                                 )
                                 Text(
-                                    text = "Time between sets",
+                                    text = stringResource(R.string.settings_rest_timer_subtitle),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = Color(0xFF9E9E9E),
                                 )
@@ -243,7 +245,7 @@ internal fun SettingsScreen(
                                 Text("-", style = MaterialTheme.typography.titleLarge)
                             }
                             Text(
-                                text = "${state.defaultRestTimer}s",
+                                text = stringResource(R.string.settings_rest_timer_value, state.defaultRestTimer),
                                 style = MaterialTheme.typography.titleMedium,
                                 color = AccentGreen,
                                 fontWeight = FontWeight.Bold,
@@ -263,8 +265,8 @@ internal fun SettingsScreen(
                     // Auto-start Rest Timer
                     SettingsToggle(
                         icon = Icons.Default.Timer,
-                        title = "Auto-Start Rest Timer",
-                        subtitle = "Start timer after completing a set",
+                        title = stringResource(R.string.settings_auto_start_rest_timer),
+                        subtitle = stringResource(R.string.settings_auto_start_rest_timer_subtitle),
                         checked = state.autoStartRestTimer,
                         onCheckedChange = { onEvent(SettingsEvent.SetAutoStartRestTimer(it)) },
                     )
@@ -272,27 +274,27 @@ internal fun SettingsScreen(
             }
 
             // Notifications Section
-            SectionTitle("Notifications")
+            SectionTitle(stringResource(R.string.settings_section_notifications))
             SettingsCard {
                 SettingsToggle(
                     icon = Icons.Default.Notifications,
-                    title = "Workout Reminders",
-                    subtitle = "Get reminded to train",
+                    title = stringResource(R.string.settings_workout_reminders),
+                    subtitle = stringResource(R.string.settings_workout_reminders_subtitle),
                     checked = state.notificationsEnabled,
                     onCheckedChange = { onEvent(SettingsEvent.SetNotifications(it)) },
                 )
             }
 
             // Health Connect Section
-            SectionTitle("Health Connect")
+            SectionTitle(stringResource(R.string.settings_section_health_connect))
             SettingsCard {
                 SettingsRow(
                     icon = Icons.Default.MonitorHeart,
-                    title = if (state.isHealthConnectConnected) "Connected" else "Not Connected",
+                    title = if (state.isHealthConnectConnected) stringResource(R.string.settings_health_connect_connected) else stringResource(R.string.settings_health_connect_not_connected),
                     subtitle = if (state.isHealthConnectAvailable) {
-                        "Sync with Health Connect"
+                        stringResource(R.string.settings_health_connect_sync)
                     } else {
-                        "Health Connect not available"
+                        stringResource(R.string.settings_health_connect_unavailable)
                     },
                     iconTint = if (state.isHealthConnectConnected) AccentGreen else Color(0xFF9E9E9E),
                     onClick = { if (state.isHealthConnectAvailable) onEvent(SettingsEvent.OpenHealthConnect) },
@@ -301,12 +303,12 @@ internal fun SettingsScreen(
             }
 
             // About Section
-            SectionTitle("About")
+            SectionTitle(stringResource(R.string.settings_section_about))
             SettingsCard {
                 Column {
                     SettingsRow(
                         icon = Icons.Default.Info,
-                        title = "App Version",
+                        title = stringResource(R.string.settings_app_version),
                         subtitle = state.appVersion,
                         iconTint = AccentGreen,
                         onClick = { },
@@ -314,8 +316,8 @@ internal fun SettingsScreen(
                     SettingsDivider()
                     SettingsRow(
                         icon = Icons.Default.Feedback,
-                        title = "Send Feedback",
-                        subtitle = "Report issues or suggest features",
+                        title = stringResource(R.string.settings_send_feedback),
+                        subtitle = stringResource(R.string.settings_send_feedback_subtitle),
                         iconTint = AccentGreen,
                         onClick = { onEvent(SettingsEvent.SendFeedback) },
                     )
@@ -333,14 +335,14 @@ internal fun SettingsScreen(
             containerColor = CardBackground,
             title = {
                 Text(
-                    text = "Clear All Data?",
+                    text = stringResource(R.string.settings_clear_data_confirm_title),
                     color = Color.White,
                     fontWeight = FontWeight.Bold,
                 )
             },
             text = {
                 Text(
-                    text = "This will reset all settings to defaults. This action cannot be undone.",
+                    text = stringResource(R.string.settings_clear_data_confirm_message),
                     color = Color(0xFF9E9E9E),
                 )
             },
@@ -354,12 +356,12 @@ internal fun SettingsScreen(
                         containerColor = Color(0xFFFF5252),
                     ),
                 ) {
-                    Text("Clear Data", color = Color.White)
+                    Text(stringResource(R.string.settings_clear_data_button), color = Color.White)
                 }
             },
             dismissButton = {
                 OutlinedButton(onClick = { showClearDataDialog = false }) {
-                    Text("Cancel", color = Color.White)
+                    Text(stringResource(R.string.action_cancel), color = Color.White)
                 }
             },
         )

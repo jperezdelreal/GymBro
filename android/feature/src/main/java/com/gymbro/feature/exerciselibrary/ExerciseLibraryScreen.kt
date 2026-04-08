@@ -52,12 +52,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.ui.res.stringResource
 import com.gymbro.core.model.Exercise
 import com.gymbro.core.model.ExerciseCategory
 import com.gymbro.core.model.MuscleGroup
 import com.gymbro.feature.common.EmptyState
 import com.gymbro.feature.common.FullScreenLoading
 import com.gymbro.feature.common.ObserveErrors
+import com.gymbro.core.R
 
 private val AccentGreen = Color(0xFF00FF87)
 private val AccentCyan = Color(0xFF00E5FF)
@@ -119,7 +121,7 @@ fun ExerciseLibraryScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = if (isPickerMode) "Pick Exercise" else "Exercise Library",
+                        text = stringResource(if (isPickerMode) R.string.exercise_library_pick_title else R.string.exercise_library_title),
                         style = MaterialTheme.typography.headlineMedium,
                         modifier = Modifier.semantics { heading() }
                     )
@@ -129,7 +131,7 @@ fun ExerciseLibraryScreen(
                         IconButton(onClick = onNavigateToCreateExercise) {
                             Icon(
                                 Icons.Default.Add,
-                                contentDescription = "Create Exercise",
+                                contentDescription = stringResource(R.string.exercise_library_create),
                                 tint = AccentGreen,
                             )
                         }
@@ -157,7 +159,7 @@ fun ExerciseLibraryScreen(
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 8.dp),
                 placeholder = {
-                    Text("Search exercises…", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(stringResource(R.string.exercise_library_search), color = MaterialTheme.colorScheme.onSurfaceVariant)
                 },
                 leadingIcon = {
                     Icon(
@@ -224,7 +226,7 @@ fun ExerciseLibraryScreen(
             // Content
             when {
                 state.isLoading -> {
-                    FullScreenLoading(message = "Loading exercises...")
+                    FullScreenLoading(message = stringResource(R.string.exercise_library_loading))
                 }
                 state.exercises.isEmpty() -> {
                     EmptyExercisesView()
@@ -292,7 +294,7 @@ private fun ExerciseRow(
 
         Icon(
             Icons.AutoMirrored.Filled.KeyboardArrowRight,
-            contentDescription = "View exercise details",
+            contentDescription = stringResource(R.string.exercise_library_view_details),
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.size(20.dp),
         )
@@ -326,7 +328,7 @@ private fun CategoryBadge(category: ExerciseCategory) {
 private fun EmptyExercisesView() {
     EmptyState(
         icon = Icons.Default.Search,
-        title = "No exercises found",
-        subtitle = "Try adjusting your search or filters",
+        title = stringResource(R.string.exercise_library_empty_title),
+        subtitle = stringResource(R.string.exercise_library_empty_subtitle),
     )
 }
