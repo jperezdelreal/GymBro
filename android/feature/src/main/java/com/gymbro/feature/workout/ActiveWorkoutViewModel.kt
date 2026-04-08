@@ -80,6 +80,11 @@ class ActiveWorkoutViewModel @Inject constructor(
             is ActiveWorkoutEvent.CompleteSet -> completeSet(event.exerciseIndex, event.setIndex)
             is ActiveWorkoutEvent.RemoveSet -> removeSet(event.exerciseIndex, event.setIndex)
             is ActiveWorkoutEvent.RemoveExercise -> removeExercise(event.exerciseIndex)
+            is ActiveWorkoutEvent.VoiceInput -> {
+                updateSetField(event.exerciseIndex, event.setIndex) {
+                    it.copy(weight = event.weight, reps = event.reps)
+                }
+            }
             is ActiveWorkoutEvent.StartRestTimer -> startRestTimer()
             is ActiveWorkoutEvent.SkipRestTimer -> skipRestTimer()
             is ActiveWorkoutEvent.AdjustRestTimer -> adjustRestTimer(event.deltaSeconds)
