@@ -132,6 +132,39 @@ jobs:
         if-no-files-found: ignore
         retention-days: 7
 
+    - name: Setup Node.js for Visual Regression
+      if: always()
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Capture Baselines (first run)
+      if: hashFiles('android/.maestro/baselines/*.png') == ''
+      run: |
+        echo "No baselines found. Capturing initial baselines..."
+        mkdir -p android/.maestro/baselines/
+        cp -r $HOME/.maestro/tests/**/*.png android/.maestro/baselines/ 2>/dev/null || true
+        echo "⚠️ Initial baselines captured. Commit them to enable visual regression checks."
+
+    - name: Visual Regression Check
+      if: always()
+      run: |
+        npm install
+        node scripts/visual-regression.js \
+          --baselines android/.maestro/baselines/ \
+          --screenshots $HOME/.maestro/tests/ \
+          --threshold 0.1 \
+          --output visual-diff-report/
+      continue-on-error: true
+
+    - name: Upload Visual Diff Report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: visual-regression-report-smoke
+        path: visual-diff-report/
+        retention-days: 30
+
   maestro-regression:
     name: Maestro Full Regression
     if: github.event_name == 'push'
@@ -253,3 +286,36 @@ jobs:
           maestro-regression-output.log
         if-no-files-found: ignore
         retention-days: 7
+
+    - name: Setup Node.js for Visual Regression
+      if: always()
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Capture Baselines (first run)
+      if: hashFiles('android/.maestro/baselines/*.png') == ''
+      run: |
+        echo "No baselines found. Capturing initial baselines..."
+        mkdir -p android/.maestro/baselines/
+        cp -r $HOME/.maestro/tests/**/*.png android/.maestro/baselines/ 2>/dev/null || true
+        echo "⚠️ Initial baselines captured. Commit them to enable visual regression checks."
+
+    - name: Visual Regression Check
+      if: always()
+      run: |
+        npm install
+        node scripts/visual-regression.js \
+          --baselines android/.maestro/baselines/ \
+          --screenshots $HOME/.maestro/tests/ \
+          --threshold 0.1 \
+          --output visual-diff-report/
+      continue-on-error: true
+
+    - name: Upload Visual Diff Report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: visual-regression-report-regression
+        path: visual-diff-report/
+        retention-days: 30
