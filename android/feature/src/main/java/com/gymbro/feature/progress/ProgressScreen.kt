@@ -65,6 +65,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
@@ -83,6 +84,7 @@ import com.gymbro.core.ui.theme.AccentGreenStart
 import com.gymbro.core.ui.theme.AccentRed
 import com.gymbro.core.ui.theme.Surface
 import com.gymbro.core.ui.theme.SurfaceVariant
+import com.gymbro.core.R
 import com.gymbro.feature.common.EmptyState
 import com.gymbro.feature.common.FullScreenLoading
 import com.gymbro.feature.common.GlassmorphicCard
@@ -140,7 +142,7 @@ private fun ProgressScreen(
     onTooltipDismissed: () -> Unit = {},
 ) {
     if (state.isLoading) {
-        FullScreenLoading(message = "Loading progress...")
+        FullScreenLoading(message = stringResource(R.string.progress_loading_message))
         return
     }
 
@@ -169,7 +171,7 @@ private fun ProgressScreen(
         // Volume Chart Section
         if (state.weeklyVolumeData.isNotEmpty()) {
             item {
-                SectionHeader(title = "Weekly Volume", icon = "📊")
+                SectionHeader(title = stringResource(R.string.progress_weekly_volume), icon = "📊")
             }
             item {
                 WeeklyVolumeChart(data = state.weeklyVolumeData)
@@ -179,7 +181,7 @@ private fun ProgressScreen(
         // Plateau Alerts Section
         if (state.plateauAlerts.isNotEmpty()) {
             item {
-                SectionHeader(title = "Plateau Alerts", icon = "⚠️")
+                SectionHeader(title = stringResource(R.string.progress_plateau_alerts), icon = "⚠️")
             }
             items(state.plateauAlerts) { alert ->
                 PlateauAlertCard(
@@ -192,7 +194,7 @@ private fun ProgressScreen(
         // PR Showcase Section
         if (state.personalRecords.isNotEmpty()) {
             item {
-                SectionHeader(title = "Recent PRs", icon = "🏆")
+                SectionHeader(title = stringResource(R.string.progress_recent_prs), icon = "🏆")
             }
             val recentPRs = state.personalRecords
                 .sortedByDescending { it.date }
@@ -205,7 +207,7 @@ private fun ProgressScreen(
         // E1RM Chart Section
         if (state.exerciseOptions.isNotEmpty()) {
             item {
-                SectionHeader(title = "Estimated 1RM Trend", icon = "📈")
+                SectionHeader(title = stringResource(R.string.progress_e1rm_trend), icon = "📈")
             }
 
             item {
@@ -233,7 +235,7 @@ private fun ProgressScreen(
                             contentAlignment = Alignment.Center,
                         ) {
                             Text(
-                                text = "No data for this exercise yet",
+                                text = stringResource(R.string.progress_no_data),
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                         }
@@ -245,7 +247,7 @@ private fun ProgressScreen(
 
         if (showChartTooltip && state.chartData.isNotEmpty()) {
             TooltipOverlay(
-                message = "Tu evolución de fuerza",
+                message = stringResource(R.string.progress_evolution),
                 position = TooltipPosition.CENTER,
                 offsetY = 0,
                 onDismiss = onTooltipDismissed
@@ -258,8 +260,8 @@ private fun ProgressScreen(
 private fun EmptyProgressState() {
     EmptyState(
         icon = Icons.Default.EmojiEvents,
-        title = "No workouts yet",
-        subtitle = "Start training to see your progress!",
+        title = stringResource(R.string.progress_empty_title),
+        subtitle = stringResource(R.string.progress_empty_subtitle_alt),
     )
 }
 
@@ -292,13 +294,13 @@ private fun AnalyticsNavigationCard(onClick: () -> Unit) {
                 Spacer(modifier = Modifier.width(12.dp))
                 Column {
                     Text(
-                        text = "Advanced Analytics",
+                        text = stringResource(R.string.progress_advanced_analytics),
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onBackground,
                         fontWeight = FontWeight.Bold,
                     )
                     Text(
-                        text = "View detailed training insights",
+                        text = stringResource(R.string.progress_detailed_insights),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -467,7 +469,7 @@ private fun E1RMChart(data: List<E1RMDataPoint>) {
                     fontWeight = FontWeight.Bold,
                 )
                 Text(
-                    text = "Current Est. 1RM (${latest.weight}kg × ${latest.reps})",
+                    text = stringResource(R.string.progress_current_est_1rm, latest.weight.toString(), latest.reps),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -711,7 +713,7 @@ private fun HeroKPISection(
                     color = Color(AccentGreenStart.value),
                 )
                 Text(
-                    text = "Total Volume",
+                    text = stringResource(R.string.progress_total_volume),
                     fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -744,13 +746,13 @@ private fun HeroKPISection(
                     color = Color(AccentCyanStart.value),
                 )
                 Text(
-                    text = "Workouts",
+                    text = stringResource(R.string.progress_workouts_label),
                     fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "This Week",
+                    text = stringResource(R.string.progress_this_week),
                     fontSize = 11.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -769,13 +771,13 @@ private fun HeroKPISection(
                     color = Color(AccentAmberStart.value),
                 )
                 Text(
-                    text = "PRs",
+                    text = stringResource(R.string.progress_prs_label),
                     fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Last 2 Weeks",
+                    text = stringResource(R.string.progress_last_2_weeks),
                     fontSize = 11.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -793,7 +795,7 @@ private fun WeeklyVolumeChart(data: List<WeeklyVolume>) {
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                text = "Last 8 Weeks",
+                text = stringResource(R.string.progress_last_8_weeks),
                 style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.Bold,
@@ -896,7 +898,7 @@ private fun PlateauAlertCard(
                 }
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "${alert.weeksDuration} weeks with no progress",
+                    text = stringResource(R.string.progress_weeks_no_progress, alert.weeksDuration),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -910,7 +912,7 @@ private fun PlateauAlertCard(
             IconButton(onClick = onDismiss) {
                 Icon(
                     Icons.Default.Close,
-                    contentDescription = "Dismiss",
+                    contentDescription = stringResource(R.string.action_dismiss),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }

@@ -72,6 +72,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
@@ -84,6 +85,7 @@ import com.gymbro.core.ui.theme.AccentGreenEnd
 import com.gymbro.core.ui.theme.AccentGreenStart
 import com.gymbro.core.ui.theme.AccentRed
 import com.gymbro.core.ui.theme.Background
+import com.gymbro.core.R
 import com.gymbro.core.voice.VoiceRecognitionService
 import com.gymbro.feature.common.AnimatedProgressCircle
 import com.gymbro.feature.common.FullScreenLoading
@@ -200,7 +202,7 @@ fun ActiveWorkoutScreen(
     onTooltipDismissed: () -> Unit = {},
 ) {
     if (state.isLoading) {
-        FullScreenLoading(message = "Starting workout...")
+        FullScreenLoading(message = stringResource(R.string.active_workout_starting))
         return
     }
 
@@ -213,7 +215,7 @@ fun ActiveWorkoutScreen(
                 title = {
                     Column {
                         Text(
-                            text = "Active Workout",
+                            text = stringResource(R.string.active_workout_title),
                             style = MaterialTheme.typography.titleLarge,
                             modifier = Modifier.semantics { heading() }
                         )
@@ -230,7 +232,7 @@ fun ActiveWorkoutScreen(
                         haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                         onEvent(ActiveWorkoutEvent.DiscardWorkout) 
                     }) {
-                        Icon(Icons.Default.Close, contentDescription = "Discard")
+                        Icon(Icons.Default.Close, contentDescription = stringResource(R.string.workout_discard))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -263,7 +265,7 @@ fun ActiveWorkoutScreen(
                     drawCircle(gradient)
                 }
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Add Exercise", tint = Color.White)
+                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.active_workout_add_exercise), tint = Color.White)
             }
         },
         containerColor = Background,
@@ -325,7 +327,7 @@ fun ActiveWorkoutScreen(
 
         if (showCompleteSetTooltip && state.exercises.isNotEmpty() && state.exercises.any { it.sets.isNotEmpty() }) {
             TooltipOverlay(
-                message = "Toca para completar la serie",
+                message = stringResource(R.string.active_workout_tap_to_complete),
                 position = TooltipPosition.CENTER,
                 offsetY = 100,
                 onDismiss = onTooltipDismissed
@@ -344,9 +346,9 @@ private fun WorkoutStatsContent(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly,
     ) {
-        StatItem(label = "Duration", value = formatDuration(elapsedSeconds), color = AccentCyanStart)
-        StatItem(label = "Volume", value = "${totalVolume.toInt()} kg", color = AccentGreenStart)
-        StatItem(label = "Sets", value = "$totalSets", color = AccentAmberStart)
+        StatItem(label = stringResource(R.string.common_duration), value = formatDuration(elapsedSeconds), color = AccentCyanStart)
+        StatItem(label = stringResource(R.string.common_volume), value = "${totalVolume.toInt()} kg", color = AccentGreenStart)
+        StatItem(label = stringResource(R.string.workout_sets), value = "$totalSets", color = AccentAmberStart)
     }
 }
 
@@ -409,7 +411,7 @@ private fun HeroRestTimer(
                     color = Color.White.copy(alpha = glowAlpha),
                 )
                 Text(
-                    text = "REST",
+                    text = stringResource(R.string.active_workout_rest),
                     fontSize = 14.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = Color.White.copy(alpha = 0.6f),
@@ -434,7 +436,7 @@ private fun HeroRestTimer(
             ) { 
                 Text("-15s") 
             }
-            GradientButton(text = "Skip", onClick = onSkip)
+            GradientButton(text = stringResource(R.string.active_workout_skip), onClick = onSkip)
             OutlinedButton(
                 onClick = { 
                     haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
@@ -485,7 +487,7 @@ private fun FinishWorkoutButton(
             }
     ) {
         GradientButton(
-            text = "Finish Workout",
+            text = stringResource(R.string.workout_finish),
             onClick = {
                 haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                 onClick()
@@ -535,7 +537,7 @@ private fun ExerciseCardContent(
             ) {
                 Icon(
                     Icons.Default.Delete,
-                    contentDescription = "Remove exercise",
+                    contentDescription = stringResource(R.string.active_workout_remove_exercise),
                     tint = Color.White.copy(alpha = 0.4f),
                     modifier = Modifier.size(18.dp),
                 )
@@ -558,9 +560,9 @@ private fun ExerciseCardContent(
                 .fillMaxWidth()
                 .padding(horizontal = 4.dp),
         ) {
-            Text("SET", style = setHeaderStyle(), modifier = Modifier.width(40.dp))
-            Text("KG", style = setHeaderStyle(), modifier = Modifier.weight(1f), textAlign = TextAlign.Center)
-            Text("REPS", style = setHeaderStyle(), modifier = Modifier.weight(1f), textAlign = TextAlign.Center)
+            Text(stringResource(R.string.active_workout_header_set), style = setHeaderStyle(), modifier = Modifier.width(40.dp))
+            Text(stringResource(R.string.active_workout_header_kg), style = setHeaderStyle(), modifier = Modifier.weight(1f), textAlign = TextAlign.Center)
+            Text(stringResource(R.string.active_workout_header_reps), style = setHeaderStyle(), modifier = Modifier.weight(1f), textAlign = TextAlign.Center)
             Spacer(modifier = Modifier.width(56.dp)) // for complete button
         }
 
@@ -599,7 +601,7 @@ private fun ExerciseCardContent(
         ) {
             Icon(Icons.Default.Add, contentDescription = null, tint = AccentGreenStart, modifier = Modifier.size(16.dp))
             Spacer(modifier = Modifier.width(4.dp))
-            Text("Add Set", color = AccentGreenStart, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+            Text(stringResource(R.string.workout_add_set), color = AccentGreenStart, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
         }
     }
 }
@@ -614,6 +616,8 @@ private fun SetRow(
     defaultWeightUnit: UserPreferences.WeightUnit,
 ) {
     val haptic = LocalHapticFeedback.current
+    val completedDescription = stringResource(R.string.active_workout_set_completed, setUi.setNumber)
+    val completeDescription = stringResource(R.string.active_workout_complete_set, setUi.setNumber)
     val rowBackground = when {
         setUi.isCompleted -> AccentGreenStart.copy(alpha = 0.08f)
         setUi.isWarmup -> AccentAmberStart.copy(alpha = 0.05f)
@@ -673,7 +677,7 @@ private fun SetRow(
                     .size(48.dp)
                     .clip(CircleShape)
                     .background(Brush.horizontalGradient(listOf(AccentGreenStart, AccentGreenEnd)))
-                    .semantics { contentDescription = "Set ${setUi.setNumber} completed" },
+                    .semantics { contentDescription = completedDescription },
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
@@ -693,7 +697,7 @@ private fun SetRow(
                         onEvent(ActiveWorkoutEvent.CompleteSet(exerciseIndex, setIndex))
                     }
                     .background(Brush.horizontalGradient(listOf(AccentGreenStart, AccentGreenEnd)))
-                    .semantics { contentDescription = "Complete set ${setUi.setNumber}" },
+                    .semantics { contentDescription = completeDescription },
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(

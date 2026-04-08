@@ -38,9 +38,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.gymbro.core.model.PersonalRecord
+import com.gymbro.core.R
 import com.gymbro.feature.common.ConfettiOverlay
 import com.gymbro.feature.common.PRCelebration
 import kotlinx.coroutines.delay
@@ -98,7 +100,7 @@ fun WorkoutSummaryScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
-                text = "Workout Complete!",
+                text = stringResource(R.string.workout_summary_title),
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
@@ -107,7 +109,7 @@ fun WorkoutSummaryScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Great session — keep pushing.",
+                text = stringResource(R.string.workout_summary_subtitle),
                 style = MaterialTheme.typography.bodyMedium,
                 color = Color.White.copy(alpha = 0.6f),
             )
@@ -121,14 +123,14 @@ fun WorkoutSummaryScreen(
             ) {
                 SummaryCard(
                     icon = Icons.Default.Timer,
-                    label = "Duration",
+                    label = stringResource(R.string.common_duration),
                     value = formatSummaryDuration(durationSeconds),
                     color = AccentCyan,
                     modifier = Modifier.weight(1f),
                 )
                 SummaryCard(
                     icon = Icons.Default.FitnessCenter,
-                    label = "Volume",
+                    label = stringResource(R.string.common_volume),
                     value = "${totalVolume.toInt()} kg",
                     color = AccentGreen,
                     modifier = Modifier.weight(1f),
@@ -143,14 +145,14 @@ fun WorkoutSummaryScreen(
             ) {
                 SummaryCard(
                     icon = Icons.Default.BarChart,
-                    label = "Sets",
+                    label = stringResource(R.string.workout_sets),
                     value = "$totalSets",
                     color = AccentAmber,
                     modifier = Modifier.weight(1f),
                 )
                 SummaryCard(
                     icon = Icons.Default.Star,
-                    label = "Exercises",
+                    label = stringResource(R.string.workout_exercises),
                     value = "$exerciseCount",
                     color = AccentGreen,
                     modifier = Modifier.weight(1f),
@@ -161,7 +163,7 @@ fun WorkoutSummaryScreen(
                 Spacer(modifier = Modifier.height(12.dp))
                 SummaryCard(
                     icon = Icons.Default.Star,
-                    label = "Personal Records",
+                    label = stringResource(R.string.history_prs),
                     value = "${personalRecords.size}",
                     color = AccentAmber,
                     modifier = Modifier.fillMaxWidth(),
@@ -180,7 +182,7 @@ fun WorkoutSummaryScreen(
                 shape = RoundedCornerShape(12.dp),
                 contentPadding = PaddingValues(vertical = 16.dp),
             ) {
-                Text("Done", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
+                Text(stringResource(R.string.workout_summary_done), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
             }
         }
 

@@ -52,6 +52,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gymbro.core.ai.ChatMessage
 import com.gymbro.core.ai.MessageRole
+import androidx.compose.ui.res.stringResource
+import com.gymbro.core.R
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
@@ -117,14 +119,14 @@ fun CoachChatScreen(
                                 modifier = Modifier.size(20.dp),
                             )
                         }
-                        Text("GymBro AI Coach")
+                        Text(stringResource(R.string.coach_title))
                     }
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back",
+                            contentDescription = stringResource(R.string.action_back),
                         )
                     }
                 },
@@ -133,7 +135,7 @@ fun CoachChatScreen(
                         IconButton(onClick = { onEvent(CoachChatEvent.ClearHistory) }) {
                             Icon(
                                 imageVector = Icons.Default.Delete,
-                                contentDescription = "Clear history",
+                                contentDescription = stringResource(R.string.coach_clear_history),
                             )
                         }
                     }
@@ -226,14 +228,14 @@ private fun WelcomeMessage() {
         }
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = "GymBro AI Coach",
+            text = stringResource(R.string.coach_title),
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
             color = Color.White,
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = "Your personal strength training advisor",
+            text = stringResource(R.string.coach_subtitle),
             style = MaterialTheme.typography.bodyMedium,
             color = Color.White.copy(alpha = 0.7f),
         )
@@ -244,22 +246,21 @@ private fun WelcomeMessage() {
 private fun QuickPrompts(onPromptClick: (String) -> Unit) {
     Column {
         Text(
-            text = "Quick prompts:",
+            text = stringResource(R.string.coach_quick_prompts),
             style = MaterialTheme.typography.labelMedium,
             color = Color.White.copy(alpha = 0.6f),
             modifier = Modifier.padding(bottom = 8.dp),
         )
+        val prompts = listOf(
+            stringResource(R.string.coach_prompt_1),
+            stringResource(R.string.coach_prompt_2),
+            stringResource(R.string.coach_prompt_3),
+            stringResource(R.string.coach_prompt_4),
+        )
         LazyRow(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            items(
-                listOf(
-                    "How should I break my bench plateau?",
-                    "What should I train today?",
-                    "Tips for better squat depth",
-                    "Am I training too often?",
-                )
-            ) { prompt ->
+            items(prompts) { prompt ->
                 Surface(
                     onClick = { onPromptClick(prompt) },
                     shape = RoundedCornerShape(20.dp),
@@ -306,7 +307,7 @@ private fun ChatBubble(message: ChatMessage) {
                     )
                 }
                 Text(
-                    text = "Coach",
+                    text = stringResource(R.string.coach_label),
                     style = MaterialTheme.typography.labelSmall,
                     color = AccentGreen,
                     fontWeight = FontWeight.SemiBold,
@@ -366,7 +367,7 @@ private fun LoadingIndicator() {
             )
         }
         Text(
-            text = "Coach is thinking...",
+            text = stringResource(R.string.coach_thinking),
             style = MaterialTheme.typography.bodyMedium,
             color = Color.White.copy(alpha = 0.6f),
             fontStyle = androidx.compose.ui.text.font.FontStyle.Italic,
@@ -406,7 +407,7 @@ private fun MessageInput(
                     .animateContentSize(),
                 placeholder = {
                     Text(
-                        text = if (enabled) "Ask your coach..." else "Firebase not configured",
+                        text = if (enabled) stringResource(R.string.coach_input_placeholder) else stringResource(R.string.coach_input_placeholder_disabled),
                         color = Color.White.copy(alpha = 0.5f),
                     )
                 },
@@ -439,7 +440,7 @@ private fun MessageInput(
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.Send,
-                        contentDescription = "Send",
+                        contentDescription = stringResource(R.string.coach_send),
                         tint = if (enabled && text.isNotBlank()) Color.Black else Color.DarkGray,
                     )
                 }
@@ -462,14 +463,14 @@ private fun FirebaseNotConfiguredMessage() {
             modifier = Modifier.padding(16.dp),
         ) {
             Text(
-                text = "⚠️ Firebase Not Configured",
+                text = stringResource(R.string.coach_firebase_not_configured_title),
                 style = MaterialTheme.typography.titleMedium,
                 color = Color(0xFFFFAB91),
                 fontWeight = FontWeight.Bold,
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "AI Coach requires Firebase AI (Vertex AI). Add google-services.json to your project to enable this feature.",
+                text = stringResource(R.string.coach_firebase_error),
                 style = MaterialTheme.typography.bodySmall,
                 color = Color.White.copy(alpha = 0.9f),
             )
@@ -501,7 +502,7 @@ private fun ErrorMessage(
                 modifier = Modifier.weight(1f),
             ) {
                 Text(
-                    text = "Error",
+                    text = stringResource(R.string.common_error),
                     style = MaterialTheme.typography.titleSmall,
                     color = Color(0xFFEF9A9A),
                     fontWeight = FontWeight.Bold,
@@ -516,7 +517,7 @@ private fun ErrorMessage(
             IconButton(onClick = onDismiss) {
                 Icon(
                     imageVector = Icons.Default.Delete,
-                    contentDescription = "Dismiss",
+                    contentDescription = stringResource(R.string.action_dismiss),
                     tint = Color.White.copy(alpha = 0.7f),
                 )
             }

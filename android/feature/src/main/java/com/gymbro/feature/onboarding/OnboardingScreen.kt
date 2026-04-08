@@ -166,7 +166,7 @@ private fun WelcomePage() {
         Spacer(modifier = Modifier.height(16.dp))
         
         Text(
-            text = "Tu compañero de gym inteligente",
+            text = stringResource(R.string.onboarding_smart_gym_companion),
             style = MaterialTheme.typography.headlineSmall,
             color = OnSurfaceVariant,
             fontWeight = FontWeight.Medium,

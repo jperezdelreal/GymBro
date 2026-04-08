@@ -298,7 +298,7 @@ private fun WorkoutCard(
                     )
                     StatChip(
                         icon = Icons.Default.FitnessCenter,
-                        label = "${workout.exerciseCount} ejercicios",
+                        label = stringResource(R.string.history_exercises_count, workout.exerciseCount),
                         gradientColors = listOf(AccentGreenStart, AccentGreenEnd),
                     )
                 }
@@ -337,17 +337,18 @@ private fun WorkoutCard(
     }
 }
 
+@Composable
 private fun getRelativeTime(workoutDate: LocalDate): String {
     val today = LocalDate.now()
     val daysBetween = Duration.between(workoutDate.atStartOfDay(), today.atStartOfDay()).toDays()
     
     return when {
-        daysBetween == 0L -> "Hoy"
-        daysBetween == 1L -> "Ayer"
-        daysBetween < 7 -> "Hace $daysBetween días"
-        daysBetween < 14 -> "Hace 1 semana"
-        daysBetween < 30 -> "Hace ${daysBetween / 7} semanas"
-        else -> "Hace ${daysBetween / 30} meses"
+        daysBetween == 0L -> stringResource(R.string.history_today)
+        daysBetween == 1L -> stringResource(R.string.history_yesterday)
+        daysBetween < 7 -> stringResource(R.string.history_days_ago, daysBetween.toInt())
+        daysBetween < 14 -> stringResource(R.string.history_one_week_ago)
+        daysBetween < 30 -> stringResource(R.string.history_weeks_ago, (daysBetween / 7).toInt())
+        else -> stringResource(R.string.history_months_ago, (daysBetween / 30).toInt())
     }
 }
 

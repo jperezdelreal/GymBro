@@ -275,7 +275,7 @@ fun ExerciseLibraryScreen(
 
         if (showFilterTooltip && !isPickerMode) {
             TooltipOverlay(
-                message = "Filtra por grupo muscular",
+                message = stringResource(R.string.tooltip_filter_muscle),
                 position = TooltipPosition.TOP_CENTER,
                 offsetY = 300,
                 onDismiss = onTooltipDismissed
@@ -480,7 +480,7 @@ private fun EmptyExercisesView() {
         Spacer(modifier = Modifier.height(8.dp))
         
         Text(
-            text = "No encontramos ese ejercicio. ¿Quieres crearlo?",
+            text = stringResource(R.string.tooltip_exercise_not_found),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
