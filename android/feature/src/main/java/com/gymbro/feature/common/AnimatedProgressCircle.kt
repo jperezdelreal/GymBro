@@ -18,9 +18,10 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.gymbro.app.ui.theme.AccentGreenEnd
-import com.gymbro.app.ui.theme.AccentGreenStart
-import com.gymbro.app.ui.theme.SurfacePrimary
+
+private val AccentGreenStart = Color(0xFF00FF87)
+private val AccentGreenEnd = Color(0xFF00D9B5)
+private val SurfacePrimary = Color(0xFF141414)
 
 @Composable
 fun AnimatedProgressCircle(

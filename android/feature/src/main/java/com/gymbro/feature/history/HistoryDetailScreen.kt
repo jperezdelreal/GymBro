@@ -1,5 +1,8 @@
 package com.gymbro.feature.history
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,6 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -34,9 +38,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.heading
@@ -46,15 +54,19 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.gymbro.feature.common.EmptyState
 import com.gymbro.feature.common.FullScreenLoading
-import com.gymbro.feature.common.GymBroCard
+import com.gymbro.feature.common.GlassmorphicCard
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import kotlinx.coroutines.delay
 
-private val AccentGreen = Color(0xFF00FF87)
-private val AccentCyan = Color(0xFF00E5FF)
-private val AccentAmber = Color(0xFFFFAB00)
-private val SurfaceCard = Color(0xFF1A1A1A)
+private val AccentGreenStart = Color(0xFF00FF87)
+private val AccentGreenEnd = Color(0xFF00D9B5)
+private val AccentCyanStart = Color(0xFF00D4FF)
+private val AccentCyanEnd = Color(0xFF0091FF)
+private val AccentAmberStart = Color(0xFFFFB800)
+private val AccentAmberEnd = Color(0xFFFF8A00)
+
 private val SurfaceDark = Color(0xFF0A0A0A)
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -112,6 +124,8 @@ fun HistoryDetailRoute(
 
 @Composable
 private fun HistoryDetailContent(detail: WorkoutDetail) {
+    var itemIndex = 0
+    
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -120,66 +134,89 @@ private fun HistoryDetailContent(detail: WorkoutDetail) {
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         item {
-            WorkoutHeader(detail = detail)
+            val currentIndex = itemIndex++
+            WorkoutHeader(detail = detail, index = currentIndex)
         }
 
         item {
-            Text(
-                text = "Overview",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                color = Color.White,
-                modifier = Modifier.padding(vertical = 8.dp).semantics { heading() },
-            )
+            val currentIndex = itemIndex++
+            AnimatedItem(index = currentIndex) {
+                Text(
+                    text = "Resumen",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White,
+                    modifier = Modifier.padding(vertical = 8.dp).semantics { heading() },
+                )
+            }
         }
 
         item {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                StatCard(
-                    icon = Icons.Default.FitnessCenter,
-                    label = "Volume",
-                    value = "${detail.totalVolume.toInt()} kg",
-                    color = AccentGreen,
-                    modifier = Modifier.weight(1f),
-                )
-                StatCard(
-                    icon = Icons.Default.BarChart,
-                    label = "Sets",
-                    value = "${detail.totalSets}",
-                    color = AccentAmber,
-                    modifier = Modifier.weight(1f),
-                )
+            val currentIndex = itemIndex++
+            AnimatedItem(index = currentIndex) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    StatCard(
+                        icon = Icons.Default.FitnessCenter,
+                        label = "Volumen",
+                        value = "${detail.totalVolume.toInt()} kg",
+                        gradientColors = listOf(AccentGreenStart, AccentGreenEnd),
+                        modifier = Modifier.weight(1f),
+                    )
+                    StatCard(
+                        icon = Icons.Default.BarChart,
+                        label = "Series",
+                        value = "${detail.totalSets}",
+                        gradientColors = listOf(AccentCyanStart, AccentCyanEnd),
+                        modifier = Modifier.weight(1f),
+                    )
+                }
             }
         }
 
         if (detail.prExerciseIds.isNotEmpty()) {
             item {
-                GymBroCard(accentColor = AccentAmber) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                val currentIndex = itemIndex++
+                AnimatedItem(index = currentIndex) {
+                    GlassmorphicCard(
+                        accentColor = AccentAmberStart
                     ) {
-                        Icon(
-                            Icons.Default.Star,
-                            contentDescription = null,
-                            tint = AccentAmber,
-                            modifier = Modifier.size(28.dp),
-                        )
-                        Column {
-                            Text(
-                                text = "${detail.prExerciseIds.size} Personal Record${if (detail.prExerciseIds.size > 1) "s" else ""}",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.White,
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(
+                                    brush = Brush.linearGradient(
+                                        colors = listOf(
+                                            AccentAmberStart.copy(alpha = 0.2f),
+                                            AccentAmberEnd.copy(alpha = 0.1f)
+                                        )
+                                    )
+                                )
+                                .padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        ) {
+                            Icon(
+                                Icons.Default.Star,
+                                contentDescription = null,
+                                tint = AccentAmberStart,
+                                modifier = Modifier.size(32.dp),
                             )
-                            Text(
-                                text = "New PRs set in this workout",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = Color.White.copy(alpha = 0.6f),
-                            )
+                            Column {
+                                Text(
+                                    text = "¡${detail.prExerciseIds.size} Récord${if (detail.prExerciseIds.size > 1) "s" else ""}!",
+                                    style = MaterialTheme.typography.titleLarge,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.White,
+                                )
+                                Text(
+                                    text = "Nuevos récords personales",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = Color.White.copy(alpha = 0.7f),
+                                )
+                            }
                         }
                     }
                 }
@@ -187,35 +224,48 @@ private fun HistoryDetailContent(detail: WorkoutDetail) {
         }
 
         item {
-            Text(
-                text = "Exercises",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                color = Color.White,
-                modifier = Modifier.padding(vertical = 8.dp).semantics { heading() },
-            )
-        }
-
-        items(detail.exercises) { exercise ->
-            ExerciseCard(exercise = exercise)
-        }
-
-        if (detail.volumeByMuscleGroup.isNotEmpty()) {
-            item {
+            val currentIndex = itemIndex++
+            AnimatedItem(index = currentIndex) {
                 Text(
-                    text = "Volume by Muscle Group",
+                    text = "Ejercicios",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = Color.White,
                     modifier = Modifier.padding(vertical = 8.dp).semantics { heading() },
                 )
             }
+        }
+
+        itemsIndexed(detail.exercises) { exerciseIndex, exercise ->
+            val currentIndex = itemIndex++
+            ExerciseCard(exercise = exercise, index = currentIndex)
+        }
+
+        if (detail.volumeByMuscleGroup.isNotEmpty()) {
+            item {
+                val currentIndex = itemIndex++
+                AnimatedItem(index = currentIndex) {
+                    Text(
+                        text = "Volumen por Grupo Muscular",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White,
+                        modifier = Modifier.padding(vertical = 8.dp).semantics { heading() },
+                    )
+                }
+            }
 
             item {
-                GymBroCard {
-                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        detail.volumeByMuscleGroup.entries.sortedByDescending { it.value }.forEach { (muscle, volume) ->
-                            MuscleVolumeRow(muscle = muscle.displayName, volume = volume)
+                val currentIndex = itemIndex++
+                AnimatedItem(index = currentIndex) {
+                    GlassmorphicCard {
+                        Column(
+                            modifier = Modifier.padding(8.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            detail.volumeByMuscleGroup.entries.sortedByDescending { it.value }.forEach { (muscle, volume) ->
+                                MuscleVolumeRow(muscle = muscle.displayName, volume = volume)
+                            }
                         }
                     }
                 }
@@ -229,27 +279,84 @@ private fun HistoryDetailContent(detail: WorkoutDetail) {
 }
 
 @Composable
-private fun WorkoutHeader(detail: WorkoutDetail) {
+private fun AnimatedItem(
+    index: Int,
+    content: @Composable () -> Unit
+) {
+    var visible by remember { mutableStateOf(false) }
+    
+    LaunchedEffect(Unit) {
+        delay(index * 50L)
+        visible = true
+    }
+    
+    AnimatedVisibility(
+        visible = visible,
+        enter = fadeIn() + slideInVertically(initialOffsetY = { it / 4 })
+    ) {
+        content()
+    }
+}
+
+@Composable
+private fun WorkoutHeader(detail: WorkoutDetail, index: Int) {
     val date = Instant.ofEpochMilli(detail.date)
         .atZone(ZoneId.systemDefault())
-        .format(DateTimeFormatter.ofPattern("EEEE, MMM d, yyyy"))
+        .format(DateTimeFormatter.ofPattern("EEEE, d 'de' MMMM"))
 
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally,
+    var visible by remember { mutableStateOf(false) }
+    
+    LaunchedEffect(Unit) {
+        delay(index * 50L)
+        visible = true
+    }
+    
+    AnimatedVisibility(
+        visible = visible,
+        enter = fadeIn() + slideInVertically(initialOffsetY = { it / 4 })
     ) {
-        Text(
-            text = date,
-            style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.Bold,
-            color = Color.White,
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = formatDuration(detail.durationSeconds),
-            style = MaterialTheme.typography.bodyLarge,
-            color = Color.White.copy(alpha = 0.6f),
-        )
+        GlassmorphicCard(
+            accentColor = AccentGreenStart
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        brush = Brush.verticalGradient(
+                            colors = listOf(
+                                AccentGreenStart.copy(alpha = 0.15f),
+                                Color.Transparent
+                            )
+                        )
+                    )
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text(
+                    text = date,
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White,
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(
+                        Icons.Default.Timer,
+                        contentDescription = null,
+                        tint = AccentCyanStart,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Text(
+                        text = formatDuration(detail.durationSeconds),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = Color.White.copy(alpha = 0.8f),
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -258,86 +365,135 @@ private fun StatCard(
     icon: ImageVector,
     label: String,
     value: String,
-    color: Color,
+    gradientColors: List<Color>,
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        modifier = modifier
-            .clip(RoundedCornerShape(12.dp))
-            .background(SurfaceCard)
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
+    GlassmorphicCard(
+        modifier = modifier,
+        accentColor = gradientColors.first()
     ) {
-        Icon(icon, contentDescription = null, tint = color, modifier = Modifier.size(28.dp))
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = value,
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold,
-            color = Color.White,
-        )
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelMedium,
-            color = Color.White.copy(alpha = 0.5f),
-        )
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    brush = Brush.linearGradient(
+                        colors = gradientColors.map { it.copy(alpha = 0.15f) }
+                    )
+                )
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Icon(icon, contentDescription = null, tint = gradientColors.first(), modifier = Modifier.size(32.dp))
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = value,
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold,
+                color = Color.White,
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = label,
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.White.copy(alpha = 0.6f),
+            )
+        }
     }
 }
 
 @Composable
-private fun ExerciseCard(exercise: ExerciseDetail) {
-    GymBroCard(accentColor = if (exercise.hasPR) AccentGreen else null) {
-        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
+private fun ExerciseCard(exercise: ExerciseDetail, index: Int) {
+    var visible by remember { mutableStateOf(false) }
+    
+    LaunchedEffect(Unit) {
+        delay(index * 50L)
+        visible = true
+    }
+    
+    val accentColor = if (exercise.hasPR) AccentAmberStart else AccentGreenStart
+    
+    AnimatedVisibility(
+        visible = visible,
+        enter = fadeIn() + slideInVertically(initialOffsetY = { it / 4 })
+    ) {
+        GlassmorphicCard(accentColor = accentColor) {
+            Column(
+                modifier = Modifier.padding(8.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Column(modifier = Modifier.weight(1f)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = exercise.exerciseName,
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White,
+                        )
+                        Text(
+                            text = exercise.muscleGroup.displayName,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color.White.copy(alpha = 0.6f),
+                        )
+                    }
+                    if (exercise.hasPR) {
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(
+                                    brush = Brush.linearGradient(
+                                        colors = listOf(AccentAmberStart, AccentAmberEnd)
+                                    )
+                                )
+                                .padding(8.dp)
+                        ) {
+                            Icon(
+                                Icons.Default.Star,
+                                contentDescription = "Récord Personal",
+                                tint = Color.White,
+                                modifier = Modifier.size(24.dp),
+                            )
+                        }
+                    }
+                }
+
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    exercise.sets.forEach { set ->
+                        SetRow(set = set)
+                    }
+                }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(
+                            brush = Brush.linearGradient(
+                                colors = listOf(
+                                    AccentCyanStart.copy(alpha = 0.2f),
+                                    AccentCyanEnd.copy(alpha = 0.1f)
+                                )
+                            )
+                        )
+                        .padding(12.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                ) {
                     Text(
-                        text = exercise.exerciseName,
-                        style = MaterialTheme.typography.titleMedium,
+                        text = "Volumen Total:",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = Color.White.copy(alpha = 0.8f),
+                        fontWeight = FontWeight.Medium,
+                    )
+                    Text(
+                        text = "${exercise.totalVolume.toInt()} kg",
+                        style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White,
-                    )
-                    Text(
-                        text = exercise.muscleGroup.displayName,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Color.White.copy(alpha = 0.6f),
+                        color = AccentCyanStart,
                     )
                 }
-                if (exercise.hasPR) {
-                    Icon(
-                        Icons.Default.Star,
-                        contentDescription = "Personal Record",
-                        tint = AccentGreen,
-                        modifier = Modifier.size(24.dp),
-                    )
-                }
-            }
-
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                exercise.sets.forEach { set ->
-                    SetRow(set = set)
-                }
-            }
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-            ) {
-                Text(
-                    text = "Total Volume:",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color.White.copy(alpha = 0.7f),
-                )
-                Text(
-                    text = "${exercise.totalVolume.toInt()} kg",
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.SemiBold,
-                    color = AccentCyan,
-                )
             }
         }
     }
@@ -348,15 +504,17 @@ private fun SetRow(set: SetDetail) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(SurfaceDark, RoundedCornerShape(8.dp))
-            .padding(horizontal = 12.dp, vertical = 8.dp),
+            .clip(RoundedCornerShape(10.dp))
+            .background(SurfaceDark)
+            .padding(horizontal = 14.dp, vertical = 10.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = "Set ${set.setNumber}",
-            style = MaterialTheme.typography.bodyMedium,
+            text = "Serie ${set.setNumber}",
+            style = MaterialTheme.typography.bodyLarge,
             color = Color.White.copy(alpha = 0.7f),
+            fontWeight = FontWeight.Medium,
         )
         Row(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -364,16 +522,28 @@ private fun SetRow(set: SetDetail) {
         ) {
             Text(
                 text = "${set.weight} kg × ${set.reps}",
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Medium,
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Bold,
                 color = Color.White,
             )
             if (set.rpe != null) {
-                Text(
-                    text = "RPE ${set.rpe}",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = AccentAmber,
-                )
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(6.dp))
+                        .background(
+                            brush = Brush.linearGradient(
+                                colors = listOf(AccentAmberStart.copy(alpha = 0.3f), AccentAmberEnd.copy(alpha = 0.2f))
+                            )
+                        )
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                ) {
+                    Text(
+                        text = "RPE ${set.rpe}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = AccentAmberStart,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
             }
         }
     }
@@ -382,20 +552,32 @@ private fun SetRow(set: SetDetail) {
 @Composable
 private fun MuscleVolumeRow(muscle: String, volume: Double) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(8.dp))
+            .background(
+                brush = Brush.linearGradient(
+                    colors = listOf(
+                        AccentGreenStart.copy(alpha = 0.15f),
+                        AccentCyanStart.copy(alpha = 0.1f)
+                    )
+                )
+            )
+            .padding(12.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
             text = muscle,
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.bodyLarge,
             color = Color.White,
+            fontWeight = FontWeight.Medium,
         )
         Text(
             text = "${volume.toInt()} kg",
-            style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.SemiBold,
-            color = AccentCyan,
+            style = MaterialTheme.typography.bodyLarge,
+            fontWeight = FontWeight.Bold,
+            color = AccentCyanStart,
         )
     }
 }

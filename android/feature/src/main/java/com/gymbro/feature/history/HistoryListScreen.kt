@@ -1,5 +1,8 @@
 package com.gymbro.feature.history
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -15,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -32,12 +36,17 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.heading
@@ -49,15 +58,21 @@ import com.gymbro.core.R
 import com.gymbro.core.model.MuscleGroup
 import com.gymbro.feature.common.EmptyState
 import com.gymbro.feature.common.FullScreenLoading
-import com.gymbro.feature.common.GymBroCard
+import com.gymbro.feature.common.GlassmorphicCard
+import java.time.Duration
 import java.time.Instant
+import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import kotlinx.coroutines.delay
 
-private val AccentGreen = Color(0xFF00FF87)
-private val AccentCyan = Color(0xFF00E5FF)
-private val AccentAmber = Color(0xFFFFAB00)
-private val SurfaceCard = Color(0xFF1A1A1A)
+private val AccentGreenStart = Color(0xFF00FF87)
+private val AccentGreenEnd = Color(0xFF00D9B5)
+private val AccentCyanStart = Color(0xFF00D4FF)
+private val AccentCyanEnd = Color(0xFF0091FF)
+private val AccentAmberStart = Color(0xFFFFB800)
+private val AccentAmberEnd = Color(0xFFFF8A00)
+
 private val SurfaceDark = Color(0xFF0A0A0A)
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -126,6 +141,7 @@ private fun HistoryListContent(
     groupedWorkouts: List<WorkoutGroup>,
     onWorkoutClick: (String) -> Unit,
 ) {
+    var itemIndex = 0
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -135,19 +151,19 @@ private fun HistoryListContent(
     ) {
         groupedWorkouts.forEach { group ->
             item {
-                Text(
-                    text = group.monthYear,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White.copy(alpha = 0.7f),
-                    modifier = Modifier.padding(vertical = 8.dp),
+                val currentIndex = itemIndex++
+                MonthHeader(
+                    monthYear = group.monthYear,
+                    index = currentIndex,
                 )
             }
 
-            items(group.workouts) { workout ->
+            itemsIndexed(group.workouts) { workoutIndex, workout ->
+                val currentIndex = itemIndex++
                 WorkoutCard(
                     workout = workout,
                     onClick = { onWorkoutClick(workout.workoutId) },
+                    index = currentIndex,
                 )
             }
         }
@@ -159,89 +175,161 @@ private fun HistoryListContent(
 }
 
 @Composable
+private fun MonthHeader(
+    monthYear: String,
+    index: Int,
+) {
+    var visible by remember { mutableStateOf(false) }
+    
+    LaunchedEffect(Unit) {
+        delay(index * 50L)
+        visible = true
+    }
+    
+    AnimatedVisibility(
+        visible = visible,
+        enter = fadeIn() + slideInVertically(initialOffsetY = { it / 4 })
+    ) {
+        GlassmorphicCard(
+            modifier = Modifier.padding(vertical = 8.dp)
+        ) {
+            Text(
+                text = monthYear,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        brush = Brush.linearGradient(
+                            colors = listOf(AccentGreenStart, AccentCyanStart)
+                        )
+                    )
+                    .padding(16.dp),
+                color = Color.White,
+            )
+        }
+    }
+}
+
+@Composable
 private fun WorkoutCard(
     workout: WorkoutListItem,
     onClick: () -> Unit,
+    index: Int,
 ) {
-    val date = Instant.ofEpochMilli(workout.date)
+    var visible by remember { mutableStateOf(false) }
+    
+    LaunchedEffect(Unit) {
+        delay(index * 50L)
+        visible = true
+    }
+    
+    val workoutDate = Instant.ofEpochMilli(workout.date)
         .atZone(ZoneId.systemDefault())
-        .format(DateTimeFormatter.ofPattern("EEE, MMM d"))
+    val date = workoutDate.format(DateTimeFormatter.ofPattern("EEE, MMM d"))
+    val relativeTime = getRelativeTime(workoutDate.toLocalDate())
+    
+    val accentColor = getAccentColorForMuscleGroups(workout.muscleGroups)
 
-    GymBroCard(
-        modifier = Modifier.clickable(onClick = onClick),
-        accentColor = if (workout.prCount > 0) AccentGreen else null,
+    AnimatedVisibility(
+        visible = visible,
+        enter = fadeIn() + slideInVertically(initialOffsetY = { it / 4 })
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = date,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White,
-                    )
-                    Text(
-                        text = formatDuration(workout.durationSeconds),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color.White.copy(alpha = 0.6f),
-                    )
-                }
-                if (workout.prCount > 0) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    ) {
-                        Icon(
-                            Icons.Default.Star,
-                            contentDescription = stringResource(R.string.history_prs),
-                            tint = AccentAmber,
-                            modifier = Modifier.size(20.dp),
-                        )
-                        Text(
-                            text = "${workout.prCount}",
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.SemiBold,
-                            color = AccentAmber,
-                        )
-                    }
-                }
-            }
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                StatChip(
-                    icon = Icons.Default.FitnessCenter,
-                    label = stringResource(R.string.history_exercises_count, workout.exerciseCount),
-                    color = AccentCyan,
-                )
-                StatChip(
-                    icon = Icons.Default.Timer,
-                    label = stringResource(R.string.history_volume_kg, workout.totalVolume.toInt()),
-                    color = AccentGreen,
-                )
-            }
-
-            if (workout.muscleGroups.isNotEmpty()) {
+        GlassmorphicCard(
+            modifier = Modifier.clickable(onClick = onClick),
+            accentColor = accentColor,
+        ) {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.Top,
                 ) {
-                    workout.muscleGroups.take(3).forEach { muscleGroup ->
-                        MuscleGroupTag(muscleGroup = muscleGroup)
-                    }
-                    if (workout.muscleGroups.size > 3) {
+                    Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = "+${workout.muscleGroups.size - 3}",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = Color.White.copy(alpha = 0.5f),
-                            modifier = Modifier.align(Alignment.CenterVertically),
+                            text = date,
+                            style = MaterialTheme.typography.headlineSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White,
                         )
+                        Text(
+                            text = relativeTime,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color.White.copy(alpha = 0.5f),
+                        )
+                    }
+                    if (workout.prCount > 0) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(
+                                    brush = Brush.linearGradient(
+                                        colors = listOf(AccentAmberStart, AccentAmberEnd)
+                                    )
+                                )
+                                .padding(horizontal = 12.dp, vertical = 6.dp),
+                        ) {
+                            Icon(
+                                Icons.Default.Star,
+                                contentDescription = stringResource(R.string.history_prs),
+                                tint = Color.White,
+                                modifier = Modifier.size(16.dp),
+                            )
+                            Text(
+                                text = "${workout.prCount}",
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White,
+                            )
+                        }
+                    }
+                }
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    StatChip(
+                        icon = Icons.Default.Timer,
+                        label = formatDuration(workout.durationSeconds),
+                        gradientColors = listOf(AccentCyanStart, AccentCyanEnd),
+                    )
+                    StatChip(
+                        icon = Icons.Default.FitnessCenter,
+                        label = "${workout.exerciseCount} ejercicios",
+                        gradientColors = listOf(AccentGreenStart, AccentGreenEnd),
+                    )
+                }
+                
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    StatChip(
+                        icon = Icons.Default.FitnessCenter,
+                        label = "${workout.totalVolume.toInt()} kg",
+                        gradientColors = listOf(AccentAmberStart, AccentAmberEnd),
+                    )
+                }
+
+                if (workout.muscleGroups.isNotEmpty()) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    ) {
+                        workout.muscleGroups.take(3).forEach { muscleGroup ->
+                            MuscleGroupTag(muscleGroup = muscleGroup)
+                        }
+                        if (workout.muscleGroups.size > 3) {
+                            Text(
+                                text = "+${workout.muscleGroups.size - 3}",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = Color.White.copy(alpha = 0.5f),
+                                modifier = Modifier.align(Alignment.CenterVertically),
+                            )
+                        }
                     }
                 }
             }
@@ -249,46 +337,103 @@ private fun WorkoutCard(
     }
 }
 
+private fun getRelativeTime(workoutDate: LocalDate): String {
+    val today = LocalDate.now()
+    val daysBetween = Duration.between(workoutDate.atStartOfDay(), today.atStartOfDay()).toDays()
+    
+    return when {
+        daysBetween == 0L -> "Hoy"
+        daysBetween == 1L -> "Ayer"
+        daysBetween < 7 -> "Hace $daysBetween días"
+        daysBetween < 14 -> "Hace 1 semana"
+        daysBetween < 30 -> "Hace ${daysBetween / 7} semanas"
+        else -> "Hace ${daysBetween / 30} meses"
+    }
+}
+
+private fun getAccentColorForMuscleGroups(muscleGroups: Set<MuscleGroup>): Color? {
+    val primaryMuscle = muscleGroups.firstOrNull() ?: return null
+    
+    return when (primaryMuscle) {
+        MuscleGroup.CHEST -> AccentGreenStart
+        MuscleGroup.BACK -> AccentCyanStart
+        MuscleGroup.SHOULDERS -> AccentAmberStart
+        MuscleGroup.BICEPS -> Color(0xFF00D4FF)
+        MuscleGroup.TRICEPS -> Color(0xFFFF3B30)
+        MuscleGroup.QUADRICEPS -> AccentGreenStart
+        MuscleGroup.HAMSTRINGS -> AccentCyanStart
+        MuscleGroup.GLUTES -> Color(0xFFFF8A00)
+        MuscleGroup.CALVES -> AccentAmberStart
+        MuscleGroup.CORE -> Color(0xFFFFB800)
+        MuscleGroup.FOREARMS -> Color(0xFF00E5FF)
+        MuscleGroup.FULL_BODY -> AccentGreenStart
+    }
+}
+
 @Composable
 private fun StatChip(
     icon: ImageVector,
     label: String,
-    color: Color,
+    gradientColors: List<Color>,
 ) {
     Row(
         modifier = Modifier
-            .clip(RoundedCornerShape(8.dp))
-            .background(SurfaceCard)
-            .padding(horizontal = 10.dp, vertical = 6.dp),
+            .clip(RoundedCornerShape(12.dp))
+            .background(
+                brush = Brush.linearGradient(colors = gradientColors.map { it.copy(alpha = 0.2f) })
+            )
+            .padding(horizontal = 12.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(6.dp),
     ) {
         Icon(
             icon,
             contentDescription = null,
-            tint = color,
-            modifier = Modifier.size(16.dp),
+            tint = gradientColors.first(),
+            modifier = Modifier.size(18.dp),
         )
         Text(
             text = label,
-            style = MaterialTheme.typography.bodySmall,
+            style = MaterialTheme.typography.bodyMedium,
             color = Color.White,
-            fontWeight = FontWeight.Medium,
+            fontWeight = FontWeight.SemiBold,
         )
     }
 }
 
 @Composable
 private fun MuscleGroupTag(muscleGroup: MuscleGroup) {
+    val gradientColors = getMuscleGroupGradient(muscleGroup)
+    
     Text(
         text = muscleGroup.displayName,
         style = MaterialTheme.typography.labelSmall,
-        color = Color.White.copy(alpha = 0.7f),
+        color = Color.White,
+        fontWeight = FontWeight.Medium,
         modifier = Modifier
-            .clip(RoundedCornerShape(6.dp))
-            .background(Color.White.copy(alpha = 0.1f))
-            .padding(horizontal = 8.dp, vertical = 4.dp),
+            .clip(RoundedCornerShape(8.dp))
+            .background(
+                brush = Brush.linearGradient(colors = gradientColors.map { it.copy(alpha = 0.3f) })
+            )
+            .padding(horizontal = 10.dp, vertical = 5.dp),
     )
+}
+
+private fun getMuscleGroupGradient(muscleGroup: MuscleGroup): List<Color> {
+    return when (muscleGroup) {
+        MuscleGroup.CHEST -> listOf(AccentGreenStart, AccentGreenEnd)
+        MuscleGroup.BACK -> listOf(AccentCyanStart, AccentCyanEnd)
+        MuscleGroup.SHOULDERS -> listOf(AccentAmberStart, AccentAmberEnd)
+        MuscleGroup.BICEPS -> listOf(Color(0xFF00D4FF), Color(0xFF0091FF))
+        MuscleGroup.TRICEPS -> listOf(Color(0xFFFF3B30), Color(0xFFFF1744))
+        MuscleGroup.QUADRICEPS -> listOf(AccentGreenStart, AccentGreenEnd)
+        MuscleGroup.HAMSTRINGS -> listOf(AccentCyanStart, AccentCyanEnd)
+        MuscleGroup.GLUTES -> listOf(AccentAmberStart, AccentAmberEnd)
+        MuscleGroup.CALVES -> listOf(Color(0xFFFFB800), Color(0xFFFF8A00))
+        MuscleGroup.CORE -> listOf(Color(0xFFFFB800), Color(0xFFFF8A00))
+        MuscleGroup.FOREARMS -> listOf(AccentCyanStart, AccentCyanEnd)
+        MuscleGroup.FULL_BODY -> listOf(AccentGreenStart, AccentCyanStart)
+    }
 }
 
 private fun formatDuration(totalSeconds: Long): String {
