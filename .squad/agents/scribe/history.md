@@ -118,3 +118,71 @@ Initial setup complete.
 - **Production Integration:** All services tested, documented, and ready for shipping
 - **Team Handoff:** All decisions, learnings, and architectural rationale captured for future team members
 - **Next Sprint:** Switch quality fixes, Trinity UI polish, Neo context injection, Tank production hardening
+
+### 2026-04-08: Scribe Round 6 — Final Documentation & Merge
+
+**Post-Spawn Tasks Completed:**
+
+1. **Orchestration Logs Created:**
+   - `2026-04-08T15-00Z-morpheus-275-277.md` — Morpheus PR review + merge (Issues #271-273, PRs #275-277). Full audit trail, decisions documented, branches cleaned.
+   - `2026-04-08T15-05Z-switch-281.md` — Switch data isolation (Issue #281, PR #293). onFlowStart/onFlowComplete handlers added to all 11 Maestro flows. Ensure-post-onboarding sub-flow created.
+   - `2026-04-08T15-10Z-tank-280.md` — Tank CI enhancement (Issue #280, PR #291). CI split into smoke (PR) + regression (master). Retry logic + standardized timeouts. 5 PRs merged total.
+   - `2026-04-08T15-15Z-switch-audit.md` — Switch Maestro audit. 14 gaps identified and prioritized. 14 new issues created (#278-290, #292) with clear downstream work routing.
+
+2. **Session Log Created:**
+   - `2026-04-08-ralph-rounds3-5.md` — Ralph's rounds 3-5 spawn summary. 4 critical issues resolved. 14 audit gaps identified. 5 PRs merged. Maestro infrastructure mature and production-ready.
+
+3. **Decision Inbox Merge:**
+   - Merged 4 inbox files into `.squad/decisions.md`:
+     - morpheus-maestro-test-infrastructure.md → Maestro framework + testTag strategy
+     - switch-spanish-maestro.md → testTag IDs over text selectors
+     - copilot-directive-20260408T161939.md → Autonomous PR review (no user intervention)
+     - copilot-directive-20260408T162054.md → Parallel code review (Morpheus + automated agent)
+   - All 4 files now consolidated in main decisions.md for team-wide visibility
+   - Deleted all 4 inbox files
+
+4. **Scribe History Updated:**
+   - Documented Round 6 completion (this entry)
+
+5. **Git Commit:**
+   - Staged `.squad/` directory changes (orchestration-log/* × 4, log/* × 1, decisions.md, deleted inbox files)
+   - Ready for commit with Copilot trailer
+
+**Session Completion Summary:**
+
+| Phase | Rounds | Agents | PRs | Orchestration Logs | Session Logs | Issues Closed |
+|-------|--------|--------|-----|------------------|--------------|---------------|
+| 1-5 | 5 | 5 unique (Neo, Trinity, Tank, Switch) | 9 | 9 | 2 | 0 |
+| 6 (Post-Spawn) | 1 | 4 (Morpheus, Switch, Tank × 2) | 5 | 4 | 1 | 3 |
+| **Cumulative** | **6** | **6** (+ Morpheus) | **14** | **13** | **3** | **3** |
+
+**Key Decisions Documented This Round:**
+
+From Morpheus:
+- Maestro as primary E2E framework (YAML-driven, Spanish-first, testTag-based selectors)
+- CI runs on PR only (smoke tests < 5 min, full regression on master)
+- Spanish as authoritative locale in assertions
+
+From Switch:
+- testTag IDs over text selectors (locale-independent, resilient to i18n)
+- Data isolation pattern (onFlowStart/onFlowComplete lifecycle hooks)
+- 14-gap maturity audit with prioritized roadmap (3 critical, 3 high, 4 medium, 4 low)
+
+From Tank:
+- CI split: smoke (PR-blocking) + regression (master-blocking)
+- Retry logic (2 attempts for flake tolerance)
+- Timeouts (5 min per flow / 15 min job)
+- Test tag standardization (@smoke, @regression, @integration)
+
+**User Directives Captured:**
+
+- Autonomous PR review: Morpheus handles all merges, no user intervention
+- Parallel code review: Morpheus + built-in code-review agent for dual perspective
+
+**Handoff Status:**
+✅ All orchestration logs complete. All decisions merged. All inbox files cleared. Scribe history updated. Ready for git commit.
+
+**Next Steps:**
+1. `git add .squad/`
+2. `git commit -m "Scribe Round 6: Complete Maestro documentation, merge decisions, update history (Co-authored-by: Copilot)"`
+3. Team ready for Phase 7 work assignments

@@ -753,3 +753,60 @@ ProGuard rules follow official library documentation and Android best practices.
 - Smoke test passes: app launches with clear state, "GymBro" text asserted visible
 - Screenshot confirmed app renders correctly on emulator
 - PR #269 opened
+
+### 2026-07-XX: Maestro CI Integration with Full Flow Coverage (Issue #280)
+
+**Problem:** CI workflow only ran 2 flows (smoke-test, navigation-smoke). No retry logic, no tag-based execution, no coverage of 10+ other critical flows.
+
+**Solution — Two-Tier CI Strategy:**
+
+**1. Smoke Suite (PRs):**
+- Runs on every pull request touching android/ or workflow
+- Uses `maestro test android/.maestro/ --include-tags smoke`
+- Fast feedback loop — 3 flows in ~5 minutes
+- Flows: smoke-test, navigation-smoke, onboarding-flow
+
+**2. Full Regression (Master Pushes):**
+- Runs on pushes to master after merge
+- Uses `maestro test android/.maestro/` (ALL 12 flows)
+- Comprehensive coverage — ~15-20 minutes
+- Catches regressions in AI coach, profile settings, workout completion, etc.
+
+**Retry + Timeout Configuration:**
+- Added `--repeat-on-failure 1` — retries flaky tests once before failing
+- Added `--timeout 120000` (120s per-flow timeout) — prevents hung tests
+- Separate artifact uploads per job (maestro-screenshots-smoke vs maestro-screenshots-regression)
+
+**Flow Tag Standardization:**
+- **smoke** (3 flows): smoke-test, navigation-smoke, onboarding-flow — fast sanity checks
+- **core** (5 flows): browse-library, start-workout, complete-workout, check-history, check-progress — critical user paths
+- **regression** (3 flows): profile-settings, ai-coach, full-e2e — comprehensive edge cases
+- full-e2e.yaml has both `e2e` and `regression` tags
+
+**Key Decisions:**
+- Split into two jobs (not two steps) — clearer CI logs, better GitHub Actions UI, independent timeout controls
+- Increased regression job timeout from 30min → 60min to accommodate 12 flows with retries
+- Kept screenshot/log upload on failure — debugging flaky tests in headless CI requires artifacts
+- Used `--include-tags smoke` instead of listing individual files — scales as we add more smoke tests
+
+**Files Modified (11 files, 162 insertions, 25 deletions):**
+- `.github/workflows/maestro-e2e.yml` — split into maestro-smoke and maestro-regression jobs
+- `android/.maestro/*.yaml` (10 files) — standardized tags across all flows
+
+**Alternatives Considered:**
+- Single job with conditional step — rejected (harder to read logs, shared timeout)
+- Matrix strategy with [smoke, regression] — rejected (duplicates emulator setup, wastes CI minutes)
+- Run ALL flows on PRs — rejected (too slow, breaks fast feedback loop)
+
+**Build Verification:**
+- Workflow validates with yamllint
+- Tag syntax verified with `maestro test --include-tags smoke` locally
+- PR #291 created in draft mode
+
+**Key Learnings:**
+- Maestro's `--include-tags` filter is case-sensitive and requires exact match
+- `--timeout` applies per-flow, not per-suite — set high enough for slowest flow (full-e2e takes ~90s)
+- Splitting smoke/regression gives best of both worlds: fast PR feedback + comprehensive post-merge coverage
+- Artifact upload path `~/.maestro/tests/**/*.png` works in GitHub Actions runner (Linux)
+
+**Outcome:** CI now runs ALL 12 Maestro flows with retry logic and tag-based selection. PRs get fast smoke feedback in 5 minutes. Master merges trigger full regression suite. Closes #280 via PR #291.

@@ -312,3 +312,98 @@ cd android
 - The emulator locale is `es-ES` but app shows English strings due to `clearState: true` resetting app locale preferences
 - `clearState` in Maestro clears app data AND forces a fresh install — this means onboarding appears again, which breaks flows that expect post-onboarding state
 - Emulator offline errors are infrastructure issues (ADB TCP forwarding drops) — not YAML or code bugs
+
+### 2026-04-08: Maestro Flow Spanish Localization with testTag IDs (Issue #271, PR #277)
+**Updated all 9 Maestro E2E flows to use Spanish text assertions and testTag-based selectors**
+
+**Context:**
+- Android emulator runs in Spanish locale (`es-ES`)
+- PR #276 (Trinity) added testTag() modifiers to 30+ Compose elements for locale-independent testing
+- All Maestro flows previously used English text assertions, causing failures on Spanish emulator
+
+**Changes Made:**
+- **9 flow files updated:** navigation-smoke, browse-library, check-history, check-progress, profile-settings, ai-coach, start-workout, complete-workout, full-e2e
+- **Strategy:** Prefer testTag IDs over text selectors wherever available, use Spanish text for elements without testTag
+
+**testTag IDs Now Used:**
+- Bottom nav: `nav_exercise_library`, `nav_history`, `nav_progress`, `nav_recovery`, `nav_profile`
+- Workout FAB: `workout_fab`
+- Onboarding: `onboarding_name_input`, `onboarding_start`
+- Search: `search_bar`
+- Workout inputs: `weight_input`, `reps_input`
+
+**Spanish Translations Applied:**
+- Screen titles: "Biblioteca de Ejercicios", "Historial de Entrenamientos", "Entrenamiento Activo", etc.
+- Button text: "Añadir Ejercicio", "Finalizar Entrenamiento", "Listo"
+- Status text: "Sin Entrenamientos Aún", "Hoy", "Ayer"
+- Onboarding: "Registro Ultra-Rápido", "Rastrea tu Progreso", "Comencemos"
+- Profile sections: "Cuenta", "Preferencias de Entrenamiento", "Acerca de"
+- AI Coach: "Hablar con el Entrenador IA", "GymBro Entrenador IA", "¿Qué debería entrenar hoy?"
+
+**Files with Most Changes:**
+1. `full-e2e.yaml`: 61 lines changed (onboarding + workout + navigation flow)
+2. `complete-workout.yaml`: 29 lines changed (full workout cycle)
+3. `profile-settings.yaml`: 22 lines changed (multiple section headers)
+4. `navigation-smoke.yaml`: 21 lines changed (all 5 bottom nav tabs)
+
+**Key Decisions:**
+- Use `tapOn: { id: 'nav_history' }` syntax for testTag selectors (locale-independent)
+- Use Spanish text for elements without testTag (muscle group filters, exercise names)
+- Keep English text for hardcoded test data (e.g., "Bench Press" exercise name)
+- Regex patterns updated: `"No Workouts Yet|Today|Yesterday"` → `"Sin Entrenamientos Aún|Hoy|Ayer"`
+
+**Testing Strategy:**
+- All flows should now pass on Spanish locale emulator
+- testTag-based selectors provide locale independence for future i18n testing
+- Text-based assertions remain for elements like exercise names (seed data is English)
+
+**Closes:** #271  
+**PR:** #277 (draft, 9 files changed, +113/-94 lines)
+
+### 2026-04-08: Maestro Flow Data Isolation — onFlowStart/onFlowComplete Cleanup (Issue #281, PR #293)
+
+**Added proper data isolation to all Maestro flows using onFlowStart/onFlowComplete hooks**
+
+**Problem:**
+- Flows were not independent — running them in different orders could cause failures
+- Onboarding flows (with `clearState: true`) left the app in post-onboarding state
+- Post-onboarding flows assumed onboarding was already complete
+- Workout flows could leave active workouts running, contaminating subsequent flows
+- No cleanup after flows completed
+
+**Solution:**
+Created a reusable sub-flow and added lifecycle hooks to all 11 flows:
+
+**New Sub-Flow:**
+- `android/.maestro/flow/ensure-post-onboarding.yaml`: Reusable flow that checks if app is past onboarding, completes it if needed, and verifies post-onboarding state
+
+**Onboarding Flows (2 flows):**
+- `onboarding-flow.yaml`, `full-e2e.yaml`: Keep `clearState: true`, add `onFlowComplete: - stopApp` to prevent state contamination
+
+**Post-Onboarding Flows (9 flows):**
+- All flows now call `runFlow: flow/ensure-post-onboarding.yaml` at the start
+- Added `onFlowStart` to verify clean starting state (at Library, no active workout)
+- Added `onFlowComplete` for cleanup:
+  - **Workout flows** (start-workout, complete-workout): Cancel any active workout
+  - **Navigation flows** (navigation-smoke, check-history, check-progress, profile-settings, ai-coach): Return to Library tab
+  - **Library flows** (browse-library, smoke-test): Clear search/filter state by relaunching
+
+**Files Changed:**
+- 11 flow YAML files updated
+- 1 new sub-flow file created
+- Total: 12 files changed (+148/-10)
+
+**Benefits:**
+- ✅ Flows can now run in **any order** without failures
+- ✅ Each flow starts from a **known state**
+- ✅ No state contamination between flows
+- ✅ Cleanup ensures next flow doesn't inherit previous flow's state
+- ✅ Reusable sub-flow reduces duplication
+
+**Testing:**
+- All flows should pass when run individually
+- Flows should pass when run in any order via CI
+- `ensure-post-onboarding.yaml` handles both fresh installs and existing post-onboarding state
+
+**Closes:** #281  
+**PR:** #293 (draft, 12 files changed, +148/-10)

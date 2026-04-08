@@ -1667,3 +1667,125 @@ User's language preference (Spanish-first). Market positioning requires visual e
 - Design review process must validate "beauty" alongside functionality
 - Polish over speed — ship complete screens, not half-baked features
 
+---
+
+## Decision: Maestro Test Infrastructure + Test Tag Pattern (2026-04-08)
+
+**Date:** 2026-04-08  
+**Decision Maker:** Morpheus (Lead)  
+**Context:** PRs #275, #276, #277 — E2E test infrastructure for Spanish-language Android app  
+
+### Decision
+
+Adopt **Maestro** as the E2E testing framework for GymBro Android, running in GitHub Actions CI on every Android code change. Establish **testTag IDs as the primary selector strategy** for structural UI elements, with Spanish text assertions as secondary selectors for labels/headings.
+
+### Rationale
+
+1. **Maestro vs Alternatives:**
+   - Maestro chosen over Espresso (too slow, flaky in CI) and Appium (heavy setup, Node.js dependency)
+   - Native YAML syntax readable by non-engineers (designers can write flows)
+   - Battle-tested in CI environments with android-emulator-runner
+
+2. **Test Tag Discipline:**
+   - Text selectors break when i18n changes (English → Spanish caused every test to fail)
+   - testTag IDs are stable across locales and theme updates
+   - Pattern: `Modifier.testTag("nav_profile")` for navigation, `testTag("weight_input")` for inputs
+
+3. **Spanish-First QA:**
+   - GymBro's default locale is Spanish (`values-es/` is authoritative, not `values/`)
+   - All Maestro assertions reference Spanish strings to catch i18n gaps early
+   - Fallback English flows removed to enforce Spanish completeness
+
+4. **CI Integration:**
+   - Runs on PR only (not push to master) to avoid double-runs on merge
+   - Smoke tests (`smoke-test.yaml`, `navigation-smoke.yaml`) in CI; full E2E (`full-e2e.yaml`) for manual runs
+   - 30-minute timeout catches emulator hang issues before they block CI queue
+
+### Team Rules
+
+1. **Composable Tagging:**
+   - Any composable in a critical user flow (onboarding, workout, navigation, profile) MUST have a testTag
+   - Naming convention: `{screen}_{element}` (e.g., `onboarding_name_input`, `workout_fab`)
+   - Document testTag IDs in PR description when adding new screens
+
+2. **Maestro Flow Updates:**
+   - When changing UI text, update corresponding Maestro flow assertions in same PR
+   - Use testTag selectors where possible; Spanish text selectors only when testTag not available
+   - Run `maestro test android/.maestro/{flow}.yaml` locally before pushing
+
+3. **CI Signal Ownership:**
+   - Tank owns CI workflow maintenance (emulator config, Maestro version bumps)
+   - Switch validates E2E test completeness before merging feature PRs
+   - Morpheus reviews testTag naming consistency in PR reviews
+
+### Success Metrics
+
+- E2E tests run < 10 minutes in CI (currently ~8 minutes with emulator startup)
+- Zero false positives (flaky tests) after 20 CI runs
+- 100% of critical user flows covered: onboarding, workout start/complete, navigation, profile settings
+
+---
+
+## Decision: Maestro Test Strategy — testTag IDs Over Text Selectors (2026-04-08)
+
+**Date:** 2026-04-08  
+**Author:** Switch  
+**Context:** Issue #271 — Spanish locale emulator causing Maestro flow failures
+
+### Decision
+
+Prefer testTag-based selectors (`tapOn: { id: 'nav_history' }`) over text-based selectors (`tapOn: "History"`) in Maestro E2E tests.
+
+### Rationale
+
+1. **Locale Independence:** testTag IDs work regardless of app locale, making tests more robust
+2. **Less Brittle:** Text changes don't break tests — only structural changes do
+3. **Faster:** ID lookups are faster than text searches in the view hierarchy
+4. **Clearer Intent:** `id: 'nav_history'` is more explicit than `"History"` which could match multiple elements
+
+### Implementation
+
+- Trinity (PR #276) added testTag() to 30+ key Compose elements
+- Switch (PR #277) updated all Maestro flows to use these IDs
+- Fallback to Spanish text for elements without testTag (e.g., muscle group filters, dynamically generated content)
+
+### Guidelines for Future Tests
+
+1. **Always add testTag()** to clickable/assertable elements when adding new UI components
+2. **Use testTag in Maestro flows** whenever available
+3. **Use localized text** only when testTag is not feasible (dynamic content, filter chips, exercise names)
+4. **Format:** `tapOn: { id: 'element_id' }` or `assertVisible: { id: 'element_id' }`
+
+### Files Using This Pattern
+
+All 9 Maestro flows now use testTag IDs:
+- navigation-smoke.yaml
+- browse-library.yaml
+- check-history.yaml
+- check-progress.yaml
+- profile-settings.yaml
+- ai-coach.yaml
+- start-workout.yaml
+- complete-workout.yaml
+- full-e2e.yaml
+
+---
+
+## User Directive (2026-04-08T16:19:39Z)
+
+**By:** Copilot (via Copilot)
+
+**What:** Never ask the user to review PRs or merge them. The team operates fully autonomously — Morpheus reviews, approves, and merges PRs without user intervention. Never pause to ask the user about reviews or merges.
+
+**Why:** User request — captured for team memory. Consistent with existing directive: "User does not want to intervene until there's a working app."
+
+---
+
+## User Directive (2026-04-08T16:20:54Z)
+
+**By:** Copilot (via Copilot)
+
+**What:** For code reviews, use both Morpheus (architecture/design review) AND the built-in code-review agent (automated bug/security/logic analysis) in parallel. Two perspectives are better than one.
+
+**Why:** User request — captured for team memory
+
