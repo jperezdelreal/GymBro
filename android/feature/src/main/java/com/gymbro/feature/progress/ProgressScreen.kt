@@ -1,5 +1,10 @@
 package com.gymbro.feature.progress
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -21,22 +26,27 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ShowChart
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.Timer
+import androidx.compose.material.icons.filled.TrendingUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
@@ -55,18 +65,24 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gymbro.core.model.E1RMDataPoint
 import com.gymbro.core.model.PersonalRecord
+import com.gymbro.core.model.PlateauAlert
+import com.gymbro.core.model.PlateauType
 import com.gymbro.core.model.RecordType
 import com.gymbro.core.model.WorkoutHistoryItem
+import com.gymbro.core.ui.theme.AccentAmberEnd
+import com.gymbro.core.ui.theme.AccentAmberStart
+import com.gymbro.core.ui.theme.AccentCyanEnd
+import com.gymbro.core.ui.theme.AccentCyanStart
+import com.gymbro.core.ui.theme.AccentGreenEnd
+import com.gymbro.core.ui.theme.AccentGreenStart
+import com.gymbro.core.ui.theme.AccentRed
+import com.gymbro.core.ui.theme.Surface
+import com.gymbro.core.ui.theme.SurfaceVariant
 import com.gymbro.feature.common.EmptyState
 import com.gymbro.feature.common.FullScreenLoading
+import com.gymbro.feature.common.GlassmorphicCard
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-
-private val AccentGreen = Color(0xFF00FF87)
-private val AccentAmber = Color(0xFFFFAB00)
-private val AccentCyan = Color(0xFF00E5FF)
-private val SurfaceColor = Color(0xFF1A1A1A)
-private val SurfaceVariantColor = Color(0xFF2A2A2A)
 
 private val dateFormatter = DateTimeFormatter.ofPattern("MMM d")
 private val fullDateFormatter = DateTimeFormatter.ofPattern("MMM d, yyyy")
@@ -118,29 +134,52 @@ private fun ProgressScreen(
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        // Analytics Card
+        // Hero KPI Cards (3 across)
         item {
-            AnalyticsNavigationCard(onClick = onNavigateToAnalytics)
+            HeroKPISection(
+                totalVolume = state.totalVolume,
+                workoutsThisWeek = state.workoutsThisWeek,
+                recentPRs = state.recentPRs,
+            )
         }
-        
-        // Section: Personal Records
+
+        // Volume Chart Section
+        if (state.weeklyVolumeData.isNotEmpty()) {
+            item {
+                SectionHeader(title = "Weekly Volume", icon = "📊")
+            }
+            item {
+                WeeklyVolumeChart(data = state.weeklyVolumeData)
+            }
+        }
+
+        // Plateau Alerts Section
+        if (state.plateauAlerts.isNotEmpty()) {
+            item {
+                SectionHeader(title = "Plateau Alerts", icon = "⚠️")
+            }
+            items(state.plateauAlerts) { alert ->
+                PlateauAlertCard(
+                    alert = alert,
+                    onDismiss = { onEvent(ProgressEvent.DismissPlateauAlert(alert.exerciseId)) }
+                )
+            }
+        }
+
+        // PR Showcase Section
         if (state.personalRecords.isNotEmpty()) {
             item {
-                SectionHeader(title = "Personal Records", icon = "🏆")
+                SectionHeader(title = "Recent PRs", icon = "🏆")
             }
-
-            val selectedRecords = if (state.selectedExerciseId != null) {
-                state.personalRecords.filter { it.exerciseId == state.selectedExerciseId }
-            } else {
-                state.personalRecords
-            }
-
-            item {
-                PRGrid(records = selectedRecords)
+            val recentPRs = state.personalRecords
+                .sortedByDescending { it.date }
+                .take(5)
+            items(recentPRs) { pr ->
+                PRShowcaseCard(record = pr)
             }
         }
 
-        // Section: E1RM Chart
+        // E1RM Chart Section
         if (state.exerciseOptions.isNotEmpty()) {
             item {
                 SectionHeader(title = "Estimated 1RM Trend", icon = "📈")
@@ -161,7 +200,7 @@ private fun ProgressScreen(
             } else {
                 item {
                     Card(
-                        colors = CardDefaults.cardColors(containerColor = SurfaceColor),
+                        colors = CardDefaults.cardColors(containerColor = Surface),
                         shape = RoundedCornerShape(12.dp),
                     ) {
                         Box(
@@ -177,20 +216,6 @@ private fun ProgressScreen(
                         }
                     }
                 }
-            }
-        }
-
-        // Section: Workout History
-        if (state.workoutHistory.isNotEmpty()) {
-            item {
-                SectionHeader(title = "Workout History", icon = "📋")
-            }
-
-            items(state.workoutHistory, key = { it.workoutId }) { workout ->
-                WorkoutHistoryRow(
-                    item = workout,
-                    onClick = { onEvent(ProgressEvent.ViewWorkoutDetail(workout.workoutId)) },
-                )
             }
         }
     }
@@ -210,7 +235,7 @@ private fun AnalyticsNavigationCard(onClick: () -> Unit) {
     Card(
         onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = SurfaceColor),
+        colors = CardDefaults.cardColors(containerColor = Surface),
         shape = RoundedCornerShape(12.dp),
     ) {
         Row(
@@ -245,7 +270,7 @@ private fun AnalyticsNavigationCard(onClick: () -> Unit) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ShowChart,
                 contentDescription = null,
-                tint = AccentGreen,
+                tint = AccentGreenStart,
                 modifier = Modifier.size(24.dp),
             )
         }
@@ -303,7 +328,7 @@ private fun PRCard(record: PersonalRecord, modifier: Modifier = Modifier) {
         modifier = modifier.semantics(mergeDescendants = true) {
             contentDescription = "${record.type.displayName}: ${formatPRValue(record)} for ${record.exerciseName}"
         },
-        colors = CardDefaults.cardColors(containerColor = SurfaceColor),
+        colors = CardDefaults.cardColors(containerColor = Surface),
         shape = RoundedCornerShape(12.dp),
     ) {
         Column(
@@ -325,7 +350,7 @@ private fun PRCard(record: PersonalRecord, modifier: Modifier = Modifier) {
             Text(
                 text = formatPRValue(record),
                 style = MaterialTheme.typography.headlineSmall,
-                color = AccentGreen,
+                color = AccentGreenStart,
                 fontWeight = FontWeight.Bold,
             )
             if (record.exerciseName.isNotEmpty()) {
@@ -343,7 +368,7 @@ private fun PRCard(record: PersonalRecord, modifier: Modifier = Modifier) {
                     Text(
                         text = "+${formatNumber(improvement)}",
                         style = MaterialTheme.typography.labelSmall,
-                        color = AccentGreen,
+                        color = AccentGreenStart,
                         fontWeight = FontWeight.SemiBold,
                     )
                 }
@@ -372,9 +397,9 @@ private fun ExerciseChipRow(
                     )
                 },
                 colors = FilterChipDefaults.filterChipColors(
-                    selectedContainerColor = AccentAmber.copy(alpha = 0.2f),
-                    selectedLabelColor = AccentAmber,
-                    containerColor = SurfaceVariantColor,
+                    selectedContainerColor = AccentAmberStart.copy(alpha = 0.2f),
+                    selectedLabelColor = AccentAmberStart,
+                    containerColor = SurfaceVariant,
                     labelColor = MaterialTheme.colorScheme.onSurfaceVariant,
                 ),
             )
@@ -387,7 +412,7 @@ private fun E1RMChart(data: List<E1RMDataPoint>) {
     val textMeasurer = rememberTextMeasurer()
 
     Card(
-        colors = CardDefaults.cardColors(containerColor = SurfaceColor),
+        colors = CardDefaults.cardColors(containerColor = Surface),
         shape = RoundedCornerShape(12.dp),
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -397,7 +422,7 @@ private fun E1RMChart(data: List<E1RMDataPoint>) {
                 Text(
                     text = "${formatNumber(latest.e1rm)} kg",
                     style = MaterialTheme.typography.headlineMedium,
-                    color = AccentAmber,
+                    color = AccentAmberStart,
                     fontWeight = FontWeight.Bold,
                 )
                 Text(
@@ -418,7 +443,7 @@ private fun E1RMChart(data: List<E1RMDataPoint>) {
                     val cx = size.width / 2
                     val cy = size.height / 2
                     drawCircle(
-                        color = AccentAmber,
+                        color = AccentAmberStart,
                         radius = 6.dp.toPx(),
                         center = Offset(cx, cy),
                     )
@@ -482,7 +507,7 @@ private fun E1RMChart(data: List<E1RMDataPoint>) {
 
                 drawPath(
                     path = path,
-                    color = AccentAmber,
+                    color = AccentAmberStart,
                     style = Stroke(
                         width = 2.5.dp.toPx(),
                         cap = StrokeCap.Round,
@@ -495,12 +520,12 @@ private fun E1RMChart(data: List<E1RMDataPoint>) {
                     val x = xForIndex(i)
                     val y = yForValue(point.e1rm)
                     drawCircle(
-                        color = AccentAmber,
+                        color = AccentAmberStart,
                         radius = 4.dp.toPx(),
                         center = Offset(x, y),
                     )
                     drawCircle(
-                        color = SurfaceColor,
+                        color = Surface,
                         radius = 2.dp.toPx(),
                         center = Offset(x, y),
                     )
@@ -543,7 +568,7 @@ private fun WorkoutHistoryRow(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
-        colors = CardDefaults.cardColors(containerColor = SurfaceColor),
+        colors = CardDefaults.cardColors(containerColor = Surface),
         shape = RoundedCornerShape(12.dp),
     ) {
         Row(
@@ -555,7 +580,7 @@ private fun WorkoutHistoryRow(
             Icon(
                 Icons.Default.FitnessCenter,
                 contentDescription = null,
-                tint = AccentCyan,
+                tint = AccentCyanStart,
                 modifier = Modifier.size(24.dp),
             )
             Spacer(modifier = Modifier.width(12.dp))
@@ -590,7 +615,7 @@ private fun WorkoutHistoryRow(
                 Icon(
                     Icons.Default.EmojiEvents,
                     contentDescription = "${item.prCount} PRs",
-                    tint = AccentGreen,
+                    tint = AccentGreenStart,
                     modifier = Modifier.size(20.dp),
                 )
             }
@@ -618,6 +643,294 @@ private fun StatChip(
         )
     }
 }
+
+@Composable
+private fun HeroKPISection(
+    totalVolume: Double,
+    workoutsThisWeek: Int,
+    recentPRs: Int,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        GlassmorphicCard(
+            modifier = Modifier.weight(1f),
+            accentColor = Color(AccentGreenStart.value),
+        ) {
+            Column {
+                Text(
+                    text = formatNumber(totalVolume),
+                    fontSize = 40.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(AccentGreenStart.value),
+                )
+                Text(
+                    text = "Total Volume",
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        Icons.Default.TrendingUp,
+                        contentDescription = null,
+                        modifier = Modifier.size(14.dp),
+                        tint = Color(AccentGreenStart.value),
+                    )
+                    Text(
+                        text = " kg",
+                        fontSize = 11.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+        }
+
+        GlassmorphicCard(
+            modifier = Modifier.weight(1f),
+            accentColor = Color(AccentCyanStart.value),
+        ) {
+            Column {
+                Text(
+                    text = "$workoutsThisWeek",
+                    fontSize = 40.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(AccentCyanStart.value),
+                )
+                Text(
+                    text = "Workouts",
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "This Week",
+                    fontSize = 11.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+
+        GlassmorphicCard(
+            modifier = Modifier.weight(1f),
+            accentColor = Color(AccentAmberStart.value),
+        ) {
+            Column {
+                Text(
+                    text = "$recentPRs",
+                    fontSize = 40.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(AccentAmberStart.value),
+                )
+                Text(
+                    text = "PRs",
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "Last 2 Weeks",
+                    fontSize = 11.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun WeeklyVolumeChart(data: List<WeeklyVolume>) {
+    val textMeasurer = rememberTextMeasurer()
+    Card(
+        colors = CardDefaults.cardColors(containerColor = Surface),
+        shape = RoundedCornerShape(12.dp),
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                text = "Last 8 Weeks",
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onSurface,
+                fontWeight = FontWeight.Bold,
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Canvas(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp),
+            ) {
+                if (data.isEmpty()) return@Canvas
+
+                val paddingLeft = 40.dp.toPx()
+                val paddingBottom = 32.dp.toPx()
+                val paddingTop = 16.dp.toPx()
+                val paddingRight = 16.dp.toPx()
+
+                val chartWidth = size.width - paddingLeft - paddingRight
+                val chartHeight = size.height - paddingTop - paddingBottom
+
+                val maxVolume = data.maxOfOrNull { it.volume } ?: 1.0
+                val barWidth = chartWidth / data.size * 0.7f
+                val spacing = chartWidth / data.size * 0.3f
+
+                data.forEachIndexed { index, weekVolume ->
+                    val barHeight = if (maxVolume > 0) {
+                        (weekVolume.volume / maxVolume * chartHeight).toFloat()
+                    } else 0f
+
+                    val x = paddingLeft + index * (barWidth + spacing)
+                    val y = size.height - paddingBottom - barHeight
+
+                    // Gradient bar
+                    drawRect(
+                        brush = Brush.verticalGradient(
+                            colors = listOf(
+                                Color(AccentGreenStart.value),
+                                Color(AccentGreenEnd.value),
+                            ),
+                            startY = y,
+                            endY = size.height - paddingBottom,
+                        ),
+                        topLeft = Offset(x, y),
+                        size = androidx.compose.ui.geometry.Size(barWidth, barHeight),
+                    )
+
+                    // Week label
+                    val label = "W${weekVolume.weekNumber}"
+                    val textResult = textMeasurer.measure(
+                        text = label,
+                        style = TextStyle(
+                            color = Color.White.copy(alpha = 0.5f),
+                            fontSize = 10.sp,
+                        ),
+                    )
+                    drawText(
+                        textLayoutResult = textResult,
+                        topLeft = Offset(
+                            x + barWidth / 2 - textResult.size.width / 2,
+                            size.height - paddingBottom + 8.dp.toPx(),
+                        ),
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun PlateauAlertCard(
+    alert: PlateauAlert,
+    onDismiss: () -> Unit,
+) {
+    val alertColor = when (alert.type) {
+        PlateauType.STAGNATION -> Color(AccentAmberStart.value)
+        PlateauType.REGRESSION -> AccentRed
+    }
+
+    GlassmorphicCard(
+        accentColor = alertColor,
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.Top,
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = if (alert.type == PlateauType.STAGNATION) "⚠️" else "🔴",
+                        fontSize = 20.sp,
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = alert.exerciseName,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "${alert.weeksDuration} weeks with no progress",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = alert.suggestion,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+            }
+            IconButton(onClick = onDismiss) {
+                Icon(
+                    Icons.Default.Close,
+                    contentDescription = "Dismiss",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun PRShowcaseCard(record: PersonalRecord) {
+    val zone = ZoneId.systemDefault()
+    GlassmorphicCard(
+        accentColor = Color(AccentAmberStart.value),
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = "🏆",
+                fontSize = 32.sp,
+            )
+            Spacer(modifier = Modifier.width(12.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = record.exerciseName,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontWeight = FontWeight.Bold,
+                )
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    text = "${record.type.displayName}: ${formatPRValue(record)}",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = Color(AccentAmberStart.value),
+                    fontWeight = FontWeight.SemiBold,
+                )
+                Text(
+                    text = record.date.atZone(zone).format(fullDateFormatter),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            if (record.previousValue != null) {
+                val improvement = record.value - record.previousValue!!
+                if (improvement > 0) {
+                    Column(horizontalAlignment = Alignment.End) {
+                        Icon(
+                            Icons.Default.TrendingUp,
+                            contentDescription = null,
+                            tint = Color(AccentAmberStart.value),
+                            modifier = Modifier.size(20.dp),
+                        )
+                        Text(
+                            text = "+${formatNumber(improvement)}",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = Color(AccentAmberStart.value),
+                            fontWeight = FontWeight.Bold,
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
 
 private fun formatPRValue(record: PersonalRecord): String {
     return when (record.type) {

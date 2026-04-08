@@ -81,6 +81,17 @@ class ProgressViewModel @Inject constructor(
                 exerciseOptions.map { it.id to it.name }
             )
 
+            // Calculate KPI metrics
+            val totalVolume = history.sumOf { it.totalVolume }
+            val now = java.time.Instant.now()
+            val weekStart = now.minusSeconds(7 * 24 * 60 * 60)
+            val workoutsThisWeek = history.count { it.date.isAfter(weekStart) }
+            val twoWeeksAgo = now.minusSeconds(14 * 24 * 60 * 60)
+            val recentPRs = allRecords.count { it.date.isAfter(twoWeeksAgo) }
+
+            // Calculate weekly volume data for last 8 weeks
+            val weeklyVolumeData = calculateWeeklyVolume(history)
+
             _state.update {
                 it.copy(
                     workoutHistory = history,
@@ -89,10 +100,37 @@ class ProgressViewModel @Inject constructor(
                     selectedExerciseId = selectedId,
                     chartData = chartData,
                     plateauAlerts = plateauAlerts,
+                    totalVolume = totalVolume,
+                    workoutsThisWeek = workoutsThisWeek,
+                    recentPRs = recentPRs,
+                    weeklyVolumeData = weeklyVolumeData,
                     isLoading = false,
                 )
             }
         }
+    }
+
+    private fun calculateWeeklyVolume(history: List<com.gymbro.core.model.WorkoutHistoryItem>): List<WeeklyVolume> {
+        val now = java.time.Instant.now()
+        val eightWeeksAgo = now.minusSeconds(8 * 7 * 24 * 60 * 60)
+        
+        val recentHistory = history.filter { it.date.isAfter(eightWeeksAgo) }
+        
+        val weeklyData = mutableMapOf<Int, Double>()
+        for (i in 0 until 8) {
+            weeklyData[i] = 0.0
+        }
+        
+        recentHistory.forEach { workout ->
+            val weekNumber = ((now.epochSecond - workout.date.epochSecond) / (7 * 24 * 60 * 60)).toInt()
+            if (weekNumber in 0 until 8) {
+                weeklyData[weekNumber] = (weeklyData[weekNumber] ?: 0.0) + workout.totalVolume
+            }
+        }
+        
+        return (0 until 8).map { weekNum ->
+            WeeklyVolume(weekNumber = 7 - weekNum, volume = weeklyData[weekNum] ?: 0.0)
+        }.reversed()
     }
 
     private fun selectExercise(exerciseId: String) {
