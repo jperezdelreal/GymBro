@@ -407,3 +407,64 @@ Created a reusable sub-flow and added lifecycle hooks to all 11 flows:
 
 **Closes:** #281  
 **PR:** #293 (draft, 12 files changed, +148/-10)
+
+### 2026-04-08: Maestro Flow Persistence Verification (Issue #278, PR #295)
+
+**Added cross-screen data persistence verification to workout flows**
+
+**Context:**
+- Users need confidence that completed workouts persist correctly across screen navigation
+- Existing flows completed workouts but didn't verify the data appeared in History or Progress screens
+- Critical UX requirement: data must be visible after completing a workout
+
+**Changes Made:**
+
+1. **Updated complete-workout.yaml** (28 lines added):
+   - After completing workout and tapping "Listo", added verification steps:
+   - Navigate to History tab (
+av_history)
+   - Assert workout appears (verify "Bench Press" visible)
+   - Navigate to Progress tab (
+av_progress)
+   - Assert progress stats updated (verify "Volumen Semanal" visible or empty state)
+   - Screenshots at each verification point
+   - Return to Exercise Library tab
+
+2. **Created erify-data-persistence.yaml** (115 lines, new file):
+   - Dedicated cross-screen verification flow
+   - **Flow steps:**
+     1. Start workout, add Squat exercise
+     2. Log a set (80kg × 8 reps)
+     3. Complete workout and verify summary screen
+     4. Navigate to History → verify workout appears
+     5. Tap workout to see details → verify set data (80, 8 reps)
+     6. Navigate to Progress → verify stats updated
+     7. Verify "Volumen Semanal" and "PRs Recientes" sections visible
+   - Tagged as core + egression for CI coverage
+   - 10 screenshots capture each verification step
+
+**Key Techniques:**
+- Uses testTag IDs for reliable navigation (
+av_history, 
+av_progress, 
+av_exercise_library)
+- Spanish locale assertions ("Historial de Entrenamientos", "Volumen Semanal")
+- Optional assertions handle empty state vs. populated state gracefully
+- Explicit workout selection (Squat) different from complete-workout.yaml (Bench Press) to avoid test data conflicts
+
+**Testing Strategy:**
+- complete-workout.yaml now serves dual purpose: workout completion + basic persistence check
+- erify-data-persistence.yaml is the comprehensive cross-screen verification flow
+- Both flows verify different exercises to avoid interference
+- Screenshots provide visual debugging for persistence failures
+
+**Benefits:**
+- ✅ Detects data persistence bugs across screen navigation
+- ✅ Verifies History screen shows completed workouts
+- ✅ Verifies Progress screen updates with new workout data
+- ✅ Comprehensive test coverage for user's workflow: log → complete → verify
+- ✅ Screenshots enable quick diagnosis of where persistence fails
+
+**Closes:** #278  
+**PR:** #295 (draft, 2 files changed, +143 lines)
+
