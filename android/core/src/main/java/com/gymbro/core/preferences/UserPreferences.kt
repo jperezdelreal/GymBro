@@ -54,14 +54,8 @@ class UserPreferences @Inject constructor(
         preferences[NOTIFICATIONS_ENABLED] ?: false
     }
 
-    fun hasCompletedOnboarding(): Boolean {
-        // Synchronously check onboarding status - returns false for first launch
-        return try {
-            val preferences = context.dataStore.data.map { it[ONBOARDING_COMPLETE] ?: false }
-            false // Default to false initially
-        } catch (e: Exception) {
-            false
-        }
+    val hasCompletedOnboarding: Flow<Boolean> = dataStore.data.map { preferences ->
+        preferences[ONBOARDING_COMPLETE] ?: false
     }
 
     suspend fun setWeightUnit(unit: WeightUnit) {

@@ -62,6 +62,7 @@ import com.gymbro.feature.workout.SmartWorkoutRoute
 import com.gymbro.feature.workout.WorkoutSummaryScreen
 import com.gymbro.core.model.PersonalRecord
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 private val AccentGreen = Color(0xFF00FF87)
 
@@ -88,8 +89,8 @@ fun GymBroNavGraph(
 
     val showBottomBar = currentDestination?.route in BottomNavTab.entries.map { it.route }
 
-    // TODO: Implement onboarding completion tracking
-    val startDestination = "exercise_library"
+    val hasCompletedOnboarding by userPreferences.hasCompletedOnboarding.collectAsStateWithLifecycle(initialValue = false)
+    val startDestination = if (hasCompletedOnboarding) "exercise_library" else "onboarding"
 
     NavHost(
         navController = navController,
