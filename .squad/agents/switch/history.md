@@ -273,6 +273,38 @@ cd android
 - `smoke-test.yaml`: ❌ Emulator infrastructure issue (`device offline` / `Unable to launch app`) — YAML syntax valid, runtime failure is emulator instability, not code
 - Emulator (`emulator-5554`) went offline intermittently during Maestro test sessions — affects `launchApp` step consistently
 
+### 2026-04-08: Issue #274 Duplicate Resolution — Onboarding i18n Already Complete
+**Verified that all onboarding i18n work was already completed in prior commits**
+
+**Investigation:**
+- Issue #274 opened claiming "remaining hardcoded English strings in OnboardingScreen.kt"
+- Code audit: ALL 14 text strings in OnboardingScreen.kt already use `stringResource(R.string.xxx)` with `com.gymbro.core.R`
+- No hardcoded English strings found (verified with grep patterns for `= ".*[A-Za-z]{2,}.*"`)
+
+**String Resource Verification:**
+- All 14 onboarding strings exist in `core/src/main/res/values/strings.xml` (English)
+- All 14 onboarding strings exist in `core/src/main/res/values-es/strings.xml` (Spanish)
+- Maestro test `onboarding-flow.yaml` assertions match defined string resources
+
+**Historical Context:**
+- PR #232 (commit aa6ec03): Initial i18n setup with all onboarding string resources
+- PR #263 (commit aeb8956): Added missing `onboarding_smart_gym_companion` string
+- PR #270 (commit 8c668c8): Replaced final hardcoded '¡Vamos!' with stringResource
+
+**Build Verification:**
+- `assembleDebug` passed successfully ✅
+- All string references resolved correctly at compile time
+
+**Outcome:**
+- Commented on issue #274 with detailed verification results
+- Recommended closing as duplicate/already resolved
+- Work was completed incrementally across PRs #232, #263, #270
+
+**Key Learning:**
+- Issues may be opened based on stale information if created before recent PRs merge
+- Always verify current master state before starting work on an issue
+- Git history search (`git log --grep`, `git show`) is essential for understanding what was already done
+
 **Key Learnings:**
 - `swipeLeft` / `swipeRight` are NOT valid Maestro commands — must use `swipe: { direction: LEFT, duration: 400 }`
 - Maestro `assertVisible` uses regex matching — `"A|B"` syntax works for OR-matching (useful for state-agnostic assertions)
