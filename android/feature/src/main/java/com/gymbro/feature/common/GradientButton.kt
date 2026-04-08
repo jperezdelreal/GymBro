@@ -1,6 +1,7 @@
 package com.gymbro.feature.common
 
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -21,8 +22,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.gymbro.app.ui.theme.AccentGreenEnd
-import com.gymbro.app.ui.theme.AccentGreenStart
+
+private val AccentGreenStart = Color(0xFF00FF87)
+private val AccentGreenEnd = Color(0xFF00D9B5)
 
 @Composable
 fun GradientButton(
@@ -83,6 +85,4 @@ fun GradientButton(
     }
 }
 
-fun Modifier.gradientBackground(brush: Brush): Modifier = this.then(
-    androidx.compose.foundation.background(brush)
-)
+fun Modifier.gradientBackground(brush: Brush): Modifier = this.background(brush = brush)
