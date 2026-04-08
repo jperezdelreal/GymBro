@@ -74,16 +74,41 @@ private data class MuscleGroupSeed(
 private class SeedDatabaseCallback(private val context: Context) : RoomDatabase.Callback() {
     override fun onCreate(db: SupportSQLiteDatabase) {
         super.onCreate(db)
+        // Run seeding asynchronously on IO thread to avoid blocking main thread
         CoroutineScope(Dispatchers.IO).launch {
-            val exercises = loadExercisesFromAssets(context)
-            // Use the DAO for cleaner insertion with proper conflict resolution
-            val database = Room.databaseBuilder(
-                context,
-                GymBroDatabase::class.java,
-                "gymbro.db"
-            ).build()
-            database.exerciseDao().insertAll(exercises)
-            database.close()
+            // Use raw SQL query to check if exercises exist (avoids DAO initialization)
+            val cursor = db.query("SELECT COUNT(*) FROM exercises")
+            cursor.moveToFirst()
+            val count = cursor.getInt(0)
+            cursor.close()
+            
+            if (count == 0) {
+                val exercises = loadExercisesFromAssets(context)
+                // Use raw SQL insert to avoid creating another database instance
+                db.beginTransaction()
+                try {
+                    exercises.forEach { exercise ->
+                        db.execSQL(
+                            """
+                            INSERT INTO exercises (id, name, muscleGroup, category, equipment, description, youtubeUrl)
+                            VALUES (?, ?, ?, ?, ?, ?, ?)
+                            """,
+                            arrayOf(
+                                exercise.id,
+                                exercise.name,
+                                exercise.muscleGroup,
+                                exercise.category,
+                                exercise.equipment,
+                                exercise.description,
+                                exercise.youtubeUrl
+                            )
+                        )
+                    }
+                    db.setTransactionSuccessful()
+                } finally {
+                    db.endTransaction()
+                }
+            }
         }
     }
 }
