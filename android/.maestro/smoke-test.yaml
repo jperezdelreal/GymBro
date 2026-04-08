@@ -1,5 +1,4 @@
 appId: com.gymbro.app
 ---
-- launchApp:
-    clearState: true
-- assertVisible: "GymBro"
+- launchApp
+- assertVisible: "GymBro|Exercise Library"

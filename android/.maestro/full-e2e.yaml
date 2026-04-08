@@ -5,6 +5,9 @@ tags:
   - regression
 ---
 
+- launchApp:
+    clearState: true
+
 # === PHASE 1: ONBOARDING ===
 
 # Welcome page
@@ -12,30 +15,37 @@ tags:
 - takeScreenshot: e2e_onboarding_start
 
 # Swipe through all pages
-- swipeLeft
-- assertVisible: "Registro Ultra-Rápido"
+- swipe:
+    direction: LEFT
+    duration: 400
+- assertVisible: "Ultra-Fast Logging"
 
-- swipeLeft
-- assertVisible: "Rastrea tu Progreso"
+- swipe:
+    direction: LEFT
+    duration: 400
+- assertVisible: "Track Your Progress"
 
-- swipeLeft
-- assertVisible: "Comencemos"
+- swipe:
+    direction: LEFT
+    duration: 400
+- assertVisible: "Let's Get Started"
 
 # Select units and enter name
-- tapOn: "Kilogramos (kg)"
-- tapOn: "Ingresa tu nombre"
+- tapOn: "Kilograms (kg)"
+- tapOn: "Enter your name"
 - inputText: "E2EUser"
+- hideKeyboard
 
 # Complete onboarding
-- tapOn: "¡Vamos!"
-- assertVisible: "Biblioteca de Ejercicios"
+- tapOn: "Let's Go"
+- assertVisible: "Exercise Library"
 - takeScreenshot: e2e_onboarding_complete
 
 # === PHASE 2: QUICK LIBRARY BROWSE ===
 
 # Dismiss tooltip if present
 - tapOn:
-    text: "Entendido"
+    text: "Got it"
     optional: true
 
 # Verify library content is loaded
@@ -44,13 +54,13 @@ tags:
 # === PHASE 3: START AND COMPLETE WORKOUT ===
 
 # Tap FAB to start workout
-- tapOn: "Iniciar Entrenamiento"
-- assertVisible: "Entrenamiento Activo"
+- tapOn: "Start Workout"
+- assertVisible: "Active Workout"
 - takeScreenshot: e2e_workout_started
 
 # Add an exercise
-- tapOn: "Añadir Ejercicio"
-- assertVisible: "Elegir Ejercicio"
+- tapOn: "Add Exercise"
+- assertVisible: "Pick Exercise"
 
 # Pick an exercise
 - tapOn:
@@ -58,7 +68,7 @@ tags:
     index: 0
 
 # Fill in set data
-- assertVisible: "Entrenamiento Activo"
+- assertVisible: "Active Workout"
 - tapOn:
     text: "0"
     index: 0
@@ -73,45 +83,45 @@ tags:
 
 # Complete the set
 - tapOn:
-    text: "Completar serie 1"
+    text: "Complete set 1"
 
 # Finish workout
-- tapOn: "Finalizar Entrenamiento"
+- tapOn: "Finish Workout"
 
 # Verify summary
-- assertVisible: "¡Entrenamiento Completado!"
+- assertVisible: "Workout Complete!"
 - takeScreenshot: e2e_workout_summary
 
 # Tap done
-- tapOn: "Listo"
-- assertVisible: "Biblioteca de Ejercicios"
+- tapOn: "Done"
+- assertVisible: "Exercise Library"
 
 # === PHASE 4: VERIFY HISTORY ===
 
 # Navigate to History tab
-- tapOn: "Historial"
-- assertVisible: "Historial de Entrenamientos"
+- tapOn: "History"
+- assertVisible: "Workout History"
 - takeScreenshot: e2e_history_with_workout
 
 # Verify the workout appears (today's entry)
 - assertVisible:
-    text: "Hoy"
+    text: "Today"
     optional: true
 
 # === PHASE 5: CHECK PROGRESS ===
 
 # Navigate to Progress tab
-- tapOn: "Progreso"
+- tapOn: "Progress"
 - takeScreenshot: e2e_progress_after_workout
 
 # === PHASE 6: VERIFY PROFILE ===
 
 # Navigate to Profile tab
-- tapOn: "Perfil"
-- assertVisible: "Cuenta"
+- tapOn: "Profile"
+- assertVisible: "Account"
 - takeScreenshot: e2e_profile
 
 # Return to library
-- tapOn: "Biblioteca"
-- assertVisible: "Biblioteca de Ejercicios"
+- tapOn: "Library"
+- assertVisible: "Exercise Library"
 - takeScreenshot: e2e_complete

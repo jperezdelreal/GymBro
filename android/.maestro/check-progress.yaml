@@ -5,24 +5,26 @@ tags:
   - smoke
 ---
 
+- launchApp
+
 # Navigate to Progress tab
-- tapOn: "Progreso"
+- tapOn: "Progress"
 - takeScreenshot: progress_tab
 
 # Check for content or empty state
 - assertVisible:
-    text: "Sin entrenamientos aún"
+    text: "No workouts yet"
     optional: true
 
 # If data exists, verify KPI section
 - assertVisible:
-    text: "Volumen Semanal"
+    text: "Weekly Volume"
     optional: true
 - assertVisible:
-    text: "PRs Recientes"
+    text: "Recent PRs"
     optional: true
 - assertVisible:
-    text: "Tendencia Est. 1RM"
+    text: "Estimated 1RM Trend"
     optional: true
 - takeScreenshot: progress_kpi_cards
 

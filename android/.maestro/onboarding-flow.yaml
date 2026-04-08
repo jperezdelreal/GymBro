@@ -5,43 +5,53 @@ tags:
   - smoke
 ---
 
+- launchApp:
+    clearState: true
+
 # Page 0: Welcome
 - assertVisible: "GymBro"
-- assertVisible: "Tu compañero de gym inteligente"
+- assertVisible: "Your smart gym companion"
 - takeScreenshot: onboarding_welcome
 
 # Swipe to Page 1: Fast Logging
-- swipeLeft
+- swipe:
+    direction: LEFT
+    duration: 400
 
-- assertVisible: "Registro Ultra-Rápido"
+- assertVisible: "Ultra-Fast Logging"
 - takeScreenshot: onboarding_fast_logging
 
 # Swipe to Page 2: Track Progress
-- swipeLeft
+- swipe:
+    direction: LEFT
+    duration: 400
 
-- assertVisible: "Rastrea tu Progreso"
+- assertVisible: "Track Your Progress"
 - takeScreenshot: onboarding_track_progress
 
 # Swipe to Page 3: Get Started
-- swipeLeft
+- swipe:
+    direction: LEFT
+    duration: 400
 
-- assertVisible: "Comencemos"
-- assertVisible: "Unidades Preferidas"
-- assertVisible: "Kilogramos (kg)"
-- assertVisible: "Libras (lbs)"
+- assertVisible: "Let's Get Started"
+- assertVisible: "Preferred Units"
+- assertVisible: "Kilograms (kg)"
+- assertVisible: "Pounds (lbs)"
 - takeScreenshot: onboarding_get_started
 
 # Select kg unit
-- tapOn: "Kilogramos (kg)"
+- tapOn: "Kilograms (kg)"
 
 # Enter name
-- tapOn: "Ingresa tu nombre"
+- tapOn: "Enter your name"
 - inputText: "TestUser"
 - takeScreenshot: onboarding_name_entered
+- hideKeyboard
 
 # Complete onboarding
-- tapOn: "¡Vamos!"
+- tapOn: "Let's Go"
 
 # Verify we landed on Exercise Library
-- assertVisible: "Biblioteca de Ejercicios"
+- assertVisible: "Exercise Library"
 - takeScreenshot: onboarding_complete
