@@ -30,14 +30,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -151,42 +147,38 @@ fun ExerciseLibraryScreen(
     showFilterTooltip: Boolean = false,
     onTooltipDismissed: () -> Unit = {},
 ) {
-    Box {
-        Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = stringResource(if (isPickerMode) R.string.exercise_library_pick_title else R.string.exercise_library_title),
-                        style = MaterialTheme.typography.headlineMedium,
-                        modifier = Modifier.semantics { heading() }
-                    )
-                },
-                actions = {
-                    if (!isPickerMode) {
-                        IconButton(onClick = onNavigateToCreateExercise) {
-                            Icon(
-                                Icons.Default.Add,
-                                contentDescription = stringResource(R.string.exercise_library_create),
-                                tint = AccentGreen,
-                            )
-                        }
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background,
-                    titleContentColor = MaterialTheme.colorScheme.onBackground,
-                ),
-            )
-        },
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-        containerColor = MaterialTheme.colorScheme.background,
-    ) { innerPadding ->
+    Box(modifier = Modifier.fillMaxSize()) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
+            modifier = Modifier.fillMaxSize(),
         ) {
+            // Title Section
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 16.dp)
+            ) {
+                Text(
+                    text = stringResource(if (isPickerMode) R.string.exercise_library_pick_title else R.string.exercise_library_title),
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .semantics { heading() }
+                )
+                if (!isPickerMode) {
+                    IconButton(
+                        onClick = onNavigateToCreateExercise,
+                        modifier = Modifier.align(Alignment.CenterEnd)
+                    ) {
+                        Icon(
+                            Icons.Default.Add,
+                            contentDescription = stringResource(R.string.exercise_library_create),
+                            tint = AccentGreen,
+                        )
+                    }
+                }
+            }
             // Search bar - Glassmorphic style
             Surface(
                 modifier = Modifier
@@ -280,7 +272,6 @@ fun ExerciseLibraryScreen(
                 }
             }
         }
-    }
 
         if (showFilterTooltip && !isPickerMode) {
             TooltipOverlay(
