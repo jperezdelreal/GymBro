@@ -61,28 +61,74 @@ jobs:
           sleep 5
           
           # Run smoke suite with retry and timeout
+          # Capture output for performance metrics
           maestro test android/.maestro/ \
             --include-tags smoke \
             --repeat-on-failure 1 \
-            --timeout 120000
+            --timeout 120000 2>&1 | tee maestro-smoke-output.log
+          
+          # Store exit code
+          echo $? > maestro-smoke-exitcode.txt
+    
+    - name: Generate Test Report
+      if: always()
+      run: |
+        echo "## 📊 Maestro Smoke Test Results" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "| Flow | Status | Duration |" >> $GITHUB_STEP_SUMMARY
+        echo "|------|--------|----------|" >> $GITHUB_STEP_SUMMARY
+        
+        # Parse Maestro output for flow results
+        if [ -f maestro-smoke-output.log ]; then
+          # Extract flow results (Maestro outputs "✅ Flow completed" or "❌ Flow failed")
+          grep -E "(Running|✅|❌|✓|✗)" maestro-smoke-output.log | while IFS= read -r line; do
+            if echo "$line" | grep -q "Running"; then
+              flow_name=$(echo "$line" | sed -n 's/.*Running \(.*\)/\1/p' | sed 's/\.yaml//')
+              echo "$flow_name|⏳ Running|N/A" >> test-results.tmp
+            elif echo "$line" | grep -qE "(✅|✓)"; then
+              # Look for duration in milliseconds
+              duration=$(echo "$line" | grep -oP '\d+ms' || echo "N/A")
+              # Get last flow name from temp file
+              if [ -f test-results.tmp ]; then
+                sed -i '$ s/|⏳ Running|N\/A$/|✅ Passed|'"$duration"'/' test-results.tmp
+              fi
+            elif echo "$line" | grep -qE "(❌|✗)"; then
+              if [ -f test-results.tmp ]; then
+                sed -i '$ s/|⏳ Running|N\/A$/|❌ Failed|N\/A/' test-results.tmp
+              fi
+            fi
+          done
+          
+          # Output results to summary
+          if [ -f test-results.tmp ]; then
+            cat test-results.tmp >> $GITHUB_STEP_SUMMARY
+            rm test-results.tmp
+          fi
+        fi
+        
+        # Add overall result
+        exitcode=0
+        if [ -f maestro-smoke-exitcode.txt ]; then
+          exitcode=$(cat maestro-smoke-exitcode.txt)
+        fi
+        
+        echo "" >> $GITHUB_STEP_SUMMARY
+        if [ "$exitcode" -eq 0 ]; then
+          echo "### ✅ All smoke tests passed!" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "### ❌ Some smoke tests failed" >> $GITHUB_STEP_SUMMARY
+        fi
 
-    - name: Upload Maestro screenshots
-      if: failure()
+    - name: Upload Maestro Test Artifacts
+      if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: maestro-screenshots-smoke
+        name: maestro-test-results-smoke
         path: |
           ~/.maestro/tests/**/*.png
           ~/.maestro/tests/**/*.mp4
-        if-no-files-found: ignore
-        retention-days: 7
-
-    - name: Upload Maestro logs
-      if: failure()
-      uses: actions/upload-artifact@v4
-      with:
-        name: maestro-logs-smoke
-        path: ~/.maestro/tests/**/*.log
+          ~/.maestro/tests/**/*.log
+          maestro-smoke-output.log
         if-no-files-found: ignore
         retention-days: 7
 
@@ -138,26 +184,72 @@ jobs:
           sleep 5
           
           # Run all flows with retry and timeout
+          # Capture output for performance metrics
           maestro test android/.maestro/ \
             --repeat-on-failure 1 \
-            --timeout 120000
+            --timeout 120000 2>&1 | tee maestro-regression-output.log
+          
+          # Store exit code
+          echo $? > maestro-regression-exitcode.txt
+    
+    - name: Generate Test Report
+      if: always()
+      run: |
+        echo "## 📊 Maestro Full Regression Results" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "| Flow | Status | Duration |" >> $GITHUB_STEP_SUMMARY
+        echo "|------|--------|----------|" >> $GITHUB_STEP_SUMMARY
+        
+        # Parse Maestro output for flow results
+        if [ -f maestro-regression-output.log ]; then
+          # Extract flow results (Maestro outputs "✅ Flow completed" or "❌ Flow failed")
+          grep -E "(Running|✅|❌|✓|✗)" maestro-regression-output.log | while IFS= read -r line; do
+            if echo "$line" | grep -q "Running"; then
+              flow_name=$(echo "$line" | sed -n 's/.*Running \(.*\)/\1/p' | sed 's/\.yaml//')
+              echo "$flow_name|⏳ Running|N/A" >> test-results.tmp
+            elif echo "$line" | grep -qE "(✅|✓)"; then
+              # Look for duration in milliseconds
+              duration=$(echo "$line" | grep -oP '\d+ms' || echo "N/A")
+              # Get last flow name from temp file
+              if [ -f test-results.tmp ]; then
+                sed -i '$ s/|⏳ Running|N\/A$/|✅ Passed|'"$duration"'/' test-results.tmp
+              fi
+            elif echo "$line" | grep -qE "(❌|✗)"; then
+              if [ -f test-results.tmp ]; then
+                sed -i '$ s/|⏳ Running|N\/A$/|❌ Failed|N\/A/' test-results.tmp
+              fi
+            fi
+          done
+          
+          # Output results to summary
+          if [ -f test-results.tmp ]; then
+            cat test-results.tmp >> $GITHUB_STEP_SUMMARY
+            rm test-results.tmp
+          fi
+        fi
+        
+        # Add overall result
+        exitcode=0
+        if [ -f maestro-regression-exitcode.txt ]; then
+          exitcode=$(cat maestro-regression-exitcode.txt)
+        fi
+        
+        echo "" >> $GITHUB_STEP_SUMMARY
+        if [ "$exitcode" -eq 0 ]; then
+          echo "### ✅ All regression tests passed!" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "### ❌ Some regression tests failed" >> $GITHUB_STEP_SUMMARY
+        fi
 
-    - name: Upload Maestro screenshots
-      if: failure()
+    - name: Upload Maestro Test Artifacts
+      if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: maestro-screenshots-regression
+        name: maestro-test-results-regression
         path: |
           ~/.maestro/tests/**/*.png
           ~/.maestro/tests/**/*.mp4
-        if-no-files-found: ignore
-        retention-days: 7
-
-    - name: Upload Maestro logs
-      if: failure()
-      uses: actions/upload-artifact@v4
-      with:
-        name: maestro-logs-regression
-        path: ~/.maestro/tests/**/*.log
+          ~/.maestro/tests/**/*.log
+          maestro-regression-output.log
         if-no-files-found: ignore
         retention-days: 7

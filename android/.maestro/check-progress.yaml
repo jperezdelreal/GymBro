@@ -27,23 +27,39 @@ onFlowComplete:
     timeout: 2000
 - takeScreenshot: progress_tab
 
-# Check for content or empty state
-- assertVisible:
-    text: "Sin entrenamientos aún"
-    optional: true
+# Conditional: Check for empty state or stats
+- runFlow:
+    when:
+      visible: "Sin entrenamientos aún"
+    commands:
+      # Empty state path
+      - assertVisible: "Sin entrenamientos aún"
+      - takeScreenshot: progress_empty_state
+      - assertVisible: "Registra tu primer entrenamiento"
+        optional: true
 
-# If data exists, verify KPI section
-- assertVisible:
-    text: "Volumen Semanal"
-    optional: true
-- assertVisible:
-    text: "PRs Recientes"
-    optional: true
-- assertVisible:
-    text: "Estimated 1RM Trend"
-    optional: true
-- takeScreenshot: progress_kpi_cards
-
-# Scroll down to see more content
-- scroll
-- takeScreenshot: progress_scrolled
+- runFlow:
+    when:
+      visible: "Volumen Semanal"
+    commands:
+      # Data exists path — verify and capture KPI stats
+      - assertVisible: "Volumen Semanal"
+      - takeScreenshot: progress_with_data
+      
+      # copyTextFrom: Capture volume stat
+      - copyTextFrom:
+          text: "\\d+.*kg|\\d+.*lb"
+      - assertVisible: "${maestro.copiedText}"
+      
+      # Verify other KPI sections
+      - assertVisible:
+          text: "PRs Recientes"
+          optional: true
+      - assertVisible:
+          text: "Estimated 1RM Trend"
+          optional: true
+      - takeScreenshot: progress_kpi_cards
+      
+      # Scroll down to see more content
+      - scroll
+      - takeScreenshot: progress_scrolled
