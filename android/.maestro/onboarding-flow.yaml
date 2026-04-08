@@ -50,7 +50,7 @@ onFlowComplete:
 
 # Enter name
 - tapOn: "Enter your name"
-- inputText: "TestUser"
+- inputText: "${USER_NAME:=TestUser}"
 - takeScreenshot: onboarding_name_entered
 - hideKeyboard
 

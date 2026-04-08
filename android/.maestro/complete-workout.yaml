@@ -9,6 +9,8 @@ tags:
 onFlowStart:
   # Ensure clean state at library
   - launchApp
+  - waitForAnimationToEnd:
+      timeout: 3000
   - assertVisible: "Biblioteca de Ejercicios"
 
 # Start from Exercise Library
@@ -17,17 +19,21 @@ onFlowStart:
 # Tap FAB to start workout
 - tapOn:
     id: "workout_fab"
+- waitForAnimationToEnd:
+    timeout: 2000
 
 # Verify active workout
 - assertVisible: "Entrenamiento Activo"
 
 # Add an exercise
 - tapOn: "Añadir Ejercicio"
+- waitForAnimationToEnd:
+    timeout: 2000
 - assertVisible: "Elegir Ejercicio"
 
 # Pick first available exercise
 - tapOn:
-    text: "Bench Press"
+    text: "${EXERCISE_NAME:=Bench Press}"
     index: 0
 
 # Verify back on workout screen
@@ -37,24 +43,28 @@ onFlowStart:
 - tapOn:
     id: "weight_input"
     index: 0
-- inputText: "100"
+- inputText: "${WEIGHT:=100}"
 
 # Fill in reps for set 1
 - tapOn:
     id: "reps_input"
     index: 0
-- inputText: "5"
+- inputText: "${REPS:=5}"
 
 - takeScreenshot: workout_set1_filled
 
 # Complete the set (tap the check/complete button)
 - tapOn:
     text: "Completar serie 1"
+- waitForAnimationToEnd:
+    timeout: 1000
 
 - takeScreenshot: workout_set1_completed
 
 # Finish the workout
 - tapOn: "Finalizar Entrenamiento"
+- waitForAnimationToEnd:
+    timeout: 2000
 
 # Verify workout summary screen
 - assertVisible: "¡Entrenamiento Completado!"
@@ -65,6 +75,8 @@ onFlowStart:
 
 # Tap Done to return
 - tapOn: "Listo"
+- waitForAnimationToEnd:
+    timeout: 2000
 
 # Back at exercise library
 - assertVisible: "Biblioteca de Ejercicios"
@@ -73,16 +85,20 @@ onFlowStart:
 # PERSISTENCE VERIFICATION: Navigate to History
 - tapOn:
     id: "nav_history"
+- waitForAnimationToEnd:
+    timeout: 2000
 - assertVisible: "Historial de Entrenamientos"
 - takeScreenshot: persistence_check_history
 
-# Verify workout appears in history (Bench Press should be visible)
-- assertVisible: "Bench Press"
+# Verify workout appears in history (Exercise should be visible)
+- assertVisible: "${EXERCISE_NAME:=Bench Press}"
 - takeScreenshot: persistence_workout_in_history
 
 # PERSISTENCE VERIFICATION: Navigate to Progress
 - tapOn:
     id: "nav_progress"
+- waitForAnimationToEnd:
+    timeout: 2000
 - assertVisible:
     text: "Volumen Semanal|Sin entrenamientos aún"
 - takeScreenshot: persistence_check_progress
