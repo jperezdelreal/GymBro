@@ -1,0 +1,22 @@
+{
+  "name": "gymbro",
+  "version": "1.0.0",
+  "description": "GymBro - Android fitness tracking app with Maestro E2E tests and visual regression testing",
+  "private": true,
+  "scripts": {
+    "visual-regression": "node scripts/visual-regression.js",
+    "update-baselines": "bash scripts/update-baselines.sh"
+  },
+  "devDependencies": {
+    "pixelmatch": "^5.3.0",
+    "pngjs": "^7.0.0"
+  },
+  "keywords": [
+    "android",
+    "fitness",
+    "maestro",
+    "visual-regression"
+  ],
+  "author": "",
+  "license": "ISC"
+}

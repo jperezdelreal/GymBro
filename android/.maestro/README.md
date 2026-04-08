@@ -193,6 +193,117 @@ For CI/CD, set environment variables in your pipeline:
   run: maestro test android/.maestro/
 ```
 
+## Visual Regression Testing
+
+Visual regression testing compares screenshots from test runs against baseline images to detect unintended UI changes.
+
+### Setup
+
+Install Node.js dependencies:
+```bash
+npm install
+```
+
+### Creating Baselines
+
+First time setup - capture baseline screenshots from a known-good build:
+
+```bash
+# 1. Run Maestro flows to generate screenshots
+maestro test android/.maestro/
+
+# 2. Copy screenshots to baselines directory
+npm run update-baselines
+
+# 3. Commit the baselines
+git add android/.maestro/baselines
+git commit -m "chore: add visual regression baselines"
+```
+
+### Running Visual Regression Tests
+
+After running Maestro flows, compare screenshots against baselines:
+
+```bash
+# Run Maestro flows
+maestro test android/.maestro/
+
+# Run visual regression comparison
+npm run visual-regression -- \
+  --baselines android/.maestro/baselines \
+  --screenshots ~/.maestro/tests/screenshots \
+  --threshold 0.1 \
+  --output visual-diffs
+```
+
+**Parameters:**
+- `--baselines` — Directory containing baseline images
+- `--screenshots` — Directory containing screenshots to compare (Maestro output)
+- `--threshold` — Acceptable difference percentage (default: 0.1 = 10%)
+- `--output` — Directory to save diff images (optional)
+
+**Exit codes:**
+- `0` — All tests passed or completed with warnings
+- `1` — One or more images exceeded the threshold
+
+### Interpreting Results
+
+The script outputs a summary table:
+```
+✅ PASS onboarding_welcome.png           | 99.87% match | 0.13% diff
+❌ FAIL exercise_library.png             | 89.23% match | 10.77% diff
+⚠️  workout_complete.png                 | MISSING
+```
+
+- **PASS** — Image difference is within threshold
+- **FAIL** — Image difference exceeds threshold (visual regression detected)
+- **MISSING** — Screenshot exists in baselines but not in current run
+- **ERROR** — Dimension mismatch or comparison error
+
+If diff images are generated (`--output` specified), they highlight changes in red.
+
+### Updating Baselines
+
+When UI changes are intentional, update baselines:
+
+```bash
+# After running Maestro flows
+npm run update-baselines
+
+# Review changes
+git diff --stat android/.maestro/baselines
+
+# Commit if changes are expected
+git add android/.maestro/baselines
+git commit -m "chore: update baselines for new UI design"
+```
+
+### CI/CD Integration
+
+Visual regression testing is integrated in the CI workflow (`.github/workflows/maestro-e2e.yml`):
+
+1. Maestro flows run and generate screenshots
+2. Visual regression script compares against baselines
+3. Diff images are uploaded as artifacts if failures occur
+4. Build fails if differences exceed threshold
+
+### Troubleshooting
+
+**No baseline images found:**
+Run `npm run update-baselines` after generating screenshots with Maestro.
+
+**Dimension mismatch:**
+Screenshot resolution changed (different device/emulator). Regenerate baselines with the new resolution.
+
+**High diff percentage on minor changes:**
+Adjust the `--threshold` parameter (e.g., `0.2` for 20% tolerance) or regenerate baselines if the change is intentional.
+
+**Flaky visual tests:**
+Some UI elements (animations, timestamps, dynamic content) may cause false positives. Consider:
+- Adding appropriate waits in Maestro flows
+- Updating baselines if flakiness persists
+- Excluding specific screenshots from regression testing
+
 ## Contributing
 
 When adding or modifying flows:
@@ -201,3 +312,4 @@ When adding or modifying flows:
 3. Update `test-data.env` with new variables
 4. Update this README with new variables in the table above
 5. Ensure flows work both with and without custom values
+6. Take descriptive screenshots at key moments for visual regression testing
