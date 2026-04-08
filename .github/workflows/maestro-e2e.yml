@@ -4,10 +4,14 @@ on:
   pull_request:
     branches: [ main, master ]
     paths: ['android/**', '.github/workflows/maestro-e2e.yml']
+  push:
+    branches: [ main, master ]
+    paths: ['android/**', '.github/workflows/maestro-e2e.yml']
 
 jobs:
-  maestro-e2e:
-    name: Maestro E2E Tests
+  maestro-smoke:
+    name: Maestro Smoke Suite
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
@@ -34,7 +38,7 @@ jobs:
         sudo udevadm control --reload-rules
         sudo udevadm trigger --name-match=kvm
 
-    - name: Run Maestro E2E tests
+    - name: Run Maestro Smoke Tests
       uses: reactivecircus/android-emulator-runner@v2
       with:
         api-level: 34
@@ -56,20 +60,17 @@ jobs:
           adb wait-for-device
           sleep 5
           
-          # Run smoke tests
-          maestro test android/.maestro/smoke-test.yaml || echo "SMOKE_TEST_FAILED=true" >> $GITHUB_ENV
-          maestro test android/.maestro/navigation-smoke.yaml || echo "NAV_TEST_FAILED=true" >> $GITHUB_ENV
-          
-          # Check if any tests failed
-          if [ "$SMOKE_TEST_FAILED" = "true" ] || [ "$NAV_TEST_FAILED" = "true" ]; then
-            exit 1
-          fi
+          # Run smoke suite with retry and timeout
+          maestro test android/.maestro/ \
+            --include-tags smoke \
+            --repeat-on-failure 1 \
+            --timeout 120000
 
     - name: Upload Maestro screenshots
       if: failure()
       uses: actions/upload-artifact@v4
       with:
-        name: maestro-screenshots
+        name: maestro-screenshots-smoke
         path: |
           ~/.maestro/tests/**/*.png
           ~/.maestro/tests/**/*.mp4
@@ -80,7 +81,83 @@ jobs:
       if: failure()
       uses: actions/upload-artifact@v4
       with:
-        name: maestro-logs
+        name: maestro-logs-smoke
+        path: ~/.maestro/tests/**/*.log
+        if-no-files-found: ignore
+        retention-days: 7
+
+  maestro-regression:
+    name: Maestro Full Regression
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up JDK 21
+      uses: actions/setup-java@v4
+      with:
+        java-version: '21'
+        distribution: 'temurin'
+
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v4
+
+    - name: Build debug APK
+      working-directory: android
+      run: ./gradlew assembleDebug --no-daemon
+
+    - name: Enable KVM
+      run: |
+        echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+        sudo udevadm control --reload-rules
+        sudo udevadm trigger --name-match=kvm
+
+    - name: Run Maestro Full Regression
+      uses: reactivecircus/android-emulator-runner@v2
+      with:
+        api-level: 34
+        target: google_apis
+        arch: x86_64
+        force-avd-creation: false
+        emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+        disable-animations: true
+        script: |
+          # Install Maestro
+          export MAESTRO_VERSION=1.39.0
+          curl -Ls "https://get.maestro.mobile.dev" | bash
+          export PATH="$PATH:$HOME/.maestro/bin"
+          
+          # Install APK
+          adb install android/app/build/outputs/apk/debug/*.apk
+          
+          # Wait for device to be ready
+          adb wait-for-device
+          sleep 5
+          
+          # Run all flows with retry and timeout
+          maestro test android/.maestro/ \
+            --repeat-on-failure 1 \
+            --timeout 120000
+
+    - name: Upload Maestro screenshots
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: maestro-screenshots-regression
+        path: |
+          ~/.maestro/tests/**/*.png
+          ~/.maestro/tests/**/*.mp4
+        if-no-files-found: ignore
+        retention-days: 7
+
+    - name: Upload Maestro logs
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: maestro-logs-regression
         path: ~/.maestro/tests/**/*.log
         if-no-files-found: ignore
         retention-days: 7

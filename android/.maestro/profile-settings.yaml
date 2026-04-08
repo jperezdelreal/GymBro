@@ -1,8 +1,7 @@
 appId: com.gymbro.app
 name: "Profile Settings — Open profile and check settings sections"
 tags:
-  - profile
-  - settings
+  - regression
 ---
 
 - launchApp

@@ -1,8 +1,7 @@
 appId: com.gymbro.app
 name: "AI Coach — Open coach and send a message"
 tags:
-  - coach
-  - ai
+  - regression
 ---
 
 - launchApp

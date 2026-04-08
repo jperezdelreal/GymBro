@@ -1,4 +1,7 @@
 appId: com.gymbro.app
+name: "Smoke Test — Basic app launch"
+tags:
+  - smoke
 ---
 - launchApp
 - assertVisible: "GymBro|Exercise Library"
