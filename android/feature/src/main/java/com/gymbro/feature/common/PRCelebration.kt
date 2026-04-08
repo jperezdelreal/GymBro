@@ -24,6 +24,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -43,10 +45,12 @@ fun PRCelebration(
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val haptic = LocalHapticFeedback.current
     val scale = remember { Animatable(0f) }
     val alpha = remember { Animatable(1f) }
 
     LaunchedEffect(Unit) {
+        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
         scale.animateTo(
             targetValue = 1f,
             animationSpec = spring(
@@ -66,7 +70,10 @@ fun PRCelebration(
         modifier = modifier
             .fillMaxSize()
             .background(SurfaceDark.copy(alpha = 0.95f * alpha.value))
-            .clickable(onClick = onDismiss),
+            .clickable {
+                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                onDismiss()
+            },
         contentAlignment = Alignment.Center,
     ) {
         ConfettiOverlay()

@@ -52,6 +52,8 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
@@ -232,8 +234,12 @@ private fun EmptyProgressState() {
 
 @Composable
 private fun AnalyticsNavigationCard(onClick: () -> Unit) {
+    val haptic = LocalHapticFeedback.current
     Card(
-        onClick = onClick,
+        onClick = {
+            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+            onClick()
+        },
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = Surface),
         shape = RoundedCornerShape(12.dp),
@@ -383,13 +389,17 @@ private fun ExerciseChipRow(
     selectedId: String?,
     onSelect: (String) -> Unit,
 ) {
+    val haptic = LocalHapticFeedback.current
     LazyRow(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         items(options) { option ->
             FilterChip(
                 selected = option.id == selectedId,
-                onClick = { onSelect(option.id) },
+                onClick = { 
+                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    onSelect(option.id) 
+                },
                 label = {
                     Text(
                         text = option.name,
@@ -563,11 +573,15 @@ private fun WorkoutHistoryRow(
     item: WorkoutHistoryItem,
     onClick: () -> Unit,
 ) {
+    val haptic = LocalHapticFeedback.current
     val zone = ZoneId.systemDefault()
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick),
+            .clickable {
+                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                onClick()
+            },
         colors = CardDefaults.cardColors(containerColor = Surface),
         shape = RoundedCornerShape(12.dp),
     ) {

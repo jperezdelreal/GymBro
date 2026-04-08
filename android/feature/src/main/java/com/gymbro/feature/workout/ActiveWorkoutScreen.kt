@@ -203,7 +203,10 @@ fun ActiveWorkoutScreen(
                     }
                 },
                 navigationIcon = {
-                    IconButton(onClick = { onEvent(ActiveWorkoutEvent.DiscardWorkout) }) {
+                    IconButton(onClick = { 
+                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                        onEvent(ActiveWorkoutEvent.DiscardWorkout) 
+                    }) {
                         Icon(Icons.Default.Close, contentDescription = "Discard")
                     }
                 },
@@ -225,7 +228,10 @@ fun ActiveWorkoutScreen(
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { onEvent(ActiveWorkoutEvent.AddExerciseClicked) },
+                onClick = { 
+                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    onEvent(ActiveWorkoutEvent.AddExerciseClicked) 
+                },
                 containerColor = Color.Transparent,
                 modifier = Modifier.drawBehind {
                     val gradient = Brush.horizontalGradient(
@@ -335,6 +341,7 @@ private fun HeroRestTimer(
     onSkip: () -> Unit,
     onAdjust: (Int) -> Unit,
 ) {
+    val haptic = LocalHapticFeedback.current
     val progress = if (totalSeconds > 0) (totalSeconds - remainingSeconds).toFloat() / totalSeconds else 0f
     
     val infiniteTransition = rememberInfiniteTransition(label = "glow_transition")
@@ -386,14 +393,20 @@ private fun HeroRestTimer(
             horizontalArrangement = Arrangement.SpaceEvenly,
         ) {
             OutlinedButton(
-                onClick = { onAdjust(-15) },
+                onClick = { 
+                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    onAdjust(-15) 
+                },
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White),
             ) { 
                 Text("-15s") 
             }
             GradientButton(text = "Skip", onClick = onSkip)
             OutlinedButton(
-                onClick = { onAdjust(15) },
+                onClick = { 
+                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    onAdjust(15) 
+                },
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White),
             ) { 
                 Text("+15s") 
@@ -408,6 +421,7 @@ private fun FinishWorkoutButton(
     completedExercises: Int,
     onClick: () -> Unit,
 ) {
+    val haptic = LocalHapticFeedback.current
     val shouldGlow = completedExercises >= 3
     
     val infiniteTransition = rememberInfiniteTransition(label = "finish_glow")
@@ -439,7 +453,10 @@ private fun FinishWorkoutButton(
     ) {
         GradientButton(
             text = "Finish Workout",
-            onClick = onClick,
+            onClick = {
+                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                onClick()
+            },
             enabled = enabled,
             modifier = Modifier.fillMaxWidth(),
         )
@@ -475,7 +492,10 @@ private fun ExerciseCardContent(
                 modifier = Modifier.weight(1f).semantics { heading() },
             )
             IconButton(
-                onClick = { onEvent(ActiveWorkoutEvent.RemoveExercise(exerciseIndex)) },
+                onClick = { 
+                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    onEvent(ActiveWorkoutEvent.RemoveExercise(exerciseIndex)) 
+                },
                 modifier = Modifier.size(32.dp),
             ) {
                 Icon(
@@ -533,7 +553,10 @@ private fun ExerciseCardContent(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(8.dp))
-                .clickable { onEvent(ActiveWorkoutEvent.AddSet(exerciseIndex)) }
+                .clickable { 
+                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    onEvent(ActiveWorkoutEvent.AddSet(exerciseIndex)) 
+                }
                 .border(1.dp, AccentGreenStart.copy(alpha = 0.3f), RoundedCornerShape(8.dp))
                 .padding(vertical = 8.dp),
             horizontalArrangement = Arrangement.Center,
@@ -574,7 +597,10 @@ private fun SetRow(
         Box(
             modifier = Modifier
                 .width(40.dp)
-                .clickable { onEvent(ActiveWorkoutEvent.ToggleWarmup(exerciseIndex, setIndex)) },
+                .clickable { 
+                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    onEvent(ActiveWorkoutEvent.ToggleWarmup(exerciseIndex, setIndex)) 
+                },
             contentAlignment = Alignment.Center,
         ) {
             Text(

@@ -18,7 +18,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
@@ -50,6 +50,8 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
@@ -246,30 +248,14 @@ fun ExerciseLibraryScreen(
                         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp),
                     ) {
-                        itemsIndexed(
+                        items(
                             items = state.exercises,
-                            key = { _, exercise -> exercise.id.toString() },
-                        ) { index, exercise ->
-                            androidx.compose.animation.AnimatedVisibility(
-                                visible = true,
-                                enter = androidx.compose.animation.fadeIn(
-                                    animationSpec = androidx.compose.animation.core.tween(
-                                        durationMillis = 300,
-                                        delayMillis = index * 50
-                                    )
-                                ) + androidx.compose.animation.slideInVertically(
-                                    animationSpec = androidx.compose.animation.core.tween(
-                                        durationMillis = 300,
-                                        delayMillis = index * 50
-                                    ),
-                                    initialOffsetY = { it / 3 }
-                                )
-                            ) {
-                                ExerciseCard(
-                                    exercise = exercise,
-                                    onClick = { onEvent(ExerciseLibraryEvent.ExerciseClicked(exercise)) },
-                                )
-                            }
+                            key = { it.id.toString() },
+                        ) { exercise ->
+                            ExerciseCard(
+                                exercise = exercise,
+                                onClick = { onEvent(ExerciseLibraryEvent.ExerciseClicked(exercise)) },
+                            )
                         }
                     }
                 }
@@ -285,6 +271,7 @@ private fun GradientFilterChip(
     label: String,
     icon: ImageVector,
 ) {
+    val haptic = LocalHapticFeedback.current
     var isPressed by remember { mutableStateOf(false) }
     val scale by animateFloatAsState(
         targetValue = if (selected) 1.0f else if (isPressed) 0.95f else 1.0f,
@@ -292,7 +279,10 @@ private fun GradientFilterChip(
     )
 
     Surface(
-        onClick = onClick,
+        onClick = {
+            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+            onClick()
+        },
         modifier = Modifier.scale(scale),
         shape = RoundedCornerShape(20.dp),
         color = if (selected) Color.Transparent else GlassOverlay,
@@ -339,6 +329,13 @@ private fun ExerciseCard(
     exercise: Exercise,
     onClick: () -> Unit,
 ) {
+    val haptic = LocalHapticFeedback.current
+    var isPressed by remember { mutableStateOf(false) }
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed) 0.97f else 1.0f,
+        label = "card_scale"
+    )
+
     // Accent color based on muscle group
     val accentColor = when (exercise.muscleGroup) {
         MuscleGroup.CHEST, MuscleGroup.BICEPS, MuscleGroup.TRICEPS -> AccentGreenStart
@@ -350,8 +347,14 @@ private fun ExerciseCard(
     }
 
     GlassmorphicCard(
+        modifier = Modifier
+            .scale(scale)
+            .clickable {
+                isPressed = true
+                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                onClick()
+            },
         accentColor = accentColor,
-        onClick = onClick,
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -391,6 +394,14 @@ private fun ExerciseCard(
                 tint = accentColor,
                 modifier = Modifier.size(24.dp),
             )
+        }
+    }
+
+    // Reset pressed state
+    LaunchedEffect(isPressed) {
+        if (isPressed) {
+            kotlinx.coroutines.delay(100)
+            isPressed = false
         }
     }
 }
