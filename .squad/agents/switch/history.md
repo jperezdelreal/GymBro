@@ -172,3 +172,21 @@ cd android
   - Total scope: ~100+ hardcoded strings across 15 files, systematically replaced in single commit
 - **Testing implications:** i18n changes are runtime testable — should verify Spanish locale displays correctly in emulator/device testing
 - Closes #252 via PR #263
+
+### 2026-04-XX: Android README Documentation (Issue #257)
+**Comprehensive documentation for Android development setup and architecture**
+- Rewrote placeholder Android README from minimal tech stack overview (27 lines) to comprehensive developer guide (600+ lines)
+- Sections added:
+  1. **Features** — Categorized into: Core Workout, Progress & Analytics, Recovery & Health, Customization, Cross-Platform
+  2. **Architecture** — Multi-module structure (app/core/feature), MVI pattern, Repository pattern, Hilt DI, Offline-first sync
+  3. **Build Instructions** — Prerequisites, environment setup (Windows/macOS/Linux), debug/release builds, IDE setup, Gradle commands
+  4. **Firebase Setup** — Optional cloud sync, conditional compilation via `google-services.json`, Firestore rules
+  5. **Testing Guide** — Unit tests (JUnit4 + MockK), instrumentation tests, coverage reporting, test templates
+  6. **Troubleshooting** — 13 common issues with solutions (JAVA_HOME, Gradle sync, Firebase, Hilt injection, memory errors, etc.)
+  7. **Resources** — Official docs, project docs, contributing guidelines
+- Explored project structure: 3 modules with 80+ Kotlin files spanning services, models, DBs, UI layers
+- Technology stack documented: Jetpack Compose, Room, Hilt, Firebase, Vertex AI, Health Connect, WorkManager, Retrofit
+- Key architectural insight: Offline-first with sync via `OfflineSyncManager` + `CloudSyncService` pattern
+- Delivery: PR #265 (draft) with formatted commit message and co-author trailer
+- **Value for new devs:** Comprehensive guide eliminates setup friction, explains patterns, provides troubleshooting for blockers
+- Closes #257
