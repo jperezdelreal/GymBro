@@ -8,27 +8,32 @@ tags:
 - launchApp
 
 # Start at Library tab
-- assertVisible: "Exercise Library"
+- assertVisible: "Biblioteca de Ejercicios"
 - takeScreenshot: nav_library
 
 # Tap History tab
-- tapOn: "History"
-- assertVisible: "Workout History"
+- tapOn:
+    id: "nav_history"
+- assertVisible: "Historial de Entrenamientos"
 - takeScreenshot: nav_history
 
 # Tap Progress tab
-- tapOn: "Progress"
+- tapOn:
+    id: "nav_progress"
 - takeScreenshot: nav_progress
 
 # Tap Recovery tab
-- tapOn: "Recovery"
+- tapOn:
+    id: "nav_recovery"
 - takeScreenshot: nav_recovery
 
 # Tap Profile tab
-- tapOn: "Profile"
+- tapOn:
+    id: "nav_profile"
 - takeScreenshot: nav_profile
 
 # Navigate back to Library
-- tapOn: "Library"
-- assertVisible: "Exercise Library"
+- tapOn:
+    id: "nav_exercise_library"
+- assertVisible: "Biblioteca de Ejercicios"
 - takeScreenshot: nav_back_to_library

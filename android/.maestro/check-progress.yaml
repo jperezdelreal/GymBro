@@ -8,20 +8,21 @@ tags:
 - launchApp
 
 # Navigate to Progress tab
-- tapOn: "Progress"
+- tapOn:
+    id: "nav_progress"
 - takeScreenshot: progress_tab
 
 # Check for content or empty state
 - assertVisible:
-    text: "No workouts yet"
+    text: "Sin entrenamientos aún"
     optional: true
 
 # If data exists, verify KPI section
 - assertVisible:
-    text: "Weekly Volume"
+    text: "Volumen Semanal"
     optional: true
 - assertVisible:
-    text: "Recent PRs"
+    text: "PRs Recientes"
     optional: true
 - assertVisible:
     text: "Estimated 1RM Trend"

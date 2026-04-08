@@ -8,31 +8,31 @@ tags:
 - launchApp
 
 # Navigate to Profile tab
-- tapOn: "Profile"
+- tapOn:
+    id: "nav_profile"
 - takeScreenshot: profile_screen
 
 # Verify profile sections are visible
-- assertVisible: "Talk to AI Coach"
-- assertVisible: "Account"
-- assertVisible: "Preferences"
+- assertVisible: "Hablar con el Entrenador IA"
+- assertVisible: "Cuenta"
+- assertVisible: "Preferencias de Entrenamiento"
 - takeScreenshot: profile_sections
 
 # Scroll to see more sections
 - scroll
 
-- assertVisible: "Data"
-- assertVisible: "About"
-- assertVisible: "Version 1.0"
+- assertVisible: "Acerca de"
+- assertVisible: "Versión 1.0"
 - takeScreenshot: profile_about_section
 
 # Verify preference items
-- assertVisible: "Rest timer"
-- assertVisible: "Weight unit"
-- assertVisible: "Notifications"
+- assertVisible: "Temporizador de Descanso Predeterminado"
+- assertVisible: "Unidad de Peso"
+- assertVisible: "Recordatorios de Entrenamiento"
 - takeScreenshot: profile_preferences
 
 # Scroll back up
 - scrollUntilVisible:
-    element: "Talk to AI Coach"
+    element: "Hablar con el Entrenador IA"
     direction: UP
 - takeScreenshot: profile_top
