@@ -1,5 +1,12 @@
 appId: com.gymbro.app
 name: "Check History — Navigate to history and verify entries"
+#
+# Tests: History tab navigation and conditional verification of empty state or workout data
+# Preconditions: User has completed onboarding (ensured by ensure-post-onboarding.yaml)
+# Test data: None (tests both empty and populated states)
+# Assertions: History screen loads, handles both empty state and data-exists scenarios correctly
+# Cleanup: Return to Library tab
+# Dependencies: flow/ensure-post-onboarding.yaml
 tags:
   - history
   - smoke
@@ -25,7 +32,8 @@ onFlowComplete:
     id: "nav_history"
 - waitForAnimationToEnd:
     timeout: 2000
-- takeScreenshot: history_tab
+# Screenshot 01: History tab opened
+- takeScreenshot: 01_check_history_tab
 
 # Verify History screen loads
 - assertVisible: "Historial de Entrenamientos"
@@ -37,7 +45,8 @@ onFlowComplete:
     commands:
       # Empty state path
       - assertVisible: "Sin Entrenamientos Aún"
-      - takeScreenshot: history_empty_state
+      # Screenshot 02: History empty state with no workouts
+      - takeScreenshot: 02_check_history_empty_state
       - assertVisible: "Comienza tu primer entrenamiento"
         optional: true
 
@@ -47,7 +56,8 @@ onFlowComplete:
         text: "Hoy|Ayer|hace.*día"
     commands:
       # Data exists path
-      - takeScreenshot: history_with_data
+      # Screenshot 03: History with workout data visible
+      - takeScreenshot: 03_check_history_with_data
       
       # Use scrollUntilVisible to find older workouts
       - scrollUntilVisible:
@@ -56,7 +66,8 @@ onFlowComplete:
             index: 2
           timeout: 5000
           optional: true
-      - takeScreenshot: history_scrolled
+      # Screenshot 04: History scrolled to show more workouts
+      - takeScreenshot: 04_check_history_scrolled
       
       # Tap the first workout to see details
       - tapOn:
@@ -64,7 +75,8 @@ onFlowComplete:
           index: 0
       - waitForAnimationToEnd:
           timeout: 2000
-      - takeScreenshot: history_workout_detail
+      # Screenshot 05: Workout detail screen opened from history
+      - takeScreenshot: 05_check_history_workout_detail
       
       # Navigate back
       - back

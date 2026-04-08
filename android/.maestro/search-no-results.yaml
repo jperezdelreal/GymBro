@@ -1,5 +1,12 @@
 appId: com.gymbro.app
 name: "Negative — Search for Nonexistent Exercise"
+#
+# Tests: Search functionality with invalid/edge case queries (nonexistent, numbers, special chars, emoji)
+# Preconditions: User has completed onboarding (ensured by ensure-post-onboarding.yaml)
+# Test data: Invalid search queries (XYZNONEXISTENT, 99999, !@#$%^&*(), 💪🏋️, Bench)
+# Assertions: App handles invalid searches gracefully, shows appropriate empty results, recovers with valid search
+# Cleanup: None
+# Dependencies: flow/ensure-post-onboarding.yaml
 tags:
   - negative
 ---
@@ -14,14 +21,16 @@ onFlowStart:
 
 # Start from Exercise Library
 - assertVisible: "Biblioteca de Ejercicios"
-- takeScreenshot: search_no_results_start
+# Screenshot 01: Search no results test starting point
+- takeScreenshot: 01_search_no_results_start
 
 # TEST 1: Search for completely nonexistent term
 - tapOn:
     id: "search_bar"
 - inputText: "XYZNONEXISTENT"
 - hideKeyboard
-- takeScreenshot: search_no_results_nonexistent
+# Screenshot 02: Search with completely nonexistent term
+- takeScreenshot: 02_search_no_results_nonexistent
 # Should show empty results or "no results" message
 
 # Clear search
@@ -35,7 +44,8 @@ onFlowStart:
     id: "search_bar"
 - inputText: "99999"
 - hideKeyboard
-- takeScreenshot: search_no_results_numbers
+# Screenshot 03: Search with numbers only
+- takeScreenshot: 03_search_no_results_numbers
 
 # Clear search
 - tapOn:
@@ -48,7 +58,8 @@ onFlowStart:
     id: "search_bar"
 - inputText: "!@#$%^&*()"
 - hideKeyboard
-- takeScreenshot: search_no_results_special_chars
+# Screenshot 04: Search with special characters
+- takeScreenshot: 04_search_no_results_special_chars
 
 # Clear search
 - tapOn:
@@ -61,7 +72,8 @@ onFlowStart:
     id: "search_bar"
 - inputText: "💪🏋️"
 - hideKeyboard
-- takeScreenshot: search_no_results_emoji
+# Screenshot 05: Search with emoji
+- takeScreenshot: 05_search_no_results_emoji
 
 # Clear search and verify app still responsive
 - tapOn:
@@ -75,5 +87,6 @@ onFlowStart:
     id: "search_bar"
 - inputText: "Bench"
 - hideKeyboard
-- takeScreenshot: search_valid_after_invalid
+# Screenshot 06: Valid search after invalid attempts (verifies recovery)
+- takeScreenshot: 06_search_no_results_valid_after_invalid
 # Should show results for Bench Press

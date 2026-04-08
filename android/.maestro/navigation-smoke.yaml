@@ -1,5 +1,12 @@
 appId: com.gymbro.app
 name: "Navigation Smoke — Tap through all bottom nav tabs"
+#
+# Tests: Bottom navigation bar functionality across all tabs
+# Preconditions: User has completed onboarding (ensured by ensure-post-onboarding.yaml)
+# Test data: None
+# Assertions: All nav tabs (Library, History, Progress, Recovery, Profile) are accessible and load correctly
+# Cleanup: Return to Library tab
+# Dependencies: flow/ensure-post-onboarding.yaml
 tags:
   - navigation
   - smoke
@@ -22,7 +29,8 @@ onFlowComplete:
 
 # Start at Library tab
 - assertVisible: "Biblioteca de Ejercicios"
-- takeScreenshot: nav_library
+# Screenshot 01: Exercise Library tab (navigation starting point)
+- takeScreenshot: 01_navigation_smoke_library
 
 # Tap History tab
 - tapOn:
@@ -30,28 +38,32 @@ onFlowComplete:
 - waitForAnimationToEnd:
     timeout: 2000
 - assertVisible: "Historial de Entrenamientos"
-- takeScreenshot: nav_history
+# Screenshot 02: History tab loaded via navigation
+- takeScreenshot: 02_navigation_smoke_history
 
 # Tap Progress tab
 - tapOn:
     id: "nav_progress"
 - waitForAnimationToEnd:
     timeout: 2000
-- takeScreenshot: nav_progress
+# Screenshot 03: Progress tab loaded via navigation
+- takeScreenshot: 03_navigation_smoke_progress
 
 # Tap Recovery tab
 - tapOn:
     id: "nav_recovery"
 - waitForAnimationToEnd:
     timeout: 2000
-- takeScreenshot: nav_recovery
+# Screenshot 04: Recovery tab loaded via navigation
+- takeScreenshot: 04_navigation_smoke_recovery
 
 # Tap Profile tab
 - tapOn:
     id: "nav_profile"
 - waitForAnimationToEnd:
     timeout: 2000
-- takeScreenshot: nav_profile
+# Screenshot 05: Profile tab loaded via navigation
+- takeScreenshot: 05_navigation_smoke_profile
 
 # Navigate back to Library
 - tapOn:
@@ -59,4 +71,5 @@ onFlowComplete:
 - waitForAnimationToEnd:
     timeout: 2000
 - assertVisible: "Biblioteca de Ejercicios"
-- takeScreenshot: nav_back_to_library
+# Screenshot 06: Returned to Exercise Library after full navigation cycle
+- takeScreenshot: 06_navigation_smoke_back_to_library

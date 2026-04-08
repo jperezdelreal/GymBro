@@ -1,5 +1,12 @@
 appId: com.gymbro.app
 name: "Full E2E — Complete user journey: onboarding → workout → history"
+#
+# Tests: Complete end-to-end user journey from onboarding through workout completion and verification
+# Preconditions: App launched with clearState (fresh install state)
+# Test data: USER_NAME (E2EUser), EXERCISE_NAME (Bench Press), WEIGHT (80), REPS (10)
+# Assertions: Onboarding completes, workout logged and finished, data visible in History and Progress
+# Cleanup: App state cleared via stopApp
+# Dependencies: None
 tags:
   - e2e
   - regression
@@ -18,7 +25,8 @@ onFlowComplete:
 
 # Welcome page
 - assertVisible: "GymBro"
-- takeScreenshot: e2e_onboarding_start
+# Screenshot 01: E2E test starting at onboarding welcome
+- takeScreenshot: 01_full_e2e_onboarding_start
 
 # Swipe through all pages
 - swipe:
@@ -49,7 +57,8 @@ onFlowComplete:
 - waitForAnimationToEnd:
     timeout: 3000
 - assertVisible: "Biblioteca de Ejercicios"
-- takeScreenshot: e2e_onboarding_complete
+# Screenshot 02: Onboarding completed, landed on Exercise Library
+- takeScreenshot: 02_full_e2e_onboarding_complete
 
 # === PHASE 2: QUICK LIBRARY BROWSE ===
 
@@ -59,7 +68,8 @@ onFlowComplete:
     optional: true
 
 # Verify library content is loaded
-- takeScreenshot: e2e_library_loaded
+# Screenshot 03: Exercise library loaded with exercises
+- takeScreenshot: 03_full_e2e_library_loaded
 
 # === PHASE 3: START AND COMPLETE WORKOUT ===
 
@@ -69,7 +79,8 @@ onFlowComplete:
 - waitForAnimationToEnd:
     timeout: 2000
 - assertVisible: "Entrenamiento Activo"
-- takeScreenshot: e2e_workout_started
+# Screenshot 04: Active workout started
+- takeScreenshot: 04_full_e2e_workout_started
 
 # Add an exercise
 - tapOn: "Añadir Ejercicio"
@@ -96,7 +107,8 @@ onFlowComplete:
     index: 0
 - inputText: "${REPS:=10}"
 
-- takeScreenshot: e2e_set_filled
+# Screenshot 05: Set filled with weight and reps
+- takeScreenshot: 05_full_e2e_set_filled
 
 # Complete the set
 - tapOn:
@@ -111,7 +123,8 @@ onFlowComplete:
 
 # Verify summary
 - assertVisible: "¡Entrenamiento Completado!"
-- takeScreenshot: e2e_workout_summary
+# Screenshot 06: Workout summary screen after completion
+- takeScreenshot: 06_full_e2e_workout_summary
 
 # Tap done
 - tapOn: "Listo"
@@ -127,7 +140,8 @@ onFlowComplete:
 - waitForAnimationToEnd:
     timeout: 2000
 - assertVisible: "Historial de Entrenamientos"
-- takeScreenshot: e2e_history_with_workout
+# Screenshot 07: History tab showing completed workout
+- takeScreenshot: 07_full_e2e_history_with_workout
 
 # Verify the workout appears (today's entry)
 - assertVisible:
@@ -141,7 +155,8 @@ onFlowComplete:
     id: "nav_progress"
 - waitForAnimationToEnd:
     timeout: 2000
-- takeScreenshot: e2e_progress_after_workout
+# Screenshot 08: Progress tab after workout completion
+- takeScreenshot: 08_full_e2e_progress_after_workout
 
 # === PHASE 6: VERIFY PROFILE ===
 
@@ -151,10 +166,12 @@ onFlowComplete:
 - waitForAnimationToEnd:
     timeout: 2000
 - assertVisible: "Cuenta"
-- takeScreenshot: e2e_profile
+# Screenshot 09: Profile tab with user account
+- takeScreenshot: 09_full_e2e_profile
 
 # Return to library
 - tapOn:
     id: "nav_exercise_library"
 - assertVisible: "Biblioteca de Ejercicios"
-- takeScreenshot: e2e_complete
+# Screenshot 10: E2E test completed, back at Exercise Library
+- takeScreenshot: 10_full_e2e_complete

@@ -1,5 +1,12 @@
 appId: com.gymbro.app
 name: "Browse Library — Search and filter exercises"
+#
+# Tests: Verifying search functionality and muscle group filters in exercise library
+# Preconditions: User has completed onboarding (ensured by ensure-post-onboarding.yaml)
+# Test data: Search query "Press", muscle groups "Pecho", "Espalda", "Hombros"
+# Assertions: Search results display correctly, filters toggle on/off, no results message appears when applicable
+# Cleanup: App relaunched with clean filters
+# Dependencies: flow/ensure-post-onboarding.yaml
 tags:
   - library
   - smoke
@@ -21,7 +28,8 @@ onFlowComplete:
 
 # Verify Exercise Library is visible
 - assertVisible: "Biblioteca de Ejercicios"
-- takeScreenshot: library_home
+# Screenshot 01: Exercise library home screen with default view
+- takeScreenshot: 01_browse_library_home
 
 # Tap on search bar and type a query
 - tapOn:
@@ -31,7 +39,8 @@ onFlowComplete:
 - inputText: "Press"
 - waitForAnimationToEnd:
     timeout: 1000
-- takeScreenshot: library_search_results
+# Screenshot 02: Search results for "Press" query
+- takeScreenshot: 02_browse_library_search_results
 
 # Conditional: Check search results
 - runFlow:
@@ -44,7 +53,8 @@ onFlowComplete:
           element:
             text: ".*Press.*"
           timeout: 5000
-      - takeScreenshot: library_exercise_found
+      # Screenshot 03: Specific exercise found in search results
+      - takeScreenshot: 03_browse_library_exercise_found
       
       # Tap the found exercise
       - tapOn:
@@ -52,7 +62,8 @@ onFlowComplete:
           index: 0
       - waitForAnimationToEnd:
           timeout: 1000
-      - takeScreenshot: library_exercise_detail
+      # Screenshot 04: Exercise detail view after tapping from search
+      - takeScreenshot: 04_browse_library_exercise_detail
       
       # Navigate back
       - back
@@ -63,7 +74,8 @@ onFlowComplete:
     commands:
       # No results path
       - assertVisible: "No se encontraron ejercicios"
-      - takeScreenshot: library_no_search_results
+      # Screenshot 05: Empty search results message
+      - takeScreenshot: 05_browse_library_no_search_results
 
 # Relaunch app to clear search
 - launchApp
@@ -77,7 +89,8 @@ onFlowComplete:
 - tapOn: "Pecho"
 - waitForAnimationToEnd:
     timeout: 1000
-- takeScreenshot: library_filter_chest
+# Screenshot 06: Library filtered by Chest/Pecho muscle group
+- takeScreenshot: 06_browse_library_filter_chest
 
 # Deselect Chest, select Back
 - tapOn: "Pecho"
@@ -86,7 +99,8 @@ onFlowComplete:
 - tapOn: "Espalda"
 - waitForAnimationToEnd:
     timeout: 1000
-- takeScreenshot: library_filter_back
+# Screenshot 07: Library filtered by Back/Espalda muscle group
+- takeScreenshot: 07_browse_library_filter_back
 
 # Deselect Back, select Shoulders
 - tapOn: "Espalda"
@@ -95,10 +109,12 @@ onFlowComplete:
 - tapOn: "Hombros"
 - waitForAnimationToEnd:
     timeout: 1000
-- takeScreenshot: library_filter_shoulders
+# Screenshot 08: Library filtered by Shoulders/Hombros muscle group
+- takeScreenshot: 08_browse_library_filter_shoulders
 
 # Deselect filter
 - tapOn: "Hombros"
 - waitForAnimationToEnd:
     timeout: 1000
-- takeScreenshot: library_no_filter
+# Screenshot 09: Library with no filters applied (all exercises shown)
+- takeScreenshot: 09_browse_library_no_filter
