@@ -11,9 +11,9 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
 private val GymBroDarkColorScheme = darkColorScheme(
-    primary = AccentGreen,
-    secondary = AccentCyan,
-    tertiary = AccentAmber,
+    primary = AccentGreenStart,
+    secondary = AccentCyanStart,
+    tertiary = AccentAmberStart,
     background = Background,
     surface = Surface,
     surfaceVariant = SurfaceVariant,
@@ -21,7 +21,7 @@ private val GymBroDarkColorScheme = darkColorScheme(
     onBackground = OnBackground,
     onSurface = OnSurface,
     onSurfaceVariant = OnSurfaceVariant,
-    error = Error,
+    error = AccentRed,
     onError = OnError,
 )
 
