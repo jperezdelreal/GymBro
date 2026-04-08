@@ -1,0 +1,117 @@
+appId: com.gymbro.app
+name: "Full E2E — Complete user journey: onboarding → workout → history"
+tags:
+  - e2e
+  - regression
+---
+
+# === PHASE 1: ONBOARDING ===
+
+# Welcome page
+- assertVisible: "GymBro"
+- takeScreenshot: e2e_onboarding_start
+
+# Swipe through all pages
+- swipeLeft
+- assertVisible: "Registro Ultra-Rápido"
+
+- swipeLeft
+- assertVisible: "Rastrea tu Progreso"
+
+- swipeLeft
+- assertVisible: "Comencemos"
+
+# Select units and enter name
+- tapOn: "Kilogramos (kg)"
+- tapOn: "Ingresa tu nombre"
+- inputText: "E2EUser"
+
+# Complete onboarding
+- tapOn: "¡Vamos!"
+- assertVisible: "Biblioteca de Ejercicios"
+- takeScreenshot: e2e_onboarding_complete
+
+# === PHASE 2: QUICK LIBRARY BROWSE ===
+
+# Dismiss tooltip if present
+- tapOn:
+    text: "Entendido"
+    optional: true
+
+# Verify library content is loaded
+- takeScreenshot: e2e_library_loaded
+
+# === PHASE 3: START AND COMPLETE WORKOUT ===
+
+# Tap FAB to start workout
+- tapOn: "Iniciar Entrenamiento"
+- assertVisible: "Entrenamiento Activo"
+- takeScreenshot: e2e_workout_started
+
+# Add an exercise
+- tapOn: "Añadir Ejercicio"
+- assertVisible: "Elegir Ejercicio"
+
+# Pick an exercise
+- tapOn:
+    text: "Bench Press"
+    index: 0
+
+# Fill in set data
+- assertVisible: "Entrenamiento Activo"
+- tapOn:
+    text: "0"
+    index: 0
+- inputText: "80"
+
+- tapOn:
+    text: "0"
+    index: 0
+- inputText: "10"
+
+- takeScreenshot: e2e_set_filled
+
+# Complete the set
+- tapOn:
+    text: "Completar serie 1"
+
+# Finish workout
+- tapOn: "Finalizar Entrenamiento"
+
+# Verify summary
+- assertVisible: "¡Entrenamiento Completado!"
+- takeScreenshot: e2e_workout_summary
+
+# Tap done
+- tapOn: "Listo"
+- assertVisible: "Biblioteca de Ejercicios"
+
+# === PHASE 4: VERIFY HISTORY ===
+
+# Navigate to History tab
+- tapOn: "Historial"
+- assertVisible: "Historial de Entrenamientos"
+- takeScreenshot: e2e_history_with_workout
+
+# Verify the workout appears (today's entry)
+- assertVisible:
+    text: "Hoy"
+    optional: true
+
+# === PHASE 5: CHECK PROGRESS ===
+
+# Navigate to Progress tab
+- tapOn: "Progreso"
+- takeScreenshot: e2e_progress_after_workout
+
+# === PHASE 6: VERIFY PROFILE ===
+
+# Navigate to Profile tab
+- tapOn: "Perfil"
+- assertVisible: "Cuenta"
+- takeScreenshot: e2e_profile
+
+# Return to library
+- tapOn: "Biblioteca"
+- assertVisible: "Biblioteca de Ejercicios"
+- takeScreenshot: e2e_complete

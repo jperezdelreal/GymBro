@@ -1,0 +1,51 @@
+appId: com.gymbro.app
+name: "Start Workout — Begin workout, add exercises, log sets"
+tags:
+  - workout
+  - core
+---
+
+# Start from Exercise Library
+- assertVisible: "Biblioteca de Ejercicios"
+
+# Tap FAB to start new workout
+- tapOn: "Iniciar Entrenamiento"
+
+# Verify Active Workout screen
+- assertVisible: "Entrenamiento Activo"
+- takeScreenshot: workout_started
+
+# Tap Add Exercise button
+- tapOn: "Añadir Ejercicio"
+
+# Verify exercise picker opens
+- assertVisible: "Elegir Ejercicio"
+- takeScreenshot: exercise_picker
+
+# Search and select an exercise
+- tapOn: "Buscar ejercicios…"
+- inputText: "Bench"
+- takeScreenshot: exercise_picker_search
+
+# Tap the first exercise result
+- tapOn:
+    text: "Bench Press"
+    index: 0
+
+# Back on workout screen — verify exercise was added
+- assertVisible: "Entrenamiento Activo"
+- takeScreenshot: workout_exercise_added
+
+# Log a set — enter weight value
+- tapOn:
+    text: "0"
+    index: 0
+- inputText: "80"
+
+# Enter reps
+- tapOn:
+    text: "0"
+    index: 0
+- inputText: "8"
+
+- takeScreenshot: workout_set_logged

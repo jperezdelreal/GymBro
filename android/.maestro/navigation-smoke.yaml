@@ -1,0 +1,32 @@
+appId: com.gymbro.app
+name: "Navigation Smoke — Tap through all bottom nav tabs"
+tags:
+  - navigation
+  - smoke
+---
+
+# Start at Library tab
+- assertVisible: "Biblioteca de Ejercicios"
+- takeScreenshot: nav_library
+
+# Tap History tab
+- tapOn: "Historial"
+- assertVisible: "Historial de Entrenamientos"
+- takeScreenshot: nav_history
+
+# Tap Progress tab
+- tapOn: "Progreso"
+- takeScreenshot: nav_progress
+
+# Tap Recovery tab
+- tapOn: "Recuperación"
+- takeScreenshot: nav_recovery
+
+# Tap Profile tab
+- tapOn: "Perfil"
+- takeScreenshot: nav_profile
+
+# Navigate back to Library
+- tapOn: "Biblioteca"
+- assertVisible: "Biblioteca de Ejercicios"
+- takeScreenshot: nav_back_to_library
