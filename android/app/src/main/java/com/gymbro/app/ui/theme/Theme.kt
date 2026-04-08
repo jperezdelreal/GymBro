@@ -9,6 +9,7 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
+import com.gymbro.core.ui.theme.*
 
 private val GymBroDarkColorScheme = darkColorScheme(
     primary = AccentGreenStart,
