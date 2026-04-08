@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+    <!-- Suppress WorkManager lint error that is a separate pre-existing issue -->
+    <issue id="RemoveWorkManagerInitializer" severity="warning" />
+</lint>
