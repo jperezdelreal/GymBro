@@ -51,7 +51,9 @@ import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.gymbro.core.R
 import com.gymbro.feature.common.EmptyState
 import com.gymbro.feature.common.FullScreenLoading
 import com.gymbro.feature.common.GlassmorphicCard
@@ -85,10 +87,10 @@ fun HistoryDetailRoute(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Workout Details", fontWeight = FontWeight.Bold, modifier = Modifier.semantics { heading() }) },
+                title = { Text(stringResource(R.string.history_workout_details), fontWeight = FontWeight.Bold, modifier = Modifier.semantics { heading() }) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.action_back))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -103,14 +105,14 @@ fun HistoryDetailRoute(
         Box(modifier = Modifier.padding(paddingValues)) {
             when {
                 state.isLoading -> {
-                    FullScreenLoading(message = "Loading workout...")
+                    FullScreenLoading(message = stringResource(R.string.history_loading_workout))
                 }
                 state.error != null -> {
                     EmptyState(
                         icon = Icons.Default.Close,
-                        title = "Error",
-                        subtitle = state.error ?: "Unknown error",
-                        actionText = "Retry",
+                        title = stringResource(R.string.common_error),
+                        subtitle = state.error ?: stringResource(R.string.common_unknown_error),
+                        actionText = stringResource(R.string.action_retry),
                         onActionClick = { viewModel.onIntent(HistoryDetailIntent.Retry) },
                     )
                 }
@@ -142,7 +144,7 @@ private fun HistoryDetailContent(detail: WorkoutDetail) {
             val currentIndex = itemIndex++
             AnimatedItem(index = currentIndex) {
                 Text(
-                    text = "Resumen",
+                    text = stringResource(R.string.history_summary),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = Color.White,
@@ -160,14 +162,14 @@ private fun HistoryDetailContent(detail: WorkoutDetail) {
                 ) {
                     StatCard(
                         icon = Icons.Default.FitnessCenter,
-                        label = "Volumen",
+                        label = stringResource(R.string.common_volume),
                         value = "${detail.totalVolume.toInt()} kg",
                         gradientColors = listOf(AccentGreenStart, AccentGreenEnd),
                         modifier = Modifier.weight(1f),
                     )
                     StatCard(
                         icon = Icons.Default.BarChart,
-                        label = "Series",
+                        label = stringResource(R.string.workout_sets),
                         value = "${detail.totalSets}",
                         gradientColors = listOf(AccentCyanStart, AccentCyanEnd),
                         modifier = Modifier.weight(1f),
@@ -206,13 +208,13 @@ private fun HistoryDetailContent(detail: WorkoutDetail) {
                             )
                             Column {
                                 Text(
-                                    text = "¡${detail.prExerciseIds.size} Récord${if (detail.prExerciseIds.size > 1) "s" else ""}!",
+                                    text = stringResource(R.string.history_new_records, detail.prExerciseIds.size),
                                     style = MaterialTheme.typography.titleLarge,
                                     fontWeight = FontWeight.Bold,
                                     color = Color.White,
                                 )
                                 Text(
-                                    text = "Nuevos récords personales",
+                                    text = stringResource(R.string.history_new_records_subtitle),
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = Color.White.copy(alpha = 0.7f),
                                 )
@@ -227,7 +229,7 @@ private fun HistoryDetailContent(detail: WorkoutDetail) {
             val currentIndex = itemIndex++
             AnimatedItem(index = currentIndex) {
                 Text(
-                    text = "Ejercicios",
+                    text = stringResource(R.string.history_exercises_label),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = Color.White,
@@ -246,7 +248,7 @@ private fun HistoryDetailContent(detail: WorkoutDetail) {
                 val currentIndex = itemIndex++
                 AnimatedItem(index = currentIndex) {
                     Text(
-                        text = "Volumen por Grupo Muscular",
+                        text = stringResource(R.string.history_volume_by_muscle),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         color = Color.White,
@@ -452,7 +454,7 @@ private fun ExerciseCard(exercise: ExerciseDetail, index: Int) {
                         ) {
                             Icon(
                                 Icons.Default.Star,
-                                contentDescription = "Récord Personal",
+                                contentDescription = stringResource(R.string.history_personal_record),
                                 tint = Color.White,
                                 modifier = Modifier.size(24.dp),
                             )
@@ -482,7 +484,7 @@ private fun ExerciseCard(exercise: ExerciseDetail, index: Int) {
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
                     Text(
-                        text = "Volumen Total:",
+                        text = stringResource(R.string.history_total_volume),
                         style = MaterialTheme.typography.bodyLarge,
                         color = Color.White.copy(alpha = 0.8f),
                         fontWeight = FontWeight.Medium,
@@ -511,7 +513,7 @@ private fun SetRow(set: SetDetail) {
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = "Serie ${set.setNumber}",
+            text = stringResource(R.string.history_set_number, set.setNumber),
             style = MaterialTheme.typography.bodyLarge,
             color = Color.White.copy(alpha = 0.7f),
             fontWeight = FontWeight.Medium,

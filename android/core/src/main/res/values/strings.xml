@@ -200,4 +200,230 @@
     <string name="common_sets">sets</string>
     <string name="common_duration_hours" formatted="false">%dh %dm</string>
     <string name="common_duration_minutes">%dm</string>
+    <string name="common_navigate_back">Navigate back</string>
+    <string name="common_duration">Duration</string>
+    <string name="common_volume">Volume</string>
+    <string name="common_score">Score</string>
+
+    <!-- Analytics -->
+    <string name="analytics_title">Analytics</string>
+    <string name="analytics_loading">Loading analytics...</string>
+    <string name="analytics_this_week">This Week</string>
+    <string name="analytics_last_week">Last Week</string>
+    <string name="analytics_volume_trend">Volume Trend</string>
+    <string name="analytics_muscle_balance">Muscle Balance</string>
+    <string name="analytics_consistency">Consistency</string>
+    <string name="analytics_top_exercises">Top Exercises</string>
+    <string name="analytics_current_streak">Current Streak</string>
+    <string name="analytics_longest_streak">Longest Streak</string>
+    <string name="analytics_week_singular">week</string>
+    <string name="analytics_week_plural">weeks</string>
+    <string name="analytics_section_icon_week">📊</string>
+    <string name="analytics_section_icon_trend">📈</string>
+    <string name="analytics_section_icon_muscle">💪</string>
+    <string name="analytics_section_icon_consistency">🔥</string>
+    <string name="analytics_section_icon_exercises">🏋️</string>
+
+    <!-- Programs -->
+    <string name="programs_title">Programs</string>
+    <string name="programs_create_template">Create Template</string>
+    <string name="programs_empty_title">No Programs Yet</string>
+    <string name="programs_empty_subtitle">Create your first workout template to get started!</string>
+    <string name="programs_start_workout">Start Workout</string>
+    <string name="programs_exercises_count">%d exercises</string>
+    <string name="programs_built_in">Built-in</string>
+    <string name="programs_last_used">Last used: %s</string>
+
+    <!-- Coach / AI Chat -->
+    <string name="coach_title">GymBro AI Coach</string>
+    <string name="coach_clear_history">Clear history</string>
+    <string name="coach_subtitle">Your personal strength training advisor</string>
+    <string name="coach_quick_prompts">Quick prompts:</string>
+    <string name="coach_prompt_1">How should I break my bench plateau?</string>
+    <string name="coach_prompt_2">What should I train today?</string>
+    <string name="coach_prompt_3">Tips for better squat depth</string>
+    <string name="coach_thinking">Coach is thinking...</string>
+    <string name="coach_input_placeholder">Ask your coach...</string>
+    <string name="coach_input_placeholder_disabled">Firebase not configured</string>
+    <string name="coach_firebase_error">AI Coach requires Firebase AI (Vertex AI). Add google-services.json to your project to enable this feature.</string>
+    <string name="coach_label">Coach</string>
+
+    <!-- Smart Workout -->
+    <string name="smart_workout_title">Smart Workout</string>
+    <string name="smart_workout_generating">Generating smart workout...</string>
+    <string name="smart_workout_suggested_exercises">Suggested Exercises</string>
+    <string name="smart_workout_start">Start This Workout</string>
+    <string name="smart_workout_regenerate">Regenerate</string>
+    <string name="smart_workout_plan">Workout Plan</string>
+    <string name="smart_workout_readiness_ready">Ready</string>
+    <string name="smart_workout_readiness_good">Good</string>
+    <string name="smart_workout_readiness_moderate">Moderate</string>
+    <string name="smart_workout_readiness_light">Light</string>
+    <string name="smart_workout_failed">Failed to Generate Workout</string>
+
+    <!-- Active Workout -->
+    <string name="active_workout_title">Active Workout</string>
+    <string name="active_workout_starting">Starting workout...</string>
+    <string name="active_workout_add_exercise">Add Exercise</string>
+    <string name="active_workout_remove_exercise">Remove exercise</string>
+    <string name="active_workout_tap_to_complete">Tap to complete set</string>
+    <string name="active_workout_rest">REST</string>
+    <string name="active_workout_skip">Skip</string>
+    <string name="active_workout_complete_set">Complete set %d</string>
+
+    <!-- Widgets -->
+    <string name="widget_start_workout">Start Workout</string>
+    <string name="widget_weekly_stats">Weekly Stats</string>
+    <string name="widget_workouts">Workouts</string>
+    <string name="widget_volume_kg">Volume (kg)</string>
+    <string name="widget_streak">Streak</string>
+    <string name="widget_day_singular">day</string>
+    <string name="widget_day_plural">days</string>
+    <string name="widget_days_since_workout">%d %s since last workout</string>
+
+    <!-- Progress -->
+    <string name="progress_loading_message">Loading progress...</string>
+    <string name="progress_weekly_volume">Weekly Volume</string>
+    <string name="progress_plateau_alerts">Plateau Alerts</string>
+    <string name="progress_recent_prs">Recent PRs</string>
+    <string name="progress_no_data">No data for this exercise yet</string>
+    <string name="progress_evolution">Your strength evolution</string>
+    <string name="progress_empty_subtitle_alt">Start training to see your progress!</string>
+    <string name="progress_advanced_analytics">Advanced Analytics</string>
+    <string name="progress_detailed_insights">View detailed training insights</string>
+    <string name="progress_current_est_1rm">Current Est. 1RM (%1$s kg × %2$d)</string>
+    <string name="progress_this_week">This Week</string>
+
+    <!-- History -->
+    <string name="history_workout_details">Workout Details</string>
+    <string name="history_loading_workout">Loading workout...</string>
+    <string name="history_summary">Summary</string>
+    <string name="history_exercises_label">Exercises</string>
+    <string name="history_volume_by_muscle">Volume by Muscle Group</string>
+    <string name="history_total_volume">Total Volume:</string>
+    <string name="history_workout_not_found">Workout not found</string>
+    <string name="history_today">Today</string>
+    <string name="history_yesterday">Yesterday</string>
+
+    <!-- Profile -->
+    <string name="profile_talk_to_coach">Talk to AI Coach</string>
+    <string name="profile_account">Account</string>
+    <string name="profile_anonymous_account">Anonymous account</string>
+    <string name="profile_sign_in_label">Sign in</string>
+    <string name="profile_sign_in_subtitle_alt">Save your data to the cloud</string>
+    <string name="profile_preferences">Preferences</string>
+    <string name="profile_rest_timer">Rest timer</string>
+    <string name="profile_weight_unit_label">Weight unit</string>
+    <string name="profile_weight_unit_lbs">lbs</string>
+    <string name="profile_notifications">Notifications</string>
+    <string name="profile_data_section">Data</string>
+    <string name="profile_export_data">Export data</string>
+    <string name="profile_clear_all_data">Clear all data</string>
+    <string name="profile_about">About</string>
+    <string name="profile_send_feedback_label">Send feedback</string>
+    <string name="profile_sign_out_description">Sign out</string>
+    <string name="profile_sign_in_button_text">Sign in</string>
+    <string name="profile_sign_in_message">Sign in to save your workouts to the cloud</string>
+    <string name="profile_user_avatar">User avatar</string>
+    <string name="profile_anonymous_lifter_alt">Anonymous Lifter</string>
+    <string name="profile_not_signed_in_alt">Not signed in</string>
+    <string name="profile_guest_account_alt">Guest account</string>
+    <string name="profile_sign_in_to_sync">Sign in to sync</string>
+    <string name="profile_connected">Connected</string>
+    <string name="profile_workouts_label">Workouts</string>
+    <string name="profile_streak_label">Streak</string>
+    <string name="profile_sync_ready">Ready to sync</string>
+    <string name="profile_synced">Synced</string>
+    <string name="profile_sync_error">Sync error</string>
+    <string name="profile_offline_status">Offline</string>
+    <string name="profile_sync_disabled">Disabled</string>
+
+    <!-- Common Messages/Toasts -->
+    <string name="message_signed_in">Signed in successfully</string>
+    <string name="message_signed_out">Signed out</string>
+    <string name="message_all_data_cleared">All data cleared</string>
+    <string name="message_licenses">Licenses will be displayed</string>
+
+    <!-- Celebration -->
+    <string name="celebration_new_pr">NEW PR!</string>
+    <string name="celebration_tap_to_continue">Tap to continue</string>
+    <string name="celebration_streak_7">One week of consistency — you\'re building serious momentum!</string>
+    <string name="celebration_streak_30">One month strong — you\'re unstoppable!</string>
+    <string name="celebration_streak_default">Keep the fire burning!</string>
+
+    <!-- Tooltips -->
+    <string name="tooltip_understood">Got it</string>
+    <string name="tooltip_filter_muscle">Filter by muscle group</string>
+    <string name="tooltip_exercise_not_found">We couldn\'t find that exercise. Want to create it?</string>
+
+    <!-- Create Exercise (additional) -->
+    <string name="create_exercise_notes_placeholder">Add notes about form, cues, or variations...</string>
+    <string name="create_exercise_name_required">Exercise name is required</string>
+    <string name="create_exercise_duplicate">An exercise with this name already exists</string>
+    <string name="create_exercise_cancel">Cancel</string>
+
+    <!-- Errors -->
+    <string name="error_retry">Retry</string>
+    <string name="error_failed_load_workout">Failed to load workout</string>
+    <string name="error_failed_load_history">Failed to load workout history</string>
+    <string name="error_failed_load_recovery">Failed to load recovery data</string>
+    <string name="error_failed_generate_workout">Failed to generate workout</string>
+    <string name="error_failed_ai_response">Failed to get response from AI Coach</string>
+
+    <!-- Onboarding (Additional) -->
+    <string name="onboarding_smart_gym_companion">Your smart gym companion</string>
+
+    <!-- Coach (additional) -->
+    <string name="coach_prompt_4">Am I training too often?</string>
+    <string name="coach_send">Send</string>
+    <string name="coach_firebase_not_configured_title">⚠️ Firebase Not Configured</string>
+
+    <!-- Common (additional) -->
+    <string name="action_dismiss">Dismiss</string>
+
+    <!-- Smart Workout (additional) -->
+    <string name="smart_workout_sets_count">%d sets</string>
+    <string name="smart_workout_reps_count">%d reps</string>
+    <string name="smart_workout_suggested_label">Suggested: </string>
+
+    <!-- Active Workout (additional) -->
+    <string name="active_workout_header_set">SET</string>
+    <string name="active_workout_header_kg">KG</string>
+    <string name="active_workout_header_reps">REPS</string>
+    <string name="active_workout_set_completed">Set %d completed</string>
+
+    <!-- Progress (additional) -->
+    <string name="progress_e1rm_trend">Estimated 1RM Trend</string>
+    <string name="progress_prs_label">PRs</string>
+    <string name="progress_last_2_weeks">Last 2 Weeks</string>
+    <string name="progress_last_8_weeks">Last 8 Weeks</string>
+    <string name="progress_weeks_no_progress">%d weeks with no progress</string>
+    <string name="progress_workouts_label">Workouts</string>
+
+    <!-- Profile (additional) -->
+    <string name="profile_health_integration">Health Integration</string>
+    <string name="profile_version">Version 1.0</string>
+    <string name="profile_rest_timer_default">2:00 default</string>
+    <string name="profile_active_days">Active Days</string>
+
+    <!-- History (additional) -->
+    <string name="history_set_number">Set %d</string>
+    <string name="history_personal_record">Personal Record</string>
+    <string name="history_new_records">%d New Record(s)!</string>
+    <string name="history_new_records_subtitle">New personal records</string>
+    <string name="history_days_ago">%d days ago</string>
+    <string name="history_one_week_ago">1 week ago</string>
+    <string name="history_weeks_ago">%d weeks ago</string>
+    <string name="history_months_ago">%d months ago</string>
+
+    <!-- Workout Summary (additional) -->
+    <string name="workout_summary_subtitle">Great session — keep pushing.</string>
+
+    <!-- Analytics (additional) -->
+    <string name="analytics_last_8_weeks">Last 8 Weeks</string>
+    <string name="analytics_avg_per_week">Avg/Week</string>
+    <string name="analytics_workouts_per_week">%1$.1f workouts</string>
+
+    <!-- Create Exercise (additional new) -->
+    <string name="create_exercise_description_label">Description (Optional)</string>
 </resources>

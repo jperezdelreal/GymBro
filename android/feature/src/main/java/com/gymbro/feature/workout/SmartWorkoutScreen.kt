@@ -39,9 +39,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gymbro.core.model.Exercise
+import com.gymbro.core.R
 
 private val AccentGreen = Color(0xFF00FF87)
 private val CardBackground = Color(0xFF1E1E1E)
@@ -91,12 +93,12 @@ internal fun SmartWorkoutScreen(
             IconButton(onClick = { onEvent(SmartWorkoutEvent.NavigateBack) }) {
                 Icon(
                     Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back",
+                    contentDescription = stringResource(R.string.action_back),
                     tint = Color.White,
                 )
             }
             Text(
-                text = "Smart Workout",
+                text = stringResource(R.string.smart_workout_title),
                 style = MaterialTheme.typography.headlineMedium,
                 color = Color.White,
                 fontWeight = FontWeight.Bold,
@@ -108,7 +110,7 @@ internal fun SmartWorkoutScreen(
             ) {
                 Icon(
                     Icons.Default.Refresh,
-                    contentDescription = "Regenerate",
+                    contentDescription = stringResource(R.string.smart_workout_regenerate),
                     tint = if (state.isGenerating) Color.Gray else AccentGreen,
                 )
             }
@@ -126,7 +128,7 @@ internal fun SmartWorkoutScreen(
                         CircularProgressIndicator(color = AccentGreen)
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
-                            text = "Generating smart workout...",
+                            text = stringResource(R.string.smart_workout_generating),
                             color = Color.White,
                             style = MaterialTheme.typography.bodyLarge,
                         )
@@ -150,7 +152,7 @@ internal fun SmartWorkoutScreen(
 
                 // Exercises List
                 Text(
-                    text = "Suggested Exercises",
+                    text = stringResource(R.string.smart_workout_suggested_exercises),
                     style = MaterialTheme.typography.titleLarge,
                     color = Color.White,
                     fontWeight = FontWeight.Bold,
@@ -183,7 +185,7 @@ internal fun SmartWorkoutScreen(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Start This Workout",
+                        text = stringResource(R.string.smart_workout_start),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                     )
@@ -205,7 +207,7 @@ internal fun SmartWorkoutScreen(
                         modifier = Modifier.size(18.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text(text = "Regenerate", fontSize = 14.sp)
+                    Text(text = stringResource(R.string.smart_workout_regenerate), fontSize = 14.sp)
                 }
             }
         }
@@ -229,7 +231,7 @@ private fun ReasoningCard(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = "Workout Plan",
+                    text = stringResource(R.string.smart_workout_plan),
                     style = MaterialTheme.typography.titleMedium,
                     color = Color.White,
                     fontWeight = FontWeight.Bold,
@@ -249,10 +251,10 @@ private fun ReasoningCard(
 @Composable
 private fun RecoveryBadge(score: Int) {
     val (color, label) = when {
-        score >= 80 -> AccentGreen to "Ready"
-        score >= 60 -> Color(0xFFFFA500) to "Good"
-        score >= 40 -> Color(0xFFFFD700) to "Moderate"
-        else -> Color(0xFFFF6B6B) to "Light"
+        score >= 80 -> AccentGreen to stringResource(R.string.smart_workout_readiness_ready)
+        score >= 60 -> Color(0xFFFFA500) to stringResource(R.string.smart_workout_readiness_good)
+        score >= 40 -> Color(0xFFFFD700) to stringResource(R.string.smart_workout_readiness_moderate)
+        else -> Color(0xFFFF6B6B) to stringResource(R.string.smart_workout_readiness_light)
     }
 
     Box(
@@ -298,12 +300,12 @@ private fun ExerciseCard(exercise: SuggestedExerciseUi) {
                 }
                 Column(horizontalAlignment = Alignment.End) {
                     Text(
-                        text = "${exercise.targetSets} sets",
+                        text = stringResource(R.string.smart_workout_sets_count, exercise.targetSets),
                         style = MaterialTheme.typography.bodyMedium,
                         color = Color.White.copy(alpha = 0.7f),
                     )
                     Text(
-                        text = "${exercise.targetReps} reps",
+                        text = stringResource(R.string.smart_workout_reps_count, exercise.targetReps),
                         style = MaterialTheme.typography.bodyMedium,
                         color = Color.White.copy(alpha = 0.7f),
                     )
@@ -318,7 +320,7 @@ private fun ExerciseCard(exercise: SuggestedExerciseUi) {
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Text(
-                            text = "Suggested: ",
+                            text = stringResource(R.string.smart_workout_suggested_label),
                             style = MaterialTheme.typography.bodySmall,
                             color = Color.White.copy(alpha = 0.6f),
                         )
@@ -359,7 +361,7 @@ private fun ErrorCard(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
-                text = "Failed to Generate Workout",
+                text = stringResource(R.string.smart_workout_failed),
                 style = MaterialTheme.typography.titleMedium,
                 color = Color(0xFFFF6B6B),
                 fontWeight = FontWeight.Bold,
@@ -379,7 +381,7 @@ private fun ErrorCard(
                     contentColor = Color.Black,
                 ),
             ) {
-                Text(text = "Retry", fontWeight = FontWeight.Bold)
+                Text(text = stringResource(R.string.action_retry), fontWeight = FontWeight.Bold)
             }
         }
     }

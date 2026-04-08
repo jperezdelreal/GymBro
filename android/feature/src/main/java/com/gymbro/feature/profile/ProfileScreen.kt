@@ -128,7 +128,7 @@ internal fun ProfileScreen(
 
         // AI Coach Button
         GradientButton(
-            text = "Hablar con AI Coach",
+            text = stringResource(R.string.profile_talk_to_coach),
             onClick = onNavigateToCoach,
             modifier = Modifier.fillMaxWidth(),
             gradientColors = listOf(AccentGreenStart, AccentGreenEnd),
@@ -138,26 +138,26 @@ internal fun ProfileScreen(
 
         // Account Settings Group (Green Accent)
         SettingsGroup(
-            title = "Cuenta",
+            title = stringResource(R.string.profile_account),
             accentColor = AccentGreenStart,
         ) {
             if (state.isSignedIn) {
                 SettingItem(
                     icon = Icons.Default.Person,
-                    label = state.user?.displayName ?: "Cuenta anónima",
+                    label = state.user?.displayName ?: stringResource(R.string.profile_anonymous_account),
                     iconTint = AccentGreenStart,
                     onClick = { /* Navigate to account details */ },
                 )
                 SettingItem(
                     icon = Icons.Default.Cloud,
-                    label = "Sincronización en la nube",
+                    label = stringResource(R.string.profile_cloud_sync_title),
                     subtitle = getSyncStatusText(state.syncStatus),
                     iconTint = AccentGreenStart,
                     onClick = { /* Navigate to sync settings */ },
                 )
                 SettingItemWithToggle(
                     icon = Icons.Default.Sync,
-                    label = "Sincronización automática",
+                    label = stringResource(R.string.profile_auto_sync_title),
                     iconTint = AccentGreenStart,
                     checked = state.autoSyncEnabled,
                     onCheckedChange = { onEvent(ProfileEvent.ToggleAutoSync(it)) },
@@ -165,8 +165,8 @@ internal fun ProfileScreen(
             } else {
                 SettingItem(
                     icon = Icons.Default.Person,
-                    label = "Iniciar sesión",
-                    subtitle = "Guarda tus datos en la nube",
+                    label = stringResource(R.string.profile_sign_in_label),
+                    subtitle = stringResource(R.string.profile_sign_in_subtitle_alt),
                     iconTint = AccentGreenStart,
                     onClick = { onEvent(ProfileEvent.SignIn) },
                 )
@@ -177,32 +177,32 @@ internal fun ProfileScreen(
 
         // Preferences Group (Cyan Accent)
         SettingsGroup(
-            title = "Preferencias",
+            title = stringResource(R.string.profile_preferences),
             accentColor = AccentCyanStart,
         ) {
             SettingItem(
                 icon = Icons.Default.Timer,
-                label = "Temporizador de descanso",
-                subtitle = "2:00 predeterminado",
+                label = stringResource(R.string.profile_rest_timer),
+                subtitle = stringResource(R.string.profile_rest_timer_default),
                 iconTint = AccentCyanStart,
                 onClick = onNavigateToSettings,
             )
             SettingItem(
                 icon = Icons.Default.FitnessCenter,
-                label = "Unidad de peso",
-                subtitle = "lbs",
+                label = stringResource(R.string.profile_weight_unit_label),
+                subtitle = stringResource(R.string.profile_weight_unit_lbs),
                 iconTint = AccentCyanStart,
                 onClick = onNavigateToSettings,
             )
             SettingItem(
                 icon = Icons.Default.Notifications,
-                label = "Notificaciones",
+                label = stringResource(R.string.profile_notifications),
                 iconTint = AccentCyanStart,
                 onClick = onNavigateToSettings,
             )
             SettingItem(
                 icon = Icons.Default.MonitorHeart,
-                label = "Integración HealthKit",
+                label = stringResource(R.string.profile_health_integration),
                 iconTint = AccentCyanStart,
                 onClick = onNavigateToSettings,
             )
@@ -212,18 +212,18 @@ internal fun ProfileScreen(
 
         // Data Group (Amber Accent)
         SettingsGroup(
-            title = "Datos",
+            title = stringResource(R.string.profile_data_section),
             accentColor = AccentAmberStart,
         ) {
             SettingItem(
                 icon = Icons.Default.Storage,
-                label = "Exportar datos",
+                label = stringResource(R.string.profile_export_data),
                 iconTint = AccentAmberStart,
                 onClick = onNavigateToSettings,
             )
             SettingItem(
                 icon = Icons.Default.Delete,
-                label = "Borrar todos los datos",
+                label = stringResource(R.string.profile_clear_all_data),
                 iconTint = AccentRed,
                 onClick = onNavigateToSettings,
             )
@@ -233,18 +233,18 @@ internal fun ProfileScreen(
 
         // About Group (White Accent)
         SettingsGroup(
-            title = "Acerca de",
+            title = stringResource(R.string.profile_about),
             accentColor = Color.White,
         ) {
             SettingItem(
                 icon = Icons.Default.Info,
-                label = "Versión 1.0",
+                label = stringResource(R.string.profile_version),
                 iconTint = Color.White,
                 onClick = { /* Show version info */ },
             )
             SettingItem(
                 icon = Icons.Default.Feedback,
-                label = "Enviar comentarios",
+                label = stringResource(R.string.profile_send_feedback_label),
                 iconTint = Color.White,
                 onClick = { /* Open feedback */ },
             )
@@ -264,12 +264,12 @@ internal fun ProfileScreen(
             ) {
                 Icon(
                     Icons.Default.Logout,
-                    contentDescription = "Cerrar sesión",
+                    contentDescription = stringResource(R.string.profile_sign_out_description),
                     modifier = Modifier.size(20.dp),
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "Cerrar sesión",
+                    text = stringResource(R.string.profile_sign_out_description),
                     fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.padding(vertical = 4.dp),
                 )
@@ -277,7 +277,7 @@ internal fun ProfileScreen(
         } else {
             // Sign In Button
             GradientButton(
-                text = "Iniciar sesión",
+                text = stringResource(R.string.profile_sign_in_button_text),
                 onClick = { onEvent(ProfileEvent.SignIn) },
                 modifier = Modifier.fillMaxWidth(),
                 gradientColors = listOf(AccentGreenStart, AccentGreenEnd),
@@ -287,7 +287,7 @@ internal fun ProfileScreen(
             Spacer(modifier = Modifier.height(8.dp))
             
             Text(
-                text = "Inicia sesión para guardar tus entrenamientos en la nube",
+                text = stringResource(R.string.profile_sign_in_message),
                 style = MaterialTheme.typography.bodySmall,
                 color = Color(0xFF757575),
                 textAlign = TextAlign.Center,
@@ -345,7 +345,7 @@ private fun ProfileHeader(
                 } else {
                     Icon(
                         Icons.Default.Person,
-                        contentDescription = "Avatar de usuario",
+                        contentDescription = stringResource(R.string.profile_user_avatar),
                         tint = AccentGreenStart,
                         modifier = Modifier.size(48.dp),
                     )
@@ -358,9 +358,9 @@ private fun ProfileHeader(
         // User Name
         Text(
             text = if (isSignedIn) {
-                displayName ?: "Levantador Anónimo"
+                displayName ?: stringResource(R.string.profile_anonymous_lifter_alt)
             } else {
-                "No has iniciado sesión"
+                stringResource(R.string.profile_not_signed_in_alt)
             },
             style = MaterialTheme.typography.headlineSmall,
             color = Color.White,
@@ -372,11 +372,11 @@ private fun ProfileHeader(
         // Status
         Text(
             text = if (isSignedIn && isAnonymous) {
-                "Cuenta de invitado"
+                stringResource(R.string.profile_guest_account_alt)
             } else if (isSignedIn) {
-                "Conectado"
+                stringResource(R.string.profile_connected)
             } else {
-                "Inicia sesión para sincronizar"
+                stringResource(R.string.profile_sign_in_to_sync)
             },
             style = MaterialTheme.typography.bodyMedium,
             color = Color(0xFF9E9E9E),
@@ -392,19 +392,19 @@ private fun ProfileHeader(
             StatCard(
                 icon = Icons.Default.FitnessCenter,
                 value = "42",
-                label = "Entrenamientos",
+                label = stringResource(R.string.profile_workouts_label),
                 modifier = Modifier.weight(1f),
             )
             StatCard(
                 icon = Icons.Default.LocalFireDepartment,
                 value = "18",
-                label = "Días activos",
+                label = stringResource(R.string.profile_active_days),
                 modifier = Modifier.weight(1f),
             )
             StatCard(
                 icon = Icons.Default.LocalFireDepartment,
                 value = "7",
-                label = "Racha",
+                label = stringResource(R.string.profile_streak_label),
                 modifier = Modifier.weight(1f),
             )
         }
@@ -552,14 +552,15 @@ private fun SettingItemWithToggle(
     }
 }
 
+@Composable
 private fun getSyncStatusText(status: SyncStatus): String {
     return when (status) {
-        SyncStatus.IDLE -> "Listo para sincronizar"
-        SyncStatus.SYNCING -> "Sincronizando..."
-        SyncStatus.SUCCESS -> "Sincronizado"
-        SyncStatus.ERROR -> "Error de sincronización"
-        SyncStatus.OFFLINE -> "Sin conexión"
-        SyncStatus.DISABLED -> "Deshabilitado"
+        SyncStatus.IDLE -> stringResource(R.string.profile_sync_ready)
+        SyncStatus.SYNCING -> stringResource(R.string.profile_syncing)
+        SyncStatus.SUCCESS -> stringResource(R.string.profile_synced)
+        SyncStatus.ERROR -> stringResource(R.string.profile_sync_error)
+        SyncStatus.OFFLINE -> stringResource(R.string.profile_offline_status)
+        SyncStatus.DISABLED -> stringResource(R.string.profile_sync_disabled)
     }
 }
 

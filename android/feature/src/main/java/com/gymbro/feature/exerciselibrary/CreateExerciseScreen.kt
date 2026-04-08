@@ -303,7 +303,7 @@ fun CreateExerciseScreen(
                     // Description (Optional)
                     Column {
                         Text(
-                            text = "Description (Optional)",
+                            text = stringResource(R.string.create_exercise_description_label),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.onBackground,

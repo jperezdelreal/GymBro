@@ -49,8 +49,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.gymbro.core.R
 import com.gymbro.core.service.ConsistencyMetrics
 import com.gymbro.core.service.MuscleGroupDistribution
 import com.gymbro.core.service.TopExercise
@@ -106,7 +108,7 @@ private fun AnalyticsScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Analytics",
+                        text = stringResource(R.string.analytics_title),
                         fontWeight = FontWeight.Bold,
                     )
                 },
@@ -114,7 +116,7 @@ private fun AnalyticsScreen(
                     IconButton(onClick = { onEvent(AnalyticsEvent.NavigateBack) }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Navigate back",
+                            contentDescription = stringResource(R.string.common_navigate_back),
                         )
                     }
                 },
@@ -126,7 +128,7 @@ private fun AnalyticsScreen(
         },
     ) { paddingValues ->
         if (state.isLoading) {
-            FullScreenLoading(message = "Loading analytics...")
+            FullScreenLoading(message = stringResource(R.string.analytics_loading))
             return@Scaffold
         }
 
@@ -141,7 +143,7 @@ private fun AnalyticsScreen(
             // Weekly Summary
             state.summary?.let { summary ->
                 item {
-                    SectionHeader(title = "This Week", icon = "📊")
+                    SectionHeader(title = stringResource(R.string.analytics_this_week), icon = "📊")
                 }
                 item {
                     WeeklySummarySection(summary)
@@ -151,7 +153,7 @@ private fun AnalyticsScreen(
             // Volume Trend
             if (state.volumeData.isNotEmpty()) {
                 item {
-                    SectionHeader(title = "Volume Trend", icon = "📈")
+                    SectionHeader(title = stringResource(R.string.analytics_volume_trend), icon = "📈")
                 }
                 item {
                     VolumeChart(data = state.volumeData)
@@ -161,7 +163,7 @@ private fun AnalyticsScreen(
             // Muscle Balance
             if (state.muscleDistribution.isNotEmpty()) {
                 item {
-                    SectionHeader(title = "Muscle Balance", icon = "💪")
+                    SectionHeader(title = stringResource(R.string.analytics_muscle_balance), icon = "💪")
                 }
                 item {
                     MuscleDistributionSection(distribution = state.muscleDistribution)
@@ -171,7 +173,7 @@ private fun AnalyticsScreen(
             // Consistency
             state.consistency?.let { consistency ->
                 item {
-                    SectionHeader(title = "Consistency", icon = "🔥")
+                    SectionHeader(title = stringResource(R.string.analytics_consistency), icon = "🔥")
                 }
                 item {
                     ConsistencySection(metrics = consistency)
@@ -181,7 +183,7 @@ private fun AnalyticsScreen(
             // Top Exercises
             if (state.topExercises.isNotEmpty()) {
                 item {
-                    SectionHeader(title = "Top Exercises", icon = "🏋️")
+                    SectionHeader(title = stringResource(R.string.analytics_top_exercises), icon = "🏋️")
                 }
                 items(state.topExercises.take(5)) { exercise ->
                     TopExerciseRow(exercise = exercise)
@@ -218,14 +220,14 @@ private fun WeeklySummarySection(summary: WeeklySummary) {
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         SummaryCard(
-            title = "Volume",
+            title = stringResource(R.string.common_volume),
             value = formatVolume(summary.thisWeekVolume),
             change = summary.volumeChange,
             modifier = Modifier.weight(1f),
             icon = Icons.Default.TrendingUp,
         )
         SummaryCard(
-            title = "Workouts",
+            title = stringResource(R.string.progress_workouts_label),
             value = summary.thisWeekWorkouts.toString(),
             change = calculateChange(summary.thisWeekWorkouts, summary.lastWeekWorkouts),
             modifier = Modifier.weight(1f),
@@ -238,14 +240,14 @@ private fun WeeklySummarySection(summary: WeeklySummary) {
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         SummaryCard(
-            title = "PRs",
+            title = stringResource(R.string.progress_prs_label),
             value = summary.thisWeekPRs.toString(),
             change = null,
             modifier = Modifier.weight(1f),
             icon = Icons.Default.EmojiEvents,
         )
         SummaryCard(
-            title = "Last Week",
+            title = stringResource(R.string.analytics_last_week),
             value = formatVolume(summary.lastWeekVolume),
             change = null,
             modifier = Modifier.weight(1f),
@@ -323,7 +325,7 @@ private fun VolumeChart(data: List<WeeklyVolumeData>) {
                 .padding(16.dp),
         ) {
             Text(
-                text = "Last 8 Weeks",
+                text = stringResource(R.string.analytics_last_8_weeks),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -512,12 +514,12 @@ private fun ConsistencySection(metrics: ConsistencyMetrics) {
                 horizontalArrangement = Arrangement.SpaceEvenly,
             ) {
                 ConsistencyStat(
-                    label = "Current Streak",
-                    value = "${metrics.currentStreak} ${if (metrics.currentStreak == 1) "week" else "weeks"}",
+                    label = stringResource(R.string.analytics_current_streak),
+                    value = "${metrics.currentStreak} ${if (metrics.currentStreak == 1) stringResource(R.string.analytics_week_singular) else stringResource(R.string.analytics_week_plural)}",
                 )
                 ConsistencyStat(
-                    label = "Longest Streak",
-                    value = "${metrics.longestStreak} ${if (metrics.longestStreak == 1) "week" else "weeks"}",
+                    label = stringResource(R.string.analytics_longest_streak),
+                    value = "${metrics.longestStreak} ${if (metrics.longestStreak == 1) stringResource(R.string.analytics_week_singular) else stringResource(R.string.analytics_week_plural)}",
                 )
             }
             
@@ -528,8 +530,8 @@ private fun ConsistencySection(metrics: ConsistencyMetrics) {
                 horizontalArrangement = Arrangement.Center,
             ) {
                 ConsistencyStat(
-                    label = "Avg/Week",
-                    value = String.format("%.1f workouts", metrics.averageWorkoutsPerWeek),
+                    label = stringResource(R.string.analytics_avg_per_week),
+                    value = stringResource(R.string.analytics_workouts_per_week, metrics.averageWorkoutsPerWeek),
                 )
             }
         }
@@ -579,7 +581,7 @@ private fun ConsistencyScoreCircle(score: Int) {
                 fontWeight = FontWeight.Bold,
             )
             Text(
-                text = "Score",
+                text = stringResource(R.string.common_score),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )

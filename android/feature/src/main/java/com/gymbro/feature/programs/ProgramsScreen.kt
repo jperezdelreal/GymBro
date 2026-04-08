@@ -54,6 +54,8 @@ import com.gymbro.core.model.WorkoutTemplate
 import com.gymbro.feature.common.EmptyState
 import com.gymbro.feature.common.FullScreenLoading
 import com.gymbro.feature.common.ObserveErrors
+import androidx.compose.ui.res.stringResource
+import com.gymbro.core.R
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -107,7 +109,7 @@ fun ProgramsScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Programs",
+                        text = stringResource(R.string.programs_title),
                         style = MaterialTheme.typography.headlineMedium,
                     )
                 },
@@ -115,7 +117,7 @@ fun ProgramsScreen(
                     IconButton(onClick = { onEvent(ProgramsEvent.CreateTemplateClicked) }) {
                         Icon(
                             Icons.Default.Add,
-                            contentDescription = "Create Template",
+                            contentDescription = stringResource(R.string.programs_create_template),
                             tint = AccentGreen,
                         )
                     }
@@ -134,8 +136,8 @@ fun ProgramsScreen(
         } else if (state.templates.isEmpty()) {
             EmptyState(
                 icon = Icons.Default.FitnessCenter,
-                title = "No Programs Yet",
-                subtitle = "Create your first workout template to get started!",
+                title = stringResource(R.string.programs_empty_title),
+                subtitle = stringResource(R.string.programs_empty_subtitle),
                 modifier = Modifier.padding(innerPadding),
             )
         } else {
@@ -212,7 +214,7 @@ private fun TemplateCard(
                 ) {
                     Icon(
                         Icons.Default.PlayArrow,
-                        contentDescription = "Start Workout",
+                        contentDescription = stringResource(R.string.programs_start_workout),
                         tint = Color.Black,
                         modifier = Modifier.size(24.dp),
                     )
@@ -226,13 +228,13 @@ private fun TemplateCard(
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 InfoChip(
-                    label = "${template.exercises.size} exercises",
+                    label = stringResource(R.string.programs_exercises_count, template.exercises.size),
                     color = AccentCyan,
                 )
                 
                 if (template.isBuiltIn) {
                     InfoChip(
-                        label = "Built-in",
+                        label = stringResource(R.string.programs_built_in),
                         color = AccentGreen,
                     )
                 }
@@ -256,7 +258,7 @@ private fun TemplateCard(
             template.lastUsedAt?.let { lastUsed ->
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "Last used: ${formatDate(lastUsed)}",
+                    text = stringResource(R.string.programs_last_used, formatDate(lastUsed)),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
