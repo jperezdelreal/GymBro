@@ -8,15 +8,16 @@ tags:
 - launchApp
 
 # Navigate to History tab
-- tapOn: "History"
+- tapOn:
+    id: "nav_history"
 - takeScreenshot: history_tab
 
 # Verify History screen loads
-- assertVisible: "Workout History"
+- assertVisible: "Historial de Entrenamientos"
 
 # Check for workout entries or empty state
 - assertVisible:
-    text: "No Workouts Yet|Today|Yesterday"
+    text: "Sin Entrenamientos Aún|Hoy|Ayer"
     optional: true
 - takeScreenshot: history_content
 

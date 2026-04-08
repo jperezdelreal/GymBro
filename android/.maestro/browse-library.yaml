@@ -8,11 +8,12 @@ tags:
 - launchApp
 
 # Verify Exercise Library is visible
-- assertVisible: "Exercise Library"
+- assertVisible: "Biblioteca de Ejercicios"
 - takeScreenshot: library_home
 
 # Tap on search bar and type a query
-- tapOn: "Search exercises…"
+- tapOn:
+    id: "search_bar"
 - inputText: "Press"
 - takeScreenshot: library_search_results
 
@@ -20,22 +21,22 @@ tags:
 - launchApp
 
 # Wait for library to load
-- assertVisible: "Exercise Library"
+- assertVisible: "Biblioteca de Ejercicios"
 
 # Filter by Chest muscle group
-- tapOn: "Chest"
+- tapOn: "Pecho"
 - takeScreenshot: library_filter_chest
 
 # Deselect Chest, select Back
-- tapOn: "Chest"
-- tapOn: "Back"
+- tapOn: "Pecho"
+- tapOn: "Espalda"
 - takeScreenshot: library_filter_back
 
 # Deselect Back, select Shoulders
-- tapOn: "Back"
-- tapOn: "Shoulders"
+- tapOn: "Espalda"
+- tapOn: "Hombros"
 - takeScreenshot: library_filter_shoulders
 
 # Deselect filter
-- tapOn: "Shoulders"
+- tapOn: "Hombros"
 - takeScreenshot: library_no_filter
