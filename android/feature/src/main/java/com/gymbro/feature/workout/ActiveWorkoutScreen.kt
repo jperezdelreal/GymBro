@@ -1,6 +1,11 @@
 package com.gymbro.feature.workout
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
@@ -31,10 +36,9 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.FitnessCenter
-import androidx.compose.material.icons.filled.Timer
-import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -47,11 +51,16 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.liveRegion
@@ -64,16 +73,31 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gymbro.core.model.Exercise
+import com.gymbro.core.model.MuscleGroup
 import com.gymbro.core.preferences.UserPreferences
+import com.gymbro.core.ui.theme.AccentAmberStart
+import com.gymbro.core.ui.theme.AccentCyanStart
+import com.gymbro.core.ui.theme.AccentGreenEnd
+import com.gymbro.core.ui.theme.AccentGreenStart
+import com.gymbro.core.ui.theme.AccentRed
+import com.gymbro.core.ui.theme.Background
 import com.gymbro.core.voice.VoiceRecognitionService
+import com.gymbro.feature.common.AnimatedProgressCircle
 import com.gymbro.feature.common.FullScreenLoading
+import com.gymbro.feature.common.GlassmorphicCard
+import com.gymbro.feature.common.GradientButton
 
-private val AccentGreen = Color(0xFF00FF87)
-private val AccentCyan = Color(0xFF00E5FF)
-private val AccentAmber = Color(0xFFFFAB00)
-private val AccentRed = Color(0xFFCF6679)
-private val SurfaceCard = Color(0xFF1A1A1A)
-private val SurfaceDark = Color(0xFF0A0A0A)
+private fun getMuscleGroupColor(muscleGroup: MuscleGroup): Color {
+    return when (muscleGroup) {
+        MuscleGroup.CHEST -> AccentGreenStart
+        MuscleGroup.BACK -> AccentCyanStart
+        MuscleGroup.QUADRICEPS, MuscleGroup.HAMSTRINGS, MuscleGroup.GLUTES, MuscleGroup.CALVES -> AccentAmberStart
+        MuscleGroup.SHOULDERS -> Color(0xFFFF6B9D)
+        MuscleGroup.BICEPS, MuscleGroup.TRICEPS, MuscleGroup.FOREARMS -> Color(0xFF9D4EDD)
+        MuscleGroup.CORE -> Color(0xFFFFBE0B)
+        MuscleGroup.FULL_BODY -> AccentGreenStart
+    }
+}
 
 @Composable
 fun ActiveWorkoutRoute(
@@ -160,76 +184,101 @@ fun ActiveWorkoutScreen(
         return
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = {
-                        Column {
-                            Text(
-                                text = "Active Workout",
-                                style = MaterialTheme.typography.titleLarge,
-                                modifier = Modifier.semantics { heading() }
-                            )
-                            Text(
-                                text = formatDuration(state.elapsedSeconds),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = AccentCyan,
-                                modifier = Modifier.semantics { liveRegion = androidx.compose.ui.semantics.LiveRegionMode.Polite }
-                            )
-                        }
-                    },
-                    navigationIcon = {
-                        IconButton(onClick = { onEvent(ActiveWorkoutEvent.DiscardWorkout) }) {
-                            Icon(Icons.Default.Close, contentDescription = "Discard")
-                        }
-                    },
-                    actions = {
-                        Button(
-                            onClick = { onEvent(ActiveWorkoutEvent.CompleteWorkout) },
-                            enabled = state.totalSets > 0 && !state.isCompleting,
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = AccentGreen,
-                                contentColor = Color.Black,
-                                disabledContainerColor = AccentGreen.copy(alpha = 0.3f),
-                            ),
-                            shape = RoundedCornerShape(8.dp),
-                        ) {
-                            Text("Finish", fontWeight = FontWeight.Bold)
-                        }
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = SurfaceDark,
-                        titleContentColor = Color.White,
-                        navigationIconContentColor = Color.White,
-                    ),
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Column {
+                        Text(
+                            text = "Active Workout",
+                            style = MaterialTheme.typography.titleLarge,
+                            modifier = Modifier.semantics { heading() }
+                        )
+                        Text(
+                            text = formatDuration(state.elapsedSeconds),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = AccentCyanStart,
+                            modifier = Modifier.semantics { liveRegion = androidx.compose.ui.semantics.LiveRegionMode.Polite }
+                        )
+                    }
+                },
+                navigationIcon = {
+                    IconButton(onClick = { onEvent(ActiveWorkoutEvent.DiscardWorkout) }) {
+                        Icon(Icons.Default.Close, contentDescription = "Discard")
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Background,
+                    titleContentColor = Color.White,
+                    navigationIconContentColor = Color.White,
+                ),
+            )
+        },
+        bottomBar = {
+            if (!state.isRestTimerActive) {
+                FinishWorkoutButton(
+                    enabled = state.totalSets > 0 && !state.isCompleting,
+                    completedExercises = state.exercises.count { ex -> ex.sets.any { it.isCompleted } },
+                    onClick = { onEvent(ActiveWorkoutEvent.CompleteWorkout) },
                 )
-            },
-            containerColor = SurfaceDark,
-        ) { innerPadding ->
-            Column(
+            }
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { onEvent(ActiveWorkoutEvent.AddExerciseClicked) },
+                containerColor = Color.Transparent,
+                modifier = Modifier.drawBehind {
+                    val gradient = Brush.horizontalGradient(
+                        colors = listOf(AccentGreenStart, AccentGreenEnd)
+                    )
+                    drawCircle(gradient)
+                }
+            ) {
+                Icon(Icons.Default.Add, contentDescription = "Add Exercise", tint = Color.White)
+            }
+        },
+        containerColor = Background,
+    ) { innerPadding ->
+        Box(modifier = Modifier.fillMaxSize()) {
+            LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(innerPadding),
+                contentPadding = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
-                // Stats bar
-                WorkoutStatsBar(
-                    elapsedSeconds = state.elapsedSeconds,
-                    totalVolume = state.totalVolume,
-                    totalSets = state.totalSets,
-                )
+                // Hero Rest Timer at top when active
+                if (state.isRestTimerActive) {
+                    item {
+                        HeroRestTimer(
+                            remainingSeconds = state.restTimerSeconds,
+                            totalSeconds = state.restTimerTotal,
+                            onSkip = { onEvent(ActiveWorkoutEvent.SkipRestTimer) },
+                            onAdjust = { delta -> onEvent(ActiveWorkoutEvent.AdjustRestTimer(delta)) },
+                        )
+                    }
+                }
 
-                // Exercise list
-                LazyColumn(
-                    modifier = Modifier.weight(1f),
-                    contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                ) {
-                    itemsIndexed(
-                        items = state.exercises,
-                        key = { index, ex -> "${ex.exercise.id}_$index" },
-                    ) { exerciseIndex, exerciseUi ->
-                        ExerciseCard(
+                // Stats card
+                item {
+                    GlassmorphicCard {
+                        WorkoutStatsContent(
+                            elapsedSeconds = state.elapsedSeconds,
+                            totalVolume = state.totalVolume,
+                            totalSets = state.totalSets,
+                        )
+                    }
+                }
+
+                // Exercise cards
+                itemsIndexed(
+                    items = state.exercises,
+                    key = { index, ex -> "${ex.exercise.id}_$index" },
+                ) { exerciseIndex, exerciseUi ->
+                    GlassmorphicCard(
+                        accentColor = getMuscleGroupColor(exerciseUi.exercise.muscleGroup),
+                    ) {
+                        ExerciseCardContent(
                             exerciseUi = exerciseUi,
                             exerciseIndex = exerciseIndex,
                             onEvent = onEvent,
@@ -237,52 +286,28 @@ fun ActiveWorkoutScreen(
                             defaultWeightUnit = defaultWeightUnit,
                         )
                     }
-
-                    item {
-                        AddExerciseButton(
-                            onClick = { onEvent(ActiveWorkoutEvent.AddExerciseClicked) },
-                        )
-                    }
-
-                    // Bottom spacer for rest timer overlay
-                    item { Spacer(modifier = Modifier.height(80.dp)) }
                 }
-            }
-        }
 
-        // Rest timer overlay
-        AnimatedVisibility(
-            visible = state.isRestTimerActive,
-            enter = slideInVertically(initialOffsetY = { it }) + fadeIn(),
-            exit = slideOutVertically(targetOffsetY = { it }) + fadeOut(),
-            modifier = Modifier.align(Alignment.BottomCenter),
-        ) {
-            RestTimerBar(
-                remainingSeconds = state.restTimerSeconds,
-                totalSeconds = state.restTimerTotal,
-                onSkip = { onEvent(ActiveWorkoutEvent.SkipRestTimer) },
-                onAdjust = { delta -> onEvent(ActiveWorkoutEvent.AdjustRestTimer(delta)) },
-            )
+                // Bottom spacer for FAB
+                item { Spacer(modifier = Modifier.height(80.dp)) }
+            }
         }
     }
 }
 
 @Composable
-private fun WorkoutStatsBar(
+private fun WorkoutStatsContent(
     elapsedSeconds: Long,
     totalVolume: Double,
     totalSets: Int,
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(SurfaceCard)
-            .padding(horizontal = 16.dp, vertical = 12.dp),
+        modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly,
     ) {
-        StatItem(label = "Duration", value = formatDuration(elapsedSeconds), color = AccentCyan)
-        StatItem(label = "Volume", value = "${totalVolume.toInt()} kg", color = AccentGreen)
-        StatItem(label = "Sets", value = "$totalSets", color = AccentAmber)
+        StatItem(label = "Duration", value = formatDuration(elapsedSeconds), color = AccentCyanStart)
+        StatItem(label = "Volume", value = "${totalVolume.toInt()} kg", color = AccentGreenStart)
+        StatItem(label = "Sets", value = "$totalSets", color = AccentAmberStart)
     }
 }
 
@@ -304,20 +329,132 @@ private fun StatItem(label: String, value: String, color: Color) {
 }
 
 @Composable
-private fun ExerciseCard(
+private fun HeroRestTimer(
+    remainingSeconds: Int,
+    totalSeconds: Int,
+    onSkip: () -> Unit,
+    onAdjust: (Int) -> Unit,
+) {
+    val progress = if (totalSeconds > 0) (totalSeconds - remainingSeconds).toFloat() / totalSeconds else 0f
+    
+    val infiniteTransition = rememberInfiniteTransition(label = "glow_transition")
+    val glowAlpha by infiniteTransition.animateFloat(
+        initialValue = 0.3f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1000),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "glow_alpha"
+    )
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        // Hero circular timer with AnimatedProgressCircle
+        AnimatedProgressCircle(
+            progress = progress,
+            size = 160.dp,
+            strokeWidth = 14.dp,
+            gradientColors = listOf(AccentGreenStart, AccentGreenEnd),
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = "${remainingSeconds}s",
+                    fontSize = 48.sp,
+                    fontWeight = FontWeight.Black,
+                    color = Color.White.copy(alpha = glowAlpha),
+                )
+                Text(
+                    text = "REST",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color.White.copy(alpha = 0.6f),
+                    letterSpacing = 2.sp,
+                )
+            }
+        }
+        
+        Spacer(modifier = Modifier.height(24.dp))
+        
+        // Controls with GradientButton
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+        ) {
+            OutlinedButton(
+                onClick = { onAdjust(-15) },
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White),
+            ) { 
+                Text("-15s") 
+            }
+            GradientButton(text = "Skip", onClick = onSkip)
+            OutlinedButton(
+                onClick = { onAdjust(15) },
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White),
+            ) { 
+                Text("+15s") 
+            }
+        }
+    }
+}
+
+@Composable
+private fun FinishWorkoutButton(
+    enabled: Boolean,
+    completedExercises: Int,
+    onClick: () -> Unit,
+) {
+    val shouldGlow = completedExercises >= 3
+    
+    val infiniteTransition = rememberInfiniteTransition(label = "finish_glow")
+    val glowAlpha by infiniteTransition.animateFloat(
+        initialValue = if (shouldGlow) 0.3f else 0f,
+        targetValue = if (shouldGlow) 0.8f else 0f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1500),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "finish_glow_alpha"
+    )
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+            .drawBehind {
+                if (shouldGlow) {
+                    val gradient = Brush.radialGradient(
+                        colors = listOf(
+                            AccentGreenStart.copy(alpha = glowAlpha * 0.3f),
+                            Color.Transparent
+                        )
+                    )
+                    drawCircle(gradient, radius = size.width)
+                }
+            }
+    ) {
+        GradientButton(
+            text = "Finish Workout",
+            onClick = onClick,
+            enabled = enabled,
+            modifier = Modifier.fillMaxWidth(),
+        )
+    }
+}
+
+@Composable
+private fun ExerciseCardContent(
     exerciseUi: WorkoutExerciseUi,
     exerciseIndex: Int,
     onEvent: (ActiveWorkoutEvent) -> Unit,
     voiceRecognitionService: com.gymbro.core.voice.VoiceRecognitionService,
     defaultWeightUnit: com.gymbro.core.preferences.UserPreferences.WeightUnit,
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
-            .background(SurfaceCard)
-            .padding(16.dp),
-    ) {
+    Column(modifier = Modifier.fillMaxWidth()) {
         // Exercise header
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -326,7 +463,7 @@ private fun ExerciseCard(
             Icon(
                 Icons.Default.FitnessCenter,
                 contentDescription = null,
-                tint = AccentGreen,
+                tint = getMuscleGroupColor(exerciseUi.exercise.muscleGroup),
                 modifier = Modifier.size(20.dp),
             )
             Spacer(modifier = Modifier.width(8.dp))
@@ -366,11 +503,10 @@ private fun ExerciseCard(
                 .fillMaxWidth()
                 .padding(horizontal = 4.dp),
         ) {
-            Text("SET", style = setHeaderStyle(), modifier = Modifier.width(36.dp))
+            Text("SET", style = setHeaderStyle(), modifier = Modifier.width(40.dp))
             Text("KG", style = setHeaderStyle(), modifier = Modifier.weight(1f), textAlign = TextAlign.Center)
             Text("REPS", style = setHeaderStyle(), modifier = Modifier.weight(1f), textAlign = TextAlign.Center)
-            Text("RPE", style = setHeaderStyle(), modifier = Modifier.width(48.dp), textAlign = TextAlign.Center)
-            Spacer(modifier = Modifier.width(40.dp)) // for complete button
+            Spacer(modifier = Modifier.width(56.dp)) // for complete button
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -386,11 +522,11 @@ private fun ExerciseCard(
                 defaultWeightUnit = defaultWeightUnit,
             )
             if (setIndex < exerciseUi.sets.lastIndex) {
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(8.dp))
             }
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
         // Add set button
         Row(
@@ -398,14 +534,14 @@ private fun ExerciseCard(
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(8.dp))
                 .clickable { onEvent(ActiveWorkoutEvent.AddSet(exerciseIndex)) }
-                .border(1.dp, AccentGreen.copy(alpha = 0.3f), RoundedCornerShape(8.dp))
+                .border(1.dp, AccentGreenStart.copy(alpha = 0.3f), RoundedCornerShape(8.dp))
                 .padding(vertical = 8.dp),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Icon(Icons.Default.Add, contentDescription = null, tint = AccentGreen, modifier = Modifier.size(16.dp))
+            Icon(Icons.Default.Add, contentDescription = null, tint = AccentGreenStart, modifier = Modifier.size(16.dp))
             Spacer(modifier = Modifier.width(4.dp))
-            Text("Add Set", color = AccentGreen, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+            Text("Add Set", color = AccentGreenStart, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
         }
     }
 }
@@ -419,16 +555,17 @@ private fun SetRow(
     voiceRecognitionService: VoiceRecognitionService,
     defaultWeightUnit: UserPreferences.WeightUnit,
 ) {
+    val haptic = LocalHapticFeedback.current
     val rowBackground = when {
-        setUi.isCompleted -> AccentGreen.copy(alpha = 0.08f)
-        setUi.isWarmup -> AccentAmber.copy(alpha = 0.05f)
+        setUi.isCompleted -> AccentGreenStart.copy(alpha = 0.08f)
+        setUi.isWarmup -> AccentAmberStart.copy(alpha = 0.05f)
         else -> Color.Transparent
     }
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(6.dp))
+            .clip(RoundedCornerShape(8.dp))
             .background(rowBackground)
             .padding(horizontal = 4.dp, vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -436,108 +573,73 @@ private fun SetRow(
         // Set number + warmup indicator
         Box(
             modifier = Modifier
-                .width(36.dp)
+                .width(40.dp)
                 .clickable { onEvent(ActiveWorkoutEvent.ToggleWarmup(exerciseIndex, setIndex)) },
             contentAlignment = Alignment.Center,
         ) {
             Text(
                 text = if (setUi.isWarmup) "W" else "${setUi.setNumber}",
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Bold,
-                color = if (setUi.isWarmup) AccentAmber else Color.White,
+                color = if (setUi.isWarmup) AccentAmberStart else Color.White,
             )
         }
 
         // Weight
-        CompactNumberField(
+        BiggerNumberField(
             value = setUi.weight,
             onValueChange = { onEvent(ActiveWorkoutEvent.UpdateSetWeight(exerciseIndex, setIndex, it)) },
             enabled = !setUi.isCompleted,
             modifier = Modifier.weight(1f),
         )
 
-        Spacer(modifier = Modifier.width(4.dp))
+        Spacer(modifier = Modifier.width(8.dp))
 
         // Reps
-        CompactNumberField(
+        BiggerNumberField(
             value = setUi.reps,
             onValueChange = { onEvent(ActiveWorkoutEvent.UpdateSetReps(exerciseIndex, setIndex, it)) },
             enabled = !setUi.isCompleted,
             modifier = Modifier.weight(1f),
         )
 
-        Spacer(modifier = Modifier.width(4.dp))
+        Spacer(modifier = Modifier.width(8.dp))
 
-        // RPE
-        CompactNumberField(
-            value = setUi.rpe,
-            onValueChange = { onEvent(ActiveWorkoutEvent.UpdateSetRpe(exerciseIndex, setIndex, it)) },
-            enabled = !setUi.isCompleted,
-            modifier = Modifier.width(48.dp),
-        )
-
-        Spacer(modifier = Modifier.width(4.dp))
-
-        // Voice input button (only show if not completed)
-        if (!setUi.isCompleted) {
-            IconButton(
-                onClick = { /* Handled by VoiceInputButton */ },
-                modifier = Modifier.size(32.dp),
-                enabled = false // The VoiceInputButton handles its own clicks
-            ) {
-                Box(modifier = Modifier.size(32.dp)) {
-                    VoiceInputButton(
-                        voiceRecognitionService = voiceRecognitionService,
-                        defaultWeightUnit = defaultWeightUnit,
-                        onVoiceResult = { result ->
-                            onEvent(
-                                ActiveWorkoutEvent.VoiceInput(
-                                    exerciseIndex = exerciseIndex,
-                                    setIndex = setIndex,
-                                    weight = result.weight.toString(),
-                                    reps = result.reps.toString()
-                                )
-                            )
-                        },
-                        modifier = Modifier.size(32.dp)
-                    )
-                }
-            }
-            Spacer(modifier = Modifier.width(4.dp))
-        }
-
-        // Complete button
+        // Complete button with GradientButton
         if (setUi.isCompleted) {
             Box(
                 modifier = Modifier
-                    .size(32.dp)
+                    .size(48.dp)
                     .clip(CircleShape)
-                    .background(AccentGreen)
+                    .background(Brush.horizontalGradient(listOf(AccentGreenStart, AccentGreenEnd)))
                     .semantics { contentDescription = "Set ${setUi.setNumber} completed" },
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
                     Icons.Default.Check,
                     contentDescription = null,
-                    tint = Color.Black,
-                    modifier = Modifier.size(18.dp),
+                    tint = Color.White,
+                    modifier = Modifier.size(24.dp),
                 )
             }
         } else {
             Box(
                 modifier = Modifier
-                    .size(32.dp)
+                    .size(48.dp)
                     .clip(CircleShape)
-                    .border(1.5.dp, AccentGreen.copy(alpha = 0.5f), CircleShape)
-                    .clickable { onEvent(ActiveWorkoutEvent.CompleteSet(exerciseIndex, setIndex)) }
+                    .clickable {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        onEvent(ActiveWorkoutEvent.CompleteSet(exerciseIndex, setIndex))
+                    }
+                    .background(Brush.horizontalGradient(listOf(AccentGreenStart, AccentGreenEnd)))
                     .semantics { contentDescription = "Complete set ${setUi.setNumber}" },
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
                     Icons.Default.Check,
                     contentDescription = null,
-                    tint = AccentGreen.copy(alpha = 0.5f),
-                    modifier = Modifier.size(18.dp),
+                    tint = Color.White,
+                    modifier = Modifier.size(24.dp),
                 )
             }
         }
@@ -545,7 +647,7 @@ private fun SetRow(
 }
 
 @Composable
-private fun CompactNumberField(
+private fun BiggerNumberField(
     value: String,
     onValueChange: (String) -> Unit,
     enabled: Boolean,
@@ -560,9 +662,11 @@ private fun CompactNumberField(
             }
         },
         enabled = enabled,
-        modifier = modifier.height(40.dp),
-        textStyle = MaterialTheme.typography.bodyMedium.copy(
+        modifier = modifier.height(56.dp),
+        textStyle = MaterialTheme.typography.titleMedium.copy(
             textAlign = TextAlign.Center,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 20.sp,
             color = if (enabled) Color.White else Color.White.copy(alpha = 0.5f),
         ),
         singleLine = true,
@@ -574,119 +678,10 @@ private fun CompactNumberField(
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
             disabledIndicatorColor = Color.Transparent,
-            cursorColor = AccentGreen,
+            cursorColor = AccentGreenStart,
         ),
-        shape = RoundedCornerShape(6.dp),
+        shape = RoundedCornerShape(8.dp),
     )
-}
-
-@Composable
-private fun AddExerciseButton(onClick: () -> Unit) {
-    Button(
-        onClick = onClick,
-        modifier = Modifier.fillMaxWidth(),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = AccentGreen.copy(alpha = 0.12f),
-            contentColor = AccentGreen,
-        ),
-        shape = RoundedCornerShape(12.dp),
-        contentPadding = PaddingValues(vertical = 14.dp),
-    ) {
-        Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(20.dp))
-        Spacer(modifier = Modifier.width(8.dp))
-        Text("Add Exercise", fontWeight = FontWeight.SemiBold)
-    }
-}
-
-@Composable
-private fun RestTimerBar(
-    remainingSeconds: Int,
-    totalSeconds: Int,
-    onSkip: () -> Unit,
-    onAdjust: (Int) -> Unit,
-) {
-    val timerColor = when {
-        remainingSeconds <= 10 -> AccentRed
-        remainingSeconds <= 30 -> AccentAmber
-        else -> AccentCyan
-    }
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
-            .background(SurfaceCard)
-            .padding(16.dp)
-            .semantics { 
-                contentDescription = "Rest timer: $remainingSeconds seconds remaining"
-                liveRegion = androidx.compose.ui.semantics.LiveRegionMode.Polite
-            },
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Icon(Icons.Default.Timer, contentDescription = null, tint = timerColor, modifier = Modifier.size(24.dp))
-            Spacer(modifier = Modifier.width(8.dp))
-            Text("Rest Timer", color = Color.White, fontWeight = FontWeight.SemiBold)
-            Spacer(modifier = Modifier.weight(1f))
-            Text(
-                text = formatDuration(remainingSeconds.toLong()),
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold,
-                color = timerColor,
-            )
-        }
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        // Progress bar
-        val progress = if (totalSeconds > 0) remainingSeconds.toFloat() / totalSeconds else 0f
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(4.dp)
-                .clip(RoundedCornerShape(2.dp))
-                .background(Color.White.copy(alpha = 0.1f)),
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth(progress)
-                    .height(4.dp)
-                    .clip(RoundedCornerShape(2.dp))
-                    .background(timerColor),
-            )
-        }
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly,
-        ) {
-            OutlinedButton(
-                onClick = { onAdjust(-30) },
-                colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White),
-            ) {
-                Text("-30s")
-            }
-            OutlinedButton(
-                onClick = { onAdjust(30) },
-                colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White),
-            ) {
-                Text("+30s")
-            }
-            Button(
-                onClick = onSkip,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = AccentGreen,
-                    contentColor = Color.Black,
-                ),
-            ) {
-                Text("Skip", fontWeight = FontWeight.Bold)
-            }
-        }
-    }
 }
 
 @Composable
