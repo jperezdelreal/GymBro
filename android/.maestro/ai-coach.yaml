@@ -9,10 +9,6 @@ name: "AI Coach — Open coach and send a message"
 # Dependencies: flow/ensure-post-onboarding.yaml
 tags:
   - regression
----
-
-- runFlow: flow/ensure-post-onboarding.yaml
-
 onFlowStart:
   # Ensure post-onboarding state
   - launchApp
@@ -25,6 +21,10 @@ onFlowComplete:
   - tapOn:
       id: "nav_exercise_library"
       optional: true
+
+---
+
+- runFlow: flow/ensure-post-onboarding.yaml
 
 # Navigate to Profile tab first
 - tapOn:

@@ -10,10 +10,6 @@ tags:
 # Cleanup: Return to Library tab
 # Dependencies: ensure-post-onboarding flow
 
----
-
-- runFlow: flow/ensure-post-onboarding.yaml
-
 onFlowStart:
   # Start at library with clean state
   - launchApp
@@ -28,6 +24,10 @@ onFlowComplete:
       optional: true
   - waitForAnimationToEnd:
       timeout: 1000
+
+---
+
+- runFlow: flow/ensure-post-onboarding.yaml
 
 # Verify we're on Library tab
 - assertVisible: "Biblioteca de Ejercicios"

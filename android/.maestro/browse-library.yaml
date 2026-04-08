@@ -10,10 +10,6 @@ name: "Browse Library — Search and filter exercises"
 tags:
   - library
   - smoke
----
-
-- runFlow: flow/ensure-post-onboarding.yaml
-
 onFlowStart:
   # Start at library with clean filters
   - launchApp
@@ -25,6 +21,10 @@ onFlowComplete:
   # Clear any active search/filter state
   - launchApp
   - assertVisible: "Biblioteca de Ejercicios"
+
+---
+
+- runFlow: flow/ensure-post-onboarding.yaml
 
 # Verify Exercise Library is visible
 - assertVisible: "Biblioteca de Ejercicios"

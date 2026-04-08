@@ -10,11 +10,11 @@ name: "Full E2E — Complete user journey: onboarding → workout → history"
 tags:
   - e2e
   - regression
----
-
 onFlowComplete:
   # Clear app state after full E2E
   - stopApp
+
+---
 
 - launchApp:
     clearState: true

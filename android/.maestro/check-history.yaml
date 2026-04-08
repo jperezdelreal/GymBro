@@ -10,10 +10,6 @@ name: "Check History — Navigate to history and verify entries"
 tags:
   - history
   - smoke
----
-
-- runFlow: flow/ensure-post-onboarding.yaml
-
 onFlowStart:
   # Ensure post-onboarding state
   - launchApp
@@ -26,6 +22,10 @@ onFlowComplete:
   - tapOn:
       id: "nav_exercise_library"
       optional: true
+
+---
+
+- runFlow: flow/ensure-post-onboarding.yaml
 
 # Navigate to History tab
 - tapOn:

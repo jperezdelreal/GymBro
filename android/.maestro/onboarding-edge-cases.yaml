@@ -10,13 +10,13 @@ name: "Negative — Onboarding Edge Cases (empty/long/special names)"
 tags:
   - negative
   - onboarding
----
-
 onFlowStart:
   - stopApp
 
 onFlowComplete:
   - stopApp
+
+---
 
 # TEST 1: Try to proceed with empty name
 - launchApp:

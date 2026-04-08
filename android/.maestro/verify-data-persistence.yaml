@@ -10,10 +10,6 @@ name: "Verify Data Persistence — Cross-screen data verification"
 tags:
   - core
   - regression
----
-
-- runFlow: flow/ensure-post-onboarding.yaml
-
 onFlowStart:
   # Ensure clean state at library
   - launchApp
@@ -26,6 +22,10 @@ onFlowComplete:
   - tapOn:
       id: "nav_exercise_library"
       optional: true
+
+---
+
+- runFlow: flow/ensure-post-onboarding.yaml
 
 # Start from Exercise Library
 - assertVisible: "Biblioteca de Ejercicios"

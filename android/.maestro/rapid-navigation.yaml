@@ -10,15 +10,15 @@ name: "Negative — Rapid Navigation Stress Test"
 tags:
   - negative
   - regression
----
-
-- runFlow: flow/ensure-post-onboarding.yaml
-
 onFlowStart:
   - launchApp
   - waitForAnimationToEnd:
       timeout: 3000
   - assertVisible: "Biblioteca de Ejercicios"
+
+---
+
+- runFlow: flow/ensure-post-onboarding.yaml
 
 # Start from Exercise Library
 - assertVisible: "Biblioteca de Ejercicios"

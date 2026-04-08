@@ -10,14 +10,14 @@ name: "Negative — Empty State UI (fresh app with no data)"
 tags:
   - negative
   - core
----
-
 onFlowStart:
   # Start completely fresh with clearState
   - stopApp
 
 onFlowComplete:
   - stopApp
+
+---
 
 # Launch with clearState to wipe all data
 - launchApp:
