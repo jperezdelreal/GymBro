@@ -32,9 +32,9 @@ onFlowComplete:
 - tapOn: "Añadir Ejercicio"
 - assertVisible: "Elegir Ejercicio"
 
-# Pick Squat exercise
+# Pick exercise
 - tapOn:
-    text: "Squat"
+    text: "${EXERCISE_NAME:=Squat}"
     index: 0
 - assertVisible: "Entrenamiento Activo"
 
@@ -42,13 +42,13 @@ onFlowComplete:
 - tapOn:
     id: "weight_input"
     index: 0
-- inputText: "80"
+- inputText: "${WEIGHT:=80}"
 - hideKeyboard
 
 - tapOn:
     id: "reps_input"
     index: 0
-- inputText: "8"
+- inputText: "${REPS:=8}"
 - hideKeyboard
 
 - takeScreenshot: persistence_set_filled
@@ -73,14 +73,14 @@ onFlowComplete:
 - assertVisible: "Historial de Entrenamientos"
 - takeScreenshot: persistence_verify_history
 
-# Verify Squat workout appears
-- assertVisible: "Squat"
+# Verify workout appears
+- assertVisible: "${EXERCISE_NAME:=Squat}"
 - takeScreenshot: persistence_workout_found_in_history
 
 # Tap on the workout to see details
-- tapOn: "Squat"
+- tapOn: "${EXERCISE_NAME:=Squat}"
 - assertVisible:
-    text: "80|8"
+    text: "${WEIGHT:=80}|${REPS:=8}"
     optional: true
 - takeScreenshot: persistence_history_detail
 

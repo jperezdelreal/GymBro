@@ -40,12 +40,12 @@ onFlowComplete:
 # Search and select an exercise
 - tapOn:
     id: "search_bar"
-- inputText: "Bench"
+- inputText: "${EXERCISE_SEARCH:=Bench}"
 - takeScreenshot: exercise_picker_search
 
 # Tap the first exercise result
 - tapOn:
-    text: "Bench Press"
+    text: "${EXERCISE_NAME:=Bench Press}"
     index: 0
 
 # Back on workout screen — verify exercise was added
@@ -56,12 +56,12 @@ onFlowComplete:
 - tapOn:
     id: "weight_input"
     index: 0
-- inputText: "80"
+- inputText: "${WEIGHT:=80}"
 
 # Enter reps
 - tapOn:
     id: "reps_input"
     index: 0
-- inputText: "8"
+- inputText: "${REPS:=8}"
 
 - takeScreenshot: workout_set_logged
