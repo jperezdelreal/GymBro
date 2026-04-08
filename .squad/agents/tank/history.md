@@ -708,3 +708,22 @@ ProGuard rules follow official library documentation and Android best practices.
 - Validates at compile-time but full release APK build verification deferred due to environment constraints
 - Outcome: Release builds now protected from reflection-based crashes (Firebase, Room, Hilt, Lottie). Gradle heap increase solves OOM issues. Ready for beta distribution.
 - Closes #254 via PR #262
+
+### Issue #251 — QA: Full emulator smoke test — navigate all screens and verify no crashes
+- **Result: ALL SCREENS PASS — zero crashes, zero ANRs, zero blank screens**
+- Built debug APK (assembleDebug) and installed on emulator-5554 (1080x2400, GymBro_Test AVD)
+- Screens tested (10/10):
+  1. **Onboarding** — Welcome splash + pager (3 pages) + "Let's Get Started" form (units, name, ¡Vamos!) → ✅
+  2. **Exercise Library** — List view with muscle group filters (Chest, Back, Quadriceps, Shoulders, Biceps, Core), search, exercise cards → ✅
+  3. **History** — "No Workouts Yet" empty state with prompt to start training → ✅
+  4. **Progress** — "No workouts yet" empty state with progress tracking prompt → ✅
+  5. **Recovery** — Health data connection prompt, sleep/HR/steps integration, "Grant Permissions" CTA → ✅
+  6. **Profile** — Avatar, stats (Workouts, Active Days, Streak), AI Coach link, Account, Preferences → ✅
+  7. **Settings** — Account, Weight Unit (lbs/kg toggle), Default Rest Timer (90s +/-), Auto-Start Rest Timer, Workout Reminders, Health Connect status, Data (Export/Clear), About (v1.0), Send Feedback → ✅
+  8. **AI Coach** — "GymBro AI Coach" header, quick prompts ("bench plateau", "what to train today"), chat input → ✅
+  9. **Active Workout** — Timer, Volume, Sets counters, Finish Workout button, Exercise Picker navigation → ✅
+  10. **Exercise Picker** — Full library in picker mode with muscle group filters → ✅
+- Comprehensive logcat analysis: 0 GymBro FATAL EXCEPTIONS, 0 ANRs, 0 blank screens
+- Only FATAL EXCEPTION seen was from `uiautomator` tool (our test instrumentation), not from the GymBro app
+- App remained responsive throughout entire test session, process never died
+- Closed #251 directly (no PR needed — QA-only, no code changes)
