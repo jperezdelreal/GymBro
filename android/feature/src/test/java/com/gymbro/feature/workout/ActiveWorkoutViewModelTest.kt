@@ -9,6 +9,7 @@ import com.gymbro.core.model.MuscleGroup
 import com.gymbro.core.model.Workout
 import com.gymbro.core.repository.WorkoutRepository
 import com.gymbro.feature.MainDispatcherRule
+import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -159,7 +160,7 @@ class ActiveWorkoutViewModelTest {
     @Before
     fun setup() = runTest(testDispatcher) {
         workoutRepository = FakeWorkoutRepository()
-        viewModel = ActiveWorkoutViewModel(workoutRepository)
+        viewModel = ActiveWorkoutViewModel(workoutRepository, mockk(relaxed = true), mockk(relaxed = true))
         advanceUntilIdle()
     }
 

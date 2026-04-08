@@ -5,6 +5,7 @@ import com.gymbro.core.TestFixtures
 import com.gymbro.core.fakes.FakeExerciseRepository
 import com.gymbro.core.model.MuscleGroup
 import com.gymbro.feature.MainDispatcherRule
+import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
@@ -32,7 +33,7 @@ class ExerciseLibraryViewModelTest {
             TestFixtures.deadlift,
             TestFixtures.bicepCurl
         )
-        viewModel = ExerciseLibraryViewModel(fakeExerciseRepository)
+        viewModel = ExerciseLibraryViewModel(fakeExerciseRepository, mockk(relaxed = true))
 
         viewModel.state.test {
             val state = expectMostRecentItem()
@@ -46,7 +47,7 @@ class ExerciseLibraryViewModelTest {
     @Test
     fun `initial state with empty repository shows empty list`() = runTest {
         fakeExerciseRepository.clearExercises()
-        viewModel = ExerciseLibraryViewModel(fakeExerciseRepository)
+        viewModel = ExerciseLibraryViewModel(fakeExerciseRepository, mockk(relaxed = true))
 
         viewModel.state.test {
             val state = expectMostRecentItem()
@@ -63,7 +64,7 @@ class ExerciseLibraryViewModelTest {
             TestFixtures.deadlift,
             TestFixtures.bicepCurl
         )
-        viewModel = ExerciseLibraryViewModel(fakeExerciseRepository)
+        viewModel = ExerciseLibraryViewModel(fakeExerciseRepository, mockk(relaxed = true))
 
         viewModel.state.test {
             skipItems(1) // Initial load
@@ -80,7 +81,7 @@ class ExerciseLibraryViewModelTest {
     @Test
     fun `filter by muscle group with no matches returns empty list`() = runTest {
         fakeExerciseRepository.setExercises(TestFixtures.benchPress)
-        viewModel = ExerciseLibraryViewModel(fakeExerciseRepository)
+        viewModel = ExerciseLibraryViewModel(fakeExerciseRepository, mockk(relaxed = true))
 
         viewModel.state.test {
             skipItems(1)
@@ -101,7 +102,7 @@ class ExerciseLibraryViewModelTest {
             TestFixtures.deadlift,
             TestFixtures.bicepCurl
         )
-        viewModel = ExerciseLibraryViewModel(fakeExerciseRepository)
+        viewModel = ExerciseLibraryViewModel(fakeExerciseRepository, mockk(relaxed = true))
 
         viewModel.state.test {
             skipItems(1)
@@ -122,7 +123,7 @@ class ExerciseLibraryViewModelTest {
             TestFixtures.squat,
             TestFixtures.deadlift
         )
-        viewModel = ExerciseLibraryViewModel(fakeExerciseRepository)
+        viewModel = ExerciseLibraryViewModel(fakeExerciseRepository, mockk(relaxed = true))
 
         viewModel.state.test {
             skipItems(1)
@@ -138,7 +139,7 @@ class ExerciseLibraryViewModelTest {
     @Test
     fun `search query with no matches returns empty list`() = runTest {
         fakeExerciseRepository.setExercises(TestFixtures.benchPress)
-        viewModel = ExerciseLibraryViewModel(fakeExerciseRepository)
+        viewModel = ExerciseLibraryViewModel(fakeExerciseRepository, mockk(relaxed = true))
 
         viewModel.state.test {
             skipItems(1)
@@ -158,7 +159,7 @@ class ExerciseLibraryViewModelTest {
             TestFixtures.squat,
             TestFixtures.bicepCurl
         )
-        viewModel = ExerciseLibraryViewModel(fakeExerciseRepository)
+        viewModel = ExerciseLibraryViewModel(fakeExerciseRepository, mockk(relaxed = true))
 
         viewModel.state.test {
             skipItems(1)
@@ -182,7 +183,7 @@ class ExerciseLibraryViewModelTest {
             TestFixtures.deadlift,
             TestFixtures.bicepCurl
         )
-        viewModel = ExerciseLibraryViewModel(fakeExerciseRepository)
+        viewModel = ExerciseLibraryViewModel(fakeExerciseRepository, mockk(relaxed = true))
 
         viewModel.state.test {
             skipItems(1)
@@ -203,7 +204,7 @@ class ExerciseLibraryViewModelTest {
     @Test
     fun `clicking exercise sends navigation effect`() = runTest {
         fakeExerciseRepository.setExercises(TestFixtures.benchPress)
-        viewModel = ExerciseLibraryViewModel(fakeExerciseRepository)
+        viewModel = ExerciseLibraryViewModel(fakeExerciseRepository, mockk(relaxed = true))
 
         viewModel.effect.test {
             viewModel.onEvent(ExerciseLibraryEvent.ExerciseClicked(TestFixtures.benchPress))
@@ -220,7 +221,7 @@ class ExerciseLibraryViewModelTest {
             TestFixtures.benchPress,
             TestFixtures.squat
         )
-        viewModel = ExerciseLibraryViewModel(fakeExerciseRepository)
+        viewModel = ExerciseLibraryViewModel(fakeExerciseRepository, mockk(relaxed = true))
 
         viewModel.state.test {
             skipItems(1)
@@ -239,7 +240,7 @@ class ExerciseLibraryViewModelTest {
             TestFixtures.benchPress,
             TestFixtures.squat
         )
-        viewModel = ExerciseLibraryViewModel(fakeExerciseRepository)
+        viewModel = ExerciseLibraryViewModel(fakeExerciseRepository, mockk(relaxed = true))
 
         viewModel.state.test {
             skipItems(1)

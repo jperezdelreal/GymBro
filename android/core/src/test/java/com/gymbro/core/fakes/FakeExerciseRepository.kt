@@ -15,10 +15,6 @@ class FakeExerciseRepository : ExerciseRepository {
         this.exercises.value = exercises.toList()
     }
     
-    fun addExercise(exercise: Exercise) {
-        exercises.value = exercises.value + exercise
-    }
-    
     fun clearExercises() {
         exercises.value = emptyList()
     }
@@ -49,5 +45,13 @@ class FakeExerciseRepository : ExerciseRepository {
             return null
         }
         return exercises.value.find { it.id == uuid }
+    }
+
+    override suspend fun addExercise(exercise: Exercise) {
+        exercises.value = exercises.value + exercise
+    }
+
+    override suspend fun isExerciseNameTaken(name: String): Boolean {
+        return exercises.value.any { it.name.equals(name, ignoreCase = true) }
     }
 }
