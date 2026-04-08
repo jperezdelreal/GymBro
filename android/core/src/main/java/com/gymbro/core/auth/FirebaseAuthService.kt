@@ -12,11 +12,12 @@ import javax.inject.Singleton
 
 @Singleton
 class FirebaseAuthService @Inject constructor(
-    private val firebaseAuth: FirebaseAuth,
+    private val firebaseAuth: FirebaseAuth?,
 ) : AuthService {
 
     override suspend fun signInAnonymously(): Result<GymBroUser> = runCatching {
-        val result = firebaseAuth.signInAnonymously().await()
+        val auth = firebaseAuth ?: throw IllegalStateException("Firebase is not configured")
+        val result = auth.signInAnonymously().await()
         result.user?.toGymBroUser()
             ?: throw IllegalStateException("Anonymous sign-in returned null user")
     }.onFailure {
@@ -24,15 +25,23 @@ class FirebaseAuthService @Inject constructor(
     }
 
     override suspend fun signOut(): Result<Unit> = runCatching {
-        firebaseAuth.signOut()
+        val auth = firebaseAuth ?: throw IllegalStateException("Firebase is not configured")
+        auth.signOut()
     }
 
     override fun getCurrentUser(): GymBroUser? =
-        firebaseAuth.currentUser?.toGymBroUser()
+        firebaseAuth?.currentUser?.toGymBroUser()
 
     override fun observeAuthState(): Flow<AuthState> = callbackFlow {
-        val listener = FirebaseAuth.AuthStateListener { auth ->
-            val user = auth.currentUser
+        val auth = firebaseAuth
+        if (auth == null) {
+            trySend(AuthState.SignedOut)
+            close()
+            return@callbackFlow
+        }
+
+        val listener = FirebaseAuth.AuthStateListener { firebaseAuth ->
+            val user = firebaseAuth.currentUser
             val state = if (user != null) {
                 AuthState.SignedIn(user.toGymBroUser())
             } else {
@@ -41,10 +50,10 @@ class FirebaseAuthService @Inject constructor(
             trySend(state)
         }
 
-        firebaseAuth.addAuthStateListener(listener)
+        auth.addAuthStateListener(listener)
 
         awaitClose {
-            firebaseAuth.removeAuthStateListener(listener)
+            auth.removeAuthStateListener(listener)
         }
     }
 
