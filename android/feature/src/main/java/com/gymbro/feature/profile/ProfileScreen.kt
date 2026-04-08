@@ -50,7 +50,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.ui.res.stringResource
 import com.gymbro.core.sync.service.SyncStatus
+import com.gymbro.core.R
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -100,7 +102,7 @@ internal fun ProfileScreen(
     ) {
         // Header
         Text(
-            text = "Profile",
+            text = stringResource(R.string.profile_title),
             style = MaterialTheme.typography.headlineMedium,
             color = Color.White,
             fontWeight = FontWeight.Bold,
@@ -162,12 +164,12 @@ internal fun ProfileScreen(
         ) {
             Icon(
                 Icons.Default.SmartToy,
-                contentDescription = "AI Coach",
+                contentDescription = stringResource(R.string.profile_ai_coach_icon),
                 modifier = Modifier.size(20.dp),
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = "Talk to AI Coach",
+                text = stringResource(R.string.profile_ai_coach_button),
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(vertical = 4.dp),
             )
@@ -186,12 +188,12 @@ internal fun ProfileScreen(
         ) {
             Icon(
                 Icons.Default.Settings,
-                contentDescription = "Settings",
+                contentDescription = stringResource(R.string.profile_settings_icon),
                 modifier = Modifier.size(20.dp),
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = "Settings",
+                text = stringResource(R.string.profile_settings_button),
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.padding(vertical = 4.dp),
             )
@@ -249,7 +251,7 @@ private fun UserCard(
                 } else {
                     Icon(
                         Icons.Default.Person,
-                        contentDescription = "User",
+                        contentDescription = stringResource(R.string.profile_user_icon),
                         tint = AccentGreen,
                         modifier = Modifier.size(28.dp),
                     )
@@ -261,9 +263,9 @@ private fun UserCard(
             Column {
                 Text(
                     text = if (isSignedIn) {
-                        displayName ?: "Anonymous Lifter"
+                        displayName ?: stringResource(R.string.profile_anonymous_lifter)
                     } else {
-                        "Not Signed In"
+                        stringResource(R.string.profile_not_signed_in)
                     },
                     style = MaterialTheme.typography.titleMedium,
                     color = Color.White,
@@ -271,11 +273,11 @@ private fun UserCard(
                 )
                 Text(
                     text = if (isSignedIn && isAnonymous) {
-                        "Guest account — data syncs to cloud"
+                        stringResource(R.string.profile_guest_account_status)
                     } else if (isSignedIn) {
-                        "Signed in — data syncs to cloud"
+                        stringResource(R.string.profile_signed_in_status)
                     } else {
-                        "Sign in to back up your training data"
+                        stringResource(R.string.profile_sign_in_prompt)
                     },
                     style = MaterialTheme.typography.bodySmall,
                     color = Color(0xFF9E9E9E),
@@ -292,12 +294,12 @@ private fun SyncStatusCard(
     isSignedIn: Boolean,
 ) {
     val (icon, label, color) = when (syncStatus) {
-        SyncStatus.IDLE -> Triple(Icons.Default.Cloud, "Ready to sync", Color(0xFF9E9E9E))
-        SyncStatus.SYNCING -> Triple(Icons.Default.CloudSync, "Syncing…", AccentGreen)
-        SyncStatus.SUCCESS -> Triple(Icons.Default.CloudDone, "Synced", AccentGreen)
-        SyncStatus.ERROR -> Triple(Icons.Default.CloudOff, "Sync error", Color(0xFFFF5252))
-        SyncStatus.OFFLINE -> Triple(Icons.Default.CloudOff, "Offline", Color(0xFFFF9100))
-        SyncStatus.DISABLED -> Triple(Icons.Default.CloudOff, "Sync disabled", Color(0xFF9E9E9E))
+        SyncStatus.IDLE -> Triple(Icons.Default.Cloud, stringResource(R.string.recovery_status_ready_to_sync), Color(0xFF9E9E9E))
+        SyncStatus.SYNCING -> Triple(Icons.Default.CloudSync, stringResource(R.string.recovery_status_syncing), AccentGreen)
+        SyncStatus.SUCCESS -> Triple(Icons.Default.CloudDone, stringResource(R.string.recovery_status_synced), AccentGreen)
+        SyncStatus.ERROR -> Triple(Icons.Default.CloudOff, stringResource(R.string.recovery_status_sync_error), Color(0xFFFF5252))
+        SyncStatus.OFFLINE -> Triple(Icons.Default.CloudOff, stringResource(R.string.recovery_status_offline), Color(0xFFFF9100))
+        SyncStatus.DISABLED -> Triple(Icons.Default.CloudOff, stringResource(R.string.recovery_status_sync_disabled), Color(0xFF9E9E9E))
     }
 
     Card(
@@ -317,20 +319,20 @@ private fun SyncStatusCard(
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "Cloud Sync",
+                    text = stringResource(R.string.profile_cloud_sync_title),
                     style = MaterialTheme.typography.titleMedium,
                     color = Color.White,
                     fontWeight = FontWeight.SemiBold,
                 )
                 Text(
-                    text = if (!isSignedIn) "Sign in to enable" else label,
+                    text = if (!isSignedIn) stringResource(R.string.profile_cloud_sync_sign_in) else label,
                     style = MaterialTheme.typography.bodySmall,
                     color = color,
                 )
                 if (lastSyncTime != null) {
                     val formatter = SimpleDateFormat("MMM d, h:mm a", Locale.getDefault())
                     Text(
-                        text = "Last: ${formatter.format(Date(lastSyncTime))}",
+                        text = stringResource(R.string.profile_cloud_sync_last, formatter.format(Date(lastSyncTime))),
                         style = MaterialTheme.typography.labelSmall,
                         color = Color(0xFF757575),
                     )
@@ -384,12 +386,12 @@ private fun AutoSyncCard(
                 Spacer(modifier = Modifier.width(12.dp))
                 Column {
                     Text(
-                        text = "Auto-Sync",
+                        text = stringResource(R.string.profile_auto_sync_title),
                         style = MaterialTheme.typography.titleSmall,
                         color = Color.White,
                     )
                     Text(
-                        text = "Sync after each workout",
+                        text = stringResource(R.string.profile_auto_sync_subtitle),
                         style = MaterialTheme.typography.bodySmall,
                         color = Color(0xFF9E9E9E),
                     )
@@ -451,7 +453,7 @@ private fun ActionsCard(
                         Spacer(modifier = Modifier.width(8.dp))
                     }
                     Text(
-                        text = if (isSyncing) "Syncing…" else "Sync Now",
+                        text = if (isSyncing) stringResource(R.string.profile_syncing) else stringResource(R.string.profile_sync_now),
                         fontWeight = FontWeight.SemiBold,
                         modifier = Modifier.padding(vertical = 4.dp),
                     )
@@ -466,7 +468,7 @@ private fun ActionsCard(
                     ),
                 ) {
                     Text(
-                        text = "Sign Out",
+                        text = stringResource(R.string.profile_sign_out),
                         fontWeight = FontWeight.SemiBold,
                         modifier = Modifier.padding(vertical = 4.dp),
                     )
@@ -483,14 +485,14 @@ private fun ActionsCard(
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     Text(
-                        text = "Sign In as Guest",
+                        text = stringResource(R.string.profile_sign_in_button),
                         fontWeight = FontWeight.SemiBold,
                         modifier = Modifier.padding(vertical = 4.dp),
                     )
                 }
 
                 Text(
-                    text = "Sign in anonymously to enable cloud backup.\nYour training data stays private.",
+                    text = stringResource(R.string.profile_sign_in_disclaimer),
                     style = MaterialTheme.typography.bodySmall,
                     color = Color(0xFF757575),
                     textAlign = TextAlign.Center,

@@ -36,6 +36,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -44,6 +45,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.gymbro.core.R
 import com.gymbro.core.model.MuscleGroup
 import com.gymbro.feature.common.EmptyState
 import com.gymbro.feature.common.FullScreenLoading
@@ -70,10 +72,10 @@ fun HistoryListRoute(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Workout History", fontWeight = FontWeight.Bold, modifier = Modifier.semantics { heading() }) },
+                title = { Text(stringResource(R.string.history_title), fontWeight = FontWeight.Bold, modifier = Modifier.semantics { heading() }) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.action_back))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -88,22 +90,22 @@ fun HistoryListRoute(
         Box(modifier = Modifier.padding(paddingValues)) {
             when {
                 state.isLoading -> {
-                    FullScreenLoading(message = "Loading history...")
+                    FullScreenLoading(message = stringResource(R.string.history_loading))
                 }
                 state.error != null -> {
                     EmptyState(
                         icon = Icons.Default.Close,
-                        title = "Error",
+                        title = stringResource(R.string.history_error_title),
                         subtitle = state.error ?: "Unknown error",
-                        actionText = "Retry",
+                        actionText = stringResource(R.string.action_retry),
                         onActionClick = { viewModel.onIntent(HistoryListIntent.Retry) },
                     )
                 }
                 state.workouts.isEmpty() -> {
                     EmptyState(
                         icon = Icons.Default.History,
-                        title = "No Workouts Yet",
-                        subtitle = "Start training to build your history!",
+                        title = stringResource(R.string.history_empty_title),
+                        subtitle = stringResource(R.string.history_empty_subtitle),
                     )
                 }
                 else -> {
@@ -195,7 +197,7 @@ private fun WorkoutCard(
                     ) {
                         Icon(
                             Icons.Default.Star,
-                            contentDescription = "Personal Records",
+                            contentDescription = stringResource(R.string.history_prs),
                             tint = AccentAmber,
                             modifier = Modifier.size(20.dp),
                         )
@@ -215,12 +217,12 @@ private fun WorkoutCard(
             ) {
                 StatChip(
                     icon = Icons.Default.FitnessCenter,
-                    label = "${workout.exerciseCount} exercises",
+                    label = stringResource(R.string.history_exercises_count, workout.exerciseCount),
                     color = AccentCyan,
                 )
                 StatChip(
                     icon = Icons.Default.Timer,
-                    label = "${workout.totalVolume.toInt()} kg",
+                    label = stringResource(R.string.history_volume_kg, workout.totalVolume.toInt()),
                     color = AccentGreen,
                 )
             }

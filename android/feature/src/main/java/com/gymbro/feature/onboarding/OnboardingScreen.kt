@@ -39,9 +39,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.gymbro.core.R
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gymbro.core.preferences.UserPreferences.WeightUnit
@@ -138,21 +140,21 @@ private fun WelcomePage() {
         )
         Spacer(modifier = Modifier.height(32.dp))
         Text(
-            text = "GymBro",
+            text = stringResource(R.string.onboarding_app_title),
             style = MaterialTheme.typography.displayLarge,
             fontWeight = FontWeight.Bold,
             color = Color.White,
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = "Train Smarter",
+            text = stringResource(R.string.onboarding_tagline),
             style = MaterialTheme.typography.headlineMedium,
             color = AccentGreen,
             fontWeight = FontWeight.Medium,
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = "Your AI-powered workout companion",
+            text = stringResource(R.string.onboarding_subtitle),
             style = MaterialTheme.typography.bodyLarge,
             color = Color(0xFF9E9E9E),
             textAlign = TextAlign.Center,
@@ -164,8 +166,8 @@ private fun WelcomePage() {
 private fun TrackPage() {
     OnboardingFeaturePage(
         icon = Icons.Default.Timer,
-        title = "Ultra-Fast Logging",
-        description = "Log your workouts faster than ever. No complex forms, no distractions. Just pure training efficiency.",
+        title = stringResource(R.string.onboarding_fast_logging_title),
+        description = stringResource(R.string.onboarding_fast_logging_description),
     )
 }
 
@@ -173,8 +175,8 @@ private fun TrackPage() {
 private fun ProgressPage() {
     OnboardingFeaturePage(
         icon = Icons.Default.TrendingUp,
-        title = "Track Your Progress",
-        description = "Automatic PR detection, progressive overload tracking, and detailed insights into your strength gains.",
+        title = stringResource(R.string.onboarding_track_progress_title),
+        description = stringResource(R.string.onboarding_track_progress_description),
     )
 }
 
@@ -232,7 +234,7 @@ private fun GetStartedPage(
         verticalArrangement = Arrangement.Center,
     ) {
         Text(
-            text = "Let's Get Started",
+            text = stringResource(R.string.onboarding_get_started_title),
             style = MaterialTheme.typography.headlineLarge,
             fontWeight = FontWeight.Bold,
             color = Color.White,
@@ -240,7 +242,7 @@ private fun GetStartedPage(
         Spacer(modifier = Modifier.height(48.dp))
 
         Text(
-            text = "Preferred Units",
+            text = stringResource(R.string.onboarding_preferred_units),
             style = MaterialTheme.typography.titleMedium,
             color = Color.White,
             modifier = Modifier.align(Alignment.Start),
@@ -252,13 +254,13 @@ private fun GetStartedPage(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             UnitButton(
-                text = "Kilograms (kg)",
+                text = stringResource(R.string.onboarding_unit_kg),
                 isSelected = selectedUnit == WeightUnit.KG,
                 onClick = { onUnitSelected(WeightUnit.KG) },
                 modifier = Modifier.weight(1f),
             )
             UnitButton(
-                text = "Pounds (lbs)",
+                text = stringResource(R.string.onboarding_unit_lbs),
                 isSelected = selectedUnit == WeightUnit.LBS,
                 onClick = { onUnitSelected(WeightUnit.LBS) },
                 modifier = Modifier.weight(1f),
@@ -268,7 +270,7 @@ private fun GetStartedPage(
         Spacer(modifier = Modifier.height(32.dp))
 
         Text(
-            text = "Your Name (Optional)",
+            text = stringResource(R.string.onboarding_your_name),
             style = MaterialTheme.typography.titleMedium,
             color = Color.White,
             modifier = Modifier.align(Alignment.Start),
@@ -278,7 +280,7 @@ private fun GetStartedPage(
         OutlinedTextField(
             value = userName,
             onValueChange = onNameChanged,
-            placeholder = { Text("Enter your name", color = Color(0xFF9E9E9E)) },
+            placeholder = { Text(stringResource(R.string.onboarding_name_placeholder), color = Color(0xFF9E9E9E)) },
             modifier = Modifier.fillMaxWidth(),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedTextColor = Color.White,
@@ -304,7 +306,7 @@ private fun GetStartedPage(
             shape = RoundedCornerShape(12.dp),
         ) {
             Text(
-                text = "Let's Go",
+                text = stringResource(R.string.onboarding_lets_go),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
             )

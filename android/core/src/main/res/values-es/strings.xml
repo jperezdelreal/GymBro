@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App Name -->
+    <string name="app_name">GymBro</string>
+
+    <!-- Widget Descriptions -->
+    <string name="quick_start_widget_description">Acceso rápido para iniciar un entrenamiento</string>
+    <string name="stats_widget_description">Ver tus estadísticas semanales de entrenamiento</string>
+
+    <!-- Bottom Navigation -->
+    <string name="nav_library">Biblioteca</string>
+    <string name="nav_history">Historial</string>
+    <string name="nav_progress">Progreso</string>
+    <string name="nav_recovery">Recuperación</string>
+    <string name="nav_profile">Perfil</string>
+
+    <!-- Common Actions -->
+    <string name="action_back">Atrás</string>
+    <string name="action_cancel">Cancelar</string>
+    <string name="action_save">Guardar</string>
+    <string name="action_delete">Eliminar</string>
+    <string name="action_retry">Reintentar</string>
+    <string name="action_refresh">Actualizar</string>
+    <string name="action_close">Cerrar</string>
+    <string name="action_add">Añadir</string>
+
+    <!-- Exercise Library -->
+    <string name="exercise_library_title">Biblioteca de Ejercicios</string>
+    <string name="exercise_library_pick_title">Elegir Ejercicio</string>
+    <string name="exercise_library_create">Crear Ejercicio</string>
+    <string name="exercise_library_search">Buscar ejercicios…</string>
+    <string name="exercise_library_empty_title">No se encontraron ejercicios</string>
+    <string name="exercise_library_empty_subtitle">Intenta ajustar tu búsqueda o filtros</string>
+    <string name="exercise_library_loading">Cargando ejercicios...</string>
+    <string name="exercise_library_view_details">Ver detalles del ejercicio</string>
+
+    <!-- Create Exercise -->
+    <string name="create_exercise_title">Crear Ejercicio</string>
+    <string name="create_exercise_name_label">Nombre del Ejercicio</string>
+    <string name="create_exercise_name_placeholder">Ingresa el nombre del ejercicio</string>
+    <string name="create_exercise_muscle_group">Grupo Muscular</string>
+    <string name="create_exercise_category">Categoría</string>
+    <string name="create_exercise_equipment">Equipo</string>
+    <string name="create_exercise_loading">Creando ejercicio...</string>
+    <string name="create_exercise_save">Guardar Ejercicio</string>
+
+    <!-- Workout -->
+    <string name="workout_start">Iniciar Entrenamiento</string>
+    <string name="workout_finish">Finalizar Entrenamiento</string>
+    <string name="workout_add_exercise">Añadir Ejercicio</string>
+    <string name="workout_discard">Descartar Entrenamiento</string>
+    <string name="workout_discard_confirm_title">¿Descartar Entrenamiento?</string>
+    <string name="workout_discard_confirm_message">Todo el progreso se perderá. Esto no se puede deshacer.</string>
+    <string name="workout_empty">Sin ejercicios aún</string>
+    <string name="workout_empty_subtitle">Toca + para añadir tu primer ejercicio</string>
+    <string name="workout_duration">Duración</string>
+    <string name="workout_volume">Volumen</string>
+    <string name="workout_sets">Series</string>
+    <string name="workout_exercises">Ejercicios</string>
+    <string name="workout_rest_timer">Temporizador de Descanso</string>
+    <string name="workout_skip_rest">Saltar Descanso</string>
+    <string name="workout_add_set">Añadir Serie</string>
+
+    <!-- Workout Summary -->
+    <string name="workout_summary_title">¡Entrenamiento Completado!</string>
+    <string name="workout_summary_done">Listo</string>
+    <string name="workout_summary_pr_title">¡Nuevos Récords Personales!</string>
+    <string name="workout_summary_no_prs">Sin nuevos récords esta vez</string>
+    <string name="workout_summary_stats_title">Estadísticas del Entrenamiento</string>
+
+    <!-- History -->
+    <string name="history_title">Historial de Entrenamientos</string>
+    <string name="history_empty_title">Sin Entrenamientos Aún</string>
+    <string name="history_empty_subtitle">¡Empieza a entrenar para construir tu historial!</string>
+    <string name="history_loading">Cargando historial...</string>
+    <string name="history_error_title">Error</string>
+    <string name="history_exercises_count">%d ejercicios</string>
+    <string name="history_volume_kg">%d kg</string>
+    <string name="history_prs">Récords Personales</string>
+
+    <!-- Progress -->
+    <string name="progress_title">Progreso</string>
+    <string name="progress_empty_title">Sin entrenamientos aún</string>
+    <string name="progress_empty_subtitle">¡Empieza a entrenar para rastrear tu progreso!</string>
+    <string name="progress_loading">Cargando progreso...</string>
+    <string name="progress_total_workouts">Total de Entrenamientos</string>
+    <string name="progress_total_volume">Volumen Total</string>
+    <string name="progress_total_prs">Récords Personales</string>
+    <string name="progress_volume_chart_title">Volumen — Últimos 30 Días</string>
+
+    <!-- Recovery -->
+    <string name="recovery_title">Recuperación</string>
+    <string name="recovery_loading">Cargando datos de recuperación...</string>
+    <string name="recovery_readiness_score">Puntuación de Preparación</string>
+    <string name="recovery_sleep_label">Sueño</string>
+    <string name="recovery_resting_hr_label">FC en Reposo</string>
+    <string name="recovery_hrv_label">VFC</string>
+    <string name="recovery_steps_label">Pasos</string>
+    <string name="recovery_sleep_chart_title">Sueño — Últimos 7 Días</string>
+    <string name="recovery_health_connect_unavailable">Health Connect No Disponible</string>
+    <string name="recovery_health_connect_unavailable_message">Instala Health Connect desde Play Store para rastrear tus métricas de recuperación.</string>
+    <string name="recovery_permissions_title">Conecta tus Datos de Salud</string>
+    <string name="recovery_permissions_message">GymBro usa datos de sueño, frecuencia cardíaca y pasos para calcular tu preparación de recuperación y optimizar el entrenamiento.</string>
+    <string name="recovery_grant_permissions">Conceder Permisos</string>
+
+    <!-- Recovery Status Labels -->
+    <string name="recovery_status_optimal">Óptimo</string>
+    <string name="recovery_status_good">Bueno</string>
+    <string name="recovery_status_fair">Regular</string>
+    <string name="recovery_status_poor">Pobre</string>
+    <string name="recovery_status_ready_to_sync">Listo para sincronizar</string>
+    <string name="recovery_status_syncing">Sincronizando…</string>
+    <string name="recovery_status_synced">Sincronizado</string>
+    <string name="recovery_status_sync_error">Error de sincronización</string>
+    <string name="recovery_status_offline">Sin conexión</string>
+    <string name="recovery_status_sync_disabled">Sincronización deshabilitada</string>
+
+    <!-- Profile -->
+    <string name="profile_title">Perfil</string>
+    <string name="profile_not_signed_in">Sin Iniciar Sesión</string>
+    <string name="profile_anonymous_lifter">Levantador Anónimo</string>
+    <string name="profile_guest_account_status">Cuenta invitada — los datos se sincronizan a la nube</string>
+    <string name="profile_signed_in_status">Sesión iniciada — los datos se sincronizan a la nube</string>
+    <string name="profile_sign_in_prompt">Inicia sesión para respaldar tus datos de entrenamiento</string>
+    <string name="profile_sign_in_button">Iniciar Sesión como Invitado</string>
+    <string name="profile_sign_in_disclaimer">Inicia sesión anónimamente para habilitar respaldo en la nube.\nTus datos de entrenamiento permanecen privados.</string>
+    <string name="profile_sign_out">Cerrar Sesión</string>
+    <string name="profile_sync_now">Sincronizar Ahora</string>
+    <string name="profile_syncing">Sincronizando…</string>
+    <string name="profile_cloud_sync_title">Sincronización en la Nube</string>
+    <string name="profile_cloud_sync_sign_in">Inicia sesión para habilitar</string>
+    <string name="profile_cloud_sync_last">Última: %s</string>
+    <string name="profile_auto_sync_title">Auto-Sincronización</string>
+    <string name="profile_auto_sync_subtitle">Sincronizar después de cada entrenamiento</string>
+    <string name="profile_ai_coach_button">Hablar con el Entrenador IA</string>
+    <string name="profile_settings_button">Configuración</string>
+    <string name="profile_user_icon">Usuario</string>
+    <string name="profile_ai_coach_icon">Entrenador IA</string>
+    <string name="profile_settings_icon">Configuración</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Configuración</string>
+    <string name="settings_section_account">Cuenta</string>
+    <string name="settings_section_workout">Preferencias de Entrenamiento</string>
+    <string name="settings_section_notifications">Notificaciones</string>
+    <string name="settings_section_health_connect">Health Connect</string>
+    <string name="settings_section_about">Acerca de</string>
+    <string name="settings_sign_in_status">Estado de Sesión</string>
+    <string name="settings_sign_in_subtitle">Administra tu cuenta</string>
+    <string name="settings_clear_data">Borrar Todos los Datos</string>
+    <string name="settings_clear_data_subtitle">Restablecer app a valores predeterminados</string>
+    <string name="settings_clear_data_confirm_title">¿Borrar Todos los Datos?</string>
+    <string name="settings_clear_data_confirm_message">Esto restablecerá toda la configuración a valores predeterminados. Esta acción no se puede deshacer.</string>
+    <string name="settings_clear_data_button">Borrar Datos</string>
+    <string name="settings_weight_unit">Unidad de Peso</string>
+    <string name="settings_weight_unit_subtitle">Mostrar pesos en</string>
+    <string name="settings_weight_unit_kg">kg</string>
+    <string name="settings_weight_unit_lbs">lbs</string>
+    <string name="settings_default_rest_timer">Temporizador de Descanso Predeterminado</string>
+    <string name="settings_rest_timer_subtitle">Tiempo entre series</string>
+    <string name="settings_rest_timer_value">%ds</string>
+    <string name="settings_auto_start_rest_timer">Auto-Iniciar Temporizador de Descanso</string>
+    <string name="settings_auto_start_rest_timer_subtitle">Iniciar temporizador después de completar una serie</string>
+    <string name="settings_workout_reminders">Recordatorios de Entrenamiento</string>
+    <string name="settings_workout_reminders_subtitle">Recibe recordatorios para entrenar</string>
+    <string name="settings_health_connect_connected">Conectado</string>
+    <string name="settings_health_connect_not_connected">No Conectado</string>
+    <string name="settings_health_connect_sync">Sincronizar con Health Connect</string>
+    <string name="settings_health_connect_unavailable">Health Connect no disponible</string>
+    <string name="settings_app_version">Versión de la App</string>
+    <string name="settings_send_feedback">Enviar Comentarios</string>
+    <string name="settings_send_feedback_subtitle">Reporta problemas o sugiere características</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_app_title">GymBro</string>
+    <string name="onboarding_tagline">Entrena Más Inteligente</string>
+    <string name="onboarding_subtitle">Tu compañero de entrenamiento potenciado por IA</string>
+    <string name="onboarding_fast_logging_title">Registro Ultra-Rápido</string>
+    <string name="onboarding_fast_logging_description">Registra tus entrenamientos más rápido que nunca. Sin formularios complejos, sin distracciones. Solo pura eficiencia de entrenamiento.</string>
+    <string name="onboarding_track_progress_title">Rastrea tu Progreso</string>
+    <string name="onboarding_track_progress_description">Detección automática de récords personales, seguimiento de sobrecarga progresiva, e información detallada sobre tus ganancias de fuerza.</string>
+    <string name="onboarding_get_started_title">Comencemos</string>
+    <string name="onboarding_preferred_units">Unidades Preferidas</string>
+    <string name="onboarding_unit_kg">Kilogramos (kg)</string>
+    <string name="onboarding_unit_lbs">Libras (lbs)</string>
+    <string name="onboarding_your_name">Tu Nombre (Opcional)</string>
+    <string name="onboarding_name_placeholder">Ingresa tu nombre</string>
+    <string name="onboarding_lets_go">¡Vamos!</string>
+
+    <!-- Common -->
+    <string name="common_loading">Cargando...</string>
+    <string name="common_error">Error</string>
+    <string name="common_unknown_error">Error desconocido</string>
+    <string name="common_kg">kg</string>
+    <string name="common_lbs">lbs</string>
+    <string name="common_reps">reps</string>
+    <string name="common_sets">series</string>
+    <string name="common_duration_hours" formatted="false">%dh %dm</string>
+    <string name="common_duration_minutes">%dm</string>
+</resources>

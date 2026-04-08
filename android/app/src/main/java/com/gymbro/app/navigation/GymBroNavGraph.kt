@@ -61,22 +61,24 @@ import com.gymbro.feature.workout.ActiveWorkoutRoute
 import com.gymbro.feature.workout.SmartWorkoutRoute
 import com.gymbro.feature.workout.WorkoutSummaryScreen
 import com.gymbro.core.model.PersonalRecord
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.gymbro.core.R
 
 private val AccentGreen = Color(0xFF00FF87)
 
 private enum class BottomNavTab(
     val route: String,
-    val label: String,
+    val labelResId: Int,
     val selectedIcon: ImageVector,
     val unselectedIcon: ImageVector,
 ) {
-    LIBRARY("exercise_library", "Library", Icons.Filled.FitnessCenter, Icons.Outlined.FitnessCenter),
-    HISTORY("history", "History", Icons.Filled.History, Icons.Outlined.History),
-    PROGRESS("progress", "Progress", Icons.AutoMirrored.Filled.ShowChart, Icons.AutoMirrored.Outlined.ShowChart),
-    RECOVERY("recovery", "Recovery", Icons.Filled.MonitorHeart, Icons.Outlined.MonitorHeart),
-    PROFILE("profile", "Profile", Icons.Filled.Person, Icons.Outlined.Person),
+    LIBRARY("exercise_library", R.string.nav_library, Icons.Filled.FitnessCenter, Icons.Outlined.FitnessCenter),
+    HISTORY("history", R.string.nav_history, Icons.Filled.History, Icons.Outlined.History),
+    PROGRESS("progress", R.string.nav_progress, Icons.AutoMirrored.Filled.ShowChart, Icons.AutoMirrored.Outlined.ShowChart),
+    RECOVERY("recovery", R.string.nav_recovery, Icons.Filled.MonitorHeart, Icons.Outlined.MonitorHeart),
+    PROFILE("profile", R.string.nav_profile, Icons.Filled.Person, Icons.Outlined.Person),
 }
 
 @Composable
@@ -130,7 +132,7 @@ fun GymBroNavGraph(
                         contentColor = Color.Black,
                         shape = CircleShape,
                     ) {
-                        Icon(Icons.Default.Add, contentDescription = "Start Workout", modifier = Modifier.size(28.dp))
+                        Icon(Icons.Default.Add, contentDescription = stringResource(R.string.workout_start), modifier = Modifier.size(28.dp))
                     }
                 },
                 containerColor = MaterialTheme.colorScheme.background,
@@ -472,18 +474,19 @@ private fun GymBroBottomNavBar(
     ) {
         BottomNavTab.entries.forEach { tab ->
             val selected = currentRoute == tab.route
+            val label = stringResource(tab.labelResId)
             NavigationBarItem(
                 selected = selected,
                 onClick = { onTabSelected(tab) },
                 icon = {
                     Icon(
                         if (selected) tab.selectedIcon else tab.unselectedIcon,
-                        contentDescription = tab.label,
+                        contentDescription = label,
                     )
                 },
                 label = {
                     Text(
-                        text = tab.label,
+                        text = label,
                         style = MaterialTheme.typography.labelSmall,
                     )
                 },
