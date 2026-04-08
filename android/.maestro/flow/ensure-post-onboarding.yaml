@@ -1,0 +1,35 @@
+appId: com.gymbro.app
+name: "Ensure Post-Onboarding State"
+---
+
+# This sub-flow verifies the app is past onboarding
+# If onboarding is visible, complete it to reach post-onboarding state
+
+- launchApp
+
+# Check if we're on onboarding or post-onboarding
+- runFlow:
+    when:
+      visible: "GymBro"
+      notVisible: "Biblioteca de Ejercicios|Exercise Library"
+    commands:
+      # We're on onboarding — complete it
+      - swipe:
+          direction: LEFT
+          duration: 400
+      - swipe:
+          direction: LEFT
+          duration: 400
+      - swipe:
+          direction: LEFT
+          duration: 400
+      - tapOn: "Kilogramos (kg)|Kilograms (kg)"
+      - tapOn:
+          id: "onboarding_name_input"
+      - inputText: "TestUser"
+      - hideKeyboard
+      - tapOn:
+          id: "onboarding_start"
+
+# Verify we're now post-onboarding
+- assertVisible: "Biblioteca de Ejercicios|Exercise Library"

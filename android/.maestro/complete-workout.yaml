@@ -5,7 +5,12 @@ tags:
   - e2e
 ---
 
-- launchApp
+- runFlow: flow/ensure-post-onboarding.yaml
+
+onFlowStart:
+  # Ensure clean state at library
+  - launchApp
+  - assertVisible: "Biblioteca de Ejercicios"
 
 # Start from Exercise Library
 - assertVisible: "Biblioteca de Ejercicios"

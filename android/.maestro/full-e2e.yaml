@@ -5,6 +5,10 @@ tags:
   - regression
 ---
 
+onFlowComplete:
+  # Clear app state after full E2E
+  - stopApp
+
 - launchApp:
     clearState: true
 

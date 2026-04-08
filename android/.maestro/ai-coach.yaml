@@ -5,7 +5,18 @@ tags:
   - ai
 ---
 
-- launchApp
+- runFlow: flow/ensure-post-onboarding.yaml
+
+onFlowStart:
+  # Ensure post-onboarding state
+  - launchApp
+  - assertVisible: "Biblioteca de Ejercicios"
+
+onFlowComplete:
+  # Return to Library tab
+  - tapOn:
+      id: "nav_exercise_library"
+      optional: true
 
 # Navigate to Profile tab first
 - tapOn:
