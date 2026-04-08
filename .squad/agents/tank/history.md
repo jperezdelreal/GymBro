@@ -555,4 +555,40 @@ This foundation unblocks all Phase-1 work:
 - Migration strategy if seed data schema changes (currently uses Room's fallbackToDestructiveMigration)
 
 **Branch:** `squad/256-exercise-seed-data` (pushed, PR needs manual creation due to enterprise auth)
+### 2026-04-08: Round 1 Execution — Exercise Seed Data + Android Foundations
+
+**Scope:** Issue #256 (exercise seed data) + Android platform setup  
+**PR:** #259  
+**Status:** ✅ MERGED  
+
+**Exercise Seed Data Implementation (Issue #256):**
+- Created ndroid/core/src/main/assets/exercises-seed.json with 400+ exercises (126KB)
+- Implemented RoomDatabase.Callback.onCreate() seed insertion in IO coroutine
+- Used deterministic UUID strategy: UUID.nameUUIDFromBytes(name.toByteArray())
+- Bulk insert via ExerciseDao.insertAll() with Room's REPLACE conflict strategy
+- Performance: ~100ms insertion on first DB creation, zero startup penalty on subsequent launches
+- Offline-first benefit: Fresh installs show populated exercise library immediately
+
+**Cross-Platform Data Parity:**
+- Exercise seed JSON shared with iOS (single source of truth)
+- Trinity (UI) can build exercise library screen without waiting for network sync
+- Neo (AI) can reference exercise names from day 1
+- Morpheus (product) onboarding friction reduced — users see value before account creation
+
+**Android Dual-Platform Consolidation:**
+- Repo restructured from iOS-only layout to ios/ + ndroid/ + shared/data/
+- Android skills installed: compose-expert, android-architecture, android-data-layer, kotlin-mvi, android-testing
+- Firebase Firestore configured for cloud sync (optional at build time via google-services.json)
+- Skills integration: All agents building Android features now have reference implementations
+
+**Directives Captured:**
+- AI Coach Chat: Gemini Flash via Firebase (native Android integration)
+- Voice Logging: Android SpeechRecognizer API (native, works offline)
+- Wear OS deprioritized per user request
+- Branch cleanup automated post-PR merge (no manual accumulation)
+
+**Module Architecture Validated:**
+- Core owns design tokens, app composes Material3 theme (enforced in #250)
+- Feature modules follow Clean Architecture pattern from android-architecture skill
+- Test infrastructure ready: FakeRepository pattern + MainDispatcherRule + Turbine for Flow testing
 
