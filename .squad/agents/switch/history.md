@@ -144,3 +144,49 @@ cd android
 - Team can merge PRs with confidence (quality gate active)
 - Testing patterns documented for consistency across iOS + Android
 
+### 2026-04-08: Complete i18n — Translate Remaining English Strings to Spanish (Issue #252)
+**Comprehensive internationalization audit and completion**
+- Audited all composable screens in `android/feature/src/main/java/com/gymbro/feature/` for hardcoded English and Spanish strings
+- Added 226 new string resources to both `values/strings.xml` and `values-es/strings.xml` in the `core` module
+- Updated 13 screen composable files to use `stringResource()` instead of hardcoded strings:
+  - AnalyticsScreen.kt — section headers, loading messages, streak labels, analytics titles
+  - CoachChatScreen.kt — AI coach title, prompts, thinking messages, Firebase errors
+  - SmartWorkoutScreen.kt — title, generating messages, readiness labels, buttons
+  - ActiveWorkoutScreen.kt — title, REST indicator, stat labels, action buttons
+  - ProgramsScreen.kt — title, empty states, template labels, exercises count
+  - ProgressScreen.kt — KPI labels, section headers, empty states, chart titles
+  - ProfileScreen.kt — account, preferences, sync status labels (extensive Spanish-to-resource conversion)
+  - HistoryDetailScreen.kt — workout details, volume labels, summary sections
+  - HistoryListScreen.kt — relative time labels (Hoy, Ayer)
+  - WorkoutSummaryScreen.kt — completion messages, stat labels
+  - OnboardingScreen.kt — companion tagline, call-to-action button
+  - CreateExerciseScreen.kt — placeholder text, error messages
+  - ExerciseLibraryScreen.kt — tooltip messages
+- Widget files (QuickStartWidget.kt, StatsWidget.kt) identified but deferred — Glance framework requires different i18n approach (context.getString() instead of composable stringResource())
+- Build verified successful: `./gradlew assembleDebug` passed
+- **Key learnings:**
+  - Always add `import androidx.compose.ui.res.stringResource` and `import com.gymbro.core.R` when extracting strings in feature module files
+  - Glance widgets (used for Android home screen widgets) don't use compose's `stringResource()` — they need context.resources.getString() pattern
+  - Pluralization (e.g., "week" vs "weeks") requires conditional logic with separate string resources for singular/plural forms
+  - Some screens had mixed hardcoded Spanish already (ProfileScreen, OnboardingScreen) that needed extraction
+  - Total scope: ~100+ hardcoded strings across 15 files, systematically replaced in single commit
+- **Testing implications:** i18n changes are runtime testable — should verify Spanish locale displays correctly in emulator/device testing
+- Closes #252 via PR #263
+
+### 2026-04-XX: Android README Documentation (Issue #257)
+**Comprehensive documentation for Android development setup and architecture**
+- Rewrote placeholder Android README from minimal tech stack overview (27 lines) to comprehensive developer guide (600+ lines)
+- Sections added:
+  1. **Features** — Categorized into: Core Workout, Progress & Analytics, Recovery & Health, Customization, Cross-Platform
+  2. **Architecture** — Multi-module structure (app/core/feature), MVI pattern, Repository pattern, Hilt DI, Offline-first sync
+  3. **Build Instructions** — Prerequisites, environment setup (Windows/macOS/Linux), debug/release builds, IDE setup, Gradle commands
+  4. **Firebase Setup** — Optional cloud sync, conditional compilation via `google-services.json`, Firestore rules
+  5. **Testing Guide** — Unit tests (JUnit4 + MockK), instrumentation tests, coverage reporting, test templates
+  6. **Troubleshooting** — 13 common issues with solutions (JAVA_HOME, Gradle sync, Firebase, Hilt injection, memory errors, etc.)
+  7. **Resources** — Official docs, project docs, contributing guidelines
+- Explored project structure: 3 modules with 80+ Kotlin files spanning services, models, DBs, UI layers
+- Technology stack documented: Jetpack Compose, Room, Hilt, Firebase, Vertex AI, Health Connect, WorkManager, Retrofit
+- Key architectural insight: Offline-first with sync via `OfflineSyncManager` + `CloudSyncService` pattern
+- Delivery: PR #265 (draft) with formatted commit message and co-author trailer
+- **Value for new devs:** Comprehensive guide eliminates setup friction, explains patterns, provides troubleshooting for blockers
+- Closes #257

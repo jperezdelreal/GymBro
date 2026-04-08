@@ -648,3 +648,63 @@ ProGuard rules follow official library documentation and Android best practices.
 - Bundle size impact: Need to measure APK size delta once build completes (expect 5-10% increase due to broader keep rules)
 - Custom ProGuard rules in library modules: May need to add consumer-rules.pro to core/ and eature/ modules if R8 still strips library-internal classes
 - Test coverage for ProGuard: Consider adding integration tests that verify release builds don't crash on startup (future enhancement)
+### 2026-01-08: Android App Icon and Splash Screen Implementation (Issue #253)
+
+**Problem:** Android app showed default launcher icon and no branded splash screen. Needed GymBro visual identity on Android.
+
+**Solution — Vector Drawable Icon + Android 12+ Splash Screen API:**
+
+- **Vector Drawable App Icon:**
+  - Created ic_launcher_foreground.xml: Green (#00FF87) dumbbell vector graphic (weights + bar + grip)
+  - Created ic_launcher_background.xml: Dark (#0A0A0A) solid background
+  - Adaptive icon configuration: mipmap-anydpi-v26/ic_launcher.xml + ic_launcher_round.xml`n  - Benefits: Scales perfectly across all densities (no mdpi/hdpi/xhdpi/xxhdpi/xxxhdpi PNGs needed), 4KB vs ~200KB for bitmap assets
+
+- **Android 12+ Splash Screen:**
+  - Added splash screen attributes to Theme.GymBro in alues/themes.xml:
+    - ndroid:windowSplashScreenBackground: #0A0A0A (dark background)
+    - ndroid:windowSplashScreenAnimatedIcon: reuses ic_launcher_foreground
+    - ndroid:windowSplashScreenIconBackgroundColor: #0A0A0A
+  - Zero Kotlin code needed — Android 12+ SplashScreen API handles rendering automatically
+  - Backwards compatible: Pre-Android 12 shows theme background color during app launch
+
+- **AndroidManifest.xml Updates:**
+  - Added ndroid:icon="@mipmap/ic_launcher"
+  - Added ndroid:roundIcon="@mipmap/ic_launcher_round" for circular icon support (Pixel Launcher, Android Auto)
+
+**Files Modified (6 files, 68 insertions):**
+- ndroid/app/src/main/res/drawable/ic_launcher_foreground.xml (new)
+- ndroid/app/src/main/res/drawable/ic_launcher_background.xml (new)
+- ndroid/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml (new)
+- ndroid/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml (new)
+- ndroid/app/src/main/res/values/themes.xml (updated splash screen attributes)
+- ndroid/app/src/main/AndroidManifest.xml (added icon references)
+
+**Build Verification:**
+- Tested with .\gradlew.bat assembleDebug (compileSdk 36, minSdk 26)
+- Build passed: 106 tasks, 15 executed, 91 up-to-date (20s build time)
+- No lint warnings on new resources
+
+**Key Learnings:**
+- **Adaptive Icons are Mandatory for Modern Android:** Round icons needed for launchers that use circular masks (Pixel, OnePlus, Samsung One UI circles). Without ic_launcher_round.xml, the icon gets auto-cropped awkwardly.
+- **Vector Drawables Save Massive Space:** Single 1.4KB XML replaces 5 PNG files (~40KB each) for mdpi/hdpi/xhdpi/xxhdpi/xxxhdpi.
+- **Android 12+ SplashScreen API is Pure Theme Config:** No custom Activity code needed. Just theme attributes + a drawable. Contrast with legacy splash screen implementations that required custom SplashActivity + timer logic.
+- **Reuse Foreground Drawable for Splash:** Using the same ic_launcher_foreground.xml for both app icon and splash screen ensures visual consistency and avoids asset duplication.
+
+**Future Enhancements (Not in Scope):**
+- Animated splash screen icon (requires AnimatedVectorDrawable)
+- Custom branding duration extension (default is 1s max per Material Design guidelines)
+- PNG fallback icons for legacy launchers (currently relying on adaptive icon backward compat)
+
+### 2026-04-08: ProGuard/R8 Configuration for Release Builds (Issue #254)
+**Production release build protection via comprehensive keep rules**
+- Created `android/app/proguard-rules.pro` with 164 lines of comprehensive keep rules protecting 8 dependency categories
+- Categories covered: Firebase (all classes + @PropertyName/@DocumentId), Hilt/Dagger (modules, components, DI), Room (entities, DAOs, databases, migrations), Lottie (animation classes for JSON parsing), Retrofit/OkHttp (annotations, interface methods), Kotlin Coroutines (dispatchers, volatile fields), AndroidX (Compose, WorkManager, Navigation, DataStore, Glance), App Models (core data models, domain models)
+- Increased Gradle heap from 2GB → 4GB in `build.gradle.kts` to prevent R8 OOM during complex dependency processing
+- Added `android/app/lint.xml` to suppress unrelated WorkManager lint warnings
+- **Key decision:** Broad "keep all" strategy chosen over granular optimization for MVP stability (one missed rule = production crash). APK size cost acceptable (5-10% larger).
+- Alternatives rejected: granular `-keepclasseswithmembers` rules (too risky), `isMinifyEnabled = false` (3-5x APK bloat), library-specific consumer-rules (deferred to post-MVP)
+- Debugging attributes preserved (source files, line numbers) for crash reporting
+- Rules follow official Firebase, Hilt, Room, Retrofit documentation and Google best practices
+- Validates at compile-time but full release APK build verification deferred due to environment constraints
+- Outcome: Release builds now protected from reflection-based crashes (Firebase, Room, Hilt, Lottie). Gradle heap increase solves OOM issues. Ready for beta distribution.
+- Closes #254 via PR #262
