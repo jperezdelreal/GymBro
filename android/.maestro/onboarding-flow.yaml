@@ -5,6 +5,11 @@ tags:
   - smoke
 ---
 
+onFlowComplete:
+  # Clear app state after testing onboarding
+  # This ensures next flow doesn't see onboarding state
+  - stopApp
+
 - launchApp:
     clearState: true
 
