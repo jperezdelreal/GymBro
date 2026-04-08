@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Base Theme -->
     <style name="Theme.GymBro" parent="android:Theme.Material.NoActionBar">
         <item name="android:statusBarColor">#FF0A0A0A</item>
         <item name="android:navigationBarColor">#FF0A0A0A</item>
         <item name="android:windowBackground">#FF0A0A0A</item>
+        <!-- Android 12+ Splash Screen -->
+        <item name="android:windowSplashScreenBackground">#FF0A0A0A</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
+        <item name="android:windowSplashScreenIconBackgroundColor">#FF0A0A0A</item>
     </style>
 </resources>
