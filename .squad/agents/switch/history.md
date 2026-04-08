@@ -74,3 +74,33 @@
 - No crashes on empty state
 - Files affected: `CoachChatViewModelTests.swift` (7 new tests)
 - Contribution to overall test coverage improvement — helps address the Phase 1+2 audit recommendation of 60%+ coverage
+
+### 2025-02-06: Fixed Android Unit Test Compilation After UX Refactors (Issue #249)
+
+**What was fixed:**
+- **FakeExerciseRepository**: Added missing `override suspend fun addExercise()` and `override suspend fun isExerciseNameTaken()` methods in both core and feature test modules
+  - Files: `android/core/src/test/java/com/gymbro/core/fakes/FakeExerciseRepository.kt`, `android/feature/src/test/java/com/gymbro/core/fakes/FakeExerciseRepository.kt`
+- **ExerciseLibraryViewModelTest**: Added missing `tooltipManager` parameter (mocked with mockk) to all 12 ViewModel instantiations
+  - File: `android/feature/src/test/java/com/gymbro/feature/exerciselibrary/ExerciseLibraryViewModelTest.kt`
+- **ProgressViewModelTest**: Added missing `plateauDetectionService` and `tooltipManager` parameters (mocked with mockk) to all 10 ViewModel instantiations
+  - File: `android/feature/src/test/java/com/gymbro/feature/progress/ProgressViewModelTest.kt`
+- **ActiveWorkoutViewModelTest**: Added missing `personalRecordService` and `tooltipManager` parameters (mocked with mockk)
+  - File: `android/feature/src/test/java/com/gymbro/feature/workout/ActiveWorkoutViewModelTest.kt`
+
+**Test Results:**
+- Core module: 80/80 tests passing ✅
+- Feature module: Compilation fixed, tests running (some pre-existing failures from UX refactors remain, not introduced by this fix)
+
+**Key patterns:**
+1. **Repository interface changes**: When adding methods to repository interfaces, update all fake implementations in both main and test source sets
+2. **ViewModel constructor changes**: When adding dependencies to ViewModels (like TooltipManager, services), update all test instantiations with mocked dependencies
+3. **Mockk usage**: Use `mockk(relaxed = true)` for injected dependencies in tests when the specific behavior isn't being tested
+4. **Test file locations**: Android test fakes can exist in both `core/src/test` and `feature/src/test` — both need updating
+
+**Build command:**
+```
+$env:JAVA_HOME = "C:\Program Files\Android\Android Studio\jbr"
+cd android
+.\gradlew.bat test
+```
+
