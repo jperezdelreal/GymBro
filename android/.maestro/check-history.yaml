@@ -47,8 +47,9 @@ onFlowComplete:
       - assertVisible: "Sin Entrenamientos Aún"
       # Screenshot 02: History empty state with no workouts
       - takeScreenshot: 02_check_history_empty_state
-      - assertVisible: "Comienza tu primer entrenamiento"
-        optional: true
+      - assertVisible:
+          text: "Comienza tu primer entrenamiento"
+          optional: true
 
 - runFlow:
     when:
