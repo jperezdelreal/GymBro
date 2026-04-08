@@ -1,5 +1,12 @@
 appId: com.gymbro.app
 name: "Negative — Invalid Workout Inputs (zero/negative/extreme values)"
+#
+# Tests: App resilience with invalid workout input values (zero, negative, extreme)
+# Preconditions: User has completed onboarding (ensured by ensure-post-onboarding.yaml)
+# Test data: Invalid inputs (0, -50, 99999, -10) for weight and reps
+# Assertions: App handles invalid inputs gracefully without crashes
+# Cleanup: Cancel active workout
+# Dependencies: flow/ensure-post-onboarding.yaml
 tags:
   - negative
   - core
@@ -30,7 +37,8 @@ onFlowComplete:
 
 # Verify Active Workout screen
 - assertVisible: "Entrenamiento Activo"
-- takeScreenshot: negative_workout_started
+# Screenshot 01: Workout started for negative input testing
+- takeScreenshot: 01_negative_workout_input_started
 
 # Add an exercise
 - tapOn: "Añadir Ejercicio"
@@ -58,7 +66,8 @@ onFlowComplete:
     index: 0
 - inputText: "5"
 - hideKeyboard
-- takeScreenshot: negative_zero_weight
+# Screenshot 02: Zero weight input test
+- takeScreenshot: 02_negative_workout_input_zero_weight
 # App should handle gracefully (no crash)
 
 # Clear and try TEST 2: Negative weight
@@ -71,7 +80,8 @@ onFlowComplete:
     index: 0
 - inputText: "5"
 - hideKeyboard
-- takeScreenshot: negative_weight
+# Screenshot 03: Negative weight input test
+- takeScreenshot: 03_negative_workout_input_negative_weight
 # App should handle gracefully
 
 # Clear and try TEST 3: Extremely large weight
@@ -80,7 +90,8 @@ onFlowComplete:
     index: 0
 - inputText: "99999"
 - hideKeyboard
-- takeScreenshot: negative_extreme_weight
+# Screenshot 04: Extreme weight input test (99999 kg)
+- takeScreenshot: 04_negative_workout_input_extreme_weight
 
 # TEST 4: Zero reps
 - tapOn:
@@ -88,7 +99,8 @@ onFlowComplete:
     index: 0
 - inputText: "0"
 - hideKeyboard
-- takeScreenshot: negative_zero_reps
+# Screenshot 05: Zero reps input test
+- takeScreenshot: 05_negative_workout_input_zero_reps
 
 # TEST 5: Negative reps
 - tapOn:
@@ -96,7 +108,8 @@ onFlowComplete:
     index: 0
 - inputText: "-10"
 - hideKeyboard
-- takeScreenshot: negative_reps
+# Screenshot 06: Negative reps input test
+- takeScreenshot: 06_negative_workout_input_negative_reps
 
 # Verify app is still responsive (no crash)
 - assertVisible: "Entrenamiento Activo"

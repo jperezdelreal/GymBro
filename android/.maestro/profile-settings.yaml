@@ -1,5 +1,12 @@
 appId: com.gymbro.app
 name: "Profile Settings — Open profile and check settings sections"
+#
+# Tests: Profile tab sections and settings visibility
+# Preconditions: User has completed onboarding (ensured by ensure-post-onboarding.yaml)
+# Test data: None
+# Assertions: All profile sections visible (AI Coach, Account, Training Preferences, About, Version)
+# Cleanup: Return to Library tab
+# Dependencies: flow/ensure-post-onboarding.yaml
 tags:
   - regression
 ---
@@ -24,29 +31,34 @@ onFlowComplete:
     id: "nav_profile"
 - waitForAnimationToEnd:
     timeout: 2000
-- takeScreenshot: profile_screen
+# Screenshot 01: Profile screen opened
+- takeScreenshot: 01_profile_settings_screen
 
 # Verify profile sections are visible
 - assertVisible: "Hablar con el Entrenador IA"
 - assertVisible: "Cuenta"
 - assertVisible: "Preferencias de Entrenamiento"
-- takeScreenshot: profile_sections
+# Screenshot 02: Profile sections visible (AI Coach, Account, Preferences)
+- takeScreenshot: 02_profile_settings_sections
 
 # Scroll to see more sections
 - scroll
 
 - assertVisible: "Acerca de"
 - assertVisible: "Versión 1.0"
-- takeScreenshot: profile_about_section
+# Screenshot 03: About section with app version visible
+- takeScreenshot: 03_profile_settings_about_section
 
 # Verify preference items
 - assertVisible: "Temporizador de Descanso Predeterminado"
 - assertVisible: "Unidad de Peso"
 - assertVisible: "Recordatorios de Entrenamiento"
-- takeScreenshot: profile_preferences
+# Screenshot 04: Training preferences items visible
+- takeScreenshot: 04_profile_settings_preferences
 
 # Scroll back up
 - scrollUntilVisible:
     element: "Hablar con el Entrenador IA"
     direction: UP
-- takeScreenshot: profile_top
+# Screenshot 05: Scrolled back to top of profile
+- takeScreenshot: 05_profile_settings_top

@@ -1,5 +1,12 @@
 appId: com.gymbro.app
 name: "Onboarding — Complete 4-page onboarding flow"
+#
+# Tests: Complete onboarding flow from welcome through name/unit selection
+# Preconditions: App launched with clearState (fresh install state)
+# Test data: USER_NAME env var (defaults to "TestUser"), units selection (kg)
+# Assertions: All 4 onboarding pages visible, name and units saved, lands on Exercise Library
+# Cleanup: App state cleared via stopApp and clearState
+# Dependencies: None
 tags:
   - onboarding
   - smoke
@@ -16,7 +23,8 @@ onFlowComplete:
 # Page 0: Welcome
 - assertVisible: "GymBro"
 - assertVisible: "Your smart gym companion"
-- takeScreenshot: onboarding_welcome
+# Screenshot 01: Welcome page (first onboarding screen)
+- takeScreenshot: 01_onboarding_welcome
 
 # Swipe to Page 1: Fast Logging
 - swipe:
@@ -24,7 +32,8 @@ onFlowComplete:
     duration: 400
 
 - assertVisible: "Ultra-Fast Logging"
-- takeScreenshot: onboarding_fast_logging
+# Screenshot 02: Fast Logging page (second onboarding screen)
+- takeScreenshot: 02_onboarding_fast_logging
 
 # Swipe to Page 2: Track Progress
 - swipe:
@@ -32,7 +41,8 @@ onFlowComplete:
     duration: 400
 
 - assertVisible: "Track Your Progress"
-- takeScreenshot: onboarding_track_progress
+# Screenshot 03: Track Progress page (third onboarding screen)
+- takeScreenshot: 03_onboarding_track_progress
 
 # Swipe to Page 3: Get Started
 - swipe:
@@ -43,7 +53,8 @@ onFlowComplete:
 - assertVisible: "Preferred Units"
 - assertVisible: "Kilograms (kg)"
 - assertVisible: "Pounds (lbs)"
-- takeScreenshot: onboarding_get_started
+# Screenshot 04: Get Started page with unit selection (fourth onboarding screen)
+- takeScreenshot: 04_onboarding_get_started
 
 # Select kg unit
 - tapOn: "Kilograms (kg)"
@@ -51,7 +62,8 @@ onFlowComplete:
 # Enter name
 - tapOn: "Enter your name"
 - inputText: "${USER_NAME:=TestUser}"
-- takeScreenshot: onboarding_name_entered
+# Screenshot 05: User name entered in onboarding form
+- takeScreenshot: 05_onboarding_name_entered
 - hideKeyboard
 
 # Complete onboarding
@@ -61,4 +73,5 @@ onFlowComplete:
 
 # Verify we landed on Exercise Library
 - assertVisible: "Exercise Library"
-- takeScreenshot: onboarding_complete
+# Screenshot 06: Successfully completed onboarding, landed on Exercise Library
+- takeScreenshot: 06_onboarding_complete

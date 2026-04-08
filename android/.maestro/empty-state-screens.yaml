@@ -1,5 +1,12 @@
 appId: com.gymbro.app
 name: "Negative — Empty State UI (fresh app with no data)"
+#
+# Tests: Empty state UI across all tabs with fresh app install
+# Preconditions: App launched with clearState (fresh install simulation)
+# Test data: User name "EmptyTest", units kg
+# Assertions: All tabs (Library, History, Progress, Recovery, Profile) handle empty state gracefully
+# Cleanup: App state cleared via stopApp
+# Dependencies: None
 tags:
   - negative
   - core
@@ -20,7 +27,8 @@ onFlowComplete:
 
 # Complete onboarding quickly to get past it
 - assertVisible: "GymBro"
-- takeScreenshot: empty_state_onboarding_start
+# Screenshot 01: Onboarding start screen (fresh app state)
+- takeScreenshot: 01_empty_state_onboarding_start
 
 # Swipe through onboarding pages
 - swipe:
@@ -46,7 +54,8 @@ onFlowComplete:
 
 # Now at Exercise Library (post-onboarding)
 - assertVisible: "Biblioteca de Ejercicios"
-- takeScreenshot: empty_state_library
+# Screenshot 02: Exercise Library empty state (no workouts yet)
+- takeScreenshot: 02_empty_state_library
 
 # TEST 1: Check History tab (should show empty state)
 - tapOn:
@@ -56,7 +65,8 @@ onFlowComplete:
 
 # Verify History screen loaded
 - assertVisible: "Historial|History"
-- takeScreenshot: empty_state_history
+# Screenshot 03: History tab empty state (no workout history)
+- takeScreenshot: 03_empty_state_history
 # Should show empty state message or empty list
 
 # TEST 2: Check Progress tab (should show empty state)
@@ -67,7 +77,8 @@ onFlowComplete:
 
 # Verify Progress screen loaded
 - assertVisible: "Progreso|Progress"
-- takeScreenshot: empty_state_progress
+# Screenshot 04: Progress tab empty state (no progress data)
+- takeScreenshot: 04_empty_state_progress
 # Should show empty state with no data
 
 # TEST 3: Check Recovery tab
@@ -77,7 +88,8 @@ onFlowComplete:
     timeout: 2000
 
 # Verify Recovery screen loaded
-- takeScreenshot: empty_state_recovery
+# Screenshot 05: Recovery tab empty state
+- takeScreenshot: 05_empty_state_recovery
 
 # TEST 4: Check Profile tab
 - tapOn:
@@ -87,7 +99,8 @@ onFlowComplete:
 
 # Verify Profile screen loaded
 - assertVisible: "Perfil|Profile"
-- takeScreenshot: empty_state_profile
+# Screenshot 06: Profile tab with fresh user data
+- takeScreenshot: 06_empty_state_profile
 
 # Verify app handles all empty states gracefully
 - assertVisible: "EmptyTest"

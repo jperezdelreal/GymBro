@@ -1,5 +1,12 @@
 appId: com.gymbro.app
 name: "Check Progress — Navigate to progress and verify KPI cards"
+#
+# Tests: Progress tab navigation and KPI data display (volume, PRs, 1RM trends)
+# Preconditions: User has completed onboarding (ensured by ensure-post-onboarding.yaml)
+# Test data: None (tests both empty and populated states)
+# Assertions: Progress screen loads, copyTextFrom captures volume stats, KPI cards visible
+# Cleanup: Return to Library tab
+# Dependencies: flow/ensure-post-onboarding.yaml
 tags:
   - progress
   - smoke
@@ -25,7 +32,8 @@ onFlowComplete:
     id: "nav_progress"
 - waitForAnimationToEnd:
     timeout: 2000
-- takeScreenshot: progress_tab
+# Screenshot 01: Progress tab opened
+- takeScreenshot: 01_check_progress_tab
 
 # Conditional: Check for empty state or stats
 - runFlow:
@@ -34,7 +42,8 @@ onFlowComplete:
     commands:
       # Empty state path
       - assertVisible: "Sin entrenamientos aún"
-      - takeScreenshot: progress_empty_state
+      # Screenshot 02: Progress empty state with no workout data
+      - takeScreenshot: 02_check_progress_empty_state
       - assertVisible: "Registra tu primer entrenamiento"
         optional: true
 
@@ -44,7 +53,8 @@ onFlowComplete:
     commands:
       # Data exists path — verify and capture KPI stats
       - assertVisible: "Volumen Semanal"
-      - takeScreenshot: progress_with_data
+      # Screenshot 03: Progress with KPI data visible
+      - takeScreenshot: 03_check_progress_with_data
       
       # copyTextFrom: Capture volume stat
       - copyTextFrom:
@@ -58,8 +68,10 @@ onFlowComplete:
       - assertVisible:
           text: "Estimated 1RM Trend"
           optional: true
-      - takeScreenshot: progress_kpi_cards
+      # Screenshot 04: KPI cards with volume and PR sections
+      - takeScreenshot: 04_check_progress_kpi_cards
       
       # Scroll down to see more content
       - scroll
-      - takeScreenshot: progress_scrolled
+      # Screenshot 05: Progress scrolled to show additional data
+      - takeScreenshot: 05_check_progress_scrolled

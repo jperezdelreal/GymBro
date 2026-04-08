@@ -1,5 +1,12 @@
 appId: com.gymbro.app
 name: "Negative — Rapid Navigation Stress Test"
+#
+# Tests: App stability under rapid navigation between tabs (stress test)
+# Preconditions: User has completed onboarding (ensured by ensure-post-onboarding.yaml)
+# Test data: None
+# Assertions: App handles rapid/repeated navigation without crashes or state corruption
+# Cleanup: None
+# Dependencies: flow/ensure-post-onboarding.yaml
 tags:
   - negative
   - regression
@@ -15,7 +22,8 @@ onFlowStart:
 
 # Start from Exercise Library
 - assertVisible: "Biblioteca de Ejercicios"
-- takeScreenshot: rapid_nav_start
+# Screenshot 01: Rapid navigation test starting point
+- takeScreenshot: 01_rapid_navigation_start
 
 # RAPID TAP SEQUENCE 1: Cycle through all nav tabs quickly
 - tapOn:
@@ -47,7 +55,8 @@ onFlowStart:
     timeout: 1500
 - assertVisible: "Biblioteca de Ejercicios"
 
-- takeScreenshot: rapid_nav_cycle1
+# Screenshot 02: First navigation cycle completed
+- takeScreenshot: 02_rapid_navigation_cycle1
 
 # RAPID TAP SEQUENCE 2: Reverse order
 - tapOn:
@@ -75,7 +84,8 @@ onFlowStart:
 - waitForAnimationToEnd:
     timeout: 1500
 
-- takeScreenshot: rapid_nav_cycle2
+# Screenshot 03: Reverse navigation cycle completed
+- takeScreenshot: 03_rapid_navigation_cycle2
 
 # RAPID TAP SEQUENCE 3: Random pattern
 - tapOn:
@@ -108,7 +118,8 @@ onFlowStart:
 - waitForAnimationToEnd:
     timeout: 1500
 
-- takeScreenshot: rapid_nav_cycle3
+# Screenshot 04: Random pattern navigation cycle completed
+- takeScreenshot: 04_rapid_navigation_cycle3
 
 # STRESS TEST: Multiple rapid taps on same tab
 - tapOn:
@@ -131,7 +142,8 @@ onFlowStart:
     timeout: 1500
 - assertVisible: "Biblioteca de Ejercicios"
 
-- takeScreenshot: rapid_nav_stress
+# Screenshot 05: Stress test (multiple rapid taps on same tab) completed
+- takeScreenshot: 05_rapid_navigation_stress
 
 # Final verification: All tabs still work correctly
 - tapOn:
@@ -163,4 +175,5 @@ onFlowStart:
     timeout: 1500
 - assertVisible: "Biblioteca de Ejercicios"
 
-- takeScreenshot: rapid_nav_complete
+# Screenshot 06: All tabs still functional after stress test
+- takeScreenshot: 06_rapid_navigation_complete

@@ -1,5 +1,12 @@
 appId: com.gymbro.app
 name: "AI Coach — Open coach and send a message"
+#
+# Tests: AI Coach feature accessibility and basic interaction
+# Preconditions: User has completed onboarding (ensured by ensure-post-onboarding.yaml)
+# Test data: Quick prompt "¿Qué debería entrenar hoy?"
+# Assertions: Coach screen opens, welcome message visible, prompt sent successfully
+# Cleanup: Navigate back to Profile tab
+# Dependencies: flow/ensure-post-onboarding.yaml
 tags:
   - regression
 ---
@@ -33,28 +40,33 @@ onFlowComplete:
 
 # Verify Coach screen opens
 - assertVisible: "GymBro Entrenador IA"
-- takeScreenshot: coach_screen
+# Screenshot 01: AI Coach screen opened from Profile
+- takeScreenshot: 01_ai_coach_screen
 
 # Check for welcome message and quick prompts
 - assertVisible: "Tu asesor personal de entrenamiento de fuerza"
 - assertVisible: "Preguntas rápidas:"
-- takeScreenshot: coach_welcome
+# Screenshot 02: Welcome message and quick prompt buttons visible
+- takeScreenshot: 02_ai_coach_welcome
 
 # Try tapping a quick prompt
 - tapOn: "¿Qué debería entrenar hoy?"
 - waitForAnimationToEnd:
     timeout: 1000
-- takeScreenshot: coach_prompt_sent
+# Screenshot 03: Quick prompt sent to AI Coach
+- takeScreenshot: 03_ai_coach_prompt_sent
 
 # Wait for response (or loading indicator)
 - assertVisible:
     text: "El entrenador está pensando...|Entrenador"
     optional: true
-- takeScreenshot: coach_response
+# Screenshot 04: AI Coach response or loading state
+- takeScreenshot: 04_ai_coach_response
 
 # Navigate back
 - back
 - waitForAnimationToEnd:
     timeout: 2000
 - assertVisible: "Perfil"
-- takeScreenshot: coach_back_to_profile
+# Screenshot 05: Returned to Profile tab after AI Coach interaction
+- takeScreenshot: 05_ai_coach_back_to_profile

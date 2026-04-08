@@ -1,5 +1,12 @@
 appId: com.gymbro.app
 name: "Negative — Onboarding Edge Cases (empty/long/special names)"
+#
+# Tests: Onboarding form validation with edge case inputs (empty, very long, special chars, emoji)
+# Preconditions: App launched with clearState for each test
+# Test data: Various invalid/edge case names (empty, 50+ chars, special chars, emoji)
+# Assertions: App handles all edge cases gracefully without crashes
+# Cleanup: App stopped after all tests
+# Dependencies: None
 tags:
   - negative
   - onboarding
@@ -18,7 +25,8 @@ onFlowComplete:
     timeout: 3000
 
 - assertVisible: "GymBro"
-- takeScreenshot: onboarding_edge_start
+# Screenshot 01: Onboarding edge case testing start
+- takeScreenshot: 01_onboarding_edge_start
 
 # Swipe to final onboarding page
 - swipe:
@@ -37,7 +45,8 @@ onFlowComplete:
 # Try to proceed without entering name
 - tapOn:
     id: "onboarding_start"
-- takeScreenshot: onboarding_edge_empty_name
+# Screenshot 02: Empty name input test
+- takeScreenshot: 02_onboarding_edge_empty_name
 # App should either require name or proceed with empty (verify no crash)
 
 # Stop and restart for next test
@@ -64,7 +73,8 @@ onFlowComplete:
     id: "onboarding_name_input"
 - inputText: "ThisIsAVeryLongNameThatExceedsFiftyCharactersToTestInputHandling"
 - hideKeyboard
-- takeScreenshot: onboarding_edge_long_name
+# Screenshot 03: Very long name input test (50+ characters)
+- takeScreenshot: 03_onboarding_edge_long_name
 # Verify name field handles long input
 
 - tapOn:
@@ -96,7 +106,8 @@ onFlowComplete:
     id: "onboarding_name_input"
 - inputText: "User@123!#$%"
 - hideKeyboard
-- takeScreenshot: onboarding_edge_special_chars
+# Screenshot 04: Special characters in name input test
+- takeScreenshot: 04_onboarding_edge_special_chars
 
 - tapOn:
     id: "onboarding_start"
@@ -127,7 +138,8 @@ onFlowComplete:
     id: "onboarding_name_input"
 - inputText: "User💪🏋️"
 - hideKeyboard
-- takeScreenshot: onboarding_edge_emoji
+# Screenshot 05: Emoji in name input test
+- takeScreenshot: 05_onboarding_edge_emoji
 
 - tapOn:
     id: "onboarding_start"
@@ -137,4 +149,5 @@ onFlowComplete:
 
 # Verify we reached Exercise Library (no crash)
 - assertVisible: "Biblioteca de Ejercicios"
-- takeScreenshot: onboarding_edge_complete
+# Screenshot 06: Edge case tests completed, app stable
+- takeScreenshot: 06_onboarding_edge_complete

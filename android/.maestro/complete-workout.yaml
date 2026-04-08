@@ -1,5 +1,12 @@
 appId: com.gymbro.app
 name: "Complete Workout — Full workout to completion and summary"
+#
+# Tests: Full workout lifecycle from start to completion, including persistence verification
+# Preconditions: User has completed onboarding (ensured by ensure-post-onboarding.yaml)
+# Test data: EXERCISE_NAME (Bench Press), WEIGHT (100), REPS (5), 3 sets
+# Assertions: Sets logged correctly with copyTextFrom, workout summary shows, data persists in History and Progress
+# Cleanup: None (workout data persists for history/progress validation)
+# Dependencies: flow/ensure-post-onboarding.yaml
 tags:
   - core
 ---
@@ -69,14 +76,16 @@ onFlowStart:
           index: 0
       - assertTrue: ${maestro.copiedText == "${REPS:=5}"}
       
-      - takeScreenshot: workout_set_${repeat.index}_filled
+      # Screenshot: Set filled with weight and reps values (numbered per repeat index)
+      - takeScreenshot: 0${repeat.index}_complete_workout_set_filled
       
       # Complete the set
       - tapOn:
           text: "Completar serie.*"
       - waitForAnimationToEnd:
           timeout: 1000
-      - takeScreenshot: workout_set_${repeat.index}_completed
+      # Screenshot: Set marked as completed (numbered per repeat index)
+      - takeScreenshot: 0${repeat.index}_complete_workout_set_completed
 
 # Finish the workout
 - tapOn: "Finalizar Entrenamiento"
@@ -85,7 +94,8 @@ onFlowStart:
 
 # Verify workout summary screen
 - assertVisible: "¡Entrenamiento Completado!"
-- takeScreenshot: workout_summary
+# Screenshot 04: Workout summary screen after completion
+- takeScreenshot: 04_complete_workout_summary
 
 # Verify stats are displayed and capture values
 - assertVisible: "Estadísticas del Entrenamiento"
@@ -100,7 +110,8 @@ onFlowStart:
     text: "\\d+.*series"
 - assertVisible: "${maestro.copiedText}"
 
-- takeScreenshot: workout_stats_captured
+# Screenshot 05: Workout stats captured with copyTextFrom verification
+- takeScreenshot: 05_complete_workout_stats_captured
 
 # Tap Done to return
 - tapOn: "Listo"
@@ -109,7 +120,8 @@ onFlowStart:
 
 # Back at exercise library
 - assertVisible: "Biblioteca de Ejercicios"
-- takeScreenshot: workout_flow_complete
+# Screenshot 06: Returned to Exercise Library after workout completion
+- takeScreenshot: 06_complete_workout_flow_complete
 
 # PERSISTENCE VERIFICATION: Navigate to History
 - tapOn:
@@ -117,11 +129,13 @@ onFlowStart:
 - waitForAnimationToEnd:
     timeout: 2000
 - assertVisible: "Historial de Entrenamientos"
-- takeScreenshot: persistence_check_history
+# Screenshot 07: History tab opened for persistence verification
+- takeScreenshot: 07_complete_workout_persistence_check_history
 
 # Verify workout appears in history (Exercise should be visible)
 - assertVisible: "${EXERCISE_NAME:=Bench Press}"
-- takeScreenshot: persistence_workout_in_history
+# Screenshot 08: Workout appears in history confirming data persistence
+- takeScreenshot: 08_complete_workout_persistence_workout_in_history
 
 # PERSISTENCE VERIFICATION: Navigate to Progress
 - tapOn:
@@ -130,13 +144,15 @@ onFlowStart:
     timeout: 2000
 - assertVisible:
     text: "Volumen Semanal|Sin entrenamientos aún"
-- takeScreenshot: persistence_check_progress
+# Screenshot 09: Progress tab opened for persistence verification
+- takeScreenshot: 09_complete_workout_persistence_check_progress
 
 # If progress data exists, verify it's updated (not empty state)
 - assertVisible:
     text: "Volumen Semanal"
     optional: true
-- takeScreenshot: persistence_progress_updated
+# Screenshot 10: Progress data updated after workout completion
+- takeScreenshot: 10_complete_workout_persistence_progress_updated
 
 # Return to Exercise Library
 - tapOn:

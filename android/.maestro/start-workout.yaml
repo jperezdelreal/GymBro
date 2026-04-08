@@ -1,5 +1,12 @@
 appId: com.gymbro.app
 name: "Start Workout — Begin workout, add exercises, log sets"
+#
+# Tests: Starting a workout, adding exercises via search, and logging set data
+# Preconditions: User has completed onboarding (ensured by ensure-post-onboarding.yaml)
+# Test data: EXERCISE_SEARCH (Bench), EXERCISE_NAME (Bench Press), WEIGHT (80), REPS (8)
+# Assertions: Workout starts, exercise picker opens, exercise added, set data entered
+# Cleanup: Cancel active workout
+# Dependencies: flow/ensure-post-onboarding.yaml
 tags:
   - core
 ---
@@ -32,7 +39,8 @@ onFlowComplete:
 
 # Verify Active Workout screen
 - assertVisible: "Entrenamiento Activo"
-- takeScreenshot: workout_started
+# Screenshot 01: Active workout screen after starting
+- takeScreenshot: 01_start_workout_started
 
 # Tap Add Exercise button
 - tapOn: "Añadir Ejercicio"
@@ -41,13 +49,15 @@ onFlowComplete:
 
 # Verify exercise picker opens
 - assertVisible: "Elegir Ejercicio"
-- takeScreenshot: exercise_picker
+# Screenshot 02: Exercise picker opened from workout
+- takeScreenshot: 02_start_workout_exercise_picker
 
 # Search and select an exercise
 - tapOn:
     id: "search_bar"
 - inputText: "${EXERCISE_SEARCH:=Bench}"
-- takeScreenshot: exercise_picker_search
+# Screenshot 03: Search query entered in exercise picker
+- takeScreenshot: 03_start_workout_exercise_picker_search
 
 # Tap the first exercise result
 - tapOn:
@@ -56,7 +66,8 @@ onFlowComplete:
 
 # Back on workout screen — verify exercise was added
 - assertVisible: "Entrenamiento Activo"
-- takeScreenshot: workout_exercise_added
+# Screenshot 04: Exercise added to active workout
+- takeScreenshot: 04_start_workout_exercise_added
 
 # Log a set — enter weight value
 - tapOn:
@@ -70,4 +81,5 @@ onFlowComplete:
     index: 0
 - inputText: "${REPS:=8}"
 
-- takeScreenshot: workout_set_logged
+# Screenshot 05: Set data logged (weight and reps entered)
+- takeScreenshot: 05_start_workout_set_logged

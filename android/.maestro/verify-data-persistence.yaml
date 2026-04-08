@@ -1,5 +1,12 @@
 appId: com.gymbro.app
 name: "Verify Data Persistence — Cross-screen data verification"
+#
+# Tests: Workout data persistence across History and Progress tabs
+# Preconditions: User has completed onboarding (ensured by ensure-post-onboarding.yaml)
+# Test data: EXERCISE_NAME (Squat), WEIGHT (80), REPS (8), 1 set
+# Assertions: Completed workout appears in History with details, Progress shows updated stats
+# Cleanup: Return to Library tab
+# Dependencies: flow/ensure-post-onboarding.yaml
 tags:
   - core
   - regression
@@ -22,7 +29,8 @@ onFlowComplete:
 
 # Start from Exercise Library
 - assertVisible: "Biblioteca de Ejercicios"
-- takeScreenshot: persistence_flow_start
+# Screenshot 01: Data persistence flow starting point
+- takeScreenshot: 01_verify_data_persistence_flow_start
 
 # STEP 1: Start a workout
 - tapOn:
@@ -30,7 +38,8 @@ onFlowComplete:
 - waitForAnimationToEnd:
     timeout: 2000
 - assertVisible: "Entrenamiento Activo"
-- takeScreenshot: persistence_workout_started
+# Screenshot 02: Workout started for persistence test
+- takeScreenshot: 02_verify_data_persistence_workout_started
 
 # STEP 2: Add an exercise
 - tapOn: "Añadir Ejercicio"
@@ -57,21 +66,24 @@ onFlowComplete:
 - inputText: "${REPS:=8}"
 - hideKeyboard
 
-- takeScreenshot: persistence_set_filled
+# Screenshot 03: Set filled with weight and reps
+- takeScreenshot: 03_verify_data_persistence_set_filled
 
 # Complete the set
 - tapOn:
     text: "Completar serie 1"
 - waitForAnimationToEnd:
     timeout: 1000
-- takeScreenshot: persistence_set_completed
+# Screenshot 04: Set completed successfully
+- takeScreenshot: 04_verify_data_persistence_set_completed
 
 # STEP 4: Complete the workout
 - tapOn: "Finalizar Entrenamiento"
 - waitForAnimationToEnd:
     timeout: 2000
 - assertVisible: "¡Entrenamiento Completado!"
-- takeScreenshot: persistence_workout_summary
+# Screenshot 05: Workout summary displayed
+- takeScreenshot: 05_verify_data_persistence_workout_summary
 
 # Return to library
 - tapOn: "Listo"
@@ -85,18 +97,21 @@ onFlowComplete:
 - waitForAnimationToEnd:
     timeout: 2000
 - assertVisible: "Historial de Entrenamientos"
-- takeScreenshot: persistence_verify_history
+# Screenshot 06: History tab opened to verify persistence
+- takeScreenshot: 06_verify_data_persistence_verify_history
 
 # Verify workout appears
 - assertVisible: "${EXERCISE_NAME:=Squat}"
-- takeScreenshot: persistence_workout_found_in_history
+# Screenshot 07: Workout found in history confirming persistence
+- takeScreenshot: 07_verify_data_persistence_workout_found_in_history
 
 # Tap on the workout to see details
 - tapOn: "${EXERCISE_NAME:=Squat}"
 - assertVisible:
     text: "${WEIGHT:=80}|${REPS:=8}"
     optional: true
-- takeScreenshot: persistence_history_detail
+# Screenshot 08: Workout detail view with set data
+- takeScreenshot: 08_verify_data_persistence_history_detail
 
 # Go back to history list
 - back
@@ -111,11 +126,13 @@ onFlowComplete:
     timeout: 2000
 - assertVisible:
     text: "Volumen Semanal|Sin entrenamientos aún"
-- takeScreenshot: persistence_verify_progress
+# Screenshot 09: Progress tab opened to verify persistence
+- takeScreenshot: 09_verify_data_persistence_verify_progress
 
 # Verify progress data shows (not empty state)
 - assertVisible: "Volumen Semanal"
-- takeScreenshot: persistence_progress_stats_visible
+# Screenshot 10: Progress stats visible confirming data persistence
+- takeScreenshot: 10_verify_data_persistence_progress_stats_visible
 
 # Verify PRs section is present (indicates data exists)
 - assertVisible:
@@ -124,10 +141,12 @@ onFlowComplete:
 
 # Scroll to see more stats
 - scroll
-- takeScreenshot: persistence_progress_scrolled
+# Screenshot 11: Progress scrolled to show additional stats
+- takeScreenshot: 11_verify_data_persistence_progress_scrolled
 
 # VERIFICATION 3: Return to library and verify state
 - tapOn:
     id: "nav_exercise_library"
 - assertVisible: "Biblioteca de Ejercicios"
-- takeScreenshot: persistence_flow_complete
+# Screenshot 12: Data persistence flow completed, back at Library
+- takeScreenshot: 12_verify_data_persistence_flow_complete
