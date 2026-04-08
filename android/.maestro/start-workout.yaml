@@ -1,11 +1,23 @@
 appId: com.gymbro.app
 name: "Start Workout — Begin workout, add exercises, log sets"
 tags:
-  - workout
   - core
 ---
 
-- launchApp
+- runFlow: flow/ensure-post-onboarding.yaml
+
+onFlowStart:
+  # Ensure we're at library with no active workout
+  - launchApp
+  - assertVisible: "Biblioteca de Ejercicios"
+
+onFlowComplete:
+  # Cancel any active workout to clean up
+  - back
+      optional: true
+  - tapOn:
+      text: "Cancelar Entrenamiento|Descartar"
+      optional: true
 
 # Start from Exercise Library
 - assertVisible: "Biblioteca de Ejercicios"

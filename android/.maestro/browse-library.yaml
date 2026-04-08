@@ -5,7 +5,17 @@ tags:
   - smoke
 ---
 
-- launchApp
+- runFlow: flow/ensure-post-onboarding.yaml
+
+onFlowStart:
+  # Start at library with clean filters
+  - launchApp
+  - assertVisible: "Biblioteca de Ejercicios"
+
+onFlowComplete:
+  # Clear any active search/filter state
+  - launchApp
+  - assertVisible: "Biblioteca de Ejercicios"
 
 # Verify Exercise Library is visible
 - assertVisible: "Biblioteca de Ejercicios"
