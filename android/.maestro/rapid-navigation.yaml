@@ -1,0 +1,118 @@
+appId: com.gymbro.app
+name: "Negative — Rapid Navigation Stress Test"
+tags:
+  - negative
+  - regression
+---
+
+- runFlow: flow/ensure-post-onboarding.yaml
+
+onFlowStart:
+  - launchApp
+  - assertVisible: "Biblioteca de Ejercicios"
+
+# Start from Exercise Library
+- assertVisible: "Biblioteca de Ejercicios"
+- takeScreenshot: rapid_nav_start
+
+# RAPID TAP SEQUENCE 1: Cycle through all nav tabs quickly
+- tapOn:
+    id: "nav_history"
+- assertVisible: "Historial|History"
+
+- tapOn:
+    id: "nav_progress"
+- assertVisible: "Progreso|Progress"
+
+- tapOn:
+    id: "nav_recovery"
+
+- tapOn:
+    id: "nav_profile"
+- assertVisible: "Perfil|Profile"
+
+- tapOn:
+    id: "nav_exercise_library"
+- assertVisible: "Biblioteca de Ejercicios"
+
+- takeScreenshot: rapid_nav_cycle1
+
+# RAPID TAP SEQUENCE 2: Reverse order
+- tapOn:
+    id: "nav_profile"
+
+- tapOn:
+    id: "nav_recovery"
+
+- tapOn:
+    id: "nav_progress"
+
+- tapOn:
+    id: "nav_history"
+
+- tapOn:
+    id: "nav_exercise_library"
+
+- takeScreenshot: rapid_nav_cycle2
+
+# RAPID TAP SEQUENCE 3: Random pattern
+- tapOn:
+    id: "nav_progress"
+
+- tapOn:
+    id: "nav_exercise_library"
+
+- tapOn:
+    id: "nav_history"
+
+- tapOn:
+    id: "nav_profile"
+
+- tapOn:
+    id: "nav_recovery"
+
+- tapOn:
+    id: "nav_exercise_library"
+
+- takeScreenshot: rapid_nav_cycle3
+
+# STRESS TEST: Multiple rapid taps on same tab
+- tapOn:
+    id: "nav_history"
+- tapOn:
+    id: "nav_history"
+- tapOn:
+    id: "nav_history"
+- assertVisible: "Historial|History"
+
+- tapOn:
+    id: "nav_exercise_library"
+- tapOn:
+    id: "nav_exercise_library"
+- tapOn:
+    id: "nav_exercise_library"
+- assertVisible: "Biblioteca de Ejercicios"
+
+- takeScreenshot: rapid_nav_stress
+
+# Final verification: All tabs still work correctly
+- tapOn:
+    id: "nav_history"
+- assertVisible: "Historial|History"
+
+- tapOn:
+    id: "nav_progress"
+- assertVisible: "Progreso|Progress"
+
+- tapOn:
+    id: "nav_recovery"
+
+- tapOn:
+    id: "nav_profile"
+- assertVisible: "Perfil|Profile"
+
+- tapOn:
+    id: "nav_exercise_library"
+- assertVisible: "Biblioteca de Ejercicios"
+
+- takeScreenshot: rapid_nav_complete

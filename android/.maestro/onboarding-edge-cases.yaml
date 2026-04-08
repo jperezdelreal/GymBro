@@ -1,0 +1,126 @@
+appId: com.gymbro.app
+name: "Negative — Onboarding Edge Cases (empty/long/special names)"
+tags:
+  - negative
+  - onboarding
+---
+
+onFlowStart:
+  - stopApp
+
+onFlowComplete:
+  - stopApp
+
+# TEST 1: Try to proceed with empty name
+- launchApp:
+    clearState: true
+
+- assertVisible: "GymBro"
+- takeScreenshot: onboarding_edge_start
+
+# Swipe to final onboarding page
+- swipe:
+    direction: LEFT
+    duration: 400
+- swipe:
+    direction: LEFT
+    duration: 400
+- swipe:
+    direction: LEFT
+    duration: 400
+
+- assertVisible: "Let's Get Started"
+- tapOn: "Kilogramos (kg)|Kilograms (kg)"
+
+# Try to proceed without entering name
+- tapOn:
+    id: "onboarding_start"
+- takeScreenshot: onboarding_edge_empty_name
+# App should either require name or proceed with empty (verify no crash)
+
+# Stop and restart for next test
+- stopApp
+
+# TEST 2: Very long name (50+ characters)
+- launchApp:
+    clearState: true
+
+- swipe:
+    direction: LEFT
+    duration: 400
+- swipe:
+    direction: LEFT
+    duration: 400
+- swipe:
+    direction: LEFT
+    duration: 400
+
+- tapOn: "Kilogramos (kg)|Kilograms (kg)"
+- tapOn:
+    id: "onboarding_name_input"
+- inputText: "ThisIsAVeryLongNameThatExceedsFiftyCharactersToTestInputHandling"
+- hideKeyboard
+- takeScreenshot: onboarding_edge_long_name
+# Verify name field handles long input
+
+- tapOn:
+    id: "onboarding_start"
+# App should handle and proceed
+
+- stopApp
+
+# TEST 3: Name with special characters
+- launchApp:
+    clearState: true
+
+- swipe:
+    direction: LEFT
+    duration: 400
+- swipe:
+    direction: LEFT
+    duration: 400
+- swipe:
+    direction: LEFT
+    duration: 400
+
+- tapOn: "Kilogramos (kg)|Kilograms (kg)"
+- tapOn:
+    id: "onboarding_name_input"
+- inputText: "User@123!#$%"
+- hideKeyboard
+- takeScreenshot: onboarding_edge_special_chars
+
+- tapOn:
+    id: "onboarding_start"
+# App should handle special characters
+
+- stopApp
+
+# TEST 4: Name with emoji
+- launchApp:
+    clearState: true
+
+- swipe:
+    direction: LEFT
+    duration: 400
+- swipe:
+    direction: LEFT
+    duration: 400
+- swipe:
+    direction: LEFT
+    duration: 400
+
+- tapOn: "Kilogramos (kg)|Kilograms (kg)"
+- tapOn:
+    id: "onboarding_name_input"
+- inputText: "User💪🏋️"
+- hideKeyboard
+- takeScreenshot: onboarding_edge_emoji
+
+- tapOn:
+    id: "onboarding_start"
+# App should handle emoji input
+
+# Verify we reached Exercise Library (no crash)
+- assertVisible: "Biblioteca de Ejercicios"
+- takeScreenshot: onboarding_edge_complete
