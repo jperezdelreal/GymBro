@@ -1,5 +1,6 @@
 package com.gymbro.feature.common
 
+import androidx.annotation.RawRes
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
@@ -30,10 +31,30 @@ private data class ConfettiParticle(
     val swayFrequency: Float,
 )
 
+/**
+ * Displays a confetti animation overlay.
+ *
+ * @param modifier Modifier for sizing/positioning
+ * @param useLottie If true and lottieResId is provided, uses Lottie animation instead of Canvas
+ * @param lottieResId Optional Lottie animation resource. If null, falls back to Canvas rendering
+ */
 @Composable
 fun ConfettiOverlay(
     modifier: Modifier = Modifier,
+    useLottie: Boolean = false,
+    @RawRes lottieResId: Int? = null,
 ) {
+    if (useLottie && lottieResId != null) {
+        GymBroLottieAnimation(
+            animationResId = lottieResId,
+            modifier = modifier,
+            iterations = 1,
+            speed = 1f,
+        )
+        return
+    }
+
+    // Fallback to Canvas-based confetti
     val colors = listOf(AccentGreen, AccentCyan, AccentAmber)
     val particles = remember {
         List(80) {

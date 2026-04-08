@@ -65,6 +65,9 @@ dependencies {
     // Health Connect
     implementation(libs.health.connect)
 
+    // Lottie
+    implementation(libs.lottie.compose)
+
     // Testing
     testImplementation(project(":core"))
     testImplementation(libs.junit)
