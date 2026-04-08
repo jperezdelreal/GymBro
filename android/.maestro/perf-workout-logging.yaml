@@ -10,10 +10,6 @@ tags:
 # Cleanup: Exit workout without saving
 # Dependencies: ensure-post-onboarding flow
 
----
-
-- runFlow: flow/ensure-post-onboarding.yaml
-
 onFlowStart:
   # Start at library
   - launchApp
@@ -34,6 +30,10 @@ onFlowComplete:
   - tapOn:
       id: "nav_exercise_library"
       optional: true
+
+---
+
+- runFlow: flow/ensure-post-onboarding.yaml
 
 # Start a workout
 - assertVisible: "Biblioteca de Ejercicios"

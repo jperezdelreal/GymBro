@@ -9,16 +9,16 @@ name: "Complete Workout — Full workout to completion and summary"
 # Dependencies: flow/ensure-post-onboarding.yaml
 tags:
   - core
----
-
-- runFlow: flow/ensure-post-onboarding.yaml
-
 onFlowStart:
   # Ensure clean state at library
   - launchApp
   - waitForAnimationToEnd:
       timeout: 3000
   - assertVisible: "Biblioteca de Ejercicios"
+
+---
+
+- runFlow: flow/ensure-post-onboarding.yaml
 
 # Start from Exercise Library
 - assertVisible: "Biblioteca de Ejercicios"

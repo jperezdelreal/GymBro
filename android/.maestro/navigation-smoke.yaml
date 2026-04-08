@@ -10,10 +10,6 @@ name: "Navigation Smoke — Tap through all bottom nav tabs"
 tags:
   - navigation
   - smoke
----
-
-- runFlow: flow/ensure-post-onboarding.yaml
-
 onFlowStart:
   # Ensure app is in post-onboarding state
   - launchApp
@@ -26,6 +22,10 @@ onFlowComplete:
   - tapOn:
       id: "nav_exercise_library"
       optional: true
+
+---
+
+- runFlow: flow/ensure-post-onboarding.yaml
 
 # Start at Library tab
 - assertVisible: "Biblioteca de Ejercicios"

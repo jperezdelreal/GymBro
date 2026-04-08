@@ -10,10 +10,6 @@ tags:
 # Cleanup: App remains launched
 # Dependencies: ensure-post-onboarding flow
 
----
-
-- runFlow: flow/ensure-post-onboarding.yaml
-
 onFlowStart:
   # Completely clear app state for cold start
   - launchApp:
@@ -24,6 +20,10 @@ onFlowStart:
 onFlowComplete:
   # Leave app in launched state
   - assertVisible: "Biblioteca de Ejercicios|Onboarding"
+
+---
+
+- runFlow: flow/ensure-post-onboarding.yaml
 
 # Cold start: Clear state and launch
 - launchApp:

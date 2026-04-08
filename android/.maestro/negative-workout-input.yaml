@@ -10,10 +10,6 @@ name: "Negative — Invalid Workout Inputs (zero/negative/extreme values)"
 tags:
   - negative
   - core
----
-
-- runFlow: flow/ensure-post-onboarding.yaml
-
 onFlowStart:
   - launchApp
   - waitForAnimationToEnd:
@@ -27,6 +23,10 @@ onFlowComplete:
   - tapOn:
       text: "Cancelar Entrenamiento|Descartar"
       optional: true
+
+---
+
+- runFlow: flow/ensure-post-onboarding.yaml
 
 # Start workout from Exercise Library
 - assertVisible: "Biblioteca de Ejercicios"

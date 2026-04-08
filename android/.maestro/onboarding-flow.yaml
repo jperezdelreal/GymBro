@@ -10,12 +10,12 @@ name: "Onboarding — Complete 4-page onboarding flow"
 tags:
   - onboarding
   - smoke
----
-
 onFlowComplete:
   # Clear app state after testing onboarding
   # This ensures next flow doesn't see onboarding state
   - stopApp
+
+---
 
 - launchApp:
     clearState: true

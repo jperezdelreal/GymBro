@@ -10,10 +10,6 @@ tags:
 # Cleanup: Return to top of library
 # Dependencies: ensure-post-onboarding flow
 
----
-
-- runFlow: flow/ensure-post-onboarding.yaml
-
 onFlowStart:
   # Start at library
   - launchApp
@@ -27,6 +23,10 @@ onFlowComplete:
       id: "nav_exercise_library"
   - waitForAnimationToEnd:
       timeout: 1000
+
+---
+
+- runFlow: flow/ensure-post-onboarding.yaml
 
 # Verify we're on Library screen
 - assertVisible: "Biblioteca de Ejercicios"

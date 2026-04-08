@@ -9,10 +9,6 @@ name: "Profile Settings — Open profile and check settings sections"
 # Dependencies: flow/ensure-post-onboarding.yaml
 tags:
   - regression
----
-
-- runFlow: flow/ensure-post-onboarding.yaml
-
 onFlowStart:
   # Ensure post-onboarding state
   - launchApp
@@ -25,6 +21,10 @@ onFlowComplete:
   - tapOn:
       id: "nav_exercise_library"
       optional: true
+
+---
+
+- runFlow: flow/ensure-post-onboarding.yaml
 
 # Navigate to Profile tab
 - tapOn:
