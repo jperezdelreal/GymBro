@@ -1,0 +1,4102 @@
+[
+  {
+    "name": "Barbell Back Squat",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Stand with barbell on upper back. Squat down until thighs are parallel or below. Drive through heels to return to start.",
+    "muscleGroups": [
+      {
+        "name": "Quadriceps",
+        "isPrimary": true
+      },
+      {
+        "name": "Glutes",
+        "isPrimary": true
+      },
+      {
+        "name": "Hamstrings",
+        "isPrimary": false
+      },
+      {
+        "name": "Core",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": "https://www.youtube.com/watch?v=ultWZbUMPL8",
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Barbell Bench Press",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Lie on bench, grip barbell slightly wider than shoulders. Lower to chest, pause, then press up to lockout.",
+    "muscleGroups": [
+      {
+        "name": "Chest",
+        "isPrimary": true
+      },
+      {
+        "name": "Triceps",
+        "isPrimary": false
+      },
+      {
+        "name": "Shoulders",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": "https://www.youtube.com/watch?v=4Y2ZdHCOXok",
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Conventional Deadlift",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Stand with feet hip-width, grip bar outside legs. Keep back flat, drive through heels to pull bar up to lockout.",
+    "muscleGroups": [
+      {
+        "name": "Hamstrings",
+        "isPrimary": true
+      },
+      {
+        "name": "Glutes",
+        "isPrimary": true
+      },
+      {
+        "name": "Lower Back",
+        "isPrimary": true
+      },
+      {
+        "name": "Traps",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": "https://www.youtube.com/watch?v=op9kVnSo6Qc",
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Barbell Overhead Press",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Stand with barbell at shoulders. Press overhead to lockout, keeping core tight. Lower under control.",
+    "muscleGroups": [
+      {
+        "name": "Shoulders",
+        "isPrimary": true
+      },
+      {
+        "name": "Triceps",
+        "isPrimary": false
+      },
+      {
+        "name": "Core",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": "https://www.youtube.com/watch?v=QAQ64hK4Xxs",
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Barbell Row",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Hinge at hips, back flat, pull bar to lower chest. Squeeze shoulder blades together at top.",
+    "muscleGroups": [
+      {
+        "name": "Lats",
+        "isPrimary": true
+      },
+      {
+        "name": "Upper Back",
+        "isPrimary": true
+      },
+      {
+        "name": "Biceps",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": "https://www.youtube.com/watch?v=FWJR5Ve8bnQ",
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Romanian Deadlift",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Start standing with barbell. Hinge at hips, keeping back flat and knees slightly bent. Lower bar to shins, drive hips forward to return.",
+    "muscleGroups": [
+      {
+        "name": "Hamstrings",
+        "isPrimary": true
+      },
+      {
+        "name": "Glutes",
+        "isPrimary": true
+      },
+      {
+        "name": "Lower Back",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": "https://www.youtube.com/watch?v=jEy_czb3RKA",
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Front Squat",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Hold barbell on front shoulders. Squat down keeping torso upright. Drive through heels to stand.",
+    "muscleGroups": [
+      {
+        "name": "Quadriceps",
+        "isPrimary": true
+      },
+      {
+        "name": "Core",
+        "isPrimary": false
+      },
+      {
+        "name": "Glutes",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": "https://www.youtube.com/watch?v=m4ytaCJZpl0",
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Sumo Deadlift",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Wide stance, toes pointed out, grip inside legs. Pull bar up keeping back flat, drive through heels.",
+    "muscleGroups": [
+      {
+        "name": "Glutes",
+        "isPrimary": true
+      },
+      {
+        "name": "Hamstrings",
+        "isPrimary": true
+      },
+      {
+        "name": "Quadriceps",
+        "isPrimary": false
+      },
+      {
+        "name": "Lower Back",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": "https://www.youtube.com/watch?v=D6poVn7mPkU",
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Incline Barbell Bench Press",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "On incline bench (30-45 degrees), lower bar to upper chest, press to lockout.",
+    "muscleGroups": [
+      {
+        "name": "Upper Chest",
+        "isPrimary": true
+      },
+      {
+        "name": "Shoulders",
+        "isPrimary": false
+      },
+      {
+        "name": "Triceps",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": "https://www.youtube.com/watch?v=jPLdzuHckI8",
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Close-Grip Bench Press",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Grip bar with hands shoulder-width. Lower to lower chest, press up focusing on triceps.",
+    "muscleGroups": [
+      {
+        "name": "Triceps",
+        "isPrimary": true
+      },
+      {
+        "name": "Chest",
+        "isPrimary": false
+      },
+      {
+        "name": "Shoulders",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": "https://www.youtube.com/watch?v=nEF0bv2FW94",
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Dumbbell Bench Press",
+    "category": "compound",
+    "equipment": "dumbbell",
+    "instructions": "Lie on bench with dumbbells at chest level. Press up to lockout, lower under control.",
+    "muscleGroups": [
+      {
+        "name": "Chest",
+        "isPrimary": true
+      },
+      {
+        "name": "Triceps",
+        "isPrimary": false
+      },
+      {
+        "name": "Shoulders",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": "https://www.youtube.com/watch?v=VmB1G1K7v94",
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Dumbbell Shoulder Press",
+    "category": "compound",
+    "equipment": "dumbbell",
+    "instructions": "Seated or standing, press dumbbells overhead to lockout. Lower to shoulder level.",
+    "muscleGroups": [
+      {
+        "name": "Shoulders",
+        "isPrimary": true
+      },
+      {
+        "name": "Triceps",
+        "isPrimary": false
+      },
+      {
+        "name": "Core",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": "https://www.youtube.com/watch?v=qEwKCR5JCog",
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Dumbbell Row",
+    "category": "compound",
+    "equipment": "dumbbell",
+    "instructions": "One knee on bench, pull dumbbell to hip, squeeze at top. Keep back flat.",
+    "muscleGroups": [
+      {
+        "name": "Lats",
+        "isPrimary": true
+      },
+      {
+        "name": "Upper Back",
+        "isPrimary": true
+      },
+      {
+        "name": "Biceps",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": "https://www.youtube.com/watch?v=pYcpY20QaE8",
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Goblet Squat",
+    "category": "compound",
+    "equipment": "dumbbell",
+    "instructions": "Hold dumbbell or kettlebell at chest. Squat down, keeping torso upright. Drive through heels.",
+    "muscleGroups": [
+      {
+        "name": "Quadriceps",
+        "isPrimary": true
+      },
+      {
+        "name": "Glutes",
+        "isPrimary": true
+      },
+      {
+        "name": "Core",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": "https://www.youtube.com/watch?v=MeIiIdhvXT4",
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Dumbbell Incline Press",
+    "category": "compound",
+    "equipment": "dumbbell",
+    "instructions": "On incline bench, press dumbbells up to lockout. Lower to chest level.",
+    "muscleGroups": [
+      {
+        "name": "Upper Chest",
+        "isPrimary": true
+      },
+      {
+        "name": "Shoulders",
+        "isPrimary": false
+      },
+      {
+        "name": "Triceps",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": "https://www.youtube.com/watch?v=8iPEnn-ltC8",
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Pull-Up",
+    "category": "compound",
+    "equipment": "bodyweight",
+    "instructions": "Hang from bar, palms facing away. Pull up until chin over bar. Lower under control.",
+    "muscleGroups": [
+      {
+        "name": "Lats",
+        "isPrimary": true
+      },
+      {
+        "name": "Upper Back",
+        "isPrimary": true
+      },
+      {
+        "name": "Biceps",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": "https://www.youtube.com/watch?v=eGo4IYlbE5g",
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Chin-Up",
+    "category": "compound",
+    "equipment": "bodyweight",
+    "instructions": "Hang from bar, palms facing you. Pull up until chin over bar.",
+    "muscleGroups": [
+      {
+        "name": "Lats",
+        "isPrimary": true
+      },
+      {
+        "name": "Biceps",
+        "isPrimary": true
+      },
+      {
+        "name": "Upper Back",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": "https://www.youtube.com/watch?v=brhRXlOhWAM",
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Dip",
+    "category": "compound",
+    "equipment": "bodyweight",
+    "instructions": "On parallel bars, lower body until upper arms parallel to ground. Press back up.",
+    "muscleGroups": [
+      {
+        "name": "Chest",
+        "isPrimary": true
+      },
+      {
+        "name": "Triceps",
+        "isPrimary": true
+      },
+      {
+        "name": "Shoulders",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": "https://www.youtube.com/watch?v=2z8JmcrW-As",
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Push-Up",
+    "category": "compound",
+    "equipment": "bodyweight",
+    "instructions": "Hands shoulder-width, body straight. Lower chest to ground, press back up.",
+    "muscleGroups": [
+      {
+        "name": "Chest",
+        "isPrimary": true
+      },
+      {
+        "name": "Triceps",
+        "isPrimary": false
+      },
+      {
+        "name": "Shoulders",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": "https://www.youtube.com/watch?v=IODxDxX7oi4",
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Leg Press",
+    "category": "compound",
+    "equipment": "machine",
+    "instructions": "Seated in machine, feet shoulder-width on platform. Press up to lockout, lower under control.",
+    "muscleGroups": [
+      {
+        "name": "Quadriceps",
+        "isPrimary": true
+      },
+      {
+        "name": "Glutes",
+        "isPrimary": false
+      },
+      {
+        "name": "Hamstrings",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": "https://www.youtube.com/watch?v=IZxyjW7MPJQ",
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Lat Pulldown",
+    "category": "compound",
+    "equipment": "cable",
+    "instructions": "Seated at cable machine, pull bar down to upper chest. Squeeze shoulder blades together.",
+    "muscleGroups": [
+      {
+        "name": "Lats",
+        "isPrimary": true
+      },
+      {
+        "name": "Upper Back",
+        "isPrimary": true
+      },
+      {
+        "name": "Biceps",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": "https://www.youtube.com/watch?v=CAwf7n6Luuc",
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Cable Row",
+    "category": "compound",
+    "equipment": "cable",
+    "instructions": "Seated at cable, pull handle to torso. Keep back straight, squeeze shoulder blades.",
+    "muscleGroups": [
+      {
+        "name": "Lats",
+        "isPrimary": true
+      },
+      {
+        "name": "Upper Back",
+        "isPrimary": true
+      },
+      {
+        "name": "Biceps",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": "https://www.youtube.com/watch?v=GZbfZ033f74",
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Leg Curl",
+    "category": "isolation",
+    "equipment": "machine",
+    "instructions": "Lying or seated, curl legs up against pad. Squeeze hamstrings at top.",
+    "muscleGroups": [
+      {
+        "name": "Hamstrings",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": "https://www.youtube.com/watch?v=1Tq3QdYUuHs",
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Leg Extension",
+    "category": "isolation",
+    "equipment": "machine",
+    "instructions": "Seated, extend legs up against pad. Squeeze quads at top.",
+    "muscleGroups": [
+      {
+        "name": "Quadriceps",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": "https://www.youtube.com/watch?v=YyvSfVjQeL0",
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Barbell Curl",
+    "category": "isolation",
+    "equipment": "barbell",
+    "instructions": "Standing, curl bar up to shoulders keeping elbows stationary. Lower under control.",
+    "muscleGroups": [
+      {
+        "name": "Biceps",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": "https://www.youtube.com/watch?v=kwG2ipFRgFo",
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Dumbbell Curl",
+    "category": "isolation",
+    "equipment": "dumbbell",
+    "instructions": "Standing or seated, curl dumbbells up to shoulders. Can alternate or do both together.",
+    "muscleGroups": [
+      {
+        "name": "Biceps",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": "https://www.youtube.com/watch?v=ykJmrZ5v0Oo",
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Hammer Curl",
+    "category": "isolation",
+    "equipment": "dumbbell",
+    "instructions": "Hold dumbbells with neutral grip. Curl up to shoulders, keeping palms facing each other.",
+    "muscleGroups": [
+      {
+        "name": "Biceps",
+        "isPrimary": true
+      },
+      {
+        "name": "Forearms",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": "https://www.youtube.com/watch?v=zC3nLlEvin4",
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Tricep Pushdown",
+    "category": "isolation",
+    "equipment": "cable",
+    "instructions": "Stand at cable, push bar down to full extension. Keep elbows tucked at sides.",
+    "muscleGroups": [
+      {
+        "name": "Triceps",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": "https://www.youtube.com/watch?v=2-LAMcpzODU",
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Overhead Tricep Extension",
+    "category": "isolation",
+    "equipment": "dumbbell",
+    "instructions": "Hold dumbbell overhead. Lower behind head, extend back up keeping elbows still.",
+    "muscleGroups": [
+      {
+        "name": "Triceps",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": "https://www.youtube.com/watch?v=YbX7Wd8jQ-Q",
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Lateral Raise",
+    "category": "isolation",
+    "equipment": "dumbbell",
+    "instructions": "Standing, raise dumbbells out to sides until arms parallel to ground. Lower under control.",
+    "muscleGroups": [
+      {
+        "name": "Shoulders",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": "https://www.youtube.com/watch?v=3VcKaXpzqRo",
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Front Raise",
+    "category": "isolation",
+    "equipment": "dumbbell",
+    "instructions": "Standing, raise dumbbells forward until arms parallel to ground.",
+    "muscleGroups": [
+      {
+        "name": "Shoulders",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Face Pull",
+    "category": "isolation",
+    "equipment": "cable",
+    "instructions": "Pull cable to face, separating hands at end. Focus on rear delts.",
+    "muscleGroups": [
+      {
+        "name": "Rear Delts",
+        "isPrimary": true
+      },
+      {
+        "name": "Upper Back",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": "https://www.youtube.com/watch?v=rep-qVOkqgk",
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Chest Fly",
+    "category": "isolation",
+    "equipment": "dumbbell",
+    "instructions": "On bench, arc dumbbells down and out to sides, then squeeze back together at top.",
+    "muscleGroups": [
+      {
+        "name": "Chest",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": "https://www.youtube.com/watch?v=eozdVDA78K0",
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Cable Fly",
+    "category": "isolation",
+    "equipment": "cable",
+    "instructions": "Standing at cable station, pull handles together in front of chest. Squeeze at contraction.",
+    "muscleGroups": [
+      {
+        "name": "Chest",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": "https://www.youtube.com/watch?v=taI4XduLpTk",
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Pec Deck",
+    "category": "isolation",
+    "equipment": "machine",
+    "instructions": "Seated, bring arm pads together in front of chest. Squeeze at contraction.",
+    "muscleGroups": [
+      {
+        "name": "Chest",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Calf Raise",
+    "category": "isolation",
+    "equipment": "machine",
+    "instructions": "Standing or seated, rise up on toes. Squeeze calves at top, lower for stretch.",
+    "muscleGroups": [
+      {
+        "name": "Calves",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": "https://www.youtube.com/watch?v=gwLzBJYoWlI",
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Barbell Shrug",
+    "category": "isolation",
+    "equipment": "barbell",
+    "instructions": "Hold bar at arms length. Shrug shoulders straight up, squeeze traps at top.",
+    "muscleGroups": [
+      {
+        "name": "Traps",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Dumbbell Shrug",
+    "category": "isolation",
+    "equipment": "dumbbell",
+    "instructions": "Hold dumbbells at sides. Shrug shoulders up, squeeze traps at top.",
+    "muscleGroups": [
+      {
+        "name": "Traps",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Preacher Curl",
+    "category": "isolation",
+    "equipment": "barbell",
+    "instructions": "Arms on preacher pad, curl bar up. Full stretch at bottom, squeeze at top.",
+    "muscleGroups": [
+      {
+        "name": "Biceps",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Concentration Curl",
+    "category": "isolation",
+    "equipment": "dumbbell",
+    "instructions": "Seated, elbow braced on inner thigh. Curl dumbbell up, squeeze at top.",
+    "muscleGroups": [
+      {
+        "name": "Biceps",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Skull Crusher",
+    "category": "isolation",
+    "equipment": "barbell",
+    "instructions": "Lying on bench, lower bar to forehead keeping upper arms vertical. Extend to lockout.",
+    "muscleGroups": [
+      {
+        "name": "Triceps",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Hip Thrust",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Upper back on bench, barbell over hips. Drive hips up, squeeze glutes at top.",
+    "muscleGroups": [
+      {
+        "name": "Glutes",
+        "isPrimary": true
+      },
+      {
+        "name": "Hamstrings",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": "https://www.youtube.com/watch?v=SEdqd1n0cvg",
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Bulgarian Split Squat",
+    "category": "compound",
+    "equipment": "dumbbell",
+    "instructions": "Rear foot elevated on bench. Lower down on front leg. Drive through heel to stand.",
+    "muscleGroups": [
+      {
+        "name": "Quadriceps",
+        "isPrimary": true
+      },
+      {
+        "name": "Glutes",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": "https://www.youtube.com/watch?v=2C-uNgKwPLE",
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Lunges",
+    "category": "compound",
+    "equipment": "dumbbell",
+    "instructions": "Step forward, lower back knee toward ground. Drive through front heel to return.",
+    "muscleGroups": [
+      {
+        "name": "Quadriceps",
+        "isPrimary": true
+      },
+      {
+        "name": "Glutes",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": "https://www.youtube.com/watch?v=D7KaRcUTQeE",
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Good Morning",
+    "category": "accessory",
+    "equipment": "barbell",
+    "instructions": "Barbell on upper back. Hinge at hips keeping back flat. Return to standing.",
+    "muscleGroups": [
+      {
+        "name": "Hamstrings",
+        "isPrimary": true
+      },
+      {
+        "name": "Glutes",
+        "isPrimary": true
+      },
+      {
+        "name": "Lower Back",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": "https://www.youtube.com/watch?v=YA-h3n9L4YU",
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Cable Crossover",
+    "category": "isolation",
+    "equipment": "cable",
+    "instructions": "High cable handles, step forward and pull down and across body. Squeeze chest.",
+    "muscleGroups": [
+      {
+        "name": "Chest",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "T-Bar Row",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Straddle bar, hinge at hips. Pull bar to chest, squeeze shoulder blades.",
+    "muscleGroups": [
+      {
+        "name": "Lats",
+        "isPrimary": true
+      },
+      {
+        "name": "Upper Back",
+        "isPrimary": true
+      },
+      {
+        "name": "Biceps",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": "https://www.youtube.com/watch?v=j3Igk5nyZE4",
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Pendlay Row",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Bar on ground, explosive pull to chest, lower to ground each rep.",
+    "muscleGroups": [
+      {
+        "name": "Upper Back",
+        "isPrimary": true
+      },
+      {
+        "name": "Lats",
+        "isPrimary": true
+      },
+      {
+        "name": "Biceps",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": "https://www.youtube.com/watch?v=ZlRrIsoDpKg",
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Power Clean",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Explosive pull from ground, catch on shoulders. Full body power movement.",
+    "muscleGroups": [
+      {
+        "name": "Hamstrings",
+        "isPrimary": true
+      },
+      {
+        "name": "Glutes",
+        "isPrimary": true
+      },
+      {
+        "name": "Traps",
+        "isPrimary": true
+      },
+      {
+        "name": "Core",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": "https://www.youtube.com/watch?v=KwHGMb5iEKg",
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Snatch",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Explosive pull from ground to overhead in one motion. Highly technical Olympic lift.",
+    "muscleGroups": [
+      {
+        "name": "Full Body",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Clean and Jerk",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Clean to shoulders, then jerk overhead. Technical Olympic lift.",
+    "muscleGroups": [
+      {
+        "name": "Full Body",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Box Squat",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Squat down to box, pause seated, then drive up explosively.",
+    "muscleGroups": [
+      {
+        "name": "Quadriceps",
+        "isPrimary": true
+      },
+      {
+        "name": "Glutes",
+        "isPrimary": true
+      },
+      {
+        "name": "Hamstrings",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": "https://www.youtube.com/watch?v=iK-kfn0YDFI",
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Pause Squat",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Squat down, pause 2-3 seconds at bottom, drive up. Builds strength out of hole.",
+    "muscleGroups": [
+      {
+        "name": "Quadriceps",
+        "isPrimary": true
+      },
+      {
+        "name": "Glutes",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": "https://www.youtube.com/watch?v=0fN2r9BI9TI",
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Pause Bench Press",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Lower bar to chest, pause 2-3 seconds, then press up. Eliminates stretch reflex.",
+    "muscleGroups": [
+      {
+        "name": "Chest",
+        "isPrimary": true
+      },
+      {
+        "name": "Triceps",
+        "isPrimary": false
+      },
+      {
+        "name": "Shoulders",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": "https://www.youtube.com/watch?v=BYKScL2sgCs",
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Deficit Deadlift",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Stand on platform 1-4 inches high. Increases range of motion, builds strength off floor.",
+    "muscleGroups": [
+      {
+        "name": "Hamstrings",
+        "isPrimary": true
+      },
+      {
+        "name": "Glutes",
+        "isPrimary": true
+      },
+      {
+        "name": "Lower Back",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": "https://www.youtube.com/watch?v=DrGMndhvJTE",
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Rack Pull",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Bar starts on pins at knee height. Pull to lockout focusing on top portion.",
+    "muscleGroups": [
+      {
+        "name": "Upper Back",
+        "isPrimary": true
+      },
+      {
+        "name": "Traps",
+        "isPrimary": true
+      },
+      {
+        "name": "Glutes",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": "https://www.youtube.com/watch?v=kYaJUjJMHQk",
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Farmer's Walk",
+    "category": "compound",
+    "equipment": "dumbbell",
+    "instructions": "Hold heavy dumbbells at sides. Walk for distance or time. Full body grip strength.",
+    "muscleGroups": [
+      {
+        "name": "Forearms",
+        "isPrimary": true
+      },
+      {
+        "name": "Traps",
+        "isPrimary": true
+      },
+      {
+        "name": "Core",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Plank",
+    "category": "isolation",
+    "equipment": "bodyweight",
+    "instructions": "Hold push-up position on forearms. Keep body straight, engage core.",
+    "muscleGroups": [
+      {
+        "name": "Core",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Ab Wheel Rollout",
+    "category": "compound",
+    "equipment": "other",
+    "instructions": "Knees or feet on ground, roll wheel forward extending body. Pull back with abs.",
+    "muscleGroups": [
+      {
+        "name": "Core",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Hanging Leg Raise",
+    "category": "isolation",
+    "equipment": "bodyweight",
+    "instructions": "Hang from bar. Raise legs to 90 degrees. Lower under control.",
+    "muscleGroups": [
+      {
+        "name": "Core",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Cable Crunch",
+    "category": "isolation",
+    "equipment": "cable",
+    "instructions": "Kneel at cable, hold rope behind head. Crunch down, focus on abs contraction.",
+    "muscleGroups": [
+      {
+        "name": "Core",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Reverse Hyper",
+    "category": "isolation",
+    "equipment": "machine",
+    "instructions": "Lying face down, swing legs up behind you. Builds glutes and lower back recovery.",
+    "muscleGroups": [
+      {
+        "name": "Glutes",
+        "isPrimary": true
+      },
+      {
+        "name": "Lower Back",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Back Extension",
+    "category": "isolation",
+    "equipment": "machine",
+    "instructions": "On hyperextension bench, hinge at hips and lower torso. Raise back up to parallel.",
+    "muscleGroups": [
+      {
+        "name": "Lower Back",
+        "isPrimary": true
+      },
+      {
+        "name": "Glutes",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "GHD Sit-Up",
+    "category": "compound",
+    "equipment": "machine",
+    "instructions": "On GHD machine, lower back past parallel, crunch up. Full range ab exercise.",
+    "muscleGroups": [
+      {
+        "name": "Core",
+        "isPrimary": true
+      },
+      {
+        "name": "Hip Flexors",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Nordic Curl",
+    "category": "isolation",
+    "equipment": "bodyweight",
+    "instructions": "Knees anchored, lower body forward under control. Eccentric hamstring destroyer.",
+    "muscleGroups": [
+      {
+        "name": "Hamstrings",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Pistol Squat",
+    "category": "compound",
+    "equipment": "bodyweight",
+    "instructions": "Single leg squat, other leg extended forward. Advanced bodyweight leg exercise.",
+    "muscleGroups": [
+      {
+        "name": "Quadriceps",
+        "isPrimary": true
+      },
+      {
+        "name": "Glutes",
+        "isPrimary": true
+      },
+      {
+        "name": "Core",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Muscle-Up",
+    "category": "compound",
+    "equipment": "bodyweight",
+    "instructions": "Pull-up transitioning into dip. Explosive upper body power move.",
+    "muscleGroups": [
+      {
+        "name": "Lats",
+        "isPrimary": true
+      },
+      {
+        "name": "Chest",
+        "isPrimary": true
+      },
+      {
+        "name": "Triceps",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Handstand Push-Up",
+    "category": "compound",
+    "equipment": "bodyweight",
+    "instructions": "Inverted against wall, press up and down. Advanced shoulder pressing.",
+    "muscleGroups": [
+      {
+        "name": "Shoulders",
+        "isPrimary": true
+      },
+      {
+        "name": "Triceps",
+        "isPrimary": false
+      },
+      {
+        "name": "Core",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Seal Row",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Lying face-down on elevated bench, row barbell or dumbbells. Eliminates lower back.",
+    "muscleGroups": [
+      {
+        "name": "Upper Back",
+        "isPrimary": true
+      },
+      {
+        "name": "Lats",
+        "isPrimary": true
+      },
+      {
+        "name": "Biceps",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Meadows Row",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Standing perpendicular to bar, one hand row with fat grip end. Unilateral back work.",
+    "muscleGroups": [
+      {
+        "name": "Lats",
+        "isPrimary": true
+      },
+      {
+        "name": "Upper Back",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Zercher Squat",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Bar in crook of elbows. Squat down, stay upright. Builds core and front-loaded strength.",
+    "muscleGroups": [
+      {
+        "name": "Quadriceps",
+        "isPrimary": true
+      },
+      {
+        "name": "Core",
+        "isPrimary": true
+      },
+      {
+        "name": "Glutes",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Arnold Press",
+    "category": "compound",
+    "equipment": "dumbbell",
+    "instructions": "Start with dumbbells at shoulders, palms facing you. Rotate and press overhead.",
+    "muscleGroups": [
+      {
+        "name": "Shoulders",
+        "isPrimary": true
+      },
+      {
+        "name": "Triceps",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": "https://www.youtube.com/watch?v=6Z15_WdXmVw",
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Reverse Curl",
+    "category": "isolation",
+    "equipment": "barbell",
+    "instructions": "Overhand grip on bar. Curl up, focusing on brachialis and forearms.",
+    "muscleGroups": [
+      {
+        "name": "Forearms",
+        "isPrimary": true
+      },
+      {
+        "name": "Biceps",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Incline Curl",
+    "category": "isolation",
+    "equipment": "dumbbell",
+    "instructions": "On incline bench, arms hanging. Curl dumbbells up, full stretch at bottom.",
+    "muscleGroups": [
+      {
+        "name": "Biceps",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Decline Bench Press",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "On decline bench, press bar from lower chest. Targets lower pecs.",
+    "muscleGroups": [
+      {
+        "name": "Lower Chest",
+        "isPrimary": true
+      },
+      {
+        "name": "Triceps",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": "https://www.youtube.com/watch?v=LfyQBUKR8SE",
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Floor Press",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Lying on floor, press bar from chest. Limited range builds lockout strength.",
+    "muscleGroups": [
+      {
+        "name": "Chest",
+        "isPrimary": true
+      },
+      {
+        "name": "Triceps",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Inverted Row",
+    "category": "compound",
+    "equipment": "bodyweight",
+    "instructions": "Under bar or rings, pull chest to bar. Bodyweight horizontal pull.",
+    "muscleGroups": [
+      {
+        "name": "Upper Back",
+        "isPrimary": true
+      },
+      {
+        "name": "Lats",
+        "isPrimary": true
+      },
+      {
+        "name": "Biceps",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Band Pull-Apart",
+    "category": "isolation",
+    "equipment": "band",
+    "instructions": "Hold band at chest level, pull apart stretching band. Rear delts and upper back.",
+    "muscleGroups": [
+      {
+        "name": "Rear Delts",
+        "isPrimary": true
+      },
+      {
+        "name": "Upper Back",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Kettlebell Swing",
+    "category": "compound",
+    "equipment": "kettlebell",
+    "instructions": "Hip hinge swing kettlebell to shoulder height. Explosive hip power.",
+    "muscleGroups": [
+      {
+        "name": "Glutes",
+        "isPrimary": true
+      },
+      {
+        "name": "Hamstrings",
+        "isPrimary": true
+      },
+      {
+        "name": "Core",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": "https://www.youtube.com/watch?v=YSxHifyI6s8",
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Turkish Get-Up",
+    "category": "compound",
+    "equipment": "kettlebell",
+    "instructions": "Complex movement from lying to standing with weight overhead. Full body stability.",
+    "muscleGroups": [
+      {
+        "name": "Core",
+        "isPrimary": true
+      },
+      {
+        "name": "Shoulders",
+        "isPrimary": true
+      },
+      {
+        "name": "Full Body",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "High Bar Squat",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Setup: Position barbell on traps (above shoulder blades), feet shoulder-width apart, toes slightly out. Execution: Break at knees and hips simultaneously, descend keeping torso upright and knees tracking over toes. Breathe in on descent. Drive through midfoot to return, exhaling at top. Common mistakes: Leaning forward excessively, knees caving inward. Safety: Keep core braced throughout entire movement.",
+    "muscleGroups": [
+      {
+        "name": "Quadriceps",
+        "isPrimary": true
+      },
+      {
+        "name": "Glutes",
+        "isPrimary": true
+      },
+      {
+        "name": "Core",
+        "isPrimary": false
+      },
+      {
+        "name": "Hamstrings",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Low Bar Squat",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Setup: Rest barbell on rear delts (lower than high bar), hands wide on bar. Setup allows more forward lean. Execution: Push hips back first, then break at knees. Maintain neutral spine, chest up. Inhale at top, brace, descend, exhale on ascent. Common mistakes: Bar rolling up back, wrists bearing load. Safety: Requires excellent shoulder mobility\u00e2\u20ac\u201ddon't force the position.",
+    "muscleGroups": [
+      {
+        "name": "Glutes",
+        "isPrimary": true
+      },
+      {
+        "name": "Quadriceps",
+        "isPrimary": true
+      },
+      {
+        "name": "Hamstrings",
+        "isPrimary": false
+      },
+      {
+        "name": "Lower Back",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Safety Squat Bar Squat",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Setup: Load safety squat bar (SSB) onto upper back using padded yoke. Hands grip handles in front of chest. Execution: SSB forces more upright torso. Descend controlled, drive through full foot. Breathe in before descent, out during ascent. Common mistakes: Leaning too far forward (SSB will pull you). Safety: Easier on shoulders than traditional barbell, great for injury rehab.",
+    "muscleGroups": [
+      {
+        "name": "Quadriceps",
+        "isPrimary": true
+      },
+      {
+        "name": "Glutes",
+        "isPrimary": true
+      },
+      {
+        "name": "Core",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Anderson Squat",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Setup: Set barbell on pins in power rack at bottom squat position (just below parallel). Position under bar while in hole. Execution: From dead stop, drive explosively upward to lockout. Lower with control back to pins. Pause 1-2 seconds between reps (no bounce). Common mistakes: Not fully settling on pins, using momentum from descent. Safety: Eliminates eccentric load\u00e2\u20ac\u201dexcellent for building concentric strength.",
+    "muscleGroups": [
+      {
+        "name": "Quadriceps",
+        "isPrimary": true
+      },
+      {
+        "name": "Glutes",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Hatfield Squat",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Setup: Use safety squat bar (SSB) on back, hands grip rack uprights or handles for support. Execution: Descend into deep squat while using hands for balance only, not to pull yourself up. Legs do all the work. Breathe normally. Common mistakes: Pulling with arms to assist, not going deep enough. Safety: Allows very heavy loads with reduced spinal stress due to hand support.",
+    "muscleGroups": [
+      {
+        "name": "Quadriceps",
+        "isPrimary": true
+      },
+      {
+        "name": "Glutes",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Trap Bar Deadlift",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Setup: Step inside trap bar (hex bar), feet hip-width. Grip handles at sides, hips slightly higher than conventional deadlift. Execution: Drive through floor with legs and extend hips simultaneously. Bar path is straight vertical. Inhale before pull, exhale at lockout. Common mistakes: Jerking bar off floor, hyperextending at top. Safety: More quad-dominant than conventional, easier on lower back\u00e2\u20ac\u201dexcellent deadlift variation for athletes.",
+    "muscleGroups": [
+      {
+        "name": "Quadriceps",
+        "isPrimary": true
+      },
+      {
+        "name": "Glutes",
+        "isPrimary": true
+      },
+      {
+        "name": "Hamstrings",
+        "isPrimary": true
+      },
+      {
+        "name": "Traps",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": "https://www.youtube.com/watch?v=gWPLjJsfbKA",
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Snatch Grip Deadlift",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Setup: Grip bar with very wide grip (hands near collars), hips lower than conventional. Execution: Pull explosively keeping bar close to body. Wider grip increases range of motion significantly. Breathe in before pull, brace hard, exhale at top. Common mistakes: Grip too narrow, bar drifting away from shins. Safety: Builds tremendous upper back strength but requires excellent mobility. Use straps if grip fails before back.",
+    "muscleGroups": [
+      {
+        "name": "Hamstrings",
+        "isPrimary": true
+      },
+      {
+        "name": "Glutes",
+        "isPrimary": true
+      },
+      {
+        "name": "Upper Back",
+        "isPrimary": true
+      },
+      {
+        "name": "Traps",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Block Pull",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Setup: Elevate barbell 2-6 inches on blocks or mats. Reduces range of motion. Stand with shins nearly vertical at start. Execution: Pull from elevated position focusing on lockout strength. Drive hips through at top. Common mistakes: Starting too low (defeats the purpose), not fully locking out. Safety: Allows heavier loading than floor pulls\u00e2\u20ac\u201dexcellent for lockout strength and grip training.",
+    "muscleGroups": [
+      {
+        "name": "Lower Back",
+        "isPrimary": true
+      },
+      {
+        "name": "Glutes",
+        "isPrimary": true
+      },
+      {
+        "name": "Traps",
+        "isPrimary": true
+      },
+      {
+        "name": "Hamstrings",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Paused Deadlift",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Setup: Standard deadlift setup, feet hip-width, conventional or sumo stance. Execution: Pull bar to just below knee, hold for 2-3 second isometric pause, then complete lockout. Maintain perfect position during pause. Breathe before lift, hold breath through pause. Common mistakes: Losing position during pause, rounding back. Safety: Reduces weight 15-20% vs regular deadlifts\u00e2\u20ac\u201dpause builds strength at sticking point.",
+    "muscleGroups": [
+      {
+        "name": "Hamstrings",
+        "isPrimary": true
+      },
+      {
+        "name": "Glutes",
+        "isPrimary": true
+      },
+      {
+        "name": "Lower Back",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Spoto Press",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Setup: Standard bench press setup, arch, leg drive. Execution: Lower bar to 1 inch above chest, pause for 2-3 seconds without touching, then press. Maintain full-body tension during pause. Breathe in on descent, hold through pause, exhale on press. Common mistakes: Touching chest (defeats purpose), losing tightness during pause. Safety: Builds incredible pressing strength without eccentric stress on shoulders.",
+    "muscleGroups": [
+      {
+        "name": "Chest",
+        "isPrimary": true
+      },
+      {
+        "name": "Triceps",
+        "isPrimary": false
+      },
+      {
+        "name": "Shoulders",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Larsen Press",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Setup: Lie on bench with feet elevated off floor (legs straight in air or resting on bench). No leg drive available. Execution: Press with upper body only. Slower tempo recommended. Common mistakes: Trying to use same weight as regular bench, bouncing bar off chest. Safety: Isolates upper body, reduces stress on lower back\u00e2\u20ac\u201dexcellent for developing pure pressing strength.",
+    "muscleGroups": [
+      {
+        "name": "Chest",
+        "isPrimary": true
+      },
+      {
+        "name": "Triceps",
+        "isPrimary": true
+      },
+      {
+        "name": "Shoulders",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Board Press",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Setup: Place 2-4 inch board (or foam pad) on chest. Standard bench setup with spotter. Execution: Lower bar to board, pause briefly, then press. Reduces range of motion to target lockout. Breathe normally. Common mistakes: Bouncing off board, not controlling descent. Safety: Allows overload of lockout phase\u00e2\u20ac\u201dcritical for powerlifters. Requires spotter for safety.",
+    "muscleGroups": [
+      {
+        "name": "Triceps",
+        "isPrimary": true
+      },
+      {
+        "name": "Chest",
+        "isPrimary": true
+      },
+      {
+        "name": "Shoulders",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Reverse Band Bench Press",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Setup: Attach resistance bands to top of power rack, loop around barbell ends. Bands provide most assistance at bottom, less at top. Execution: Press as normal, bands deload bottom position allowing heavier weight. Common mistakes: Using bands that provide too much assistance. Safety: Excellent for overloading lockout and building confidence with supramaximal loads.",
+    "muscleGroups": [
+      {
+        "name": "Chest",
+        "isPrimary": true
+      },
+      {
+        "name": "Triceps",
+        "isPrimary": true
+      },
+      {
+        "name": "Shoulders",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Hang Power Clean",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Setup: Start with bar at mid-thigh (hang position), hook grip. Execution: Dip slightly by bending knees, then explosively extend hips and jump, shrugging bar upward. Pull yourself under bar into quarter squat, catching on shoulders. Stand. Breathe before each rep. Common mistakes: Pulling with arms too early, not fully extending hips. Safety: Lighter than full clean, excellent for learning proper triple extension. Master form before adding weight.",
+    "muscleGroups": [
+      {
+        "name": "Hamstrings",
+        "isPrimary": true
+      },
+      {
+        "name": "Glutes",
+        "isPrimary": true
+      },
+      {
+        "name": "Traps",
+        "isPrimary": true
+      },
+      {
+        "name": "Shoulders",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Hang Power Snatch",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Setup: Wide snatch grip, bar at mid-thigh. Execution: Explosive hip extension and jump, pulling bar overhead in one motion. Catch in quarter squat with arms locked out. Stand to complete. Inhale before pull, exhale after catch. Common mistakes: Pressing out instead of catching with locked arms, jumping forward. Safety: Highly technical\u00e2\u20ac\u201drequires coaching. Start with PVC pipe to learn bar path.",
+    "muscleGroups": [
+      {
+        "name": "Shoulders",
+        "isPrimary": true
+      },
+      {
+        "name": "Traps",
+        "isPrimary": true
+      },
+      {
+        "name": "Glutes",
+        "isPrimary": true
+      },
+      {
+        "name": "Hamstrings",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Clean Pull",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Setup: Standard clean deadlift position, feet hip-width, hook grip. Execution: Pull explosively from floor, extending hips and ankles (triple extension) and shrugging violently. Bar rises to chest height but you don't catch it. Lower under control. Common mistakes: Not completing hip extension, rowing the bar. Safety: Develops explosive pulling power without technical demand of full clean. Can handle heavier loads.",
+    "muscleGroups": [
+      {
+        "name": "Hamstrings",
+        "isPrimary": true
+      },
+      {
+        "name": "Glutes",
+        "isPrimary": true
+      },
+      {
+        "name": "Traps",
+        "isPrimary": true
+      },
+      {
+        "name": "Calves",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Snatch Pull",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Setup: Wide snatch grip, deadlift position. Execution: Explosive pull from floor with full triple extension and violent shrug. Bar rises to chest/shoulder height. No catch. Lower controlled. Breathe in before pull. Common mistakes: Not keeping bar close, incomplete hip extension. Safety: Builds snatch-specific pulling strength at 100-110% of snatch max. Use straps to focus on power, not grip.",
+    "muscleGroups": [
+      {
+        "name": "Hamstrings",
+        "isPrimary": true
+      },
+      {
+        "name": "Glutes",
+        "isPrimary": true
+      },
+      {
+        "name": "Upper Back",
+        "isPrimary": true
+      },
+      {
+        "name": "Traps",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Push Jerk",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Setup: Bar in front rack position on shoulders. Feet hip-width. Execution: Dip 3-4 inches by bending knees, then drive explosively upward while pressing bar overhead. Split or jump feet out slightly as you drop under bar. Lock out overhead. Return feet to center, lower bar. Common mistakes: Dipping too deep, pressing before drive completes. Safety: Learn with empty bar\u00e2\u20ac\u201dtiming is critical. Easier than split jerk for beginners.",
+    "muscleGroups": [
+      {
+        "name": "Shoulders",
+        "isPrimary": true
+      },
+      {
+        "name": "Triceps",
+        "isPrimary": true
+      },
+      {
+        "name": "Quadriceps",
+        "isPrimary": false
+      },
+      {
+        "name": "Core",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Split Jerk",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Setup: Bar in front rack. Feet hip-width. Execution: Dip and drive explosively, then split legs into lunge position (front and back) while pressing bar overhead. Front shin vertical, back leg slightly bent. Recover by stepping front foot back, then back foot forward. Common mistakes: Not splitting aggressively enough, landing too narrow. Safety: Most technical jerk variation. Allows heaviest overhead loads. Requires ankle and hip mobility.",
+    "muscleGroups": [
+      {
+        "name": "Shoulders",
+        "isPrimary": true
+      },
+      {
+        "name": "Triceps",
+        "isPrimary": true
+      },
+      {
+        "name": "Quadriceps",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Power Snatch",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Setup: Wide snatch grip, feet hip-width, bar over midfoot. Execution: Pull explosively from floor, extend hips fully, shrug and pull yourself under bar. Catch overhead in quarter squat (no full squat). Stand to complete. Breathe before each lift. Common mistakes: Pulling with arms too early, not locking out overhead in catch. Safety: Less technical than full snatch. Build to 80-85% of full snatch max.",
+    "muscleGroups": [
+      {
+        "name": "Shoulders",
+        "isPrimary": true
+      },
+      {
+        "name": "Traps",
+        "isPrimary": true
+      },
+      {
+        "name": "Glutes",
+        "isPrimary": true
+      },
+      {
+        "name": "Hamstrings",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Cable Lateral Raise",
+    "category": "isolation",
+    "equipment": "cable",
+    "instructions": "Setup: D-handle on low cable, stand sideways to machine. Execution: Raise arm to shoulder height leading with elbow, slight bend in elbow. Control back down. Exhale on raise. Common mistakes: Using too much weight, swinging torso. Constant tension from cable is superior to dumbbells for hypertrophy.",
+    "muscleGroups": [
+      {
+        "name": "Shoulders",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Cable Rear Delt Fly",
+    "category": "isolation",
+    "equipment": "cable",
+    "instructions": "Setup: D-handles on cables set at shoulder height. Cross cables (left hand grabs right cable). Execution: Pull handles out and back in fly motion, leading with elbows. Squeeze shoulder blades. Exhale during pull. Common mistakes: Using too much weight, pulling with arms instead of rear delts. Keep slight elbow bend throughout.",
+    "muscleGroups": [
+      {
+        "name": "Rear Delts",
+        "isPrimary": true
+      },
+      {
+        "name": "Upper Back",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Cable Chest Press",
+    "category": "compound",
+    "equipment": "cable",
+    "instructions": "Setup: D-handles at chest height, staggered stance for stability. Execution: Press forward from chest, full arm extension, squeeze pecs at peak. Return controlled. Breathe out on press. Common mistakes: Standing too close to machine, not maintaining stable base. Constant tension throughout ROM.",
+    "muscleGroups": [
+      {
+        "name": "Chest",
+        "isPrimary": true
+      },
+      {
+        "name": "Triceps",
+        "isPrimary": false
+      },
+      {
+        "name": "Shoulders",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Cable Tricep Extension (Rope)",
+    "category": "isolation",
+    "equipment": "cable",
+    "instructions": "Setup: Rope attachment on high cable, elbows tucked at sides. Execution: Extend arms downward, split rope at bottom to maximize tricep contraction. Return controlled. Exhale on extension. Common mistakes: Elbows flaring out, using momentum from torso. Keep upper arms stationary.",
+    "muscleGroups": [
+      {
+        "name": "Triceps",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Cable Bicep Curl",
+    "category": "isolation",
+    "equipment": "cable",
+    "instructions": "Setup: Straight bar or EZ bar on low cable. Stand with slight lean back for tension. Execution: Curl to shoulder height, squeeze biceps, lower controlled. Elbows stay stationary at sides. Exhale on curl. Common mistakes: Swinging, moving elbows forward. Constant tension is the benefit vs free weights.",
+    "muscleGroups": [
+      {
+        "name": "Biceps",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Cable Wood Chop",
+    "category": "compound",
+    "equipment": "cable",
+    "instructions": "Setup: Cable at high position, stand sideways. Both hands grip handle. Execution: Rotate torso while pulling cable diagonally down across body (high to opposite low). Return controlled. Exhale during chop. Common mistakes: Using arms instead of core rotation, not rotating through hips. Anti-rotation core exercise.",
+    "muscleGroups": [
+      {
+        "name": "Obliques",
+        "isPrimary": true
+      },
+      {
+        "name": "Core",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Cable Pull-Through",
+    "category": "compound",
+    "equipment": "cable",
+    "instructions": "Setup: Rope attachment on low cable, face away from machine, rope between legs. Execution: Hinge at hips, pushing them back while keeping slight knee bend. Drive hips forward explosively to lockout. Breathe in during hinge, out on hip drive. Common mistakes: Squatting instead of hinging, rounding lower back. Perfect for learning hip hinge pattern.",
+    "muscleGroups": [
+      {
+        "name": "Glutes",
+        "isPrimary": true
+      },
+      {
+        "name": "Hamstrings",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Single Arm Cable Row",
+    "category": "compound",
+    "equipment": "cable",
+    "instructions": "Setup: D-handle at chest height, staggered stance. Execution: Pull handle to ribs, driving elbow back. Avoid rotating torso. Squeeze shoulder blade back. Exhale on pull. Common mistakes: Rotating torso excessively, shrugging shoulder. Keep core braced to resist rotation\u00e2\u20ac\u201danti-rotation benefit.",
+    "muscleGroups": [
+      {
+        "name": "Lats",
+        "isPrimary": true
+      },
+      {
+        "name": "Upper Back",
+        "isPrimary": true
+      },
+      {
+        "name": "Core",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Cable Upright Row",
+    "category": "compound",
+    "equipment": "cable",
+    "instructions": "Setup: Straight bar on low cable, shoulder-width grip. Execution: Pull bar to chin height, elbows drive up and out. Lower controlled. Exhale on pull. Common mistakes: Pulling too high (shoulder impingement risk), using momentum. Stop at chin level\u00e2\u20ac\u201dhigher can stress shoulders.",
+    "muscleGroups": [
+      {
+        "name": "Shoulders",
+        "isPrimary": true
+      },
+      {
+        "name": "Traps",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Pallof Press",
+    "category": "accessory",
+    "equipment": "cable",
+    "instructions": "Setup: Cable at chest height, stand sideways to machine, both hands grip handle at chest. Execution: Press arms straight out from chest while resisting rotation toward machine. Hold 2-3 seconds, return to chest. Breathe normally. Common mistakes: Allowing torso to rotate, not maintaining rigid core. Pure anti-rotation core exercise.",
+    "muscleGroups": [
+      {
+        "name": "Core",
+        "isPrimary": true
+      },
+      {
+        "name": "Obliques",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Kettlebell Clean",
+    "category": "compound",
+    "equipment": "kettlebell",
+    "instructions": "Setup: KB between feet, hip-width stance. Execution: Hike KB back between legs, then explosively extend hips driving KB upward. Guide KB to rack position (resting on forearm against chest) in one fluid motion. Avoid banging wrist. Common mistakes: Curling KB (use momentum, not biceps), death-gripping handle. Let KB float, guide it to rack.",
+    "muscleGroups": [
+      {
+        "name": "Hamstrings",
+        "isPrimary": true
+      },
+      {
+        "name": "Glutes",
+        "isPrimary": true
+      },
+      {
+        "name": "Shoulders",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Kettlebell Snatch",
+    "category": "compound",
+    "equipment": "kettlebell",
+    "instructions": "Setup: KB between feet. Execution: Explosive hip extension drives KB overhead in one motion. Punch hand through handle at top so KB rests on back of forearm. Lock out overhead. Lower by letting KB fall forward, guide back between legs. Breathe in during down-swing, out at lockout. Common mistakes: Pressing KB overhead (should be ballistic), banging forearm. High skill exercise requiring practice.",
+    "muscleGroups": [
+      {
+        "name": "Shoulders",
+        "isPrimary": true
+      },
+      {
+        "name": "Glutes",
+        "isPrimary": true
+      },
+      {
+        "name": "Hamstrings",
+        "isPrimary": true
+      },
+      {
+        "name": "Core",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Double Kettlebell Front Squat",
+    "category": "compound",
+    "equipment": "kettlebell",
+    "instructions": "Setup: Clean two KBs to rack position (both resting on forearms). Elbows high, KBs at shoulders. Execution: Squat keeping elbows high and torso upright. Drive through heels to stand. Breathe in on descent, out on ascent. Common mistakes: Elbows dropping (KBs will pull you forward), not going deep enough. Challenges core stability more than barbell.",
+    "muscleGroups": [
+      {
+        "name": "Quadriceps",
+        "isPrimary": true
+      },
+      {
+        "name": "Glutes",
+        "isPrimary": true
+      },
+      {
+        "name": "Core",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Kettlebell Overhead Press",
+    "category": "compound",
+    "equipment": "kettlebell",
+    "instructions": "Setup: KB in rack position on one shoulder. Execution: Press KB overhead, rotating palm forward at top. Slight lean away from KB. Lock out fully. Lower to rack. Exhale on press. Common mistakes: Not cleaning KB properly first, arching back excessively. Keep core braced to prevent hyperextension.",
+    "muscleGroups": [
+      {
+        "name": "Shoulders",
+        "isPrimary": true
+      },
+      {
+        "name": "Triceps",
+        "isPrimary": false
+      },
+      {
+        "name": "Core",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Kettlebell Windmill",
+    "category": "accessory",
+    "equipment": "kettlebell",
+    "instructions": "Setup: Press KB overhead with one arm, lock out. Feet wide. Execution: Keeping eyes on KB, hinge at hips and lean toward opposite side. Free hand tracks down leg toward floor. Return to standing while maintaining lockout overhead. Common mistakes: Bending arm overhead, not pushing hips to side. Requires significant shoulder and hip mobility.",
+    "muscleGroups": [
+      {
+        "name": "Core",
+        "isPrimary": true
+      },
+      {
+        "name": "Obliques",
+        "isPrimary": true
+      },
+      {
+        "name": "Shoulders",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Double Kettlebell Swing",
+    "category": "compound",
+    "equipment": "kettlebell",
+    "instructions": "Setup: Two KBs between feet, hip-width stance. Execution: Hinge and hike KBs back, then explosively extend hips to swing KBs to shoulder height. Keep arms straight. Let hips do all the work. Breathe in on backswing, sharp exhale (power breath) on hip snap. Common mistakes: Squatting instead of hinging, using arms. This is a hip hinge movement, not a squat or arm raise.",
+    "muscleGroups": [
+      {
+        "name": "Glutes",
+        "isPrimary": true
+      },
+      {
+        "name": "Hamstrings",
+        "isPrimary": true
+      },
+      {
+        "name": "Core",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Single Arm Kettlebell Row",
+    "category": "compound",
+    "equipment": "kettlebell",
+    "instructions": "Setup: KB on floor, opposite hand and knee on bench for support. Execution: Pull KB to hip, driving elbow back. Avoid rotating torso. Lower controlled. Exhale on pull. Common mistakes: Rotating excessively, shrugging shoulder. Keep back flat and parallel to ground.",
+    "muscleGroups": [
+      {
+        "name": "Lats",
+        "isPrimary": true
+      },
+      {
+        "name": "Upper Back",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Dumbbell Floor Press",
+    "category": "compound",
+    "equipment": "dumbbell",
+    "instructions": "Setup: Lie on floor with DBs at chest. Execution: Press DBs overhead, pause at lockout, lower until triceps touch floor (limits ROM). Breathe out on press. Common mistakes: Bouncing elbows off floor. ROM limitation is the point\u00e2\u20ac\u201dbuilds lockout strength and reduces shoulder stress.",
+    "muscleGroups": [
+      {
+        "name": "Triceps",
+        "isPrimary": true
+      },
+      {
+        "name": "Chest",
+        "isPrimary": true
+      },
+      {
+        "name": "Shoulders",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Dumbbell Pullover",
+    "category": "isolation",
+    "equipment": "dumbbell",
+    "instructions": "Setup: Lie perpendicular on bench (shoulders only), hips below bench level. Hold single DB with both hands above chest. Execution: Lower DB overhead in arc motion, stretch lats and chest. Pull back to start. Inhale on stretch, exhale on pull. Common mistakes: Bending elbows excessively, going too heavy. Keep slight elbow bend throughout.",
+    "muscleGroups": [
+      {
+        "name": "Lats",
+        "isPrimary": true
+      },
+      {
+        "name": "Chest",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Dumbbell Chest Press (Neutral Grip)",
+    "category": "compound",
+    "equipment": "dumbbell",
+    "instructions": "Setup: Lie on bench, DBs at chest with palms facing each other (neutral). Execution: Press DBs overhead, maintain neutral grip throughout. Lower with control. Breathe out on press. Common mistakes: Rotating to pronated grip. Neutral grip reduces shoulder stress\u00e2\u20ac\u201dexcellent for shoulder health.",
+    "muscleGroups": [
+      {
+        "name": "Chest",
+        "isPrimary": true
+      },
+      {
+        "name": "Triceps",
+        "isPrimary": false
+      },
+      {
+        "name": "Shoulders",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Single Arm Dumbbell Press",
+    "category": "compound",
+    "equipment": "dumbbell",
+    "instructions": "Setup: Bench press position, one DB only. Free hand on hip or across body. Execution: Press single DB overhead while resisting torso rotation. Core works anti-rotationally. Lower controlled. Exhale on press. Common mistakes: Allowing torso to twist, using momentum. Keep shoulders square to ceiling.",
+    "muscleGroups": [
+      {
+        "name": "Chest",
+        "isPrimary": true
+      },
+      {
+        "name": "Core",
+        "isPrimary": true
+      },
+      {
+        "name": "Triceps",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Dumbbell Romanian Deadlift",
+    "category": "compound",
+    "equipment": "dumbbell",
+    "instructions": "Setup: Hold DBs at thighs, feet hip-width, slight knee bend. Execution: Push hips back, lowering DBs along front of legs. Feel hamstring stretch. Drive hips forward to return. Keep back flat. Breathe in on descent, out on ascent. Common mistakes: Rounding back, bending knees too much (becomes a squat). This is a hip hinge.",
+    "muscleGroups": [
+      {
+        "name": "Hamstrings",
+        "isPrimary": true
+      },
+      {
+        "name": "Glutes",
+        "isPrimary": true
+      },
+      {
+        "name": "Lower Back",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Dumbbell Lateral Raise (Leaning)",
+    "category": "isolation",
+    "equipment": "dumbbell",
+    "instructions": "Setup: Hold support with one hand, lean away at 20-30 degrees. DB in working hand. Execution: Raise DB laterally to shoulder height while maintaining lean. Gravity angle makes medial delt work harder. Lower controlled. Exhale on raise. Common mistakes: Not leaning enough, using momentum. The lean is critical\u00e2\u20ac\u201dit changes the resistance curve.",
+    "muscleGroups": [
+      {
+        "name": "Shoulders",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Dumbbell Chest-Supported Row",
+    "category": "compound",
+    "equipment": "dumbbell",
+    "instructions": "Setup: Lie prone on incline bench, DBs hanging straight down. Execution: Pull DBs to ribs, driving elbows back. Squeeze shoulder blades. Lower controlled. Exhale on pull. Common mistakes: Using momentum, not fully squeezing at top. Chest support eliminates cheating\u00e2\u20ac\u201dpure back work.",
+    "muscleGroups": [
+      {
+        "name": "Lats",
+        "isPrimary": true
+      },
+      {
+        "name": "Upper Back",
+        "isPrimary": true
+      },
+      {
+        "name": "Rear Delts",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Dumbbell Split Squat",
+    "category": "compound",
+    "equipment": "dumbbell",
+    "instructions": "Setup: DBs at sides, stagger stance with rear foot elevated on bench. Execution: Lower rear knee toward floor, front knee tracks over toes. Drive through front heel to return. Breathe in on descent, out on ascent. Common mistakes: Front knee caving in, not going deep enough. Keep torso upright.",
+    "muscleGroups": [
+      {
+        "name": "Quadriceps",
+        "isPrimary": true
+      },
+      {
+        "name": "Glutes",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Dumbbell Step-Up",
+    "category": "compound",
+    "equipment": "dumbbell",
+    "instructions": "Setup: DBs at sides, box or bench at knee height. Execution: Step up with one leg, drive through heel of working leg (don't push off back leg). Stand fully, then lower controlled. Alternate legs or complete all reps one side. Common mistakes: Pushing with back leg, box too high. Working leg should do 100% of the work.",
+    "muscleGroups": [
+      {
+        "name": "Quadriceps",
+        "isPrimary": true
+      },
+      {
+        "name": "Glutes",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Dumbbell Farmer's March",
+    "category": "compound",
+    "equipment": "dumbbell",
+    "instructions": "Setup: Heavy DBs at sides, standing tall. Execution: Walk with normal gait pattern while maintaining perfect posture. Shoulders back, core braced. Don't let DBs tilt you. Breathe normally. Common mistakes: Leaning to one side, shrugging shoulders up. Distance or time-based (30-60 seconds).",
+    "muscleGroups": [
+      {
+        "name": "Forearms",
+        "isPrimary": true
+      },
+      {
+        "name": "Traps",
+        "isPrimary": true
+      },
+      {
+        "name": "Core",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Smith Machine Bench Press",
+    "category": "compound",
+    "equipment": "machine",
+    "instructions": "Setup: Bench under Smith machine bar, bar path aligns with mid-chest. Execution: Unrack and lower to chest, press to lockout. Fixed bar path removes stabilization demand\u00e2\u20ac\u201dcan focus on chest contraction. Breathe out on press. Common mistakes: Bar path not aligned with natural press angle. Adjust bench position to match your pressing angle.",
+    "muscleGroups": [
+      {
+        "name": "Chest",
+        "isPrimary": true
+      },
+      {
+        "name": "Triceps",
+        "isPrimary": false
+      },
+      {
+        "name": "Shoulders",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Smith Machine Squat",
+    "category": "compound",
+    "equipment": "machine",
+    "instructions": "Setup: Bar on upper back, feet slightly forward of bar (fixed bar path allows this). Execution: Descend straight down, knees track over toes. Drive straight up. Breathe in on descent, out on ascent. Common mistakes: Feet too close to bar (can't balance), going too heavy (no spotter needed but still can fail). Fixed path makes this safer for training to failure.",
+    "muscleGroups": [
+      {
+        "name": "Quadriceps",
+        "isPrimary": true
+      },
+      {
+        "name": "Glutes",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Hack Squat",
+    "category": "compound",
+    "equipment": "machine",
+    "instructions": "Setup: Back against pad, shoulders under pads, feet on platform shoulder-width. Execution: Release safeties, descend until knees at 90 degrees or deeper. Drive through midfoot to extend. Breathe in on descent, out on drive. Common mistakes: Heels lifting, knees caving in. Quad-dominant movement\u00e2\u20ac\u201dexcellent for hypertrophy.",
+    "muscleGroups": [
+      {
+        "name": "Quadriceps",
+        "isPrimary": true
+      },
+      {
+        "name": "Glutes",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Lying Leg Curl",
+    "category": "isolation",
+    "equipment": "machine",
+    "instructions": "Setup: Lie prone, pad behind ankles, knees just off edge of bench. Execution: Curl heels toward glutes, squeeze hamstrings at top, lower controlled. Exhale on curl. Common mistakes: Lifting hips off pad, using momentum. Keep hips pressed down throughout.",
+    "muscleGroups": [
+      {
+        "name": "Hamstrings",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Seated Leg Curl",
+    "category": "isolation",
+    "equipment": "machine",
+    "instructions": "Setup: Seated, pad on lower shins, back against pad. Execution: Curl legs downward, squeezing hamstrings. Return controlled. Exhale on curl. Common mistakes: Not achieving full contraction, using too much weight. Different hamstring angle than lying variation\u00e2\u20ac\u201duse both for complete development.",
+    "muscleGroups": [
+      {
+        "name": "Hamstrings",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Chest Press Machine",
+    "category": "compound",
+    "equipment": "machine",
+    "instructions": "Setup: Seat height adjusted so handles align with mid-chest. Back flat against pad. Execution: Press handles forward to lockout, squeeze chest. Return controlled. Breathe out on press. Common mistakes: Incorrect seat height, bouncing weight. Machines allow training to failure safely\u00e2\u20ac\u201dexcellent for hypertrophy work.",
+    "muscleGroups": [
+      {
+        "name": "Chest",
+        "isPrimary": true
+      },
+      {
+        "name": "Triceps",
+        "isPrimary": false
+      },
+      {
+        "name": "Shoulders",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Shoulder Press Machine",
+    "category": "compound",
+    "equipment": "machine",
+    "instructions": "Setup: Seat adjusted so handles start at shoulder height. Back against pad. Execution: Press overhead to lockout, lower controlled. Exhale on press. Common mistakes: Arching back excessively, not achieving full ROM. Fixed path is safer than free weights for high-rep shoulder work.",
+    "muscleGroups": [
+      {
+        "name": "Shoulders",
+        "isPrimary": true
+      },
+      {
+        "name": "Triceps",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Cable Lat Pulldown (Wide Grip)",
+    "category": "compound",
+    "equipment": "machine",
+    "instructions": "Setup: Wide grip on bar, seated with thighs under pads. Execution: Pull bar to upper chest, driving elbows down and back. Squeeze lats. Return controlled. Exhale on pull. Common mistakes: Pulling behind neck (shoulder impingement risk), leaning back excessively. Pull to front of chest for safety and better lat activation.",
+    "muscleGroups": [
+      {
+        "name": "Lats",
+        "isPrimary": true
+      },
+      {
+        "name": "Biceps",
+        "isPrimary": false
+      },
+      {
+        "name": "Upper Back",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Cable Lat Pulldown (Close Grip)",
+    "category": "compound",
+    "equipment": "machine",
+    "instructions": "Setup: V-bar or close grip attachment, seated with thighs under pads. Execution: Pull bar to chest, elbows drive straight down. Emphasizes lower lat. Return controlled. Exhale on pull. Common mistakes: Not pulling low enough (should touch upper chest), rounding shoulders forward. Keep chest up throughout.",
+    "muscleGroups": [
+      {
+        "name": "Lats",
+        "isPrimary": true
+      },
+      {
+        "name": "Biceps",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Seated Cable Row (V-Bar)",
+    "category": "compound",
+    "equipment": "machine",
+    "instructions": "Setup: V-bar attachment, seated with feet on platform. Execution: Pull V-bar to lower chest, driving elbows back. Squeeze shoulder blades together. Return controlled. Exhale on pull. Common mistakes: Using lower back to heave weight, not achieving full contraction. Keep torso at 90 degrees\u00e2\u20ac\u201dslight lean but no swinging.",
+    "muscleGroups": [
+      {
+        "name": "Lats",
+        "isPrimary": true
+      },
+      {
+        "name": "Upper Back",
+        "isPrimary": true
+      },
+      {
+        "name": "Rear Delts",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Leg Press (Narrow Stance)",
+    "category": "compound",
+    "equipment": "machine",
+    "instructions": "Setup: Feet together at center of platform, lower on platform. Execution: Lower weight until knees at 90 degrees or deeper. Drive through midfoot to extend. Breathe in on descent, out on drive. Common mistakes: Locking out knees, letting lower back round. Narrow stance emphasizes quads. Keep back flat against pad.",
+    "muscleGroups": [
+      {
+        "name": "Quadriceps",
+        "isPrimary": true
+      },
+      {
+        "name": "Glutes",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Leg Press (Wide Stance)",
+    "category": "compound",
+    "equipment": "machine",
+    "instructions": "Setup: Feet wide on platform, toes pointed out 30-45 degrees, higher on platform. Execution: Lower until deep knee bend, drive through heels. Breathe in on descent, out on drive. Common mistakes: Not going deep enough, heels lifting. Wide stance emphasizes glutes and adductors.",
+    "muscleGroups": [
+      {
+        "name": "Glutes",
+        "isPrimary": true
+      },
+      {
+        "name": "Quadriceps",
+        "isPrimary": true
+      },
+      {
+        "name": "Adductors",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Seated Calf Raise",
+    "category": "isolation",
+    "equipment": "machine",
+    "instructions": "Setup: Seated, balls of feet on platform, pad across thighs. Execution: Lower heels below platform for stretch, then drive up onto toes for peak contraction. Pause at top. Exhale on raise. Common mistakes: Bouncing at bottom, not achieving full ROM. Seated targets soleus (bent-knee calf muscle).",
+    "muscleGroups": [
+      {
+        "name": "Calves",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Standing Calf Raise",
+    "category": "isolation",
+    "equipment": "machine",
+    "instructions": "Setup: Shoulders under pads, balls of feet on platform, legs straight. Execution: Lower heels below platform, drive up onto toes. Pause at top for peak contraction. Exhale on raise. Common mistakes: Bending knees (turns into seated variation), not controlling descent. Standing targets gastrocnemius (straight-leg calf muscle).",
+    "muscleGroups": [
+      {
+        "name": "Calves",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Archer Push-Up",
+    "category": "compound",
+    "equipment": "bodyweight",
+    "instructions": "Setup: Wide hand placement, one arm extended out to side, one bent under chest. Execution: Lower toward bent arm side, extending opposite arm. Push back up. Alternate sides or complete all reps one side. Common mistakes: Not fully extending off arm, sagging hips. Progression toward one-arm push-up.",
+    "muscleGroups": [
+      {
+        "name": "Chest",
+        "isPrimary": true
+      },
+      {
+        "name": "Triceps",
+        "isPrimary": true
+      },
+      {
+        "name": "Shoulders",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Pseudo Planche Push-Up",
+    "category": "compound",
+    "equipment": "bodyweight",
+    "instructions": "Setup: Hands at hip level (not shoulder level), fingers pointing toward feet, lean forward. Execution: Lower to full push-up while maintaining lean. Push back up. Breathe normally. Common mistakes: Hands too high (reduces difficulty), not leaning enough. Advanced progression\u00e2\u20ac\u201dbuilds toward planche.",
+    "muscleGroups": [
+      {
+        "name": "Chest",
+        "isPrimary": true
+      },
+      {
+        "name": "Shoulders",
+        "isPrimary": true
+      },
+      {
+        "name": "Core",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "L-Sit",
+    "category": "accessory",
+    "equipment": "bodyweight",
+    "instructions": "Setup: Seated on floor or parallel bars, hands at sides. Execution: Press down, lifting entire body off ground with legs extended straight forward (L-shape). Hold 10-30 seconds. Breathe shallowly. Common mistakes: Bending legs, rounding back. Requires tremendous core and hip flexor strength. Use bent-knee tuck progression if needed.",
+    "muscleGroups": [
+      {
+        "name": "Core",
+        "isPrimary": true
+      },
+      {
+        "name": "Hip Flexors",
+        "isPrimary": true
+      },
+      {
+        "name": "Triceps",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Dragon Flag",
+    "category": "accessory",
+    "equipment": "bodyweight",
+    "instructions": "Setup: Lie on bench, grip bench behind head. Execution: Raise entire body (shoulders to feet) until vertical, then lower with full body rigid. Only upper back touches bench. Breathe in on raise, out on lower. Common mistakes: Bending at hips, dropping too fast. Extremely advanced core exercise. Start with negatives only.",
+    "muscleGroups": [
+      {
+        "name": "Core",
+        "isPrimary": true
+      },
+      {
+        "name": "Hip Flexors",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Ring Dips",
+    "category": "compound",
+    "equipment": "bodyweight",
+    "instructions": "Setup: Support on gymnastics rings, arms locked, rings close to body. Execution: Lower with control until shoulders below elbows, push back to lockout. Rings try to push apart\u00e2\u20ac\u201dfight to keep them together. Common mistakes: Flaring elbows, not going deep enough. Instability makes this much harder than bar dips.",
+    "muscleGroups": [
+      {
+        "name": "Triceps",
+        "isPrimary": true
+      },
+      {
+        "name": "Chest",
+        "isPrimary": true
+      },
+      {
+        "name": "Shoulders",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Ring Push-Up",
+    "category": "compound",
+    "equipment": "bodyweight",
+    "instructions": "Setup: Hands in rings, rings at push-up height. Execution: Lower to deep push-up while fighting to keep rings stable. Push back up, turning rings out at top for extra activation. Common mistakes: Letting rings wobble excessively, not controlling descent. Instability adds core demand vs floor push-ups.",
+    "muscleGroups": [
+      {
+        "name": "Chest",
+        "isPrimary": true
+      },
+      {
+        "name": "Triceps",
+        "isPrimary": true
+      },
+      {
+        "name": "Core",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Front Lever",
+    "category": "compound",
+    "equipment": "bodyweight",
+    "instructions": "Setup: Hang from pull-up bar. Execution: Raise legs and body until completely horizontal, face-up position, arms straight. Hold 5-30 seconds. Breathe shallowly. Common mistakes: Bending arms, piking at hips. Extremely advanced pulling exercise. Use tuck progression (knees to chest) first.",
+    "muscleGroups": [
+      {
+        "name": "Lats",
+        "isPrimary": true
+      },
+      {
+        "name": "Core",
+        "isPrimary": true
+      },
+      {
+        "name": "Biceps",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Back Lever",
+    "category": "compound",
+    "equipment": "bodyweight",
+    "instructions": "Setup: Hang from bar, rotate backward. Execution: Lower body backward until horizontal, face-down position, arms straight. Hold. Common mistakes: Not fully inverting, bending arms. Requires significant shoulder strength and mobility. Easier than front lever but still advanced.",
+    "muscleGroups": [
+      {
+        "name": "Shoulders",
+        "isPrimary": true
+      },
+      {
+        "name": "Core",
+        "isPrimary": true
+      },
+      {
+        "name": "Lats",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Weighted Pull-Up",
+    "category": "compound",
+    "equipment": "bodyweight",
+    "instructions": "Setup: Hang from bar, weight belt or dumbbell between feet/ankles. Execution: Pull chin over bar, lower controlled. Exhale on pull. Common mistakes: Swinging excessively, not achieving full ROM. Progressive overload for pull-ups\u00e2\u20ac\u201dsuperior to high-rep sets for strength.",
+    "muscleGroups": [
+      {
+        "name": "Lats",
+        "isPrimary": true
+      },
+      {
+        "name": "Biceps",
+        "isPrimary": true
+      },
+      {
+        "name": "Upper Back",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Weighted Dip",
+    "category": "compound",
+    "equipment": "bodyweight",
+    "instructions": "Setup: Support on parallel bars, weight belt with plates. Execution: Lower until shoulders below elbows, push back to lockout. Keep slight forward lean for chest emphasis. Common mistakes: Not going deep enough, flaring elbows too wide. Excellent for building pressing strength and mass.",
+    "muscleGroups": [
+      {
+        "name": "Triceps",
+        "isPrimary": true
+      },
+      {
+        "name": "Chest",
+        "isPrimary": true
+      },
+      {
+        "name": "Shoulders",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Band Face Pull",
+    "category": "isolation",
+    "equipment": "band",
+    "instructions": "Setup: Band at face height, anchored. Grip with both hands. Execution: Pull band to face, externally rotating shoulders (hands end wider than elbows). Squeeze shoulder blades. Common mistakes: Pulling to chest instead of face, not externally rotating. Critical for shoulder health\u00e2\u20ac\u201ddo these often.",
+    "muscleGroups": [
+      {
+        "name": "Rear Delts",
+        "isPrimary": true
+      },
+      {
+        "name": "Upper Back",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Band Dislocates",
+    "category": "accessory",
+    "equipment": "band",
+    "instructions": "Setup: Hold band with wide grip in front of body. Execution: Keeping arms straight, rotate band overhead and behind body in arc motion. Return. Breathe normally. Common mistakes: Bending elbows, grip too narrow. Shoulder mobility drill\u00e2\u20ac\u201dstart with very wide grip, narrow over time as mobility improves.",
+    "muscleGroups": [
+      {
+        "name": "Shoulders",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Band Assisted Pull-Up",
+    "category": "compound",
+    "equipment": "band",
+    "instructions": "Setup: Loop band over bar, place foot/knee in band. Band provides assistance. Execution: Pull chin over bar, band helps at bottom where you're weakest. Lower controlled. Common mistakes: Using too much assistance, not progressing to lighter bands. Goal is to progress to unassisted pull-ups.",
+    "muscleGroups": [
+      {
+        "name": "Lats",
+        "isPrimary": true
+      },
+      {
+        "name": "Biceps",
+        "isPrimary": true
+      },
+      {
+        "name": "Upper Back",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Band Resisted Push-Up",
+    "category": "compound",
+    "equipment": "band",
+    "instructions": "Setup: Loop band across upper back, hands pin band to floor. Execution: Push-up with band providing resistance. Band tension increases at lockout. Common mistakes: Band slipping, not achieving full ROM. Progressive overload for push-ups when bodyweight becomes too easy.",
+    "muscleGroups": [
+      {
+        "name": "Chest",
+        "isPrimary": true
+      },
+      {
+        "name": "Triceps",
+        "isPrimary": true
+      },
+      {
+        "name": "Shoulders",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Band Good Morning",
+    "category": "compound",
+    "equipment": "band",
+    "instructions": "Setup: Stand on band, loop over neck/upper back. Execution: Hip hinge, pushing hips back while keeping slight knee bend. Feel hamstring stretch. Return by driving hips forward. Common mistakes: Rounding back, bending knees excessively. Teaches hip hinge pattern with minimal equipment.",
+    "muscleGroups": [
+      {
+        "name": "Hamstrings",
+        "isPrimary": true
+      },
+      {
+        "name": "Glutes",
+        "isPrimary": true
+      },
+      {
+        "name": "Lower Back",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Band Resisted Squat",
+    "category": "compound",
+    "equipment": "band",
+    "instructions": "Setup: Stand on band, loop over shoulders. Execution: Squat with band providing resistance that increases as you stand. Breathe in on descent, out on ascent. Common mistakes: Band too tight (can't descend), not controlling ascent. Variable resistance makes top half hardest.",
+    "muscleGroups": [
+      {
+        "name": "Quadriceps",
+        "isPrimary": true
+      },
+      {
+        "name": "Glutes",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Spider Curl",
+    "category": "isolation",
+    "equipment": "dumbbell",
+    "instructions": "Setup: Lie prone on incline bench, arms hanging straight down, DBs in hands. Execution: Curl DBs to shoulders, keeping upper arms perpendicular to floor. Lower controlled. Exhale on curl. Common mistakes: Swinging, using momentum. Strict bicep isolation\u00e2\u20ac\u201dno cheating possible.",
+    "muscleGroups": [
+      {
+        "name": "Biceps",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Overhead Cable Tricep Extension",
+    "category": "isolation",
+    "equipment": "cable",
+    "instructions": "Setup: Rope on low cable, face away, step forward, rope overhead behind head. Execution: Extend arms overhead, keeping elbows stationary and pointed up. Return controlled. Exhale on extension. Common mistakes: Elbows flaring out, not achieving full extension. Targets long head of triceps.",
+    "muscleGroups": [
+      {
+        "name": "Triceps",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Close-Grip EZ Bar Curl",
+    "category": "isolation",
+    "equipment": "barbell",
+    "instructions": "Setup: EZ bar with narrow grip (hands at first inner bend). Execution: Curl bar to shoulders, elbows at sides. Lower controlled. Exhale on curl. Common mistakes: Elbows moving forward, swinging torso. Narrow grip emphasizes outer bicep head.",
+    "muscleGroups": [
+      {
+        "name": "Biceps",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Wide-Grip EZ Bar Curl",
+    "category": "isolation",
+    "equipment": "barbell",
+    "instructions": "Setup: EZ bar with wide grip (hands at outer bends). Execution: Curl to shoulders, elbows stationary. Lower controlled. Exhale on curl. Common mistakes: Grip too wide (wrist strain), using momentum. Wide grip emphasizes inner bicep head.",
+    "muscleGroups": [
+      {
+        "name": "Biceps",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "JM Press",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Setup: Bench press position, close grip on barbell. Execution: Lower bar to throat/chin area by bending elbows (not to chest). Press back up. Hybrid between close-grip bench and skull crusher. Common mistakes: Flaring elbows, hitting face with bar. Excellent tricep mass builder. Use spotter.",
+    "muscleGroups": [
+      {
+        "name": "Triceps",
+        "isPrimary": true
+      },
+      {
+        "name": "Chest",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Tate Press",
+    "category": "isolation",
+    "equipment": "dumbbell",
+    "instructions": "Setup: Lie on bench, DBs held above chest with palms facing forward and elbows out. Execution: Lower DBs to sides of chest in arc motion, bringing DB ends together. Press back up. Unique tricep exercise targeting lateral head. Common mistakes: Using too much weight, not controlling path.",
+    "muscleGroups": [
+      {
+        "name": "Triceps",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Zottman Curl",
+    "category": "isolation",
+    "equipment": "dumbbell",
+    "instructions": "Setup: DBs at sides, palms forward (supinated). Execution: Curl up with supinated grip, at top rotate to pronated (palms down), lower with pronated grip. Rotate back to supinated at bottom. Exhale on curl. Common mistakes: Not fully rotating, rushing the movement. Trains biceps and forearms simultaneously.",
+    "muscleGroups": [
+      {
+        "name": "Biceps",
+        "isPrimary": true
+      },
+      {
+        "name": "Forearms",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Cable Hammer Curl",
+    "category": "isolation",
+    "equipment": "cable",
+    "instructions": "Setup: Rope attachment on low cable, neutral grip (palms facing each other). Execution: Curl rope to shoulders, keep elbows at sides. Squeeze at top. Lower controlled. Exhale on curl. Common mistakes: Elbows moving forward, twisting rope. Targets brachialis and brachioradialis.",
+    "muscleGroups": [
+      {
+        "name": "Biceps",
+        "isPrimary": true
+      },
+      {
+        "name": "Forearms",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Dead Bug",
+    "category": "accessory",
+    "equipment": "bodyweight",
+    "instructions": "Setup: Lie on back, arms straight up, knees at 90 degrees. Execution: Extend opposite arm and leg simultaneously while keeping lower back pressed to floor. Return. Alternate sides. Breathe normally, never hold breath. Common mistakes: Lower back arching off floor, moving too fast. Anti-extension core exercise.",
+    "muscleGroups": [
+      {
+        "name": "Core",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Copenhagen Plank",
+    "category": "accessory",
+    "equipment": "bodyweight",
+    "instructions": "Setup: Side plank position with top leg elevated on bench, bottom leg hanging in air. Execution: Hold position, lifting bottom leg to meet top leg. 20-30 second holds. Common mistakes: Hips sagging, not engaging adductors. Adductor strengthening\u00e2\u20ac\u201dcritical for groin injury prevention.",
+    "muscleGroups": [
+      {
+        "name": "Adductors",
+        "isPrimary": true
+      },
+      {
+        "name": "Core",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Landmine Rotation",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Setup: Barbell in landmine attachment, hold end with both hands at chest. Execution: Rotate barbell side to side in arc motion, pivoting feet. Core resists and controls rotation. Exhale during rotation. Common mistakes: Using arms instead of core, not rotating through hips. Anti-rotation and rotational power exercise.",
+    "muscleGroups": [
+      {
+        "name": "Obliques",
+        "isPrimary": true
+      },
+      {
+        "name": "Core",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Turkish Get-Up (Kettlebell)",
+    "category": "compound",
+    "equipment": "kettlebell",
+    "instructions": "Setup: Lie on back, KB in one hand pressed overhead. Execution: Complex multi-step movement to stand while keeping KB overhead: roll to elbow, post up to hand, bridge hips up, sweep leg through, stand. Reverse to return. Common mistakes: Lowering KB, rushing steps. Learn steps slowly with no weight first. Full-body strength and stability exercise.",
+    "muscleGroups": [
+      {
+        "name": "Core",
+        "isPrimary": true
+      },
+      {
+        "name": "Shoulders",
+        "isPrimary": true
+      },
+      {
+        "name": "Glutes",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Suitcase Carry",
+    "category": "accessory",
+    "equipment": "dumbbell",
+    "instructions": "Setup: Heavy DB in one hand, stand tall. Execution: Walk while resisting lateral flexion (bending toward weight). Keep shoulders level. 30-60 second walks. Breathe normally. Common mistakes: Leaning toward weight, shrugging shoulder up. Anti-lateral flexion core exercise plus grip work.",
+    "muscleGroups": [
+      {
+        "name": "Core",
+        "isPrimary": true
+      },
+      {
+        "name": "Obliques",
+        "isPrimary": true
+      },
+      {
+        "name": "Forearms",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Birddogs",
+    "category": "accessory",
+    "equipment": "bodyweight",
+    "instructions": "Setup: Hands and knees position (quadruped). Execution: Extend opposite arm and leg simultaneously while maintaining neutral spine. Hold 3-5 seconds. Return. Alternate sides. Breathe normally. Common mistakes: Rotating hips, hyperextending back. Core stability and anti-rotation exercise.",
+    "muscleGroups": [
+      {
+        "name": "Core",
+        "isPrimary": true
+      },
+      {
+        "name": "Glutes",
+        "isPrimary": false
+      },
+      {
+        "name": "Lower Back",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Landmine Press",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Setup: Barbell in landmine attachment, hold end at shoulder. Execution: Press barbell overhead in arc path (not straight vertical). Landmine creates unique pressing angle. Exhale on press. Common mistakes: Not following natural arc, pressing straight up. Easier on shoulders than vertical pressing.",
+    "muscleGroups": [
+      {
+        "name": "Shoulders",
+        "isPrimary": true
+      },
+      {
+        "name": "Triceps",
+        "isPrimary": false
+      },
+      {
+        "name": "Core",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Landmine Row",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Setup: Barbell in landmine, straddle bar, hinge at hips. Execution: Row barbell to chest, driving elbow back. Lower controlled. Exhale on pull. Common mistakes: Standing too upright, using lower back to heave weight. Hinge position must be maintained.",
+    "muscleGroups": [
+      {
+        "name": "Lats",
+        "isPrimary": true
+      },
+      {
+        "name": "Upper Back",
+        "isPrimary": true
+      },
+      {
+        "name": "Core",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Overhead Squat",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Setup: Snatch grip, barbell overhead locked out. Feet shoulder-width. Execution: Squat while maintaining barbell directly overhead. Requires extreme mobility and stability. Breathe in on descent, out on ascent. Common mistakes: Bar drifting forward, not having mobility (don't force it). Technical Olympic lift variation\u00e2\u20ac\u201drequires coaching.",
+    "muscleGroups": [
+      {
+        "name": "Quadriceps",
+        "isPrimary": true
+      },
+      {
+        "name": "Glutes",
+        "isPrimary": true
+      },
+      {
+        "name": "Shoulders",
+        "isPrimary": true
+      },
+      {
+        "name": "Core",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Thruster",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Setup: Barbell in front rack position. Execution: Front squat down, then explosively stand while pressing barbell overhead in one continuous motion. Lower bar to front rack, repeat. Common mistakes: Pausing at top of squat (should be one fluid motion), not using leg drive to help press. MetCon staple exercise.",
+    "muscleGroups": [
+      {
+        "name": "Quadriceps",
+        "isPrimary": true
+      },
+      {
+        "name": "Shoulders",
+        "isPrimary": true
+      },
+      {
+        "name": "Glutes",
+        "isPrimary": true
+      },
+      {
+        "name": "Triceps",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Bayesian Cable Curl",
+    "category": "isolation",
+    "equipment": "cable",
+    "instructions": "Setup: Face away from cable machine, D-handle in one hand, step forward for tension. Execution: Arm starts behind body for pre-stretch. Curl forward and up to shoulder. Enhanced stretch on biceps compared to standard curl. Exhale on curl. Common mistakes: Not stepping far enough forward, elbows drifting too far forward. Named after Menno Henselmans' research on lengthened partials.",
+    "muscleGroups": [
+      {
+        "name": "Biceps",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Sissy Squat",
+    "category": "isolation",
+    "equipment": "bodyweight",
+    "instructions": "Setup: Hold support with one hand, feet hip-width. Execution: Lean back while bending knees, lowering torso backward. Knees travel far forward over toes. Rise back to start. Common mistakes: Not leaning back enough, heels lifting. Extreme quad isolation\u00e2\u20ac\u201dmuch harder than it looks. Start with shallow ROM.",
+    "muscleGroups": [
+      {
+        "name": "Quadriceps",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Cable Kickback",
+    "category": "isolation",
+    "equipment": "cable",
+    "instructions": "Setup: Ankle strap on low cable, attach to one ankle. Support yourself facing machine. Execution: Extend hip to drive leg back, squeezing glute. Return controlled. Exhale on extension. Common mistakes: Using momentum, arching lower back. Keep core braced\u00e2\u20ac\u201dglute should do all the work.",
+    "muscleGroups": [
+      {
+        "name": "Glutes",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Glute Ham Raise",
+    "category": "compound",
+    "equipment": "machine",
+    "instructions": "Setup: Knees on pad, ankles secured, body at 45 degrees. Execution: Lower torso toward floor by extending at knees, then pull back up using hamstrings. One of the hardest hamstring exercises. Most need to push off floor initially. Common mistakes: Not going through full ROM, hyperextending back. Build up slowly\u00e2\u20ac\u201dcauses severe DOMS.",
+    "muscleGroups": [
+      {
+        "name": "Hamstrings",
+        "isPrimary": true
+      },
+      {
+        "name": "Glutes",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Wrist Roller",
+    "category": "isolation",
+    "equipment": "other",
+    "instructions": "Setup: Hold wrist roller device (rod with rope and weight), arms extended forward. Execution: Roll weight up by alternating wrist flexion/extension. Once at top, roll back down. Breathe normally. Common mistakes: Bending elbows, dropping arms. Keep arms parallel to ground entire time. Brutal forearm and grip exercise.",
+    "muscleGroups": [
+      {
+        "name": "Forearms",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Barbell Wrist Curl",
+    "category": "isolation",
+    "equipment": "barbell",
+    "instructions": "Setup: Seated, forearms on thighs, wrists hanging over knees, palms up. Execution: Curl bar using only wrists, let bar roll to fingertips on eccentric. Exhale on curl. Common mistakes: Using too much weight, not achieving full ROM. Targets wrist flexors\u00e2\u20ac\u201duse light weight and high reps.",
+    "muscleGroups": [
+      {
+        "name": "Forearms",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Reverse Wrist Curl",
+    "category": "isolation",
+    "equipment": "barbell",
+    "instructions": "Setup: Seated, forearms on thighs, wrists hanging over knees, palms down. Execution: Extend wrists to curl bar up. Lower controlled. Exhale on extension. Common mistakes: Using too much weight, wrists bending backward excessively. Targets wrist extensors\u00e2\u20ac\u201dvery light weight needed.",
+    "muscleGroups": [
+      {
+        "name": "Forearms",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Dumbbell Side Bend",
+    "category": "isolation",
+    "equipment": "dumbbell",
+    "instructions": "Setup: DB in one hand, stand upright. Execution: Bend laterally toward DB side, then return to upright and continue bending away from DB. Control throughout. Common mistakes: Bending forward instead of pure lateral, using too much weight. Oblique development exercise\u00e2\u20ac\u201dcontroversial, can make waist wider.",
+    "muscleGroups": [
+      {
+        "name": "Obliques",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Yoke Walk",
+    "category": "compound",
+    "equipment": "other",
+    "instructions": "Setup: Position under yoke bar (heavy frame on shoulders). Execution: Walk forward with heavy load on upper back. Maintain upright posture, short quick steps. Distance or time-based. Common mistakes: Looking down, taking long strides. Breathing pattern: short inhales/exhales. Strongman staple\u00e2\u20ac\u201dbuilds total body strength and mental toughness.",
+    "muscleGroups": [
+      {
+        "name": "Traps",
+        "isPrimary": true
+      },
+      {
+        "name": "Core",
+        "isPrimary": true
+      },
+      {
+        "name": "Quadriceps",
+        "isPrimary": true
+      },
+      {
+        "name": "Glutes",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Sandbag Carry",
+    "category": "compound",
+    "equipment": "other",
+    "instructions": "Setup: Pick up sandbag to chest/shoulder height or bear hug position. Execution: Walk with sandbag for distance or time. Maintain upright posture. Common mistakes: Rounding back, taking too long strides. Sandbag shifts\u00e2\u20ac\u201drequires constant adjustment and core stability. Excellent real-world strength builder.",
+    "muscleGroups": [
+      {
+        "name": "Core",
+        "isPrimary": true
+      },
+      {
+        "name": "Traps",
+        "isPrimary": true
+      },
+      {
+        "name": "Forearms",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Tire Flip",
+    "category": "compound",
+    "equipment": "other",
+    "instructions": "Setup: Squat down, grip bottom of large tire. Execution: Deadlift tire up explosively, when it reaches chest height, switch grip and press it over. Let it fall to opposite side. Reset and repeat. Common mistakes: Rounding back, not using legs. Powerful hip hinge and pressing movement. Requires heavy tire (400+ lbs for trained athletes).",
+    "muscleGroups": [
+      {
+        "name": "Hamstrings",
+        "isPrimary": true
+      },
+      {
+        "name": "Glutes",
+        "isPrimary": true
+      },
+      {
+        "name": "Shoulders",
+        "isPrimary": true
+      },
+      {
+        "name": "Core",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Sled Push",
+    "category": "compound",
+    "equipment": "other",
+    "instructions": "Setup: Hands on sled handles, arms extended, lean into sled. Execution: Drive legs to push sled forward. Maintain forward lean, drive through balls of feet. Powerful leg drive. Breathe in rhythm with steps. Common mistakes: Standing too upright, not driving hard enough. Excellent for leg development without eccentric stress\u00e2\u20ac\u201dminimal soreness.",
+    "muscleGroups": [
+      {
+        "name": "Quadriceps",
+        "isPrimary": true
+      },
+      {
+        "name": "Glutes",
+        "isPrimary": true
+      },
+      {
+        "name": "Calves",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Sled Drag",
+    "category": "compound",
+    "equipment": "other",
+    "instructions": "Setup: Attach rope to sled, hold rope, walk backward pulling sled. Execution: Walk backward with sled in tow, maintaining tension on rope. Take short steps. Common mistakes: Rope going slack, not maintaining steady pace. Posterior chain and conditioning work. Can also drag forward with harness for different stimulus.",
+    "muscleGroups": [
+      {
+        "name": "Hamstrings",
+        "isPrimary": true
+      },
+      {
+        "name": "Glutes",
+        "isPrimary": true
+      },
+      {
+        "name": "Calves",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Feet-Up Bench Press",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Setup: Bench press position but feet elevated on bench (no leg drive). Execution: Press as normal but without ability to use legs. Focuses purely on upper body pressing strength. Exhale on press. Common mistakes: Trying same weight as regular bench, losing stability. Reduce weight 10-15% from regular bench. Similar to Larsen press.",
+    "muscleGroups": [
+      {
+        "name": "Chest",
+        "isPrimary": true
+      },
+      {
+        "name": "Triceps",
+        "isPrimary": true
+      },
+      {
+        "name": "Shoulders",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Pin Squat",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Setup: Set pins in rack at desired depth (usually parallel or below). Bar rests on pins. Execution: Position under bar while in bottom position, stand up from dead stop, lower back to pins. Pause on pins between reps. Common mistakes: Not fully settling on pins, bouncing. Builds bottom position strength\u00e2\u20ac\u201dexcellent for powerlifters.",
+    "muscleGroups": [
+      {
+        "name": "Quadriceps",
+        "isPrimary": true
+      },
+      {
+        "name": "Glutes",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Tempo Squat",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Setup: Standard squat setup. Execution: Descend for 3-5 second count (slow eccentric), pause at bottom for 1-2 seconds, explode up. Tempo listed as 3-2-1-0 (eccentric-bottom pause-concentric-top pause). Common mistakes: Not maintaining tempo, going too heavy. Reduce weight 20-30% vs regular squats. Builds control and time under tension.",
+    "muscleGroups": [
+      {
+        "name": "Quadriceps",
+        "isPrimary": true
+      },
+      {
+        "name": "Glutes",
+        "isPrimary": true
+      },
+      {
+        "name": "Hamstrings",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Tempo Deadlift",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Setup: Conventional or sumo deadlift setup. Execution: Pull at normal speed, but lower for 3-5 second eccentric. Control the descent\u00e2\u20ac\u201ddon't drop. Reset and repeat. Common mistakes: Dropping the weight, losing position during slow eccentric. Builds eccentric strength and positional awareness. Use 60-70% of max.",
+    "muscleGroups": [
+      {
+        "name": "Hamstrings",
+        "isPrimary": true
+      },
+      {
+        "name": "Glutes",
+        "isPrimary": true
+      },
+      {
+        "name": "Lower Back",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "High-Incline Dumbbell Press",
+    "category": "compound",
+    "equipment": "dumbbell",
+    "instructions": "Setup: Bench at 60-70 degree incline (higher than regular incline), DBs at shoulders. Execution: Press DBs overhead, bringing them together at top. Lower controlled. Exhale on press. Common mistakes: Not setting incline high enough, flaring elbows excessively. Targets upper chest and front delts more than standard incline.",
+    "muscleGroups": [
+      {
+        "name": "Shoulders",
+        "isPrimary": true
+      },
+      {
+        "name": "Chest",
+        "isPrimary": true
+      },
+      {
+        "name": "Triceps",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "One-Arm Barbell Row",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Setup: Load one end of barbell in corner, straddle bar, grab loaded end with one hand. Execution: Row barbell to hip, driving elbow back. Avoid excessive torso rotation. Lower controlled. Exhale on pull. Common mistakes: Using too much torso english, not controlling the weight. Excellent for unilateral back development and anti-rotation core work.",
+    "muscleGroups": [
+      {
+        "name": "Lats",
+        "isPrimary": true
+      },
+      {
+        "name": "Upper Back",
+        "isPrimary": true
+      },
+      {
+        "name": "Core",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Face Pull (Rope)",
+    "category": "isolation",
+    "equipment": "cable",
+    "instructions": "Setup: Rope attachment on high cable, grip rope ends. Execution: Pull rope to face, separating rope ends to pass ears. Externally rotate shoulders. Squeeze rear delts and upper back. Common mistakes: Pulling to chest instead of face, not externally rotating. Do these frequently\u00e2\u20ac\u201dcritical for shoulder health and posture. High reps (15-20).",
+    "muscleGroups": [
+      {
+        "name": "Rear Delts",
+        "isPrimary": true
+      },
+      {
+        "name": "Upper Back",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Reverse Pec Deck",
+    "category": "isolation",
+    "equipment": "machine",
+    "instructions": "Setup: Face machine, chest against pad, arms extended to sides gripping handles. Execution: Pull handles back in reverse fly motion, squeezing shoulder blades together. Return controlled. Exhale during pull. Common mistakes: Using too much weight, not achieving full contraction. Pure rear delt isolation.",
+    "muscleGroups": [
+      {
+        "name": "Rear Delts",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Cable Y-Raise",
+    "category": "isolation",
+    "equipment": "cable",
+    "instructions": "Setup: D-handles on low cables set close together, stand between cables. Execution: Raise arms up and out forming a Y-shape overhead. Targets upper traps and lower trap fibers. Lower controlled. Exhale on raise. Common mistakes: Using too much weight, shrugging instead of raising. Light weight, focus on trap activation.",
+    "muscleGroups": [
+      {
+        "name": "Traps",
+        "isPrimary": true
+      },
+      {
+        "name": "Shoulders",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Bradford Press",
+    "category": "compound",
+    "equipment": "barbell",
+    "instructions": "Setup: Barbell at front rack position. Execution: Press overhead to just above head (not lockout), lower to behind head, press back up, return to front. Continuous motion alternating front and back. Common mistakes: Locking out (defeats purpose), going too heavy. Builds shoulder endurance and stability. Use light weight.",
+    "muscleGroups": [
+      {
+        "name": "Shoulders",
+        "isPrimary": true
+      },
+      {
+        "name": "Triceps",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Dumbbell Incline Fly",
+    "category": "isolation",
+    "equipment": "dumbbell",
+    "instructions": "Setup: Incline bench 30-45 degrees, DBs held above chest, slight elbow bend. Execution: Lower DBs out to sides in arc motion, feel chest stretch. Bring back together at top. Exhale on concentric. Common mistakes: Bending elbows too much (becomes a press), going too heavy. Light weight, strict form. Upper chest emphasis.",
+    "muscleGroups": [
+      {
+        "name": "Chest",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Decline Dumbbell Bench Press",
+    "category": "compound",
+    "equipment": "dumbbell",
+    "instructions": "Setup: Decline bench, feet secured, DBs at chest. Execution: Press DBs overhead. Lower controlled. Exhale on press. Common mistakes: Not securing feet properly, letting DBs drift toward head. Targets lower chest specifically. Many consider it optional if doing flat and incline work.",
+    "muscleGroups": [
+      {
+        "name": "Chest",
+        "isPrimary": true
+      },
+      {
+        "name": "Triceps",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  }
+]
