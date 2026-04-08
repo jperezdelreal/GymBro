@@ -49,6 +49,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
@@ -72,6 +73,7 @@ import com.gymbro.core.model.MuscleGroup
 import com.gymbro.feature.common.FullScreenLoading
 import com.gymbro.feature.common.GlassmorphicCard
 import com.gymbro.feature.common.ObserveErrors
+import com.gymbro.feature.common.icon
 import com.gymbro.core.R
 
 // Backwards compatibility
@@ -224,6 +226,7 @@ fun ExerciseLibraryScreen(
                             )
                         },
                         label = group.displayName,
+                        icon = group.icon(),
                     )
                 }
             }
@@ -264,6 +267,7 @@ private fun GradientFilterChip(
     selected: Boolean,
     onClick: () -> Unit,
     label: String,
+    icon: ImageVector,
 ) {
     var isPressed by remember { mutableStateOf(false) }
     val scale by animateFloatAsState(
@@ -293,12 +297,23 @@ private fun GradientFilterChip(
                 )
                 .padding(horizontal = 16.dp, vertical = 8.dp)
         ) {
-            Text(
-                text = label,
-                fontSize = 13.sp,
-                fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
-                color = if (selected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    modifier = Modifier.size(16.dp),
+                    tint = if (selected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Text(
+                    text = label,
+                    fontSize = 13.sp,
+                    fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
+                    color = if (selected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
         }
     }
 }
