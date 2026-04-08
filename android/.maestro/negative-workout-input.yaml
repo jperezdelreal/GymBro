@@ -9,6 +9,8 @@ tags:
 
 onFlowStart:
   - launchApp
+  - waitForAnimationToEnd:
+      timeout: 3000
   - assertVisible: "Biblioteca de Ejercicios"
 
 onFlowComplete:
@@ -23,6 +25,8 @@ onFlowComplete:
 - assertVisible: "Biblioteca de Ejercicios"
 - tapOn:
     id: "workout_fab"
+- waitForAnimationToEnd:
+    timeout: 2000
 
 # Verify Active Workout screen
 - assertVisible: "Entrenamiento Activo"
@@ -30,6 +34,8 @@ onFlowComplete:
 
 # Add an exercise
 - tapOn: "Añadir Ejercicio"
+- waitForAnimationToEnd:
+    timeout: 2000
 - assertVisible: "Elegir Ejercicio"
 - tapOn:
     id: "search_bar"
@@ -97,4 +103,6 @@ onFlowComplete:
 
 # Cancel workout to clean up
 - back
+- waitForAnimationToEnd:
+    timeout: 1000
 - tapOn: "Cancelar Entrenamiento|Descartar"

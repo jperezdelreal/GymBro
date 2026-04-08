@@ -9,6 +9,8 @@ tags:
 
 onFlowStart:
   - launchApp
+  - waitForAnimationToEnd:
+      timeout: 3000
   - assertVisible: "Biblioteca de Ejercicios"
 
 # Start from Exercise Library
@@ -18,21 +20,31 @@ onFlowStart:
 # RAPID TAP SEQUENCE 1: Cycle through all nav tabs quickly
 - tapOn:
     id: "nav_history"
+- waitForAnimationToEnd:
+    timeout: 1500
 - assertVisible: "Historial|History"
 
 - tapOn:
     id: "nav_progress"
+- waitForAnimationToEnd:
+    timeout: 1500
 - assertVisible: "Progreso|Progress"
 
 - tapOn:
     id: "nav_recovery"
+- waitForAnimationToEnd:
+    timeout: 1500
 
 - tapOn:
     id: "nav_profile"
+- waitForAnimationToEnd:
+    timeout: 1500
 - assertVisible: "Perfil|Profile"
 
 - tapOn:
     id: "nav_exercise_library"
+- waitForAnimationToEnd:
+    timeout: 1500
 - assertVisible: "Biblioteca de Ejercicios"
 
 - takeScreenshot: rapid_nav_cycle1
@@ -40,39 +52,61 @@ onFlowStart:
 # RAPID TAP SEQUENCE 2: Reverse order
 - tapOn:
     id: "nav_profile"
+- waitForAnimationToEnd:
+    timeout: 1500
 
 - tapOn:
     id: "nav_recovery"
+- waitForAnimationToEnd:
+    timeout: 1500
 
 - tapOn:
     id: "nav_progress"
+- waitForAnimationToEnd:
+    timeout: 1500
 
 - tapOn:
     id: "nav_history"
+- waitForAnimationToEnd:
+    timeout: 1500
 
 - tapOn:
     id: "nav_exercise_library"
+- waitForAnimationToEnd:
+    timeout: 1500
 
 - takeScreenshot: rapid_nav_cycle2
 
 # RAPID TAP SEQUENCE 3: Random pattern
 - tapOn:
     id: "nav_progress"
+- waitForAnimationToEnd:
+    timeout: 1500
 
 - tapOn:
     id: "nav_exercise_library"
+- waitForAnimationToEnd:
+    timeout: 1500
 
 - tapOn:
     id: "nav_history"
+- waitForAnimationToEnd:
+    timeout: 1500
 
 - tapOn:
     id: "nav_profile"
+- waitForAnimationToEnd:
+    timeout: 1500
 
 - tapOn:
     id: "nav_recovery"
+- waitForAnimationToEnd:
+    timeout: 1500
 
 - tapOn:
     id: "nav_exercise_library"
+- waitForAnimationToEnd:
+    timeout: 1500
 
 - takeScreenshot: rapid_nav_cycle3
 
@@ -83,6 +117,8 @@ onFlowStart:
     id: "nav_history"
 - tapOn:
     id: "nav_history"
+- waitForAnimationToEnd:
+    timeout: 1500
 - assertVisible: "Historial|History"
 
 - tapOn:
@@ -91,6 +127,8 @@ onFlowStart:
     id: "nav_exercise_library"
 - tapOn:
     id: "nav_exercise_library"
+- waitForAnimationToEnd:
+    timeout: 1500
 - assertVisible: "Biblioteca de Ejercicios"
 
 - takeScreenshot: rapid_nav_stress
@@ -98,21 +136,31 @@ onFlowStart:
 # Final verification: All tabs still work correctly
 - tapOn:
     id: "nav_history"
+- waitForAnimationToEnd:
+    timeout: 1500
 - assertVisible: "Historial|History"
 
 - tapOn:
     id: "nav_progress"
+- waitForAnimationToEnd:
+    timeout: 1500
 - assertVisible: "Progreso|Progress"
 
 - tapOn:
     id: "nav_recovery"
+- waitForAnimationToEnd:
+    timeout: 1500
 
 - tapOn:
     id: "nav_profile"
+- waitForAnimationToEnd:
+    timeout: 1500
 - assertVisible: "Perfil|Profile"
 
 - tapOn:
     id: "nav_exercise_library"
+- waitForAnimationToEnd:
+    timeout: 1500
 - assertVisible: "Biblioteca de Ejercicios"
 
 - takeScreenshot: rapid_nav_complete

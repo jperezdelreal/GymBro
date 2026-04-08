@@ -15,6 +15,8 @@ onFlowComplete:
 # Launch with clearState to wipe all data
 - launchApp:
     clearState: true
+- waitForAnimationToEnd:
+    timeout: 3000
 
 # Complete onboarding quickly to get past it
 - assertVisible: "GymBro"
@@ -39,6 +41,8 @@ onFlowComplete:
 - hideKeyboard
 - tapOn:
     id: "onboarding_start"
+- waitForAnimationToEnd:
+    timeout: 3000
 
 # Now at Exercise Library (post-onboarding)
 - assertVisible: "Biblioteca de Ejercicios"
@@ -47,6 +51,8 @@ onFlowComplete:
 # TEST 1: Check History tab (should show empty state)
 - tapOn:
     id: "nav_history"
+- waitForAnimationToEnd:
+    timeout: 2000
 
 # Verify History screen loaded
 - assertVisible: "Historial|History"
@@ -56,6 +62,8 @@ onFlowComplete:
 # TEST 2: Check Progress tab (should show empty state)
 - tapOn:
     id: "nav_progress"
+- waitForAnimationToEnd:
+    timeout: 2000
 
 # Verify Progress screen loaded
 - assertVisible: "Progreso|Progress"
@@ -65,6 +73,8 @@ onFlowComplete:
 # TEST 3: Check Recovery tab
 - tapOn:
     id: "nav_recovery"
+- waitForAnimationToEnd:
+    timeout: 2000
 
 # Verify Recovery screen loaded
 - takeScreenshot: empty_state_recovery
@@ -72,6 +82,8 @@ onFlowComplete:
 # TEST 4: Check Profile tab
 - tapOn:
     id: "nav_profile"
+- waitForAnimationToEnd:
+    timeout: 2000
 
 # Verify Profile screen loaded
 - assertVisible: "Perfil|Profile"

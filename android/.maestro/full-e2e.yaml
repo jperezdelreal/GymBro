@@ -11,6 +11,8 @@ onFlowComplete:
 
 - launchApp:
     clearState: true
+- waitForAnimationToEnd:
+    timeout: 3000
 
 # === PHASE 1: ONBOARDING ===
 
@@ -44,6 +46,8 @@ onFlowComplete:
 # Complete onboarding
 - tapOn:
     id: "onboarding_start"
+- waitForAnimationToEnd:
+    timeout: 3000
 - assertVisible: "Biblioteca de Ejercicios"
 - takeScreenshot: e2e_onboarding_complete
 
@@ -62,17 +66,23 @@ onFlowComplete:
 # Tap FAB to start workout
 - tapOn:
     id: "workout_fab"
+- waitForAnimationToEnd:
+    timeout: 2000
 - assertVisible: "Entrenamiento Activo"
 - takeScreenshot: e2e_workout_started
 
 # Add an exercise
 - tapOn: "Añadir Ejercicio"
+- waitForAnimationToEnd:
+    timeout: 2000
 - assertVisible: "Elegir Ejercicio"
 
 # Pick an exercise
 - tapOn:
     text: "Bench Press"
     index: 0
+- waitForAnimationToEnd:
+    timeout: 2000
 
 # Fill in set data
 - assertVisible: "Entrenamiento Activo"
@@ -91,9 +101,13 @@ onFlowComplete:
 # Complete the set
 - tapOn:
     text: "Completar serie 1"
+- waitForAnimationToEnd:
+    timeout: 1000
 
 # Finish workout
 - tapOn: "Finalizar Entrenamiento"
+- waitForAnimationToEnd:
+    timeout: 2000
 
 # Verify summary
 - assertVisible: "¡Entrenamiento Completado!"
@@ -101,6 +115,8 @@ onFlowComplete:
 
 # Tap done
 - tapOn: "Listo"
+- waitForAnimationToEnd:
+    timeout: 2000
 - assertVisible: "Biblioteca de Ejercicios"
 
 # === PHASE 4: VERIFY HISTORY ===
@@ -108,6 +124,8 @@ onFlowComplete:
 # Navigate to History tab
 - tapOn:
     id: "nav_history"
+- waitForAnimationToEnd:
+    timeout: 2000
 - assertVisible: "Historial de Entrenamientos"
 - takeScreenshot: e2e_history_with_workout
 
@@ -121,6 +139,8 @@ onFlowComplete:
 # Navigate to Progress tab
 - tapOn:
     id: "nav_progress"
+- waitForAnimationToEnd:
+    timeout: 2000
 - takeScreenshot: e2e_progress_after_workout
 
 # === PHASE 6: VERIFY PROFILE ===
@@ -128,6 +148,8 @@ onFlowComplete:
 # Navigate to Profile tab
 - tapOn:
     id: "nav_profile"
+- waitForAnimationToEnd:
+    timeout: 2000
 - assertVisible: "Cuenta"
 - takeScreenshot: e2e_profile
 

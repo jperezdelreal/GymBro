@@ -9,6 +9,8 @@ tags:
 onFlowStart:
   # Ensure post-onboarding state
   - launchApp
+  - waitForAnimationToEnd:
+      timeout: 3000
   - assertVisible: "Biblioteca de Ejercicios"
 
 onFlowComplete:
@@ -20,10 +22,14 @@ onFlowComplete:
 # Navigate to Profile tab first
 - tapOn:
     id: "nav_profile"
+- waitForAnimationToEnd:
+    timeout: 2000
 - assertVisible: "Hablar con el Entrenador IA"
 
 # Tap AI Coach button
 - tapOn: "Hablar con el Entrenador IA"
+- waitForAnimationToEnd:
+    timeout: 2000
 
 # Verify Coach screen opens
 - assertVisible: "GymBro Entrenador IA"
@@ -36,6 +42,8 @@ onFlowComplete:
 
 # Try tapping a quick prompt
 - tapOn: "¿Qué debería entrenar hoy?"
+- waitForAnimationToEnd:
+    timeout: 1000
 - takeScreenshot: coach_prompt_sent
 
 # Wait for response (or loading indicator)
@@ -46,5 +54,7 @@ onFlowComplete:
 
 # Navigate back
 - back
+- waitForAnimationToEnd:
+    timeout: 2000
 - assertVisible: "Perfil"
 - takeScreenshot: coach_back_to_profile

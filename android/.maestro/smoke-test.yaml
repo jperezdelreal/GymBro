@@ -9,6 +9,8 @@ tags:
 onFlowStart:
   # Launch app and verify it's functional
   - launchApp
+  - waitForAnimationToEnd:
+      timeout: 3000
 
 # Verify post-onboarding state
 - assertVisible: "Biblioteca de Ejercicios|Exercise Library"

@@ -10,6 +10,8 @@ tags:
 onFlowStart:
   # Ensure post-onboarding state
   - launchApp
+  - waitForAnimationToEnd:
+      timeout: 3000
   - assertVisible: "Biblioteca de Ejercicios"
 
 onFlowComplete:
@@ -21,6 +23,8 @@ onFlowComplete:
 # Navigate to History tab
 - tapOn:
     id: "nav_history"
+- waitForAnimationToEnd:
+    timeout: 2000
 - takeScreenshot: history_tab
 
 # Verify History screen loads
@@ -43,4 +47,6 @@ onFlowComplete:
 
 # Navigate back
 - back
+- waitForAnimationToEnd:
+    timeout: 2000
 - takeScreenshot: history_after_back

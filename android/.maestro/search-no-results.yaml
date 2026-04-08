@@ -8,6 +8,8 @@ tags:
 
 onFlowStart:
   - launchApp
+  - waitForAnimationToEnd:
+      timeout: 3000
   - assertVisible: "Biblioteca de Ejercicios"
 
 # Start from Exercise Library

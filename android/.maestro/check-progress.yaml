@@ -10,6 +10,8 @@ tags:
 onFlowStart:
   # Ensure post-onboarding state
   - launchApp
+  - waitForAnimationToEnd:
+      timeout: 3000
   - assertVisible: "Biblioteca de Ejercicios"
 
 onFlowComplete:
@@ -21,6 +23,8 @@ onFlowComplete:
 # Navigate to Progress tab
 - tapOn:
     id: "nav_progress"
+- waitForAnimationToEnd:
+    timeout: 2000
 - takeScreenshot: progress_tab
 
 # Check for content or empty state

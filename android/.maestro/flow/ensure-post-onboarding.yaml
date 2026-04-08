@@ -6,6 +6,8 @@ name: "Ensure Post-Onboarding State"
 # If onboarding is visible, complete it to reach post-onboarding state
 
 - launchApp
+- waitForAnimationToEnd:
+    timeout: 3000
 
 # Check if we're on onboarding or post-onboarding
 - runFlow:
@@ -30,6 +32,8 @@ name: "Ensure Post-Onboarding State"
       - hideKeyboard
       - tapOn:
           id: "onboarding_start"
+      - waitForAnimationToEnd:
+          timeout: 3000
 
 # Verify we're now post-onboarding
 - assertVisible: "Biblioteca de Ejercicios|Exercise Library"

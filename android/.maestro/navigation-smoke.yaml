@@ -10,6 +10,8 @@ tags:
 onFlowStart:
   # Ensure app is in post-onboarding state
   - launchApp
+  - waitForAnimationToEnd:
+      timeout: 3000
   - assertVisible: "Biblioteca de Ejercicios"
 
 onFlowComplete:
@@ -25,26 +27,36 @@ onFlowComplete:
 # Tap History tab
 - tapOn:
     id: "nav_history"
+- waitForAnimationToEnd:
+    timeout: 2000
 - assertVisible: "Historial de Entrenamientos"
 - takeScreenshot: nav_history
 
 # Tap Progress tab
 - tapOn:
     id: "nav_progress"
+- waitForAnimationToEnd:
+    timeout: 2000
 - takeScreenshot: nav_progress
 
 # Tap Recovery tab
 - tapOn:
     id: "nav_recovery"
+- waitForAnimationToEnd:
+    timeout: 2000
 - takeScreenshot: nav_recovery
 
 # Tap Profile tab
 - tapOn:
     id: "nav_profile"
+- waitForAnimationToEnd:
+    timeout: 2000
 - takeScreenshot: nav_profile
 
 # Navigate back to Library
 - tapOn:
     id: "nav_exercise_library"
+- waitForAnimationToEnd:
+    timeout: 2000
 - assertVisible: "Biblioteca de Ejercicios"
 - takeScreenshot: nav_back_to_library

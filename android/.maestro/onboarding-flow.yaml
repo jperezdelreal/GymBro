@@ -56,6 +56,8 @@ onFlowComplete:
 
 # Complete onboarding
 - tapOn: "Let's Go"
+- waitForAnimationToEnd:
+    timeout: 3000
 
 # Verify we landed on Exercise Library
 - assertVisible: "Exercise Library"

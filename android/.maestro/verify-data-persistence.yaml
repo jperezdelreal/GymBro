@@ -10,6 +10,8 @@ tags:
 onFlowStart:
   # Ensure clean state at library
   - launchApp
+  - waitForAnimationToEnd:
+      timeout: 3000
   - assertVisible: "Biblioteca de Ejercicios"
 
 onFlowComplete:
@@ -25,11 +27,15 @@ onFlowComplete:
 # STEP 1: Start a workout
 - tapOn:
     id: "workout_fab"
+- waitForAnimationToEnd:
+    timeout: 2000
 - assertVisible: "Entrenamiento Activo"
 - takeScreenshot: persistence_workout_started
 
 # STEP 2: Add an exercise
 - tapOn: "Añadir Ejercicio"
+- waitForAnimationToEnd:
+    timeout: 2000
 - assertVisible: "Elegir Ejercicio"
 
 # Pick Squat exercise
@@ -56,20 +62,28 @@ onFlowComplete:
 # Complete the set
 - tapOn:
     text: "Completar serie 1"
+- waitForAnimationToEnd:
+    timeout: 1000
 - takeScreenshot: persistence_set_completed
 
 # STEP 4: Complete the workout
 - tapOn: "Finalizar Entrenamiento"
+- waitForAnimationToEnd:
+    timeout: 2000
 - assertVisible: "¡Entrenamiento Completado!"
 - takeScreenshot: persistence_workout_summary
 
 # Return to library
 - tapOn: "Listo"
+- waitForAnimationToEnd:
+    timeout: 2000
 - assertVisible: "Biblioteca de Ejercicios"
 
 # VERIFICATION 1: Check History for workout
 - tapOn:
     id: "nav_history"
+- waitForAnimationToEnd:
+    timeout: 2000
 - assertVisible: "Historial de Entrenamientos"
 - takeScreenshot: persistence_verify_history
 
@@ -86,11 +100,15 @@ onFlowComplete:
 
 # Go back to history list
 - back
+- waitForAnimationToEnd:
+    timeout: 2000
 - assertVisible: "Historial de Entrenamientos"
 
 # VERIFICATION 2: Check Progress for updated stats
 - tapOn:
     id: "nav_progress"
+- waitForAnimationToEnd:
+    timeout: 2000
 - assertVisible:
     text: "Volumen Semanal|Sin entrenamientos aún"
 - takeScreenshot: persistence_verify_progress

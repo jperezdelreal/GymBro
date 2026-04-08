@@ -9,6 +9,8 @@ tags:
 onFlowStart:
   # Ensure post-onboarding state
   - launchApp
+  - waitForAnimationToEnd:
+      timeout: 3000
   - assertVisible: "Biblioteca de Ejercicios"
 
 onFlowComplete:
@@ -20,6 +22,8 @@ onFlowComplete:
 # Navigate to Profile tab
 - tapOn:
     id: "nav_profile"
+- waitForAnimationToEnd:
+    timeout: 2000
 - takeScreenshot: profile_screen
 
 # Verify profile sections are visible
