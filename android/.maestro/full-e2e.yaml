@@ -81,6 +81,8 @@ onFlowComplete:
 - tapOn:
     text: "${EXERCISE_NAME:=Bench Press}"
     index: 0
+- waitForAnimationToEnd:
+    timeout: 2000
 
 # Fill in set data
 - assertVisible: "Entrenamiento Activo"

@@ -10,6 +10,8 @@ tags:
 onFlowStart:
   # Start at library with clean filters
   - launchApp
+  - waitForAnimationToEnd:
+      timeout: 3000
   - assertVisible: "Biblioteca de Ejercicios"
 
 onFlowComplete:
@@ -24,29 +26,47 @@ onFlowComplete:
 # Tap on search bar and type a query
 - tapOn:
     id: "search_bar"
+- waitForAnimationToEnd:
+    timeout: 1000
 - inputText: "Press"
+- waitForAnimationToEnd:
+    timeout: 1000
 - takeScreenshot: library_search_results
 
 # Relaunch app to clear search
 - launchApp
+- waitForAnimationToEnd:
+    timeout: 3000
 
 # Wait for library to load
 - assertVisible: "Biblioteca de Ejercicios"
 
 # Filter by Chest muscle group
 - tapOn: "Pecho"
+- waitForAnimationToEnd:
+    timeout: 1000
 - takeScreenshot: library_filter_chest
 
 # Deselect Chest, select Back
 - tapOn: "Pecho"
+- waitForAnimationToEnd:
+    timeout: 500
 - tapOn: "Espalda"
+- waitForAnimationToEnd:
+    timeout: 1000
 - takeScreenshot: library_filter_back
 
 # Deselect Back, select Shoulders
 - tapOn: "Espalda"
+- waitForAnimationToEnd:
+    timeout: 500
 - tapOn: "Hombros"
+- waitForAnimationToEnd:
+    timeout: 1000
 - takeScreenshot: library_filter_shoulders
 
 # Deselect filter
 - tapOn: "Hombros"
+- waitForAnimationToEnd:
+    timeout: 1000
 - takeScreenshot: library_no_filter

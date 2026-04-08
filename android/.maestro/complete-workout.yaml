@@ -35,6 +35,8 @@ onFlowStart:
 - tapOn:
     text: "${EXERCISE_NAME:=Bench Press}"
     index: 0
+- waitForAnimationToEnd:
+    timeout: 2000
 
 # Verify back on workout screen
 - assertVisible: "Entrenamiento Activo"

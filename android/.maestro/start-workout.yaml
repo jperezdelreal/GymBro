@@ -9,6 +9,8 @@ tags:
 onFlowStart:
   # Ensure we're at library with no active workout
   - launchApp
+  - waitForAnimationToEnd:
+      timeout: 3000
   - assertVisible: "Biblioteca de Ejercicios"
 
 onFlowComplete:
@@ -25,6 +27,8 @@ onFlowComplete:
 # Tap FAB to start new workout
 - tapOn:
     id: "workout_fab"
+- waitForAnimationToEnd:
+    timeout: 2000
 
 # Verify Active Workout screen
 - assertVisible: "Entrenamiento Activo"
@@ -32,6 +36,8 @@ onFlowComplete:
 
 # Tap Add Exercise button
 - tapOn: "Añadir Ejercicio"
+- waitForAnimationToEnd:
+    timeout: 2000
 
 # Verify exercise picker opens
 - assertVisible: "Elegir Ejercicio"
