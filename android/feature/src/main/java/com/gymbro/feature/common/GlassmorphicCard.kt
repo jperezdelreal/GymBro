@@ -14,9 +14,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-
-private val GlassOverlay = Color(0x1AFFFFFF)
-private val GlassBorder = Color(0x33FFFFFF)
+import com.gymbro.core.ui.theme.GlassBorder
+import com.gymbro.core.ui.theme.GlassOverlay
 
 @Composable
 fun GlassmorphicCard(

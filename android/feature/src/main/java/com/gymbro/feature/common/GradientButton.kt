@@ -22,9 +22,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-
-private val AccentGreenStart = Color(0xFF00FF87)
-private val AccentGreenEnd = Color(0xFF00D9B5)
+import com.gymbro.core.ui.theme.AccentGreenEnd
+import com.gymbro.core.ui.theme.AccentGreenStart
 
 @Composable
 fun GradientButton(
@@ -85,4 +84,6 @@ fun GradientButton(
     }
 }
 
-fun Modifier.gradientBackground(brush: Brush): Modifier = this.background(brush = brush)
+fun Modifier.gradientBackground(brush: Brush): Modifier = this.then(
+    background(brush)
+)
