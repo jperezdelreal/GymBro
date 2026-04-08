@@ -511,3 +511,48 @@ This foundation unblocks all Phase-1 work:
 - Firestore documents denormalized (workout embeds sets) for efficient reads
 
 **Verification:** assembleDebug passes clean (105 tasks, 0 errors)
+
+### 2026-01-12: Android Exercise Seed Data from JSON (Issue #256)
+
+**Problem:** Fresh Android installs show empty exercise library. Users need exercises available immediately on first launch (no network required).
+
+**Solution — Room Database Seed Data via Callback:**
+- Created `android/core/src/main/assets/exercises-seed.json` — copied from shared/data/exercises-seed.json (126KB, ~4100 lines with 400+ exercises)
+- Extended `DatabaseModule.kt` with JSON parsing and seeding:
+  - Added kotlinx.serialization dependency (v1.8.0)
+  - Created `ExerciseSeed` and `MuscleGroupSeed` data classes for JSON deserialization
+  - `SeedDatabaseCallback.onCreate()` reads JSON from assets, parses, maps to `ExerciseEntity`, and bulk-inserts via `ExerciseDao.insertAll()`
+  - Uses `UUID.nameUUIDFromBytes(name)` for stable IDs — same name always generates same UUID, preventing duplicates across installs
+  - Picks first primary muscle group from `muscleGroups` array as the single `muscleGroup` field in Room entity
+  - Uppercase normalization for enums (category, equipment, muscleGroup)
+  - `videoURL` → `youtubeUrl` mapping
+
+**Architecture Decisions:**
+- JSON in `core` module assets (not `app`) so the seed data is available to core Room database code without cross-module asset access
+- Callback runs on `RoomDatabase.onCreate()` — fires only on first DB creation, not on every app launch (performance)
+- `ExerciseDao.insertAll()` with `OnConflictStrategy.REPLACE` prevents duplicates if remote sync later provides same exercises
+- Coroutine IO scope in callback — database insertion doesn't block main thread
+
+**Key Files Modified:**
+- `android/core/build.gradle.kts` — added kotlinx-serialization plugin + dependency
+- `android/gradle/libs.versions.toml` — added kotlin-serialization plugin + kotlinx-serialization-json library (v1.8.0)
+- `android/core/src/main/java/com/gymbro/core/di/DatabaseModule.kt` — replaced hardcoded 22-exercise seed with JSON-driven seed (~400+ exercises)
+- `android/core/src/main/assets/exercises-seed.json` — created (4102 lines)
+
+**Duplicate Prevention Strategy:**
+- Room DAO uses `OnConflictStrategy.REPLACE` — if remote sync brings an exercise with the same ID, it replaces the local seed version
+- UUIDs generated deterministically from exercise name — guarantees idempotency across fresh installs and remote sync
+- No server-side deduplication needed — client-side UUID generation is sufficient
+
+**Testing:**
+- Build verification: `.\gradlew.bat assembleDebug` passed (106 tasks, 33s, no errors)
+- Exercise count: JSON contains 400+ exercises vs. previous hardcoded 22 — 18x expansion
+
+**Deferred/Future Work:**
+- UI for importing custom exercises from wger.de API (Android equivalent of iOS wger integration from issue #77)
+- Exercise media (images, videos) — current seed only includes YouTube URLs, no embedded media
+- Exercise search/filter by multiple muscle groups (current Room schema only stores single `muscleGroup` string)
+- Migration strategy if seed data schema changes (currently uses Room's fallbackToDestructiveMigration)
+
+**Branch:** `squad/256-exercise-seed-data` (pushed, PR needs manual creation due to enterprise auth)
+
