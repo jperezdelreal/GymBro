@@ -24,29 +24,36 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.gymbro.core.model.PersonalRecord
-import com.gymbro.core.model.RecordType
 import kotlinx.coroutines.delay
 
 private val AccentGreen = Color(0xFF00FF87)
-private val AccentCyan = Color(0xFF00E5FF)
 private val AccentAmber = Color(0xFFFFAB00)
 private val SurfaceCard = Color(0xFF1A1A1A)
 private val SurfaceDark = Color(0xFF0A0A0A)
 
+/**
+ * Displays a celebration overlay for workout streak milestones.
+ *
+ * @param streakDays Number of consecutive workout days
+ * @param onDismiss Callback when celebration is dismissed
+ * @param modifier Modifier for sizing/positioning
+ */
 @Composable
-fun PRCelebration(
-    personalRecords: List<PersonalRecord>,
+fun StreakCelebration(
+    streakDays: Int,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scale = remember { Animatable(0f) }
     val alpha = remember { Animatable(1f) }
+    val view = LocalView.current
 
     LaunchedEffect(Unit) {
+        view.performHapticFeedback(android.view.HapticFeedbackConstants.LONG_PRESS)
         scale.animateTo(
             targetValue = 1f,
             animationSpec = spring(
@@ -69,7 +76,7 @@ fun PRCelebration(
             .clickable(onClick = onDismiss),
         contentAlignment = Alignment.Center,
     ) {
-        ConfettiOverlay()
+        ConfettiOverlay(useLottie = true)
 
         Column(
             modifier = Modifier
@@ -85,7 +92,7 @@ fun PRCelebration(
                 contentAlignment = Alignment.Center,
             ) {
                 GymBroLottieAnimation(
-                    animationResId = com.gymbro.feature.R.raw.anim_trophy,
+                    animationResId = com.gymbro.feature.R.raw.anim_workout,
                     modifier = Modifier.size(80.dp),
                     iterations = 1,
                     speed = 1f,
@@ -95,7 +102,11 @@ fun PRCelebration(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "NEW PR!",
+                text = when (streakDays) {
+                    7 -> "7 Day Streak!"
+                    30 -> "30 Day Streak!"
+                    else -> "$streakDays Day Streak!"
+                },
                 style = MaterialTheme.typography.headlineLarge,
                 fontWeight = FontWeight.Bold,
                 color = AccentGreen,
@@ -103,15 +114,16 @@ fun PRCelebration(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            personalRecords.forEach { pr ->
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = formatPRText(pr),
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = Color.White,
-                    textAlign = TextAlign.Center,
-                )
-            }
+            Text(
+                text = when (streakDays) {
+                    7 -> "One week of consistency — you're building serious momentum!"
+                    30 -> "One month strong — you're unstoppable!"
+                    else -> "Keep the fire burning!"
+                },
+                style = MaterialTheme.typography.bodyLarge,
+                color = Color.White,
+                textAlign = TextAlign.Center,
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -120,23 +132,6 @@ fun PRCelebration(
                 style = MaterialTheme.typography.labelMedium,
                 color = Color.White.copy(alpha = 0.5f),
             )
-        }
-    }
-}
-
-private fun formatPRText(pr: PersonalRecord): String {
-    return when (pr.type) {
-        RecordType.MAX_WEIGHT -> {
-            "${pr.type.emoji} ${pr.exerciseName}: ${pr.value.toInt()} kg"
-        }
-        RecordType.MAX_REPS -> {
-            "${pr.type.emoji} ${pr.exerciseName}: ${pr.value.toInt()} reps"
-        }
-        RecordType.MAX_VOLUME -> {
-            "${pr.type.emoji} ${pr.exerciseName}: ${pr.value.toInt()} kg volume"
-        }
-        RecordType.MAX_E1RM -> {
-            "${pr.type.emoji} ${pr.exerciseName}: ${pr.value.toInt()} kg E1RM"
         }
     }
 }

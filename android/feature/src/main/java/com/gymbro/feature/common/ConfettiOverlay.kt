@@ -35,18 +35,16 @@ private data class ConfettiParticle(
  * Displays a confetti animation overlay.
  *
  * @param modifier Modifier for sizing/positioning
- * @param useLottie If true and lottieResId is provided, uses Lottie animation instead of Canvas
- * @param lottieResId Optional Lottie animation resource. If null, falls back to Canvas rendering
+ * @param useLottie If true, uses Lottie animation (anim_confetti.json) instead of Canvas
  */
 @Composable
 fun ConfettiOverlay(
     modifier: Modifier = Modifier,
-    useLottie: Boolean = false,
-    @RawRes lottieResId: Int? = null,
+    useLottie: Boolean = true,
 ) {
-    if (useLottie && lottieResId != null) {
+    if (useLottie) {
         GymBroLottieAnimation(
-            animationResId = lottieResId,
+            animationResId = com.gymbro.feature.R.raw.anim_confetti,
             modifier = modifier,
             iterations = 1,
             speed = 1f,

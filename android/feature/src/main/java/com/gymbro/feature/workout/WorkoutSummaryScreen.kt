@@ -27,6 +27,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,10 +37,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.gymbro.core.model.PersonalRecord
+import com.gymbro.feature.common.ConfettiOverlay
 import com.gymbro.feature.common.PRCelebration
+import kotlinx.coroutines.delay
 
 private val AccentGreen = Color(0xFF00FF87)
 private val AccentCyan = Color(0xFF00E5FF)
@@ -57,6 +61,14 @@ fun WorkoutSummaryScreen(
     onDone: () -> Unit,
 ) {
     var showCelebration by remember { mutableStateOf(personalRecords.isNotEmpty()) }
+    var showCompletionConfetti by remember { mutableStateOf(true) }
+    val view = LocalView.current
+
+    LaunchedEffect(Unit) {
+        view.performHapticFeedback(android.view.HapticFeedbackConstants.LONG_PRESS)
+        delay(3500)
+        showCompletionConfetti = false
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -170,6 +182,13 @@ fun WorkoutSummaryScreen(
             ) {
                 Text("Done", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
             }
+        }
+
+        if (showCompletionConfetti) {
+            ConfettiOverlay(
+                modifier = Modifier.fillMaxSize(),
+                useLottie = true,
+            )
         }
 
         if (showCelebration) {
