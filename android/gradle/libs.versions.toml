@@ -94,6 +94,7 @@ firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.r
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore-ktx" }
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth-ktx" }
 firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging-ktx" }
+firebase-vertexai = { group = "com.google.firebase", name = "firebase-vertexai" }
 
 # Testing
 junit = { group = "junit", name = "junit", version.ref = "junit" }
