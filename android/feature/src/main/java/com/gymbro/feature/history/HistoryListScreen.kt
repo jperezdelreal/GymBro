@@ -236,7 +236,7 @@ private fun WorkoutCard(
         enter = fadeIn() + slideInVertically(initialOffsetY = { it / 4 })
     ) {
         GlassmorphicCard(
-            modifier = Modifier.clickable(onClick = onClick),
+            onClick = onClick,
             accentColor = accentColor,
         ) {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
