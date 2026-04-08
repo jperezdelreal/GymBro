@@ -18,7 +18,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
@@ -246,14 +246,30 @@ fun ExerciseLibraryScreen(
                         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp),
                     ) {
-                        items(
+                        itemsIndexed(
                             items = state.exercises,
-                            key = { it.id.toString() },
-                        ) { exercise ->
-                            ExerciseCard(
-                                exercise = exercise,
-                                onClick = { onEvent(ExerciseLibraryEvent.ExerciseClicked(exercise)) },
-                            )
+                            key = { _, exercise -> exercise.id.toString() },
+                        ) { index, exercise ->
+                            androidx.compose.animation.AnimatedVisibility(
+                                visible = true,
+                                enter = androidx.compose.animation.fadeIn(
+                                    animationSpec = androidx.compose.animation.core.tween(
+                                        durationMillis = 300,
+                                        delayMillis = index * 50
+                                    )
+                                ) + androidx.compose.animation.slideInVertically(
+                                    animationSpec = androidx.compose.animation.core.tween(
+                                        durationMillis = 300,
+                                        delayMillis = index * 50
+                                    ),
+                                    initialOffsetY = { it / 3 }
+                                )
+                            ) {
+                                ExerciseCard(
+                                    exercise = exercise,
+                                    onClick = { onEvent(ExerciseLibraryEvent.ExerciseClicked(exercise)) },
+                                )
+                            }
                         }
                     }
                 }
@@ -323,12 +339,6 @@ private fun ExerciseCard(
     exercise: Exercise,
     onClick: () -> Unit,
 ) {
-    var isPressed by remember { mutableStateOf(false) }
-    val scale by animateFloatAsState(
-        targetValue = if (isPressed) 0.97f else 1.0f,
-        label = "card_scale"
-    )
-
     // Accent color based on muscle group
     val accentColor = when (exercise.muscleGroup) {
         MuscleGroup.CHEST, MuscleGroup.BICEPS, MuscleGroup.TRICEPS -> AccentGreenStart
@@ -340,13 +350,8 @@ private fun ExerciseCard(
     }
 
     GlassmorphicCard(
-        modifier = Modifier
-            .scale(scale)
-            .clickable {
-                isPressed = true
-                onClick()
-            },
         accentColor = accentColor,
+        onClick = onClick,
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -386,14 +391,6 @@ private fun ExerciseCard(
                 tint = accentColor,
                 modifier = Modifier.size(24.dp),
             )
-        }
-    }
-
-    // Reset pressed state
-    LaunchedEffect(isPressed) {
-        if (isPressed) {
-            kotlinx.coroutines.delay(100)
-            isPressed = false
         }
     }
 }

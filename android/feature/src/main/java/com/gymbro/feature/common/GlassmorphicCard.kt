@@ -21,10 +21,17 @@ import com.gymbro.core.ui.theme.GlassOverlay
 fun GlassmorphicCard(
     modifier: Modifier = Modifier,
     accentColor: Color? = null,
+    onClick: (() -> Unit)? = null,
     content: @Composable () -> Unit,
 ) {
+    val cardModifier = if (onClick != null) {
+        modifier.fillMaxWidth().scaleOnPress()
+    } else {
+        modifier.fillMaxWidth()
+    }
+    
     Card(
-        modifier = modifier.fillMaxWidth(),
+        modifier = cardModifier,
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
             containerColor = GlassOverlay,
@@ -33,6 +40,7 @@ fun GlassmorphicCard(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 0.dp,
         ),
+        onClick = onClick ?: {}
     ) {
         Column {
             if (accentColor != null) {

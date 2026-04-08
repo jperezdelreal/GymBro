@@ -1,5 +1,9 @@
 package com.gymbro.app.navigation
 
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -97,6 +101,30 @@ fun GymBroNavGraph(
     NavHost(
         navController = navController,
         startDestination = startDestination,
+        enterTransition = {
+            slideIntoContainer(
+                towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                animationSpec = tween(300)
+            ) + fadeIn(animationSpec = tween(300))
+        },
+        exitTransition = {
+            slideOutOfContainer(
+                towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                animationSpec = tween(300)
+            ) + fadeOut(animationSpec = tween(300))
+        },
+        popEnterTransition = {
+            slideIntoContainer(
+                towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                animationSpec = tween(300)
+            ) + fadeIn(animationSpec = tween(300))
+        },
+        popExitTransition = {
+            slideOutOfContainer(
+                towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                animationSpec = tween(300)
+            ) + fadeOut(animationSpec = tween(300))
+        },
     ) {
         composable("onboarding") {
             OnboardingRoute(
@@ -468,35 +496,65 @@ private fun GymBroBottomNavBar(
     currentRoute: String?,
     onTabSelected: (BottomNavTab) -> Unit,
 ) {
-    NavigationBar(
-        containerColor = Color(0xFF1A1A1A),
-        contentColor = Color.White,
-    ) {
-        BottomNavTab.entries.forEach { tab ->
-            val selected = currentRoute == tab.route
-            val label = stringResource(tab.labelResId)
-            NavigationBarItem(
-                selected = selected,
-                onClick = { onTabSelected(tab) },
-                icon = {
-                    Icon(
-                        if (selected) tab.selectedIcon else tab.unselectedIcon,
-                        contentDescription = label,
-                    )
-                },
-                label = {
-                    Text(
-                        text = label,
-                        style = MaterialTheme.typography.labelSmall,
-                    )
-                },
-                colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = AccentGreen,
-                    selectedTextColor = AccentGreen,
-                    unselectedIconColor = Color(0xFF9E9E9E),
-                    unselectedTextColor = Color(0xFF9E9E9E),
-                    indicatorColor = AccentGreen.copy(alpha = 0.12f),
-                ),
+    val selectedIndex = BottomNavTab.entries.indexOfFirst { it.route == currentRoute }.takeIf { it >= 0 } ?: 0
+    val indicatorOffset by androidx.compose.animation.core.animateFloatAsState(
+        targetValue = selectedIndex.toFloat(),
+        animationSpec = androidx.compose.animation.core.spring(
+            dampingRatio = androidx.compose.animation.core.Spring.DampingRatioMediumBouncy,
+            stiffness = androidx.compose.animation.core.Spring.StiffnessMedium
+        ),
+        label = "bottomNavIndicator"
+    )
+    
+    androidx.compose.foundation.layout.Box {
+        NavigationBar(
+            containerColor = Color(0xFF1A1A1A),
+            contentColor = Color.White,
+        ) {
+            BottomNavTab.entries.forEach { tab ->
+                val selected = currentRoute == tab.route
+                val label = stringResource(tab.labelResId)
+                NavigationBarItem(
+                    selected = selected,
+                    onClick = { onTabSelected(tab) },
+                    icon = {
+                        Icon(
+                            if (selected) tab.selectedIcon else tab.unselectedIcon,
+                            contentDescription = label,
+                        )
+                    },
+                    label = {
+                        Text(
+                            text = label,
+                            style = MaterialTheme.typography.labelSmall,
+                        )
+                    },
+                    colors = NavigationBarItemDefaults.colors(
+                        selectedIconColor = AccentGreen,
+                        selectedTextColor = AccentGreen,
+                        unselectedIconColor = Color(0xFF9E9E9E),
+                        unselectedTextColor = Color(0xFF9E9E9E),
+                        indicatorColor = Color.Transparent,
+                    ),
+                )
+            }
+        }
+        
+        // Animated indicator bar at the top of the bottom nav
+        androidx.compose.foundation.Canvas(
+            modifier = Modifier
+                .fillMaxSize()
+                .align(Alignment.TopStart)
+        ) {
+            val tabWidth = size.width / BottomNavTab.entries.size
+            val indicatorWidth = tabWidth * 0.5f
+            val indicatorHeight = 3.dp.toPx()
+            val xOffset = (indicatorOffset * tabWidth) + (tabWidth - indicatorWidth) / 2
+            
+            drawRect(
+                color = AccentGreen,
+                topLeft = androidx.compose.ui.geometry.Offset(xOffset, 0f),
+                size = androidx.compose.ui.geometry.Size(indicatorWidth, indicatorHeight)
             )
         }
     }
