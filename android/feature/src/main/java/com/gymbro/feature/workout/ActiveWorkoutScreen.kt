@@ -52,7 +52,9 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -72,6 +74,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewModelScope
 import com.gymbro.core.model.Exercise
 import com.gymbro.core.model.MuscleGroup
 import com.gymbro.core.preferences.UserPreferences
@@ -86,6 +89,9 @@ import com.gymbro.feature.common.AnimatedProgressCircle
 import com.gymbro.feature.common.FullScreenLoading
 import com.gymbro.feature.common.GlassmorphicCard
 import com.gymbro.feature.common.GradientButton
+import com.gymbro.feature.common.TooltipOverlay
+import com.gymbro.feature.common.TooltipPosition
+import kotlinx.coroutines.launch
 
 private fun getMuscleGroupColor(muscleGroup: MuscleGroup): Color {
     return when (muscleGroup) {
@@ -109,6 +115,11 @@ fun ActiveWorkoutRoute(
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle()
     val context = androidx.compose.ui.platform.LocalContext.current
+    var showCompleteSetTooltip by remember { mutableStateOf(false) }
+    
+    LaunchedEffect(Unit) {
+        showCompleteSetTooltip = viewModel.tooltipManager.shouldShow("active_workout_complete_set")
+    }
     
     // Get services from Hilt through entry point
     val voiceRecognitionService = remember {
@@ -156,6 +167,13 @@ fun ActiveWorkoutRoute(
         onEvent = viewModel::onEvent,
         voiceRecognitionService = voiceRecognitionService,
         defaultWeightUnit = weightUnit.value,
+        showCompleteSetTooltip = showCompleteSetTooltip,
+        onTooltipDismissed = {
+            showCompleteSetTooltip = false
+            viewModel.viewModelScope.launch {
+                viewModel.tooltipManager.markShown("active_workout_complete_set")
+            }
+        }
     )
 }
 
@@ -178,13 +196,18 @@ fun ActiveWorkoutScreen(
     onEvent: (ActiveWorkoutEvent) -> Unit,
     voiceRecognitionService: VoiceRecognitionService,
     defaultWeightUnit: UserPreferences.WeightUnit,
+    showCompleteSetTooltip: Boolean = false,
+    onTooltipDismissed: () -> Unit = {},
 ) {
     if (state.isLoading) {
         FullScreenLoading(message = "Starting workout...")
         return
     }
 
-    Scaffold(
+    Box {
+        val haptic = LocalHapticFeedback.current
+        
+        Scaffold(
         topBar = {
             TopAppBar(
                 title = {
@@ -297,6 +320,16 @@ fun ActiveWorkoutScreen(
                 // Bottom spacer for FAB
                 item { Spacer(modifier = Modifier.height(80.dp)) }
             }
+        }
+    }
+
+        if (showCompleteSetTooltip && state.exercises.isNotEmpty() && state.exercises.any { it.sets.isNotEmpty() }) {
+            TooltipOverlay(
+                message = "Toca para completar la serie",
+                position = TooltipPosition.CENTER,
+                offsetY = 100,
+                onDismiss = onTooltipDismissed
+            )
         }
     }
 }
@@ -471,6 +504,8 @@ private fun ExerciseCardContent(
     voiceRecognitionService: com.gymbro.core.voice.VoiceRecognitionService,
     defaultWeightUnit: com.gymbro.core.preferences.UserPreferences.WeightUnit,
 ) {
+    val haptic = LocalHapticFeedback.current
+    
     Column(modifier = Modifier.fillMaxWidth()) {
         // Exercise header
         Row(

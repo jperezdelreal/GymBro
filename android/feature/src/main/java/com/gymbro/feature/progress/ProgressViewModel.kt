@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.gymbro.core.repository.ExerciseRepository
 import com.gymbro.core.service.PersonalRecordService
 import com.gymbro.core.service.PlateauDetectionService
+import com.gymbro.feature.common.TooltipManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,6 +21,7 @@ class ProgressViewModel @Inject constructor(
     private val prService: PersonalRecordService,
     private val exerciseRepository: ExerciseRepository,
     private val plateauDetectionService: PlateauDetectionService,
+    val tooltipManager: TooltipManager,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ProgressState())

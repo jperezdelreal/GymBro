@@ -42,7 +42,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -65,6 +67,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewModelScope
 import com.gymbro.core.model.E1RMDataPoint
 import com.gymbro.core.model.PersonalRecord
 import com.gymbro.core.model.PlateauAlert
@@ -83,6 +86,9 @@ import com.gymbro.core.ui.theme.SurfaceVariant
 import com.gymbro.feature.common.EmptyState
 import com.gymbro.feature.common.FullScreenLoading
 import com.gymbro.feature.common.GlassmorphicCard
+import com.gymbro.feature.common.TooltipOverlay
+import com.gymbro.feature.common.TooltipPosition
+import kotlinx.coroutines.launch
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
@@ -96,6 +102,11 @@ fun ProgressRoute(
 ) {
     val viewModel: ProgressViewModel = hiltViewModel()
     val state by viewModel.state.collectAsStateWithLifecycle()
+    var showChartTooltip by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        showChartTooltip = viewModel.tooltipManager.shouldShow("progress_chart")
+    }
 
     LaunchedEffect(Unit) {
         viewModel.effects.collect { effect ->
@@ -110,6 +121,13 @@ fun ProgressRoute(
         state = state,
         onEvent = viewModel::onEvent,
         onNavigateToAnalytics = onNavigateToAnalytics,
+        showChartTooltip = showChartTooltip,
+        onTooltipDismissed = {
+            showChartTooltip = false
+            viewModel.viewModelScope.launch {
+                viewModel.tooltipManager.markShown("progress_chart")
+            }
+        }
     )
 }
 
@@ -118,6 +136,8 @@ private fun ProgressScreen(
     state: ProgressState,
     onEvent: (ProgressEvent) -> Unit,
     onNavigateToAnalytics: () -> Unit = {},
+    showChartTooltip: Boolean = false,
+    onTooltipDismissed: () -> Unit = {},
 ) {
     if (state.isLoading) {
         FullScreenLoading(message = "Loading progress...")
@@ -129,7 +149,8 @@ private fun ProgressScreen(
         return
     }
 
-    LazyColumn(
+    Box {
+        LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background),
@@ -219,6 +240,16 @@ private fun ProgressScreen(
                     }
                 }
             }
+        }
+    }
+
+        if (showChartTooltip && state.chartData.isNotEmpty()) {
+            TooltipOverlay(
+                message = "Tu evolución de fuerza",
+                position = TooltipPosition.CENTER,
+                offsetY = 0,
+                onDismiss = onTooltipDismissed
+            )
         }
     }
 }

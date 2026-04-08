@@ -6,6 +6,7 @@ import com.gymbro.core.model.Exercise
 import com.gymbro.core.model.ExerciseSet
 import com.gymbro.core.repository.WorkoutRepository
 import com.gymbro.core.service.PersonalRecordService
+import com.gymbro.feature.common.TooltipManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
@@ -23,6 +24,7 @@ import javax.inject.Inject
 class ActiveWorkoutViewModel @Inject constructor(
     private val workoutRepository: WorkoutRepository,
     private val personalRecordService: PersonalRecordService,
+    val tooltipManager: TooltipManager,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ActiveWorkoutState())
