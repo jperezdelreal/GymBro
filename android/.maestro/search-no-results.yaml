@@ -1,0 +1,77 @@
+appId: com.gymbro.app
+name: "Negative — Search for Nonexistent Exercise"
+tags:
+  - negative
+---
+
+- runFlow: flow/ensure-post-onboarding.yaml
+
+onFlowStart:
+  - launchApp
+  - assertVisible: "Biblioteca de Ejercicios"
+
+# Start from Exercise Library
+- assertVisible: "Biblioteca de Ejercicios"
+- takeScreenshot: search_no_results_start
+
+# TEST 1: Search for completely nonexistent term
+- tapOn:
+    id: "search_bar"
+- inputText: "XYZNONEXISTENT"
+- hideKeyboard
+- takeScreenshot: search_no_results_nonexistent
+# Should show empty results or "no results" message
+
+# Clear search
+- tapOn:
+    id: "search_bar"
+- clearTextField
+- hideKeyboard
+
+# TEST 2: Search for numbers only
+- tapOn:
+    id: "search_bar"
+- inputText: "99999"
+- hideKeyboard
+- takeScreenshot: search_no_results_numbers
+
+# Clear search
+- tapOn:
+    id: "search_bar"
+- clearTextField
+- hideKeyboard
+
+# TEST 3: Search for special characters
+- tapOn:
+    id: "search_bar"
+- inputText: "!@#$%^&*()"
+- hideKeyboard
+- takeScreenshot: search_no_results_special_chars
+
+# Clear search
+- tapOn:
+    id: "search_bar"
+- clearTextField
+- hideKeyboard
+
+# TEST 4: Search for emoji
+- tapOn:
+    id: "search_bar"
+- inputText: "💪🏋️"
+- hideKeyboard
+- takeScreenshot: search_no_results_emoji
+
+# Clear search and verify app still responsive
+- tapOn:
+    id: "search_bar"
+- clearTextField
+- hideKeyboard
+- assertVisible: "Biblioteca de Ejercicios"
+
+# Verify search still works with valid term
+- tapOn:
+    id: "search_bar"
+- inputText: "Bench"
+- hideKeyboard
+- takeScreenshot: search_valid_after_invalid
+# Should show results for Bench Press
