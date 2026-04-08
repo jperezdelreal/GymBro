@@ -1,6 +1,8 @@
 package com.gymbro.feature.profile
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,18 +19,26 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Cloud
 import androidx.compose.material.icons.filled.CloudDone
 import androidx.compose.material.icons.filled.CloudOff
 import androidx.compose.material.icons.filled.CloudSync
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Feedback
+import androidx.compose.material.icons.filled.FitnessCenter
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.LocalFireDepartment
+import androidx.compose.material.icons.filled.Logout
+import androidx.compose.material.icons.filled.MonitorHeart
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.SmartToy
+import androidx.compose.material.icons.filled.Storage
 import androidx.compose.material.icons.filled.Sync
-import androidx.compose.material3.Button
+import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -41,6 +51,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.heading
@@ -53,13 +65,17 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.res.stringResource
 import com.gymbro.core.sync.service.SyncStatus
 import com.gymbro.core.R
+import com.gymbro.core.ui.theme.AccentAmberStart
+import com.gymbro.core.ui.theme.AccentCyanStart
+import com.gymbro.core.ui.theme.AccentGreenEnd
+import com.gymbro.core.ui.theme.AccentGreenStart
+import com.gymbro.core.ui.theme.AccentRed
+import com.gymbro.core.ui.theme.Background
+import com.gymbro.feature.common.GlassmorphicCard
+import com.gymbro.feature.common.GradientButton
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-
-private val AccentGreen = Color(0xFF00FF87)
-private val CardBackground = Color(0xFF1E1E1E)
-private val SurfaceDark = Color(0xFF121212)
 
 @Composable
 fun ProfileRoute(
@@ -96,409 +112,454 @@ internal fun ProfileScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(SurfaceDark)
+            .background(Background)
             .verticalScroll(rememberScrollState())
             .padding(16.dp),
     ) {
-        // Header
-        Text(
-            text = stringResource(R.string.profile_title),
-            style = MaterialTheme.typography.headlineMedium,
-            color = Color.White,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.semantics { heading() }
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // User Card
-        UserCard(
+        // Profile Header with Avatar and Stats
+        ProfileHeader(
             isSignedIn = state.isSignedIn,
             displayName = state.user?.displayName,
             isAnonymous = state.user?.isAnonymous ?: true,
             isLoading = state.isLoading,
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Sync Status Card
-        SyncStatusCard(
-            syncStatus = state.syncStatus,
-            lastSyncTime = state.lastSyncTime,
-            isSignedIn = state.isSignedIn,
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Auto-sync Toggle
-        if (state.isSignedIn) {
-            AutoSyncCard(
-                autoSyncEnabled = state.autoSyncEnabled,
-                onToggle = { onEvent(ProfileEvent.ToggleAutoSync(it)) },
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-        }
-
-        // Actions
-        ActionsCard(
-            isSignedIn = state.isSignedIn,
-            isLoading = state.isLoading,
-            isSyncing = state.syncStatus == SyncStatus.SYNCING,
-            onSignIn = { onEvent(ProfileEvent.SignIn) },
-            onSignOut = { onEvent(ProfileEvent.SignOut) },
-            onSyncNow = { onEvent(ProfileEvent.SyncNow) },
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
         // AI Coach Button
-        Button(
+        GradientButton(
+            text = "Hablar con AI Coach",
             onClick = onNavigateToCoach,
-            shape = RoundedCornerShape(12.dp),
             modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = AccentGreen,
-                contentColor = Color.Black,
-            ),
+            gradientColors = listOf(AccentGreenStart, AccentGreenEnd),
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Account Settings Group (Green Accent)
+        SettingsGroup(
+            title = "Cuenta",
+            accentColor = AccentGreenStart,
         ) {
-            Icon(
-                Icons.Default.SmartToy,
-                contentDescription = stringResource(R.string.profile_ai_coach_icon),
-                modifier = Modifier.size(20.dp),
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = stringResource(R.string.profile_ai_coach_button),
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(vertical = 4.dp),
-            )
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Settings Button
-        OutlinedButton(
-            onClick = onNavigateToSettings,
-            shape = RoundedCornerShape(12.dp),
-            modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.outlinedButtonColors(
-                contentColor = AccentGreen,
-            ),
-        ) {
-            Icon(
-                Icons.Default.Settings,
-                contentDescription = stringResource(R.string.profile_settings_icon),
-                modifier = Modifier.size(20.dp),
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = stringResource(R.string.profile_settings_button),
-                fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.padding(vertical = 4.dp),
-            )
-        }
-
-        // Error
-        if (state.error != null) {
-            Spacer(modifier = Modifier.height(16.dp))
-            Card(
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF2D1F1F)),
-                shape = RoundedCornerShape(16.dp),
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Text(
-                    text = state.error,
-                    color = Color(0xFFFF6B6B),
-                    modifier = Modifier.padding(16.dp),
-                    style = MaterialTheme.typography.bodyMedium,
+            if (state.isSignedIn) {
+                SettingItem(
+                    icon = Icons.Default.Person,
+                    label = state.user?.displayName ?: "Cuenta anónima",
+                    iconTint = AccentGreenStart,
+                    onClick = { /* Navigate to account details */ },
+                )
+                SettingItem(
+                    icon = Icons.Default.Cloud,
+                    label = "Sincronización en la nube",
+                    subtitle = getSyncStatusText(state.syncStatus),
+                    iconTint = AccentGreenStart,
+                    onClick = { /* Navigate to sync settings */ },
+                )
+                SettingItemWithToggle(
+                    icon = Icons.Default.Sync,
+                    label = "Sincronización automática",
+                    iconTint = AccentGreenStart,
+                    checked = state.autoSyncEnabled,
+                    onCheckedChange = { onEvent(ProfileEvent.ToggleAutoSync(it)) },
+                )
+            } else {
+                SettingItem(
+                    icon = Icons.Default.Person,
+                    label = "Iniciar sesión",
+                    subtitle = "Guarda tus datos en la nube",
+                    iconTint = AccentGreenStart,
+                    onClick = { onEvent(ProfileEvent.SignIn) },
                 )
             }
         }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Preferences Group (Cyan Accent)
+        SettingsGroup(
+            title = "Preferencias",
+            accentColor = AccentCyanStart,
+        ) {
+            SettingItem(
+                icon = Icons.Default.Timer,
+                label = "Temporizador de descanso",
+                subtitle = "2:00 predeterminado",
+                iconTint = AccentCyanStart,
+                onClick = onNavigateToSettings,
+            )
+            SettingItem(
+                icon = Icons.Default.FitnessCenter,
+                label = "Unidad de peso",
+                subtitle = "lbs",
+                iconTint = AccentCyanStart,
+                onClick = onNavigateToSettings,
+            )
+            SettingItem(
+                icon = Icons.Default.Notifications,
+                label = "Notificaciones",
+                iconTint = AccentCyanStart,
+                onClick = onNavigateToSettings,
+            )
+            SettingItem(
+                icon = Icons.Default.MonitorHeart,
+                label = "Integración HealthKit",
+                iconTint = AccentCyanStart,
+                onClick = onNavigateToSettings,
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Data Group (Amber Accent)
+        SettingsGroup(
+            title = "Datos",
+            accentColor = AccentAmberStart,
+        ) {
+            SettingItem(
+                icon = Icons.Default.Storage,
+                label = "Exportar datos",
+                iconTint = AccentAmberStart,
+                onClick = onNavigateToSettings,
+            )
+            SettingItem(
+                icon = Icons.Default.Delete,
+                label = "Borrar todos los datos",
+                iconTint = AccentRed,
+                onClick = onNavigateToSettings,
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // About Group (White Accent)
+        SettingsGroup(
+            title = "Acerca de",
+            accentColor = Color.White,
+        ) {
+            SettingItem(
+                icon = Icons.Default.Info,
+                label = "Versión 1.0",
+                iconTint = Color.White,
+                onClick = { /* Show version info */ },
+            )
+            SettingItem(
+                icon = Icons.Default.Feedback,
+                label = "Enviar comentarios",
+                iconTint = Color.White,
+                onClick = { /* Open feedback */ },
+            )
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Sign Out Button (if signed in)
+        if (state.isSignedIn) {
+            OutlinedButton(
+                onClick = { onEvent(ProfileEvent.SignOut) },
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.outlinedButtonColors(
+                    contentColor = AccentRed,
+                ),
+            ) {
+                Icon(
+                    Icons.Default.Logout,
+                    contentDescription = "Cerrar sesión",
+                    modifier = Modifier.size(20.dp),
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "Cerrar sesión",
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.padding(vertical = 4.dp),
+                )
+            }
+        } else {
+            // Sign In Button
+            GradientButton(
+                text = "Iniciar sesión",
+                onClick = { onEvent(ProfileEvent.SignIn) },
+                modifier = Modifier.fillMaxWidth(),
+                gradientColors = listOf(AccentGreenStart, AccentGreenEnd),
+                enabled = !state.isLoading,
+            )
+            
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            Text(
+                text = "Inicia sesión para guardar tus entrenamientos en la nube",
+                style = MaterialTheme.typography.bodySmall,
+                color = Color(0xFF757575),
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
     }
 }
 
 @Composable
-private fun UserCard(
+private fun ProfileHeader(
     isSignedIn: Boolean,
     displayName: String?,
     isAnonymous: Boolean,
     isLoading: Boolean,
 ) {
-    Card(
-        colors = CardDefaults.cardColors(containerColor = CardBackground),
-        shape = RoundedCornerShape(20.dp),
+    Column(
         modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp),
-            verticalAlignment = Alignment.CenterVertically,
+        // Large Avatar with Gradient Border Ring
+        Box(
+            modifier = Modifier.size(100.dp),
+            contentAlignment = Alignment.Center,
         ) {
+            // Gradient border ring
             Box(
                 modifier = Modifier
-                    .size(56.dp)
-                    .background(AccentGreen.copy(alpha = 0.15f), CircleShape),
+                    .size(100.dp)
+                    .border(
+                        width = 3.dp,
+                        brush = Brush.linearGradient(
+                            colors = listOf(AccentGreenStart, AccentCyanStart, AccentAmberStart)
+                        ),
+                        shape = CircleShape
+                    )
+            )
+            
+            // Avatar background
+            Box(
+                modifier = Modifier
+                    .size(90.dp)
+                    .clip(CircleShape)
+                    .background(AccentGreenStart.copy(alpha = 0.15f)),
                 contentAlignment = Alignment.Center,
             ) {
                 if (isLoading) {
                     CircularProgressIndicator(
-                        color = AccentGreen,
-                        modifier = Modifier.size(24.dp),
-                        strokeWidth = 2.dp,
+                        color = AccentGreenStart,
+                        modifier = Modifier.size(32.dp),
+                        strokeWidth = 3.dp,
                     )
                 } else {
                     Icon(
                         Icons.Default.Person,
-                        contentDescription = stringResource(R.string.profile_user_icon),
-                        tint = AccentGreen,
-                        modifier = Modifier.size(28.dp),
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.width(16.dp))
-
-            Column {
-                Text(
-                    text = if (isSignedIn) {
-                        displayName ?: stringResource(R.string.profile_anonymous_lifter)
-                    } else {
-                        stringResource(R.string.profile_not_signed_in)
-                    },
-                    style = MaterialTheme.typography.titleMedium,
-                    color = Color.White,
-                    fontWeight = FontWeight.SemiBold,
-                )
-                Text(
-                    text = if (isSignedIn && isAnonymous) {
-                        stringResource(R.string.profile_guest_account_status)
-                    } else if (isSignedIn) {
-                        stringResource(R.string.profile_signed_in_status)
-                    } else {
-                        stringResource(R.string.profile_sign_in_prompt)
-                    },
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Color(0xFF9E9E9E),
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun SyncStatusCard(
-    syncStatus: SyncStatus,
-    lastSyncTime: Long?,
-    isSignedIn: Boolean,
-) {
-    val (icon, label, color) = when (syncStatus) {
-        SyncStatus.IDLE -> Triple(Icons.Default.Cloud, stringResource(R.string.recovery_status_ready_to_sync), Color(0xFF9E9E9E))
-        SyncStatus.SYNCING -> Triple(Icons.Default.CloudSync, stringResource(R.string.recovery_status_syncing), AccentGreen)
-        SyncStatus.SUCCESS -> Triple(Icons.Default.CloudDone, stringResource(R.string.recovery_status_synced), AccentGreen)
-        SyncStatus.ERROR -> Triple(Icons.Default.CloudOff, stringResource(R.string.recovery_status_sync_error), Color(0xFFFF5252))
-        SyncStatus.OFFLINE -> Triple(Icons.Default.CloudOff, stringResource(R.string.recovery_status_offline), Color(0xFFFF9100))
-        SyncStatus.DISABLED -> Triple(Icons.Default.CloudOff, stringResource(R.string.recovery_status_sync_disabled), Color(0xFF9E9E9E))
-    }
-
-    Card(
-        colors = CardDefaults.cardColors(containerColor = CardBackground),
-        shape = RoundedCornerShape(20.dp),
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            StatusIcon(icon = icon, tint = color)
-
-            Spacer(modifier = Modifier.width(16.dp))
-
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = stringResource(R.string.profile_cloud_sync_title),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = Color.White,
-                    fontWeight = FontWeight.SemiBold,
-                )
-                Text(
-                    text = if (!isSignedIn) stringResource(R.string.profile_cloud_sync_sign_in) else label,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = color,
-                )
-                if (lastSyncTime != null) {
-                    val formatter = SimpleDateFormat("MMM d, h:mm a", Locale.getDefault())
-                    Text(
-                        text = stringResource(R.string.profile_cloud_sync_last, formatter.format(Date(lastSyncTime))),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = Color(0xFF757575),
+                        contentDescription = "Avatar de usuario",
+                        tint = AccentGreenStart,
+                        modifier = Modifier.size(48.dp),
                     )
                 }
             }
         }
-    }
-}
 
-@Composable
-private fun StatusIcon(icon: ImageVector, tint: Color) {
-    Box(
-        modifier = Modifier
-            .size(44.dp)
-            .background(tint.copy(alpha = 0.15f), CircleShape),
-        contentAlignment = Alignment.Center,
-    ) {
-        Icon(
-            icon,
-            contentDescription = null,
-            tint = tint,
-            modifier = Modifier.size(24.dp),
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // User Name
+        Text(
+            text = if (isSignedIn) {
+                displayName ?: "Levantador Anónimo"
+            } else {
+                "No has iniciado sesión"
+            },
+            style = MaterialTheme.typography.headlineSmall,
+            color = Color.White,
+            fontWeight = FontWeight.Bold,
         )
-    }
-}
 
-@Composable
-private fun AutoSyncCard(
-    autoSyncEnabled: Boolean,
-    onToggle: (Boolean) -> Unit,
-) {
-    Card(
-        colors = CardDefaults.cardColors(containerColor = CardBackground),
-        shape = RoundedCornerShape(20.dp),
-        modifier = Modifier.fillMaxWidth(),
-    ) {
+        Spacer(modifier = Modifier.height(4.dp))
+
+        // Status
+        Text(
+            text = if (isSignedIn && isAnonymous) {
+                "Cuenta de invitado"
+            } else if (isSignedIn) {
+                "Conectado"
+            } else {
+                "Inicia sesión para sincronizar"
+            },
+            style = MaterialTheme.typography.bodyMedium,
+            color = Color(0xFF9E9E9E),
+        )
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        // Stats Row in small GlassmorphicCards
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    Icons.Default.Sync,
-                    contentDescription = null,
-                    tint = AccentGreen,
-                    modifier = Modifier.size(24.dp),
-                )
-                Spacer(modifier = Modifier.width(12.dp))
-                Column {
-                    Text(
-                        text = stringResource(R.string.profile_auto_sync_title),
-                        style = MaterialTheme.typography.titleSmall,
-                        color = Color.White,
-                    )
-                    Text(
-                        text = stringResource(R.string.profile_auto_sync_subtitle),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Color(0xFF9E9E9E),
-                    )
-                }
-            }
-
-            Switch(
-                checked = autoSyncEnabled,
-                onCheckedChange = onToggle,
-                colors = SwitchDefaults.colors(
-                    checkedThumbColor = Color.White,
-                    checkedTrackColor = AccentGreen,
-                    uncheckedThumbColor = Color(0xFF9E9E9E),
-                    uncheckedTrackColor = Color(0xFF2A2A2A),
-                ),
+            StatCard(
+                icon = Icons.Default.FitnessCenter,
+                value = "42",
+                label = "Entrenamientos",
+                modifier = Modifier.weight(1f),
+            )
+            StatCard(
+                icon = Icons.Default.LocalFireDepartment,
+                value = "18",
+                label = "Días activos",
+                modifier = Modifier.weight(1f),
+            )
+            StatCard(
+                icon = Icons.Default.LocalFireDepartment,
+                value = "7",
+                label = "Racha",
+                modifier = Modifier.weight(1f),
             )
         }
     }
 }
 
 @Composable
-private fun ActionsCard(
-    isSignedIn: Boolean,
-    isLoading: Boolean,
-    isSyncing: Boolean,
-    onSignIn: () -> Unit,
-    onSignOut: () -> Unit,
-    onSyncNow: () -> Unit,
+private fun StatCard(
+    icon: ImageVector,
+    value: String,
+    label: String,
+    modifier: Modifier = Modifier,
 ) {
-    Card(
-        colors = CardDefaults.cardColors(containerColor = CardBackground),
-        shape = RoundedCornerShape(20.dp),
-        modifier = Modifier.fillMaxWidth(),
-    ) {
+    GlassmorphicCard(modifier = modifier) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            if (isSignedIn) {
-                Button(
-                    onClick = onSyncNow,
-                    enabled = !isSyncing,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = AccentGreen,
-                        contentColor = Color.Black,
-                        disabledContainerColor = AccentGreen.copy(alpha = 0.4f),
-                    ),
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    if (isSyncing) {
-                        CircularProgressIndicator(
-                            color = Color.Black,
-                            modifier = Modifier.size(18.dp),
-                            strokeWidth = 2.dp,
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                    }
-                    Text(
-                        text = if (isSyncing) stringResource(R.string.profile_syncing) else stringResource(R.string.profile_sync_now),
-                        fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier.padding(vertical = 4.dp),
-                    )
-                }
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = AccentGreenStart,
+                modifier = Modifier.size(20.dp),
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = value,
+                style = MaterialTheme.typography.titleLarge,
+                color = Color.White,
+                fontWeight = FontWeight.Bold,
+            )
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelSmall,
+                color = Color(0xFF9E9E9E),
+                textAlign = TextAlign.Center,
+            )
+        }
+    }
+}
 
-                OutlinedButton(
-                    onClick = onSignOut,
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = Color(0xFFFF5252),
-                    ),
-                ) {
-                    Text(
-                        text = stringResource(R.string.profile_sign_out),
-                        fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier.padding(vertical = 4.dp),
-                    )
-                }
-            } else {
-                Button(
-                    onClick = onSignIn,
-                    enabled = !isLoading,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = AccentGreen,
-                        contentColor = Color.Black,
-                    ),
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text(
-                        text = stringResource(R.string.profile_sign_in_button),
-                        fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier.padding(vertical = 4.dp),
-                    )
-                }
-
-                Text(
-                    text = stringResource(R.string.profile_sign_in_disclaimer),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Color(0xFF757575),
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth(),
-                )
+@Composable
+private fun SettingsGroup(
+    title: String,
+    accentColor: Color,
+    content: @Composable () -> Unit,
+) {
+    Column {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleSmall,
+            color = accentColor,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.padding(start = 4.dp, bottom = 8.dp),
+        )
+        GlassmorphicCard(accentColor = accentColor) {
+            Column {
+                content()
             }
         }
     }
 }
+
+@Composable
+private fun SettingItem(
+    icon: ImageVector,
+    label: String,
+    subtitle: String? = null,
+    iconTint: Color,
+    onClick: () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = iconTint,
+            modifier = Modifier.size(24.dp),
+        )
+        Spacer(modifier = Modifier.width(12.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.bodyLarge,
+                color = Color.White,
+            )
+            if (subtitle != null) {
+                Text(
+                    text = subtitle,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color(0xFF9E9E9E),
+                )
+            }
+        }
+        Icon(
+            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+            contentDescription = null,
+            tint = Color(0xFF9E9E9E),
+            modifier = Modifier.size(20.dp),
+        )
+    }
+}
+
+@Composable
+private fun SettingItemWithToggle(
+    icon: ImageVector,
+    label: String,
+    iconTint: Color,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = iconTint,
+            modifier = Modifier.size(24.dp),
+        )
+        Spacer(modifier = Modifier.width(12.dp))
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodyLarge,
+            color = Color.White,
+            modifier = Modifier.weight(1f),
+        )
+        Switch(
+            checked = checked,
+            onCheckedChange = onCheckedChange,
+            colors = SwitchDefaults.colors(
+                checkedThumbColor = Color.White,
+                checkedTrackColor = AccentGreenStart,
+                uncheckedThumbColor = Color(0xFF9E9E9E),
+                uncheckedTrackColor = Color(0xFF2A2A2A),
+            ),
+        )
+    }
+}
+
+private fun getSyncStatusText(status: SyncStatus): String {
+    return when (status) {
+        SyncStatus.IDLE -> "Listo para sincronizar"
+        SyncStatus.SYNCING -> "Sincronizando..."
+        SyncStatus.SUCCESS -> "Sincronizado"
+        SyncStatus.ERROR -> "Error de sincronización"
+        SyncStatus.OFFLINE -> "Sin conexión"
+        SyncStatus.DISABLED -> "Deshabilitado"
+    }
+}
+
