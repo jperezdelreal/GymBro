@@ -9,15 +9,14 @@ name: "Smoke Test — Basic app launch"
 # Dependencies: flow/ensure-post-onboarding.yaml
 tags:
   - smoke
----
-
-- runFlow: flow/ensure-post-onboarding.yaml
-
 onFlowStart:
   # Launch app and verify it's functional
   - launchApp
   - waitForAnimationToEnd:
       timeout: 3000
+---
+
+- runFlow: flow/ensure-post-onboarding.yaml
 
 # Verify post-onboarding state
 - assertVisible: "Biblioteca de Ejercicios|Exercise Library"
