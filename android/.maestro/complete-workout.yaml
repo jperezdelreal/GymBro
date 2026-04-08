@@ -1,0 +1,64 @@
+appId: com.gymbro.app
+name: "Complete Workout — Full workout to completion and summary"
+tags:
+  - workout
+  - e2e
+---
+
+# Start from Exercise Library
+- assertVisible: "Biblioteca de Ejercicios"
+
+# Tap FAB to start workout
+- tapOn: "Iniciar Entrenamiento"
+
+# Verify active workout
+- assertVisible: "Entrenamiento Activo"
+
+# Add an exercise
+- tapOn: "Añadir Ejercicio"
+- assertVisible: "Elegir Ejercicio"
+
+# Pick first available exercise
+- tapOn:
+    text: "Bench Press"
+    index: 0
+
+# Verify back on workout screen
+- assertVisible: "Entrenamiento Activo"
+
+# Fill in weight for set 1
+- tapOn:
+    text: "0"
+    index: 0
+- inputText: "100"
+
+# Fill in reps for set 1
+- tapOn:
+    text: "0"
+    index: 0
+- inputText: "5"
+
+- takeScreenshot: workout_set1_filled
+
+# Complete the set (tap the check/complete button)
+- tapOn:
+    text: "Completar serie 1"
+
+- takeScreenshot: workout_set1_completed
+
+# Finish the workout
+- tapOn: "Finalizar Entrenamiento"
+
+# Verify workout summary screen
+- assertVisible: "¡Entrenamiento Completado!"
+- takeScreenshot: workout_summary
+
+# Verify stats are displayed
+- assertVisible: "Estadísticas del Entrenamiento"
+
+# Tap Done to return
+- tapOn: "Listo"
+
+# Back at exercise library
+- assertVisible: "Biblioteca de Ejercicios"
+- takeScreenshot: workout_flow_complete

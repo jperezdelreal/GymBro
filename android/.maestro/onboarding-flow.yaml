@@ -1,0 +1,47 @@
+appId: com.gymbro.app
+name: "Onboarding — Complete 4-page onboarding flow"
+tags:
+  - onboarding
+  - smoke
+---
+
+# Page 0: Welcome
+- assertVisible: "GymBro"
+- assertVisible: "Tu compañero de gym inteligente"
+- takeScreenshot: onboarding_welcome
+
+# Swipe to Page 1: Fast Logging
+- swipeLeft
+
+- assertVisible: "Registro Ultra-Rápido"
+- takeScreenshot: onboarding_fast_logging
+
+# Swipe to Page 2: Track Progress
+- swipeLeft
+
+- assertVisible: "Rastrea tu Progreso"
+- takeScreenshot: onboarding_track_progress
+
+# Swipe to Page 3: Get Started
+- swipeLeft
+
+- assertVisible: "Comencemos"
+- assertVisible: "Unidades Preferidas"
+- assertVisible: "Kilogramos (kg)"
+- assertVisible: "Libras (lbs)"
+- takeScreenshot: onboarding_get_started
+
+# Select kg unit
+- tapOn: "Kilogramos (kg)"
+
+# Enter name
+- tapOn: "Ingresa tu nombre"
+- inputText: "TestUser"
+- takeScreenshot: onboarding_name_entered
+
+# Complete onboarding
+- tapOn: "¡Vamos!"
+
+# Verify we landed on Exercise Library
+- assertVisible: "Biblioteca de Ejercicios"
+- takeScreenshot: onboarding_complete

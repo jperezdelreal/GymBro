@@ -1,0 +1,36 @@
+appId: com.gymbro.app
+name: "Profile Settings — Open profile and check settings sections"
+tags:
+  - profile
+  - settings
+---
+
+# Navigate to Profile tab
+- tapOn: "Perfil"
+- takeScreenshot: profile_screen
+
+# Verify profile sections are visible
+- assertVisible: "Hablar con Entrenador IA"
+- assertVisible: "Cuenta"
+- assertVisible: "Preferencias"
+- takeScreenshot: profile_sections
+
+# Scroll to see more sections
+- scroll
+
+- assertVisible: "Datos"
+- assertVisible: "Acerca de"
+- assertVisible: "Versión 1.0"
+- takeScreenshot: profile_about_section
+
+# Verify preference items
+- assertVisible: "Temporizador de descanso"
+- assertVisible: "Unidad de peso"
+- assertVisible: "Notificaciones"
+- takeScreenshot: profile_preferences
+
+# Scroll back up
+- scrollUntilVisible:
+    element: "Hablar con Entrenador IA"
+    direction: UP
+- takeScreenshot: profile_top

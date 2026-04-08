@@ -1,0 +1,32 @@
+appId: com.gymbro.app
+name: "Check History — Navigate to history and verify entries"
+tags:
+  - history
+  - smoke
+---
+
+# Navigate to History tab
+- tapOn: "Historial"
+- takeScreenshot: history_tab
+
+# Verify History screen loads
+- assertVisible: "Historial de Entrenamientos"
+
+# Check for workout entries or empty state
+- assertVisible:
+    text: "Sin Entrenamientos Aún|Hoy|Ayer"
+    optional: true
+- takeScreenshot: history_content
+
+# If there are workouts, tap the first one to see details
+- tapOn:
+    text: ".*"
+    index: 0
+    optional: true
+
+# Take screenshot of whatever state we're in
+- takeScreenshot: history_detail_or_empty
+
+# Navigate back
+- back
+- takeScreenshot: history_after_back

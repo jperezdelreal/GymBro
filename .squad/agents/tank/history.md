@@ -727,3 +727,29 @@ ProGuard rules follow official library documentation and Android best practices.
 - Only FATAL EXCEPTION seen was from `uiautomator` tool (our test instrumentation), not from the GymBro app
 - App remained responsive throughout entire test session, process never died
 - Closed #251 directly (no PR needed — QA-only, no code changes)
+
+### 2026-07-XX: Maestro E2E Testing Framework Setup
+
+**Decision:** Adopted Maestro (v2.4.0) for declarative YAML-based E2E UI testing on Android.
+
+**Why Maestro:**
+- YAML-based flows — no compiled test code, easy for any team member to write
+- Works headless with Android emulator — perfect for CI
+- Fast execution — smoke test runs in seconds, not minutes
+- Open source, active development, strong community
+
+**Installation on Windows:**
+- Maestro CLI is distributed as a universal ZIP (JVM-based) from GitHub releases
+- Extract to `%USERPROFILE%\.maestro\maestro\` and add `bin` to PATH
+- Requires Java 17+ (Android Studio's bundled JBR at `C:\Program Files\Android\Android Studio\jbr` works)
+- macOS/Linux: `curl -fsSL "https://get.maestro.mobile.dev" | bash`
+
+**Project Structure:**
+- `android/.maestro/config.yaml` — Global config with appId (`com.gymbro.app`)
+- `android/.maestro/smoke-test.yaml` — Smoke test: launch + assert "GymBro" visible
+- `android/maestro-tests.md` — Full documentation
+
+**Verified:**
+- Smoke test passes: app launches with clear state, "GymBro" text asserted visible
+- Screenshot confirmed app renders correctly on emulator
+- PR #269 opened

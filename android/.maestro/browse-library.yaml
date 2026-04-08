@@ -1,0 +1,42 @@
+appId: com.gymbro.app
+name: "Browse Library — Search and filter exercises"
+tags:
+  - library
+  - smoke
+---
+
+# Verify Exercise Library is visible
+- assertVisible: "Biblioteca de Ejercicios"
+- takeScreenshot: library_home
+
+# Tap on search bar and type a query
+- tapOn: "Buscar ejercicios…"
+- inputText: "Press"
+- takeScreenshot: library_search_results
+
+# Clear search
+- clearState:
+    appId: com.gymbro.app
+- launchApp:
+    appId: com.gymbro.app
+
+# Wait for library to load
+- assertVisible: "Biblioteca de Ejercicios"
+
+# Filter by Chest muscle group
+- tapOn: "Chest"
+- takeScreenshot: library_filter_chest
+
+# Deselect Chest, select Back
+- tapOn: "Chest"
+- tapOn: "Back"
+- takeScreenshot: library_filter_back
+
+# Deselect Back, select Shoulders
+- tapOn: "Back"
+- tapOn: "Shoulders"
+- takeScreenshot: library_filter_shoulders
+
+# Deselect filter
+- tapOn: "Shoulders"
+- takeScreenshot: library_no_filter

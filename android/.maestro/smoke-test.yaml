@@ -1,0 +1,5 @@
+appId: com.gymbro.app
+---
+- launchApp:
+    clearState: true
+- assertVisible: "GymBro"

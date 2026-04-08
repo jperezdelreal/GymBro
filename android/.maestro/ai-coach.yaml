@@ -1,0 +1,37 @@
+appId: com.gymbro.app
+name: "AI Coach — Open coach and send a message"
+tags:
+  - coach
+  - ai
+---
+
+# Navigate to Profile tab first
+- tapOn: "Perfil"
+- assertVisible: "Hablar con Entrenador IA"
+
+# Tap AI Coach button
+- tapOn: "Hablar con Entrenador IA"
+
+# Verify Coach screen opens
+- assertVisible: "GymBro Entrenador IA"
+- takeScreenshot: coach_screen
+
+# Check for welcome message and quick prompts
+- assertVisible: "Tu asesor personal de entrenamiento de fuerza"
+- assertVisible: "Preguntas rápidas:"
+- takeScreenshot: coach_welcome
+
+# Try tapping a quick prompt
+- tapOn: "¿Qué debería entrenar hoy?"
+- takeScreenshot: coach_prompt_sent
+
+# Wait for response (or loading indicator)
+- assertVisible:
+    text: "El entrenador está pensando...|Entrenador"
+    optional: true
+- takeScreenshot: coach_response
+
+# Navigate back
+- back
+- assertVisible: "Perfil"
+- takeScreenshot: coach_back_to_profile

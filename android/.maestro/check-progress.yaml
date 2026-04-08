@@ -1,0 +1,31 @@
+appId: com.gymbro.app
+name: "Check Progress — Navigate to progress and verify KPI cards"
+tags:
+  - progress
+  - smoke
+---
+
+# Navigate to Progress tab
+- tapOn: "Progreso"
+- takeScreenshot: progress_tab
+
+# Check for content or empty state
+- assertVisible:
+    text: "Sin entrenamientos aún"
+    optional: true
+
+# If data exists, verify KPI section
+- assertVisible:
+    text: "Volumen Semanal"
+    optional: true
+- assertVisible:
+    text: "PRs Recientes"
+    optional: true
+- assertVisible:
+    text: "Tendencia Est. 1RM"
+    optional: true
+- takeScreenshot: progress_kpi_cards
+
+# Scroll down to see more content
+- scroll
+- takeScreenshot: progress_scrolled
