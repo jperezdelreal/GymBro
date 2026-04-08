@@ -33,6 +33,38 @@ onFlowComplete:
     timeout: 1000
 - takeScreenshot: library_search_results
 
+# Conditional: Check search results
+- runFlow:
+    when:
+      visible:
+        id: "exercise_card"
+    commands:
+      # Results found — use scrollUntilVisible to find specific exercise
+      - scrollUntilVisible:
+          element:
+            text: ".*Press.*"
+          timeout: 5000
+      - takeScreenshot: library_exercise_found
+      
+      # Tap the found exercise
+      - tapOn:
+          text: ".*Press.*"
+          index: 0
+      - waitForAnimationToEnd:
+          timeout: 1000
+      - takeScreenshot: library_exercise_detail
+      
+      # Navigate back
+      - back
+
+- runFlow:
+    when:
+      visible: "No se encontraron ejercicios"
+    commands:
+      # No results path
+      - assertVisible: "No se encontraron ejercicios"
+      - takeScreenshot: library_no_search_results
+
 # Relaunch app to clear search
 - launchApp
 - waitForAnimationToEnd:

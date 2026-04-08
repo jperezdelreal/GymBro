@@ -41,27 +41,42 @@ onFlowStart:
 # Verify back on workout screen
 - assertVisible: "Entrenamiento Activo"
 
-# Fill in weight for set 1
-- tapOn:
-    id: "weight_input"
-    index: 0
-- inputText: "${WEIGHT:=100}"
-
-# Fill in reps for set 1
-- tapOn:
-    id: "reps_input"
-    index: 0
-- inputText: "${REPS:=5}"
-
-- takeScreenshot: workout_set1_filled
-
-# Complete the set (tap the check/complete button)
-- tapOn:
-    text: "Completar serie 1"
-- waitForAnimationToEnd:
-    timeout: 1000
-
-- takeScreenshot: workout_set1_completed
+# Use repeat to log multiple sets with copyTextFrom verification
+- repeat:
+    times: 3
+    commands:
+      # Fill in weight for current set
+      - tapOn:
+          id: "weight_input"
+          index: 0
+      - inputText: "${WEIGHT:=100}"
+      
+      # Fill in reps for current set
+      - tapOn:
+          id: "reps_input"
+          index: 0
+      - inputText: "${REPS:=5}"
+      
+      # Capture the entered weight value
+      - copyTextFrom:
+          id: "weight_input"
+          index: 0
+      - assertTrue: ${maestro.copiedText == "${WEIGHT:=100}"}
+      
+      # Capture the entered reps value
+      - copyTextFrom:
+          id: "reps_input"
+          index: 0
+      - assertTrue: ${maestro.copiedText == "${REPS:=5}"}
+      
+      - takeScreenshot: workout_set_${repeat.index}_filled
+      
+      # Complete the set
+      - tapOn:
+          text: "Completar serie.*"
+      - waitForAnimationToEnd:
+          timeout: 1000
+      - takeScreenshot: workout_set_${repeat.index}_completed
 
 # Finish the workout
 - tapOn: "Finalizar Entrenamiento"
@@ -72,8 +87,20 @@ onFlowStart:
 - assertVisible: "¡Entrenamiento Completado!"
 - takeScreenshot: workout_summary
 
-# Verify stats are displayed
+# Verify stats are displayed and capture values
 - assertVisible: "Estadísticas del Entrenamiento"
+
+# copyTextFrom: Capture workout duration
+- copyTextFrom:
+    text: "\\d+.*min|\\d+.*seg"
+- assertVisible: "${maestro.copiedText}"
+
+# copyTextFrom: Capture total sets
+- copyTextFrom:
+    text: "\\d+.*series"
+- assertVisible: "${maestro.copiedText}"
+
+- takeScreenshot: workout_stats_captured
 
 # Tap Done to return
 - tapOn: "Listo"

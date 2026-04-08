@@ -30,23 +30,43 @@ onFlowComplete:
 # Verify History screen loads
 - assertVisible: "Historial de Entrenamientos"
 
-# Check for workout entries or empty state
-- assertVisible:
-    text: "Sin Entrenamientos Aún|Hoy|Ayer"
-    optional: true
-- takeScreenshot: history_content
+# Conditional: Check for empty state or workout data
+- runFlow:
+    when:
+      visible: "Sin Entrenamientos Aún"
+    commands:
+      # Empty state path
+      - assertVisible: "Sin Entrenamientos Aún"
+      - takeScreenshot: history_empty_state
+      - assertVisible: "Comienza tu primer entrenamiento"
+        optional: true
 
-# If there are workouts, tap the first one to see details
-- tapOn:
-    text: ".*"
-    index: 0
-    optional: true
-
-# Take screenshot of whatever state we're in
-- takeScreenshot: history_detail_or_empty
-
-# Navigate back
-- back
-- waitForAnimationToEnd:
-    timeout: 2000
-- takeScreenshot: history_after_back
+- runFlow:
+    when:
+      visible:
+        text: "Hoy|Ayer|hace.*día"
+    commands:
+      # Data exists path
+      - takeScreenshot: history_with_data
+      
+      # Use scrollUntilVisible to find older workouts
+      - scrollUntilVisible:
+          element:
+            text: ".*"
+            index: 2
+          timeout: 5000
+          optional: true
+      - takeScreenshot: history_scrolled
+      
+      # Tap the first workout to see details
+      - tapOn:
+          text: "Hoy|Ayer|hace.*día"
+          index: 0
+      - waitForAnimationToEnd:
+          timeout: 2000
+      - takeScreenshot: history_workout_detail
+      
+      # Navigate back
+      - back
+      - waitForAnimationToEnd:
+          timeout: 2000
