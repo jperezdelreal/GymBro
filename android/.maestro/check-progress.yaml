@@ -44,8 +44,9 @@ onFlowComplete:
       - assertVisible: "Sin entrenamientos aún"
       # Screenshot 02: Progress empty state with no workout data
       - takeScreenshot: 02_check_progress_empty_state
-      - assertVisible: "Registra tu primer entrenamiento"
-        optional: true
+      - assertVisible:
+          text: "Registra tu primer entrenamiento"
+          optional: true
 
 - runFlow:
     when:
@@ -66,7 +67,7 @@ onFlowComplete:
           text: "PRs Recientes"
           optional: true
       - assertVisible:
-          text: "Estimated 1RM Trend"
+          text: "Tendencia Est. 1RM|Estimated 1RM Trend"
           optional: true
       # Screenshot 04: KPI cards with volume and PR sections
       - takeScreenshot: 04_check_progress_kpi_cards

@@ -31,10 +31,10 @@ onFlowComplete:
     id: "nav_profile"
 - waitForAnimationToEnd:
     timeout: 2000
-- assertVisible: "Hablar con el Entrenador IA"
+- assertVisible: "Hablar con Entrenador IA"
 
 # Tap AI Coach button
-- tapOn: "Hablar con el Entrenador IA"
+- tapOn: "Hablar con Entrenador IA"
 - waitForAnimationToEnd:
     timeout: 2000
 

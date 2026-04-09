@@ -42,7 +42,7 @@ onFlowComplete:
     duration: 400
 
 # Complete onboarding setup
-- tapOn: "Kilogramos (kg)|Kilograms (kg)"
+- tapOn: "Kilogramos \\(kg\\)|Kilograms \\(kg\\)"
 - tapOn:
     id: "onboarding_name_input"
 - inputText: "EmptyTest"

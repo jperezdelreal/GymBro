@@ -35,7 +35,7 @@ onFlowComplete:
 - takeScreenshot: 01_profile_settings_screen
 
 # Verify profile sections are visible
-- assertVisible: "Hablar con el Entrenador IA"
+- assertVisible: "Hablar con Entrenador IA"
 - assertVisible: "Cuenta"
 - assertVisible: "Preferencias de Entrenamiento"
 # Screenshot 02: Profile sections visible (AI Coach, Account, Preferences)
@@ -58,7 +58,7 @@ onFlowComplete:
 
 # Scroll back up
 - scrollUntilVisible:
-    element: "Hablar con el Entrenador IA"
+    element: "Hablar con Entrenador IA"
     direction: UP
 # Screenshot 05: Scrolled back to top of profile
 - takeScreenshot: 05_profile_settings_top

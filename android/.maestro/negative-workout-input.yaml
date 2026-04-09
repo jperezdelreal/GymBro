@@ -50,7 +50,7 @@ onFlowComplete:
 - inputText: "${EXERCISE_SEARCH:=Bench}"
 - hideKeyboard
 - tapOn:
-    text: "${EXERCISE_NAME:=Bench Press}"
+    text: "Bench Press"
     index: 0
 
 # Back on workout screen

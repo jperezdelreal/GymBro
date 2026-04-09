@@ -25,7 +25,7 @@ name: "Ensure Post-Onboarding State"
       - swipe:
           direction: LEFT
           duration: 400
-      - tapOn: "Kilogramos (kg)|Kilograms (kg)"
+      - tapOn: "Kilogramos \\(kg\\)|Kilograms \\(kg\\)"
       - tapOn:
           id: "onboarding_name_input"
       - inputText: "TestUser"

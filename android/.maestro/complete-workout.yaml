@@ -40,7 +40,7 @@ onFlowStart:
 
 # Pick first available exercise
 - tapOn:
-    text: "${EXERCISE_NAME:=Bench Press}"
+    text: "Bench Press"
     index: 0
 - waitForAnimationToEnd:
     timeout: 2000
@@ -68,13 +68,13 @@ onFlowStart:
       - copyTextFrom:
           id: "weight_input"
           index: 0
-      - assertTrue: ${maestro.copiedText == "${WEIGHT:=100}"}
+      - assertTrue: ${maestro.copiedText == "100"}
       
       # Capture the entered reps value
       - copyTextFrom:
           id: "reps_input"
           index: 0
-      - assertTrue: ${maestro.copiedText == "${REPS:=5}"}
+      - assertTrue: ${maestro.copiedText == "5"}
       
       # Screenshot: Set filled with weight and reps values (numbered per repeat index)
       - takeScreenshot: 0${repeat.index}_complete_workout_set_filled
@@ -133,7 +133,7 @@ onFlowStart:
 - takeScreenshot: 07_complete_workout_persistence_check_history
 
 # Verify workout appears in history (Exercise should be visible)
-- assertVisible: "${EXERCISE_NAME:=Bench Press}"
+- assertVisible: "Bench Press"
 # Screenshot 08: Workout appears in history confirming data persistence
 - takeScreenshot: 08_complete_workout_persistence_workout_in_history
 
