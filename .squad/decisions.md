@@ -1243,6 +1243,78 @@ The codebase has solid foundations in the tested areas (plateau detection, E1RM,
 2. **PersonalRecordService force unwrap in predicate (line 68)** — will crash on any set with nil completedAt
 3. **Test coverage for SmartDefaultsService and PersonalRecordService** — core features with zero verification
 
+---
+
+## Decision: Maestro Compose testTag Selector Pattern (2026-04-09)
+
+**Date:** 2026-04-09  
+**Author:** Trinity (iOS/Mobile Dev)  
+**Status:** Implemented (PR #308)
+
+### Context
+
+Maestro flows were failing to find Compose elements using `id:` selectors (e.g., `id: "nav_history"`, `id: "search_bar"`). The flows used `id:` selector syntax, but Jetpack Compose's `testTag()` modifier does not automatically expose test tags as resource IDs in the Android accessibility tree.
+
+~15 Maestro flows were blocked, including:
+- `navigation-smoke.yaml`
+- `browse-library.yaml`
+- `check-history.yaml`
+
+### Research
+
+Maestro's `id:` selector maps to the `android:resource-id` attribute in the accessibility tree. Compose's `testTag()` modifier does **not** set resource IDs by default — it only adds testTag semantics for Compose testing APIs.
+
+To expose testTags as resource IDs for Maestro:
+- Add `testTagsAsResourceId = true` to a semantics modifier
+- Applied at root composable, it propagates to the entire composition tree
+
+Source: [Maestro Jetpack Compose docs](https://docs.maestro.dev/get-started/supported-platform/android/jetpack)
+
+### Decision
+
+✅ **Add `testTagsAsResourceId = true` to the root Scaffold's semantics modifier in `GymBroNavGraph.kt`**
+
+```kotlin
+Scaffold(
+    modifier = Modifier.semantics {
+        testTagsAsResourceId = true
+    },
+    // ...
+)
+```
+
+This approach:
+- Enables testTag → resource-id mapping app-wide with one line
+- No changes needed to existing `testTag()` modifiers
+- No changes needed to Maestro YAML files
+- Minimal, surgical, maintainable
+
+### Alternatives Considered
+
+❌ **Per-screen semantics wrapping** — Would require wrapping every screen's root composable. More verbose, harder to maintain.
+
+❌ **Rewrite Maestro flows to use text selectors** — Text selectors work, but are fragile (break on i18n, copy changes, dynamic text). testTag is more stable.
+
+❌ **Use Maestro's `testTag:` selector** — Maestro does not support a `testTag:` selector. The `id:` selector is the correct approach when paired with `testTagsAsResourceId = true`.
+
+### Impact
+
+- **Unblocks:** All testTag-based Maestro flows (~15 flows)
+- **Testing:** Build verified (`./gradlew assembleDebug` passed). Manual Maestro testing required to confirm flows now pass.
+- **Breaking changes:** None
+- **Performance:** No impact — semantics modifier is compile-time only
+
+### Future Considerations
+
+- If we add more root composables (e.g., separate navigation graphs for different entry points), apply the same semantics modifier to each root.
+- This pattern should be documented in Android testing guidelines for new team members.
+
+### Related
+
+- Issue #307
+- PR #308
+- Previous work: PR #276 (added testTag modifiers), PR #277 (updated Maestro flows to use `id:` selector)
+
 ### Recommendation
 
 Do NOT ship MVP without fixing #26 (concurrency) and the PersonalRecordService crash in #30. Test coverage (#25) should reach 60%+ before beta.

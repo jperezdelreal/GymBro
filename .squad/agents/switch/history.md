@@ -391,6 +391,16 @@ Created a reusable sub-flow and added lifecycle hooks to all 11 flows:
 **Files Changed:**
 - 11 flow YAML files updated
 - 1 new sub-flow file created
+
+---
+
+## 2026-04-09: Maestro testTag Selector Fix (Issue #307)
+
+Trinity fixed Maestro flows failing to find Compose elements by implementing `testTagsAsResourceId=true` at the root Scaffold in `GymBroNavGraph.kt`. This single-line change enables all `testTag()` modifiers to expose resource IDs that Maestro's `id:` selectors can find.
+
+**Key Learning for Switch (Validation):** When validating Maestro flows, remember that Compose `testTag()` alone doesn't expose resource IDs—the semantics modifier is required. If flows start passing after this change, confirm by checking that Maestro can now find elements by `id:` without needing text selectors or other workarounds.
+
+**Reference:** Issue #307, PR #308, Decision in `.squad/decisions.md`
 - Total: 12 files changed (+148/-10)
 
 **Benefits:**

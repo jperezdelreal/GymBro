@@ -327,3 +327,34 @@
 - **Onboarding gate timing**: Check hasCompletedOnboarding after auth is known but before mainTabView renders. Use .task {} on Group, not on TabView, to avoid double-execution per tab.
 - **FetchDescriptor pattern for single-item checks**: `FetchDescriptor<UserProfile>()` with try? fetch returns empty array on failure. First profile = current user (single-user app). More reliable than relying on implicit fetch.
 
+
+### 2025-01-03: Maestro testTag Selector Fix (Issue #307, PR #308)
+**Problem solved:**
+- Maestro flows using `id:` selectors couldn't find Compose testTag elements
+- Compose's testTag() doesn't expose tags as resource IDs by default — Maestro's `id:` selector requires resource-id attribute in accessibility tree
+- Blocked ~15 Maestro flows (navigation-smoke, browse-library, check-history, etc.)
+
+**Solution implemented:**
+- Added `testTagsAsResourceId = true` to root Scaffold's semantics modifier in GymBroNavGraph.kt
+- Single surgical change: `Modifier.semantics { testTagsAsResourceId = true }` on Scaffold
+- Exposes all testTag modifiers app-wide as resource IDs for Maestro
+
+**Architecture learnings:**
+- Maestro's `id:` selector maps to android:resource-id in accessibility tree (not directly to testTag)
+- testTagsAsResourceId is a Compose-level semantic property, not a per-element modifier
+- Applied at root composable propagates to entire composition tree
+- Minimal approach: set once at Scaffold level rather than wrapping individual screens
+- No changes needed to existing testTag() modifiers or Maestro YAML files
+
+**Testing approach:**
+- Build verification: `./gradlew assembleDebug` passed
+- Manual Maestro testing required with emulator to confirm flows pass (not done in this PR)
+- Zero behavioral changes for users — purely test infrastructure
+
+**Key files:**
+- `android/app/src/main/java/com/gymbro/app/navigation/GymBroNavGraph.kt` — root navigation composable
+- Maestro flows: `android/.maestro/*.yaml` — use `id:` selectors unchanged
+
+**References:**
+- Maestro docs: [Jetpack Compose Support](https://docs.maestro.dev/get-started/supported-platform/android/jetpack)
+- GitHub issue: [Compose test tags not visible #763](https://github.com/mobile-dev-inc/maestro/issues/763)
