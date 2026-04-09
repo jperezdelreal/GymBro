@@ -55,13 +55,13 @@ onFlowStart:
       - tapOn:
           id: "weight_input"
           index: 0
-      - inputText: "${WEIGHT:=100}"
+      - inputText: "${WEIGHT || '100'}"
       
       # Fill in reps for current set
       - tapOn:
           id: "reps_input"
           index: 0
-      - inputText: "${REPS:=5}"
+      - inputText: "${REPS || '5'}"
       
       # Capture the entered weight value
       - copyTextFrom:

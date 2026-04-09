@@ -48,7 +48,7 @@ onFlowComplete:
 - tapOn: "Kilogramos \\(kg\\)|Kilograms \\(kg\\)"
 - tapOn:
     id: "onboarding_name_input"
-- inputText: "${USER_NAME:=E2EUser}"
+- inputText: "${USER_NAME || 'E2EUser'}"
 - hideKeyboard
 
 # Complete onboarding
@@ -100,12 +100,12 @@ onFlowComplete:
 - tapOn:
     id: "weight_input"
     index: 0
-- inputText: "${WEIGHT:=80}"
+- inputText: "${WEIGHT || '80'}"
 
 - tapOn:
     id: "reps_input"
     index: 0
-- inputText: "${REPS:=10}"
+- inputText: "${REPS || '10'}"
 
 # Screenshot 05: Set filled with weight and reps
 - takeScreenshot: 05_full_e2e_set_filled

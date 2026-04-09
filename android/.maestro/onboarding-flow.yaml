@@ -59,16 +59,19 @@ onFlowComplete:
 # Enter name, then dismiss keyboard by tapping empty area
 - tapOn:
     id: "onboarding_name_input"
-- inputText: "${USER_NAME:=TestUser}"
+- inputText: "${USER_NAME || 'TestUser'}"
 # Screenshot 05: User name entered in onboarding form
 - takeScreenshot: 05_onboarding_name_entered
+# Dismiss keyboard by tapping far outside the input area
 - tapOn:
-    point: "50%,20%"
+    point: "50%,10%"
 - waitForAnimationToEnd:
     timeout: 2000
 
-# Complete onboarding
-- tapOn: "¡Vamos!"
+# Complete onboarding - tap start button using coordinates (testTag targets wrapper View, not clickable button)
+# Button is at left side of screen, center ~(20%, 69%)
+- tapOn:
+    point: "20%,69%"
 - waitForAnimationToEnd:
     timeout: 3000
 

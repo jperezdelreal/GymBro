@@ -47,7 +47,7 @@ onFlowComplete:
 - assertVisible: "Elegir Ejercicio"
 - tapOn:
     id: "search_bar"
-- inputText: "${EXERCISE_SEARCH:=Bench}"
+- inputText: "${EXERCISE_SEARCH || 'Bench'}"
 - hideKeyboard
 - tapOn:
     text: "Bench Press"

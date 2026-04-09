@@ -45,7 +45,10 @@ onFlowComplete:
 # Try to proceed without entering name
 - waitForAnimationToEnd:
     timeout: 2000
-- tapOn: "¡Vamos!"
+# Tap start button using coordinates (testTag targets wrapper View, not clickable button)
+# Button is at left side of screen, center ~(20%, 69%)
+- tapOn:
+    point: "20%,69%"
 # Screenshot 02: Empty name input test
 - takeScreenshot: 02_onboarding_edge_empty_name
 # App should either require name or proceed with empty (verify no crash)
@@ -81,7 +84,10 @@ onFlowComplete:
 
 - waitForAnimationToEnd:
     timeout: 2000
-- tapOn: "¡Vamos!"
+# Tap start button using coordinates (testTag targets wrapper View, not clickable button)
+# Button is at left side of screen, center ~(20%, 69%)
+- tapOn:
+    point: "20%,69%"
 - waitForAnimationToEnd:
     timeout: 3000
 # App should handle and proceed
@@ -115,7 +121,10 @@ onFlowComplete:
 
 - waitForAnimationToEnd:
     timeout: 2000
-- tapOn: "¡Vamos!"
+# Tap start button using coordinates (testTag targets wrapper View, not clickable button)
+# Button is at left side of screen, center ~(20%, 69%)
+- tapOn:
+    point: "20%,69%"
 - waitForAnimationToEnd:
     timeout: 3000
 # App should handle special characters
@@ -149,7 +158,10 @@ onFlowComplete:
 
 - waitForAnimationToEnd:
     timeout: 2000
-- tapOn: "¡Vamos!"
+# Tap start button using coordinates (testTag targets wrapper View, not clickable button)
+# Button is at left side of screen, center ~(20%, 69%)
+- tapOn:
+    point: "20%,69%"
 - waitForAnimationToEnd:
     timeout: 3000
 # App should handle emoji input

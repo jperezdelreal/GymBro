@@ -49,7 +49,10 @@ onFlowComplete:
     point: "50%,20%"
 - waitForAnimationToEnd:
     timeout: 2000
-- tapOn: "¡Vamos!"
+# Tap start button using coordinates (testTag targets wrapper View, not clickable button)
+# Button is at left side of screen, center ~(20%, 69%)
+- tapOn:
+    point: "20%,69%"
 - waitForAnimationToEnd:
     timeout: 3000
 
