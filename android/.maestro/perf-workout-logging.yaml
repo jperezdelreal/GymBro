@@ -55,7 +55,7 @@ onFlowComplete:
 
 # Verify workout screen is loaded
 - assertVisible:
-    text: "weight_input|reps_input|Peso|Repeticiones"
+    text: "weight_input|reps_input|Peso|Weight|Repeticiones|Reps"
     optional: true
 - takeScreenshot: perf_workout_logging_workout_screen
 
@@ -65,7 +65,7 @@ onFlowComplete:
     commands:
       # Input weight
       - tapOn:
-          text: "Peso|weight_input"
+          text: "Peso|Weight|weight_input"
           optional: true
       - waitForAnimationToEnd:
           timeout: 300
@@ -73,7 +73,7 @@ onFlowComplete:
       
       # Input reps
       - tapOn:
-          text: "Repeticiones|reps_input"
+          text: "Repeticiones|Reps|reps_input"
           optional: true
       - waitForAnimationToEnd:
           timeout: 300
@@ -81,7 +81,7 @@ onFlowComplete:
       
       # Save set
       - tapOn:
-          text: "Guardar Serie|Agregar Serie"
+          text: "Guardar Serie|Save Set|Agregar Serie|Add Set"
           optional: true
       - waitForAnimationToEnd:
           timeout: 500
@@ -95,27 +95,27 @@ onFlowComplete:
 
 # Verify UI is still responsive after rapid logging
 - assertVisible:
-    text: "Entrenamiento|Serie|Peso|Repeticiones"
+    text: "Entrenamiento|Workout|Serie|Set|Peso|Weight|Repeticiones|Reps"
     optional: true
 - takeScreenshot: perf_workout_logging_5_sets_complete
 
 # Try to add one more set to verify continued responsiveness
 - tapOn:
-    text: "Peso|weight_input"
+    text: "Peso|Weight|weight_input"
     optional: true
 - waitForAnimationToEnd:
     timeout: 500
 - inputText: "150"
 
 - tapOn:
-    text: "Repeticiones|reps_input"
+    text: "Repeticiones|Reps|reps_input"
     optional: true
 - waitForAnimationToEnd:
     timeout: 500
 - inputText: "8"
 
 - tapOn:
-    text: "Guardar Serie|Agregar Serie"
+    text: "Guardar Serie|Save Set|Agregar Serie|Add Set"
     optional: true
 - waitForAnimationToEnd:
     timeout: 1000
@@ -123,7 +123,7 @@ onFlowComplete:
 
 # Verify workout data is displayed correctly
 - assertVisible:
-    text: "Serie|Entrenamiento"
+    text: "Serie|Set|Entrenamiento|Workout"
     optional: true
 - takeScreenshot: perf_workout_logging_final
 

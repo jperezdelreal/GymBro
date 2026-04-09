@@ -48,7 +48,7 @@ onFlowComplete:
     id: "nav_history"
 - waitForAnimationToEnd:
     timeout: 2000
-- assertVisible: "Historial"
+- assertVisible: "Historial|History"
 - assertVisible:
     id: "nav_history"
 - takeScreenshot: a11y_content_history
@@ -58,7 +58,7 @@ onFlowComplete:
     id: "nav_progress"
 - waitForAnimationToEnd:
     timeout: 2000
-- assertVisible: "Progreso"
+- assertVisible: "Progreso|Progress"
 - assertVisible:
     id: "nav_progress"
 - takeScreenshot: a11y_content_progress
@@ -68,7 +68,7 @@ onFlowComplete:
     id: "nav_recovery"
 - waitForAnimationToEnd:
     timeout: 2000
-- assertVisible: "Recuperación"
+- assertVisible: "Recuperación|Recovery"
 - assertVisible:
     id: "nav_recovery"
 - takeScreenshot: a11y_content_recovery
@@ -78,7 +78,7 @@ onFlowComplete:
     id: "nav_profile"
 - waitForAnimationToEnd:
     timeout: 2000
-- assertVisible: "Perfil"
+- assertVisible: "Perfil|Profile"
 - assertVisible:
     id: "nav_profile"
 - takeScreenshot: a11y_content_profile
