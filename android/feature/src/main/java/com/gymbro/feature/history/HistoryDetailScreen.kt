@@ -117,7 +117,9 @@ fun HistoryDetailRoute(
                     )
                 }
                 state.workoutDetail != null -> {
-                    HistoryDetailContent(detail = state.workoutDetail!!)
+                    state.workoutDetail?.also { detail ->
+                        HistoryDetailContent(detail = detail)
+                    }
                 }
             }
         }

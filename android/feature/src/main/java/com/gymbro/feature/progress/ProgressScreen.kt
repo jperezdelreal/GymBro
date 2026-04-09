@@ -955,8 +955,8 @@ private fun PRShowcaseCard(record: PersonalRecord) {
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
-            if (record.previousValue != null) {
-                val improvement = record.value - record.previousValue!!
+            record.previousValue?.let { previousValue ->
+                val improvement = record.value - previousValue
                 if (improvement > 0) {
                     Column(horizontalAlignment = Alignment.End) {
                         Icon(
