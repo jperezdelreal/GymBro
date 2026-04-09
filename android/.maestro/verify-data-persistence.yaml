@@ -1,5 +1,5 @@
 appId: com.gymbro.app
-name: "Verify Data Persistence — Cross-screen data verification"
+name: "Verify Data Persistence - Cross-screen data verification"
 #
 # Tests: Workout data persistence across History and Progress tabs
 # Preconditions: User has completed onboarding (ensured by ensure-post-onboarding.yaml)

@@ -1,5 +1,5 @@
 appId: com.gymbro.app
-name: "Check Progress — Navigate to progress and verify KPI cards"
+name: "Check Progress - Navigate to progress and verify KPI cards"
 #
 # Tests: Progress tab navigation and KPI data display (volume, PRs, 1RM trends)
 # Preconditions: User has completed onboarding (ensured by ensure-post-onboarding.yaml)

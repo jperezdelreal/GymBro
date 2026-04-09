@@ -1,5 +1,5 @@
 appId: com.gymbro.app
-name: "Negative — Invalid Workout Inputs (zero/negative/extreme values)"
+name: "Negative - Invalid Workout Inputs (zero/negative/extreme values)"
 #
 # Tests: App resilience with invalid workout input values (zero, negative, extreme)
 # Preconditions: User has completed onboarding (ensured by ensure-post-onboarding.yaml)

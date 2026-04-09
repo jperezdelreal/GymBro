@@ -1,5 +1,5 @@
 appId: com.gymbro.app
-name: "Check History — Navigate to history and verify entries"
+name: "Check History - Navigate to history and verify entries"
 #
 # Tests: History tab navigation and conditional verification of empty state or workout data
 # Preconditions: User has completed onboarding (ensured by ensure-post-onboarding.yaml)

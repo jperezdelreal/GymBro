@@ -1,5 +1,5 @@
 appId: com.gymbro.app
-name: "Negative — Onboarding Edge Cases (empty/long/special names)"
+name: "Negative - Onboarding Edge Cases (empty/long/special names)"
 #
 # Tests: Onboarding form validation with edge case inputs (empty, very long, special chars, emoji)
 # Preconditions: App launched with clearState for each test

@@ -1,5 +1,5 @@
 appId: com.gymbro.app
-name: "Start Workout — Begin workout, add exercises, log sets"
+name: "Start Workout - Begin workout, add exercises, log sets"
 #
 # Tests: Starting a workout, adding exercises via search, and logging set data
 # Preconditions: User has completed onboarding (ensured by ensure-post-onboarding.yaml)

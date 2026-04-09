@@ -1,5 +1,5 @@
 appId: com.gymbro.app
-name: "Negative — Search for Nonexistent Exercise"
+name: "Negative - Search for Nonexistent Exercise"
 #
 # Tests: Search functionality with invalid/edge case queries (nonexistent, numbers, special chars, emoji)
 # Preconditions: User has completed onboarding (ensured by ensure-post-onboarding.yaml)

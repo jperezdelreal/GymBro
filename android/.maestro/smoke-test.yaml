@@ -1,5 +1,5 @@
 appId: com.gymbro.app
-name: "Smoke Test — Basic app launch"
+name: "Smoke Test - Basic app launch"
 #
 # Tests: Basic app launch and post-onboarding state verification
 # Preconditions: User has completed onboarding (ensured by ensure-post-onboarding.yaml)

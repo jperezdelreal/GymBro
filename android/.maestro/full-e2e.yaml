@@ -1,5 +1,5 @@
 appId: com.gymbro.app
-name: "Full E2E — Complete user journey: onboarding → workout → history"
+name: "Full E2E - Complete user journey: onboarding → workout → history"
 #
 # Tests: Complete end-to-end user journey from onboarding through workout completion and verification
 # Preconditions: App launched with clearState (fresh install state)

@@ -1,5 +1,5 @@
 appId: com.gymbro.app
-name: "Onboarding — Complete 4-page onboarding flow"
+name: "Onboarding - Complete 4-page onboarding flow"
 #
 # Tests: Complete onboarding flow from welcome through name/unit selection
 # Preconditions: App launched with clearState (fresh install state)

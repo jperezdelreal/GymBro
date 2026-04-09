@@ -1,5 +1,5 @@
 appId: com.gymbro.app
-name: "Navigation Smoke — Tap through all bottom nav tabs"
+name: "Navigation Smoke - Tap through all bottom nav tabs"
 #
 # Tests: Bottom navigation bar functionality across all tabs
 # Preconditions: User has completed onboarding (ensured by ensure-post-onboarding.yaml)
