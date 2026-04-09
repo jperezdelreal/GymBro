@@ -59,6 +59,60 @@ GymBro is a **specialist for serious lifters**, not a generalist. We don't need 
 
 ---
 
+## 2026-04-08T09-00Z: Android Workstream Prioritization — 3 Parallel Tracks
+
+**Decision by:** Morpheus  
+**Date:** 2026-04-08  
+**Context:** Android codebase has reached feature completeness (12 screens, all core features). Board is clear. Time to lock down quality before expanding feature scope.
+
+### THE DECISION: Prioritized Sequential Execution
+
+**Priority Order:**
+
+1. **FIRST:** Maestro E2E Validation + CI Hardening (Workstream A) — **BLOCKING**
+2. **SECOND:** Unit Test Coverage to 60% (Workstream B) — **AFTER Maestro passes**
+3. **LAST:** Android Skills Gap (Workstream C) — **Continuous, start after test coverage hits 40%**
+
+### Key Workstreams
+
+**Workstream A: Maestro E2E Validation + CI Hardening**
+- Objective: Validate all 24 Maestro flows pass after testTagsAsResourceId fix. Harden CI to catch UX regressions.
+- Timeline: 2-3 hours (Tank execution) + 1 week monitoring
+- Success: All 24 flows pass locally, smoke suite runs on every PR, <5% flake rate
+
+**Workstream B: Unit Test Coverage to 60%**
+- Objective: Raise coverage from ~9% to 60% for beta readiness. Tier 1 (40%): ViewModels + core Repositories. Tier 2 (60%): DAOs + data sources.
+- Timeline: 2 weeks total (1 week per tier)
+- Success: 40% coverage, then 60% coverage with all 12 ViewModels tested
+- Approach: Use Maestro flows as acceptance criteria for unit tests
+
+**Workstream C: Android Skills (3 Critical)**
+- Objective: Add high-leverage skills that eliminate recurring agent mistakes. Quality over quantity.
+- Recommended skills: (1) android-coroutines-expert (CRITICAL), (2) compose-performance (HIGH), (3) android-navigation-compose (MEDIUM)
+- Timeline: 1 day per skill (start after 40% coverage)
+- Success: 3 skills with 5+ code examples, anti-patterns documented, <500 lines each
+
+### Why This Order (Sequential, Not Parallel)
+
+- **E2E First = Regression Safety Net:** Maestro catches UX breaks that unit tests miss. Must validate before investing in test coverage.
+- **Unit Tests Second = Code Safety Net:** With E2E passing, acceptance criteria clear. Tests prevent logic bugs and ensure flows stay working.
+- **Skills Last = Quality Multiplier:** Test patterns reveal what agents struggle with. Skills codify those lessons, improving agent output.
+
+### Risk Mitigation
+
+- **Risk 1:** Maestro flows fail catastrophically → Triage by category (selectors, timing, data), fix in batches
+- **Risk 2:** Test coverage takes too long → Focus on high-value tests (ViewModels), defer DAOs to Tier 2
+- **Risk 3:** Skills don't improve agent output → Validate with before/after test, delete low-signal skills
+
+### Dependencies & Timeline
+
+1. **Maestro E2E Validation (Blocking)** → 3 hours + 1 week
+2. **Unit Test Coverage: Tier 1 (40%)** → 1 week (after Maestro passes)
+3. **Android Skills + Unit Test Coverage: Tier 2 (60%)** → Parallel after 40% coverage
+4. **Total:** 3 weeks to completion
+
+---
+
 ## 2026-04-07T15-06-17Z: User Directive — Repo Hygiene
 
 **By:** Copilot (via user request)
