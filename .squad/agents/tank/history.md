@@ -810,3 +810,31 @@ ProGuard rules follow official library documentation and Android best practices.
 - Artifact upload path `~/.maestro/tests/**/*.png` works in GitHub Actions runner (Linux)
 
 **Outcome:** CI now runs ALL 12 Maestro flows with retry logic and tag-based selection. PRs get fast smoke feedback in 5 minutes. Master merges trigger full regression suite. Closes #280 via PR #291.
+
+### 2026-10-04: Android Room Migration Implementation (Issue #327)
+
+**Problem:** App was using .fallbackToDestructiveMigration(true) which DELETED ALL USER DATA on schema changes. This is unacceptable for an offline-first fitness app where workout history is sacred.
+
+**Solution Implemented:**
+- **Created Migrations.kt:** Defined three non-destructive migrations (v1→v2, v2→v3, v3→v4) that preserve all user data across schema changes.
+  - **v1→v2:** Renamed instructions → description, added category and youtubeUrl columns to exercises table. Used ALTER TABLE + data copy pattern to avoid data loss.
+  - **v2→v3:** Added workouts and workout_sets tables with proper foreign key constraints and indices for performance. Enables workout history tracking.
+  - **v3→v4:** Added workout_templates and 	emplate_exercises tables with foreign keys. Enables program management.
+- **Updated DatabaseModule.kt:** Removed destructive fallback, added .addMigrations() with all three migration objects.
+- **Comprehensive Testing:** Created MigrationTest.kt with 6 test cases verifying:
+  - Data preservation across each migration
+  - Foreign key relationships work correctly
+  - Full migration path (v1→v4) preserves all original data
+  - Migrated database can be opened by Room without errors
+
+**Philosophy Alignment:**
+- Mirrors iOS offline-first strategy: Room is source of truth (like SwiftData on iOS), data loss is unacceptable
+- Follows Android data layer skill guidance: non-destructive migrations, preserve workout history
+- All tests pass—migrations verified to preserve user PRs and training history across schema changes
+
+**Files Modified:**
+- ndroid/core/src/main/java/com/gymbro/core/database/Migrations.kt (created)
+- ndroid/core/src/main/java/com/gymbro/core/di/DatabaseModule.kt (updated)
+- ndroid/core/src/androidTest/java/com/gymbro/core/database/MigrationTest.kt (created)
+
+**Outcome:** Users can now update the app without losing their workout history. The pipes are clean—data flows safely through schema changes.
