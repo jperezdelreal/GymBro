@@ -5,6 +5,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.gymbro.core.database.GymBroDatabase
+import com.gymbro.core.database.Migrations
 import com.gymbro.core.database.dao.ExerciseDao
 import com.gymbro.core.database.dao.WorkoutDao
 import com.gymbro.core.database.dao.WorkoutTemplateDao
@@ -34,7 +35,11 @@ object DatabaseModule {
             GymBroDatabase::class.java,
             "gymbro.db",
         )
-            .fallbackToDestructiveMigration(true)
+            .addMigrations(
+                Migrations.MIGRATION_1_2,
+                Migrations.MIGRATION_2_3,
+                Migrations.MIGRATION_3_4
+            )
             .addCallback(SeedDatabaseCallback(context))
             .build()
     }
