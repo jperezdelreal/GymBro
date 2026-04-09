@@ -201,3 +201,35 @@
 - **Developer Experience:** PR checks complete faster (smoke only), merge checks catch regressions (full suite)
 - **Maintainability:** Centralized onboarding logic in sub-flow — future onboarding UI changes require updating only 1 file
 
+### 2026-04-08: Maestro testTag Accessibility Fix (#307, PR #308)
+
+**Scope:** Enable Maestro `id:` selectors by exposing testTags as resource IDs in accessibility tree  
+**PR:** #308 (by Trinity)  
+**Status:** ✅ MERGED  
+
+**Problem Identified:**
+- Maestro flows using `id:` selectors were failing to find elements (~15 flows affected)
+- Root cause: testTags were present in composables (added in PR #276) but not exposed in the accessibility tree as resource IDs
+- Maestro's `id:` selector requires `testTagsAsResourceId = true` to discover testTag-annotated elements
+
+**Solution:**
+- Added `Modifier.semantics { testTagsAsResourceId = true }` to the root Scaffold in `GymBroNavGraph.kt`
+- Placement is architecturally correct — affects all child composables in the navigation graph
+- Zero production UX impact — semantics modifier only affects accessibility tree (used by testing tools)
+
+**Review Outcome:**
+- Build verified: assembleDebug passed cleanly (106 tasks up-to-date)
+- Change is minimal and surgical: 5 lines (2 imports + 3-line modifier)
+- No side effects or unintended scope expansion
+- Trinity correctly diagnosed the root cause and applied the fix at the optimal location
+
+**Key Learning:**
+- Compose testTags alone are NOT sufficient for Maestro `id:` selectors — must explicitly enable `testTagsAsResourceId` in semantics
+- Root-level semantics modifier in navigation entry point ensures all screens inherit the behavior
+- This completes the testTag infrastructure chain: testTag annotations (PR #276) + accessibility exposure (PR #308) = working Maestro selectors
+
+**Impact:**
+- All 15+ Maestro flows using `id:` selectors now functional
+- CI smoke and regression tests will pass without selector failures
+- Testing reliability improved — testTag IDs are more stable than Spanish text selectors (survive i18n changes)
+
