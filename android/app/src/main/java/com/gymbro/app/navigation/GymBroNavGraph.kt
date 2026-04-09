@@ -38,6 +38,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -102,6 +104,9 @@ fun GymBroNavGraph(
     val startDestination = if (hasCompletedOnboarding) "exercise_library" else "onboarding"
 
     Scaffold(
+        modifier = Modifier.semantics {
+            testTagsAsResourceId = true
+        },
         bottomBar = {
             if (showBottomBar) {
                 GymBroBottomNavBar(
