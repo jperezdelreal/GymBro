@@ -29,9 +29,12 @@ name: "Ensure Post-Onboarding State"
       - tapOn:
           id: "onboarding_name_input"
       - inputText: "TestUser"
-      - hideKeyboard
+      # Tap empty area to dismiss Gboard floating toolbar
       - tapOn:
-          id: "onboarding_start"
+          point: "50%,20%"
+      - waitForAnimationToEnd:
+          timeout: 2000
+      - tapOn: "¡Vamos!"
       - waitForAnimationToEnd:
           timeout: 3000
 

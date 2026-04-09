@@ -41,14 +41,15 @@ onFlowComplete:
     direction: LEFT
     duration: 400
 
-# Complete onboarding setup
-- tapOn: "Kilogramos \\(kg\\)|Kilograms \\(kg\\)"
+# Complete onboarding setup (name first, then dismiss keyboard)
 - tapOn:
     id: "onboarding_name_input"
 - inputText: "EmptyTest"
-- hideKeyboard
 - tapOn:
-    id: "onboarding_start"
+    point: "50%,20%"
+- waitForAnimationToEnd:
+    timeout: 2000
+- tapOn: "¡Vamos!"
 - waitForAnimationToEnd:
     timeout: 3000
 

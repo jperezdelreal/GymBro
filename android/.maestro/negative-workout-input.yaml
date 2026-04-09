@@ -11,10 +11,10 @@ tags:
   - negative
   - core
 onFlowStart:
+  # Launch app — ensure-post-onboarding.yaml handles onboarding state
   - launchApp
   - waitForAnimationToEnd:
       timeout: 3000
-  - assertVisible: "Biblioteca de Ejercicios"
 
 onFlowComplete:
   # Clean up any active workout

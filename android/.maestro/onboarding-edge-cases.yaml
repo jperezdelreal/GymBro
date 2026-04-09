@@ -43,8 +43,9 @@ onFlowComplete:
 - tapOn: "Kilogramos \\(kg\\)|Kilograms \\(kg\\)"
 
 # Try to proceed without entering name
-- tapOn:
-    id: "onboarding_start"
+- waitForAnimationToEnd:
+    timeout: 2000
+- tapOn: "¡Vamos!"
 # Screenshot 02: Empty name input test
 - takeScreenshot: 02_onboarding_edge_empty_name
 # App should either require name or proceed with empty (verify no crash)
@@ -72,13 +73,15 @@ onFlowComplete:
 - tapOn:
     id: "onboarding_name_input"
 - inputText: "ThisIsAVeryLongNameThatExceedsFiftyCharactersToTestInputHandling"
-- hideKeyboard
+- tapOn:
+    point: "50%,20%"
 # Screenshot 03: Very long name input test (50+ characters)
 - takeScreenshot: 03_onboarding_edge_long_name
 # Verify name field handles long input
 
-- tapOn:
-    id: "onboarding_start"
+- waitForAnimationToEnd:
+    timeout: 2000
+- tapOn: "¡Vamos!"
 - waitForAnimationToEnd:
     timeout: 3000
 # App should handle and proceed
@@ -105,12 +108,14 @@ onFlowComplete:
 - tapOn:
     id: "onboarding_name_input"
 - inputText: "User@123!#$%"
-- hideKeyboard
+- tapOn:
+    point: "50%,20%"
 # Screenshot 04: Special characters in name input test
 - takeScreenshot: 04_onboarding_edge_special_chars
 
-- tapOn:
-    id: "onboarding_start"
+- waitForAnimationToEnd:
+    timeout: 2000
+- tapOn: "¡Vamos!"
 - waitForAnimationToEnd:
     timeout: 3000
 # App should handle special characters
@@ -137,12 +142,14 @@ onFlowComplete:
 - tapOn:
     id: "onboarding_name_input"
 - inputText: "User💪🏋️"
-- hideKeyboard
+- tapOn:
+    point: "50%,20%"
 # Screenshot 05: Emoji in name input test
 - takeScreenshot: 05_onboarding_edge_emoji
 
-- tapOn:
-    id: "onboarding_start"
+- waitForAnimationToEnd:
+    timeout: 2000
+- tapOn: "¡Vamos!"
 - waitForAnimationToEnd:
     timeout: 3000
 # App should handle emoji input
