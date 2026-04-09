@@ -972,3 +972,26 @@ av_exercise_library)
 - PR #345 created and ready for merge
 - CI workflow should now be reliable and provide better debugging output
 
+
+## 2026-04-10 — Issue #334: Eliminated Unsafe Null Handling
+
+**Task:** Replace 32 !! force-unwrap usages with safe alternatives.
+
+**Found:** 5 instances in production code (not 32 as originally reported):
+1. PersonalRecordService.kt — E1RM history calculation
+2. PlateauDetectionService.kt — Weekly data averaging  
+3. HistoryDetailScreen.kt — Workout detail rendering
+4. ProgressScreen.kt — Improvement calculation
+5. ActiveWorkoutViewModel.kt — PR filtering logic
+
+**Solutions Applied:**
+- Used mapNotNull with early returns for collection operations
+- Used ?.let and ?.also for delegated property smart casts
+- Used safe call chains (?.) for API properties
+
+**Result:** All 5 !! operators eliminated. Code compiles successfully. No new test failures.
+
+**Branch:** squad/334-null-safety  
+**Commit:** 669c3a8  
+**PR:** https://github.com/jperezdelreal/GymBro/pull/346
+
