@@ -100,6 +100,14 @@
 - Tests must be realistic: Timer counting down over 2-3 seconds is acceptable test duration for accuracy validation.
 - Singleton pattern requires careful `setUp()`/`tearDown()` to reset state between tests.
 
+### 2026-04-09: Maestro E2E Regression Alert (Issue #311)
+**From Switch's E2E Revalidation:**
+- **Critical Finding:** After PRs #308–310, Android Maestro E2E suite dropped from ~22/23 passing to 5/23 passing (78% regression).
+- **Root Cause #1 (3 flows):** JavaScript syntax error in Maestro flows — `${VAR:=default}` is bash/shell syntax, not JavaScript. Maestro uses Graal.js, which doesn't support `:=` operator. Must use `${VAR || 'default'}` instead.
+- **Root Cause #2 (16 flows):** UTF-8 encoding bug on Windows Maestro — multi-byte UTF-8 characters like "¡" (C2 A1) are misread as "í" (C3 AD). Affects flows using `flow/ensure-post-onboarding.yaml` helper which has `tapOn: "¡Vamos!"`.
+- **Decision:** Documented in `.squad/decisions/decisions.md` — new Maestro standards for JavaScript syntax, UTF-8 text selector avoidance, and pre-merge validation requirement.
+- **Action:** PRs #312–313 will fix JavaScript syntax and UTF-8 encoding, followed by full suite re-validation.
+
 ### 2026-04-07: Crash Recovery Implementation (Issue #53)
 **Active Workout State Persistence:**
 - Added `isActive: Bool` and `isCancelled: Bool` flags to Workout model. `isActive` set true when workout starts (or is created), set false when finished or cancelled.
@@ -358,3 +366,9 @@
 **References:**
 - Maestro docs: [Jetpack Compose Support](https://docs.maestro.dev/get-started/supported-platform/android/jetpack)
 - GitHub issue: [Compose test tags not visible #763](https://github.com/mobile-dev-inc/maestro/issues/763)
+
+### 2026-04-09: Maestro onFlowStart Hooks Fixed (PR #310)
+- **Root Cause 1 (12 flows):** `onFlowStart` hooks asserted `Biblioteca de Ejercicios` visible BEFORE `ensure-post-onboarding.yaml` ran. Removed the assertion — sub-flow handles it.
+- **Root Cause 2a:** `hideKeyboard` uses back-key on Android → exits app from root activities (onboarding). Replaced with point-based tap (50%,20%) to dismiss Gboard toolbar.
+- **Root Cause 2b:** `onboarding_start` accessibility ID was on a wrapper View (912px wide) but actual clickable button only 259px. Maestro tapped wrapper center (x=540), missing the button (ends x=343). Fixed by tapping text `¡Vamos!` instead of ID.
+- **Lesson:** Never use `hideKeyboard` on Android root activities. Always verify element ID targets the actual clickable child, not an oversized wrapper. Use Maestro logs (`bounds=`) to debug tap misses.
