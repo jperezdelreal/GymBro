@@ -201,6 +201,47 @@
 - **Developer Experience:** PR checks complete faster (smoke only), merge checks catch regressions (full suite)
 - **Maintainability:** Centralized onboarding logic in sub-flow — future onboarding UI changes require updating only 1 file
 
+### 2026-04-09: Bilingual Regex Pattern Audit (#320, PR #321)
+
+**Scope:** Audit all Maestro flows for hardcoded Spanish/English text selectors and replace with bilingual regex patterns  
+**PR:** #321 (by Switch)  
+**Status:** ✅ MERGED  
+
+**Problem:**
+- Android emulator runs es-ES locale
+- Some Maestro flows still had hardcoded Spanish-only OR English-only text selectors
+- Maestro text selectors treat parentheses as regex groups — must escape `\\(` `\\)`
+- Maestro on Windows misreads UTF-8 chars like ¡ (U+00A1)
+
+**Solution:**
+- Audited all 4 remaining flows with hardcoded text:
+  1. `a11y-content-descriptions.yaml`: Tab labels (Historial, Progreso, Recuperación, Perfil)
+  2. `a11y-keyboard-navigation.yaml`: Same tab labels
+  3. `perf-rapid-navigation.yaml`: Same tab labels
+  4. `perf-workout-logging.yaml`: Input labels (Peso, Repeticiones, Guardar Serie)
+- Replaced with bilingual regex using pipe-separated alternation: `"Spanish|English"`
+- Examples:
+  - `"Historial"` → `"Historial|History"`
+  - `"Peso"` → `"Peso|Weight"`
+  - `"Guardar Serie"` → `"Guardar Serie|Save Set"`
+
+**Review Outcome:**
+- ✅ Bilingual patterns correct (Spanish|English format)
+- ✅ No parentheses escaping issues (used pipes, not parens)
+- ✅ Comprehensive coverage (all 4 flows audited)
+- ✅ No unintended changes
+- ✅ Properly closes #320
+
+**Key Learning:**
+- Bilingual regex is the final piece for full locale compatibility — now all Maestro flows support both es-ES and en-US without modification
+- Pattern established: Use `"Spanish|English"` format for all user-facing text selectors that might vary by locale
+- Prefer testTag IDs when possible (locale-independent), fallback to bilingual text selectors when IDs unavailable
+
+**Impact:**
+- All Maestro E2E flows now locale-agnostic — work on both Spanish and English emulators
+- Future-proof for potential en-US testing or English translation expansion
+- Zero test maintenance required if app UI switches between Spanish/English defaults
+
 ### 2026-04-08: Maestro testTag Accessibility Fix (#307, PR #308)
 
 **Scope:** Enable Maestro `id:` selectors by exposing testTags as resource IDs in accessibility tree  

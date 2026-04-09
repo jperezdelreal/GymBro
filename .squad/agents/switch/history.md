@@ -781,3 +781,51 @@ av_exercise_library)
 
 **Next Session Action:** Jump straight to writing tests. Start with OnboardingViewModel (simplest, 1 dep) then HistoryListViewModel, then the rest. Create missing fakes first as a batch.
 
+### 2026-04-09: Maestro Bilingual Regex Audit (Issue #320, PR #321)
+
+**Context:**
+- GymBro Android emulator runs es-ES locale
+- Some Maestro flows had hardcoded English or Spanish text selectors that would fail on the opposite locale
+- Mission: Audit all flows and ensure bilingual regex patterns for locale compatibility
+
+**Files Audited:**
+- All 24 Maestro YAML files in android/.maestro/ and android/.maestro/flow/
+
+**Issues Found and Fixed:**
+
+1. **a11y-content-descriptions.yaml** (4 fixes)
+   - Lines 52, 59, 65, 72: Hardcoded Spanish "Historial", "Progreso", "Recuperación", "Perfil"
+   - Fixed to: "Historial|History", "Progreso|Progress", "Recuperación|Recovery", "Perfil|Profile"
+
+2. **a11y-keyboard-navigation.yaml** (4 fixes)
+   - Lines 41, 49, 57, 65: Same tab label issues
+   - Applied same bilingual patterns
+
+3. **perf-rapid-navigation.yaml** (4 fixes)
+   - Lines 138, 145, 153, 161: Tab verification assertions
+   - Fixed to include English equivalents
+
+4. **perf-workout-logging.yaml** (9 fixes)
+   - Multiple Spanish-only patterns: "Peso", "Repeticiones", "Guardar Serie", "Agregar Serie", "Entrenamiento", "Serie"
+   - Fixed to: "Peso|Weight", "Repeticiones|Reps", "Guardar Serie|Save Set", "Agregar Serie|Add Set", "Entrenamiento|Workout", "Serie|Set"
+   - This flow uses optional patterns that accept EITHER IDs OR text, so maintained that flexibility while adding English
+
+**Pattern Applied:**
+- Spanish|English order for consistency with existing flows
+- Used simple pipe (|) for regex alternation
+- No escaping needed for these simple text strings
+
+**Files Already Correct:**
+- Most flows already used bilingual patterns correctly (smoke-test.yaml, full-e2e.yaml, onboarding-flow.yaml, start-workout.yaml, complete-workout.yaml, browse-library.yaml, check-history.yaml, check-progress.yaml, ai-coach.yaml, profile-settings.yaml, empty-state-screens.yaml, search-no-results.yaml, negative-workout-input.yaml, verify-data-persistence.yaml, onboarding-edge-cases.yaml, navigation-smoke.yaml, rapid-navigation.yaml, ensure-post-onboarding.yaml, perf-startup.yaml, perf-scroll-library.yaml, config.yaml)
+
+**Key Learnings:**
+- Always use bilingual regex for text selectors: "Spanish|English"
+- Accessibility flows and performance flows are common places to miss this
+- IDs don't need bilingual patterns (they're locale-independent)
+- The perf-workout-logging flow is unique in using flexible "ID|text" patterns for optional matching
+
+**Verification:**
+- All changes are pure text replacements (21 insertions, 21 deletions)
+- No functional changes to flow logic
+- YAML syntax verified (no escaping issues)
+
