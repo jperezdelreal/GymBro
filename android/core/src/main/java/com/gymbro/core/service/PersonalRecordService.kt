@@ -1,6 +1,10 @@
 package com.gymbro.core.service
 
+import android.util.Log
 import com.gymbro.core.database.dao.WorkoutDao
+import com.gymbro.core.error.AppResult
+import com.gymbro.core.error.retryWithBackoff
+import com.gymbro.core.error.runCatchingAsResult
 import com.gymbro.core.model.E1RMDataPoint
 import com.gymbro.core.model.PersonalRecord
 import com.gymbro.core.model.RecordType
@@ -22,111 +26,157 @@ class PersonalRecordService @Inject constructor(
     }
 
     suspend fun getPersonalRecords(exerciseId: String, exerciseName: String): List<PersonalRecord> {
-        val sets = workoutDao.getSetsByExercise(exerciseId)
-        if (sets.isEmpty()) return emptyList()
+        val result = retryWithBackoff {
+            runCatchingAsResult {
+                val sets = workoutDao.getSetsByExercise(exerciseId)
+                if (sets.isEmpty()) return@runCatchingAsResult emptyList()
 
-        val records = mutableListOf<PersonalRecord>()
+            val records = mutableListOf<PersonalRecord>()
 
-        val maxWeightSet = sets.maxByOrNull { it.weight }
-        if (maxWeightSet != null) {
-            val previousBest = sets
-                .filter { it.completedAt < maxWeightSet.completedAt }
-                .maxByOrNull { it.weight }
-            records += PersonalRecord(
-                exerciseId = exerciseId,
-                exerciseName = exerciseName,
-                type = RecordType.MAX_WEIGHT,
-                value = maxWeightSet.weight,
-                date = Instant.ofEpochMilli(maxWeightSet.completedAt),
-                previousValue = previousBest?.weight,
-            )
+            val maxWeightSet = sets.maxByOrNull { it.weight }
+            if (maxWeightSet != null) {
+                val previousBest = sets
+                    .filter { it.completedAt < maxWeightSet.completedAt }
+                    .maxByOrNull { it.weight }
+                records += PersonalRecord(
+                    exerciseId = exerciseId,
+                    exerciseName = exerciseName,
+                    type = RecordType.MAX_WEIGHT,
+                    value = maxWeightSet.weight,
+                    date = Instant.ofEpochMilli(maxWeightSet.completedAt),
+                    previousValue = previousBest?.weight,
+                )
+            }
+
+            val maxRepsSet = sets.maxByOrNull { it.reps }
+            if (maxRepsSet != null) {
+                val previousBest = sets
+                    .filter { it.completedAt < maxRepsSet.completedAt }
+                    .maxByOrNull { it.reps }
+                records += PersonalRecord(
+                    exerciseId = exerciseId,
+                    exerciseName = exerciseName,
+                    type = RecordType.MAX_REPS,
+                    value = maxRepsSet.reps.toDouble(),
+                    date = Instant.ofEpochMilli(maxRepsSet.completedAt),
+                    previousValue = previousBest?.reps?.toDouble(),
+                )
+            }
+
+            val maxVolumeSet = sets.maxByOrNull { it.weight * it.reps }
+            if (maxVolumeSet != null) {
+                val volume = maxVolumeSet.weight * maxVolumeSet.reps
+                val previousBest = sets
+                    .filter { it.completedAt < maxVolumeSet.completedAt }
+                    .maxByOrNull { it.weight * it.reps }
+                records += PersonalRecord(
+                    exerciseId = exerciseId,
+                    exerciseName = exerciseName,
+                    type = RecordType.MAX_VOLUME,
+                    value = volume,
+                    date = Instant.ofEpochMilli(maxVolumeSet.completedAt),
+                    previousValue = previousBest?.let { it.weight * it.reps },
+                )
+            }
+
+            val maxE1RMSet = sets.maxByOrNull { calculateE1RM(it.weight, it.reps) }
+            if (maxE1RMSet != null) {
+                val e1rm = calculateE1RM(maxE1RMSet.weight, maxE1RMSet.reps)
+                val previousBest = sets
+                    .filter { it.completedAt < maxE1RMSet.completedAt }
+                    .maxByOrNull { calculateE1RM(it.weight, it.reps) }
+                records += PersonalRecord(
+                    exerciseId = exerciseId,
+                    exerciseName = exerciseName,
+                    type = RecordType.MAX_E1RM,
+                    value = e1rm,
+                    date = Instant.ofEpochMilli(maxE1RMSet.completedAt),
+                    previousValue = previousBest?.let { calculateE1RM(it.weight, it.reps) },
+                )
+            }
+
+            records
+            }
         }
-
-        val maxRepsSet = sets.maxByOrNull { it.reps }
-        if (maxRepsSet != null) {
-            val previousBest = sets
-                .filter { it.completedAt < maxRepsSet.completedAt }
-                .maxByOrNull { it.reps }
-            records += PersonalRecord(
-                exerciseId = exerciseId,
-                exerciseName = exerciseName,
-                type = RecordType.MAX_REPS,
-                value = maxRepsSet.reps.toDouble(),
-                date = Instant.ofEpochMilli(maxRepsSet.completedAt),
-                previousValue = previousBest?.reps?.toDouble(),
-            )
+        return when (result) {
+            is AppResult.Success -> result.data
+            is AppResult.Error -> {
+                Log.e(TAG, "Failed to get personal records for exercise $exerciseId: ${result.error.message}")
+                emptyList()
+            }
         }
-
-        val maxVolumeSet = sets.maxByOrNull { it.weight * it.reps }
-        if (maxVolumeSet != null) {
-            val volume = maxVolumeSet.weight * maxVolumeSet.reps
-            val previousBest = sets
-                .filter { it.completedAt < maxVolumeSet.completedAt }
-                .maxByOrNull { it.weight * it.reps }
-            records += PersonalRecord(
-                exerciseId = exerciseId,
-                exerciseName = exerciseName,
-                type = RecordType.MAX_VOLUME,
-                value = volume,
-                date = Instant.ofEpochMilli(maxVolumeSet.completedAt),
-                previousValue = previousBest?.let { it.weight * it.reps },
-            )
-        }
-
-        val maxE1RMSet = sets.maxByOrNull { calculateE1RM(it.weight, it.reps) }
-        if (maxE1RMSet != null) {
-            val e1rm = calculateE1RM(maxE1RMSet.weight, maxE1RMSet.reps)
-            val previousBest = sets
-                .filter { it.completedAt < maxE1RMSet.completedAt }
-                .maxByOrNull { calculateE1RM(it.weight, it.reps) }
-            records += PersonalRecord(
-                exerciseId = exerciseId,
-                exerciseName = exerciseName,
-                type = RecordType.MAX_E1RM,
-                value = e1rm,
-                date = Instant.ofEpochMilli(maxE1RMSet.completedAt),
-                previousValue = previousBest?.let { calculateE1RM(it.weight, it.reps) },
-            )
-        }
-
-        return records
     }
 
     suspend fun getE1RMHistory(exerciseId: String): List<E1RMDataPoint> {
-        val sets = workoutDao.getSetsByExercise(exerciseId)
-        if (sets.isEmpty()) return emptyList()
+        val result = retryWithBackoff {
+            runCatchingAsResult {
+                val sets = workoutDao.getSetsByExercise(exerciseId)
+                if (sets.isEmpty()) return@runCatchingAsResult emptyList()
 
-        return sets
-            .groupBy { Instant.ofEpochMilli(it.completedAt).epochSecond / 86400 }
-            .mapNotNull { (_, daySets) ->
-                val best = daySets.maxByOrNull { calculateE1RM(it.weight, it.reps) } ?: return@mapNotNull null
-                E1RMDataPoint(
-                    date = Instant.ofEpochMilli(best.completedAt),
-                    e1rm = calculateE1RM(best.weight, best.reps),
-                    weight = best.weight,
-                    reps = best.reps,
-                )
+            sets
+                .groupBy { Instant.ofEpochMilli(it.completedAt).epochSecond / 86400 }
+                .mapNotNull { (_, daySets) ->
+                    val best = daySets.maxByOrNull { calculateE1RM(it.weight, it.reps) } ?: return@mapNotNull null
+                    E1RMDataPoint(
+                        date = Instant.ofEpochMilli(best.completedAt),
+                        e1rm = calculateE1RM(best.weight, best.reps),
+                        weight = best.weight,
+                        reps = best.reps,
+                    )
+                }
+                .sortedBy { it.date }
             }
-            .sortedBy { it.date }
+        }
+        return when (result) {
+            is AppResult.Success -> result.data
+            is AppResult.Error -> {
+                Log.e(TAG, "Failed to get E1RM history for exercise $exerciseId: ${result.error.message}")
+                emptyList()
+            }
+        }
     }
 
     suspend fun getWorkoutHistory(): List<WorkoutHistoryItem> {
-        val workouts = workoutDao.getAllCompletedWorkouts()
-        return workouts.map { wws ->
-            val workingSets = wws.sets.filter { !it.isWarmup }
-            val exerciseIds = workingSets.map { it.exerciseId }.distinct()
-            WorkoutHistoryItem(
-                workoutId = wws.workout.id,
-                date = Instant.ofEpochMilli(wws.workout.startedAt),
-                exerciseCount = exerciseIds.size,
-                totalVolume = workingSets.sumOf { it.weight * it.reps },
-                durationSeconds = wws.workout.durationSeconds,
-                exerciseNames = emptyList(),
-            )
+        val result = retryWithBackoff {
+            runCatchingAsResult {
+                val workouts = workoutDao.getAllCompletedWorkouts()
+                workouts.map { wws ->
+                val workingSets = wws.sets.filter { !it.isWarmup }
+                val exerciseIds = workingSets.map { it.exerciseId }.distinct()
+                WorkoutHistoryItem(
+                    workoutId = wws.workout.id,
+                    date = Instant.ofEpochMilli(wws.workout.startedAt),
+                    exerciseCount = exerciseIds.size,
+                    totalVolume = workingSets.sumOf { it.weight * it.reps },
+                    durationSeconds = wws.workout.durationSeconds,
+                    exerciseNames = emptyList(),
+                )
+            }
+            }
+        }
+        return when (result) {
+            is AppResult.Success -> result.data
+            is AppResult.Error -> {
+                Log.e(TAG, "Failed to get workout history: ${result.error.message}")
+                emptyList()
+            }
         }
     }
 
     suspend fun getExerciseIdsWithHistory(): List<String> {
-        return workoutDao.getExerciseIdsWithHistory()
+        val result = retryWithBackoff {
+            runCatchingAsResult { workoutDao.getExerciseIdsWithHistory() }
+        }
+        return when (result) {
+            is AppResult.Success -> result.data
+            is AppResult.Error -> {
+                Log.e(TAG, "Failed to get exercise IDs with history: ${result.error.message}")
+                emptyList()
+            }
+        }
+    }
+
+    companion object {
+        private const val TAG = "PersonalRecordService"
     }
 }

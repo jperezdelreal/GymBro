@@ -1,5 +1,6 @@
 package com.gymbro.core.service
 
+import android.util.Log
 import com.gymbro.core.database.dao.WorkoutDao
 import com.gymbro.core.health.HealthConnectRepository
 import com.gymbro.core.model.Exercise
@@ -41,20 +42,30 @@ class WorkoutGeneratorService @Inject constructor(
 ) {
 
     suspend fun generateSmartWorkout(lookbackDays: Int = 7): SmartWorkoutSuggestion {
-        val allExercises = exerciseRepository.getAllExercises().first()
-        val muscleGroupHistory = analyzeMuscleGroupHistory(lookbackDays)
-        val recoveryMetrics = healthConnectRepository.getRecoveryMetrics()
+        return try {
+            val allExercises = exerciseRepository.getAllExercises().first()
+            val muscleGroupHistory = analyzeMuscleGroupHistory(lookbackDays)
+            val recoveryMetrics = healthConnectRepository.getRecoveryMetrics()
 
-        val targetMuscleGroups = selectTargetMuscleGroups(muscleGroupHistory, recoveryMetrics.readinessScore)
-        val exercises = selectExercises(allExercises, targetMuscleGroups, recoveryMetrics.readinessScore)
-        val reasoning = generateReasoning(muscleGroupHistory, targetMuscleGroups, recoveryMetrics.readinessScore)
+            val targetMuscleGroups = selectTargetMuscleGroups(muscleGroupHistory, recoveryMetrics.readinessScore)
+            val exercises = selectExercises(allExercises, targetMuscleGroups, recoveryMetrics.readinessScore)
+            val reasoning = generateReasoning(muscleGroupHistory, targetMuscleGroups, recoveryMetrics.readinessScore)
 
-        return SmartWorkoutSuggestion(
-            exercises = exercises,
-            targetMuscleGroups = targetMuscleGroups,
-            reasoning = reasoning,
-            recoveryScore = recoveryMetrics.readinessScore,
-        )
+            SmartWorkoutSuggestion(
+                exercises = exercises,
+                targetMuscleGroups = targetMuscleGroups,
+                reasoning = reasoning,
+                recoveryScore = recoveryMetrics.readinessScore,
+            )
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to generate smart workout, returning default", e)
+            SmartWorkoutSuggestion(
+                exercises = emptyList(),
+                targetMuscleGroups = emptyList(),
+                reasoning = "Unable to generate workout suggestion. Please try again.",
+                recoveryScore = 70,
+            )
+        }
     }
 
     private suspend fun analyzeMuscleGroupHistory(lookbackDays: Int): Map<MuscleGroup, MuscleGroupHistory> {
@@ -181,15 +192,20 @@ class WorkoutGeneratorService @Inject constructor(
     }
 
     private suspend fun getExerciseHistory(exerciseId: String): ExerciseHistorySummary? {
-        val sets = workoutDao.getSetsByExercise(exerciseId)
-        if (sets.isEmpty()) return null
+        return try {
+            val sets = workoutDao.getSetsByExercise(exerciseId)
+            if (sets.isEmpty()) return null
 
-        val lastSet = sets.maxByOrNull { it.completedAt } ?: return null
-        return ExerciseHistorySummary(
-            weight = lastSet.weight,
-            reps = lastSet.reps,
-            timestamp = Instant.ofEpochMilli(lastSet.completedAt),
-        )
+            val lastSet = sets.maxByOrNull { it.completedAt } ?: return null
+            ExerciseHistorySummary(
+                weight = lastSet.weight,
+                reps = lastSet.reps,
+                timestamp = Instant.ofEpochMilli(lastSet.completedAt),
+            )
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to get exercise history for $exerciseId", e)
+            null
+        }
     }
 
     private fun generateProgressionHint(history: ExerciseHistorySummary?): String? {
@@ -244,4 +260,8 @@ class WorkoutGeneratorService @Inject constructor(
         val reps: Int,
         val timestamp: Instant,
     )
+
+    companion object {
+        private const val TAG = "WorkoutGeneratorService"
+    }
 }

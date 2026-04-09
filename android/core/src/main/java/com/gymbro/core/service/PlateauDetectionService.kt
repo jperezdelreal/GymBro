@@ -1,5 +1,6 @@
 package com.gymbro.core.service
 
+import android.util.Log
 import com.gymbro.core.model.E1RMDataPoint
 import com.gymbro.core.model.PlateauAlert
 import com.gymbro.core.model.PlateauType
@@ -12,21 +13,26 @@ class PlateauDetectionService @Inject constructor(
 ) {
 
     suspend fun detectPlateaus(exerciseId: String, exerciseName: String): PlateauAlert? {
-        val history = prService.getE1RMHistory(exerciseId)
-        if (history.isEmpty()) return null
+        return try {
+            val history = prService.getE1RMHistory(exerciseId)
+            if (history.isEmpty()) return null
 
-        val now = Instant.now()
-        val fourWeeksAgo = now.minus(28, ChronoUnit.DAYS)
-        val sixWeeksAgo = now.minus(42, ChronoUnit.DAYS)
+            val now = Instant.now()
+            val fourWeeksAgo = now.minus(28, ChronoUnit.DAYS)
+            val sixWeeksAgo = now.minus(42, ChronoUnit.DAYS)
 
-        val recentData = history.filter { it.date.isAfter(sixWeeksAgo) }
-        if (recentData.size < 2) return null
+            val recentData = history.filter { it.date.isAfter(sixWeeksAgo) }
+            if (recentData.size < 2) return null
 
-        val regressionAlert = detectRegression(recentData, exerciseId, exerciseName, now)
-        if (regressionAlert != null) return regressionAlert
+            val regressionAlert = detectRegression(recentData, exerciseId, exerciseName, now)
+            if (regressionAlert != null) return regressionAlert
 
-        val stagnationAlert = detectStagnation(recentData, exerciseId, exerciseName, now, fourWeeksAgo)
-        return stagnationAlert
+            val stagnationAlert = detectStagnation(recentData, exerciseId, exerciseName, now, fourWeeksAgo)
+            stagnationAlert
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to detect plateaus for exercise $exerciseId", e)
+            null
+        }
     }
 
     private fun detectRegression(
@@ -122,8 +128,17 @@ class PlateauDetectionService @Inject constructor(
     }
 
     suspend fun detectAllPlateaus(exerciseIds: List<Pair<String, String>>): List<PlateauAlert> {
-        return exerciseIds.mapNotNull { (id, name) ->
-            detectPlateaus(id, name)
+        return try {
+            exerciseIds.mapNotNull { (id, name) ->
+                detectPlateaus(id, name)
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to detect all plateaus", e)
+            emptyList()
         }
+    }
+
+    companion object {
+        private const val TAG = "PlateauDetectionService"
     }
 }
