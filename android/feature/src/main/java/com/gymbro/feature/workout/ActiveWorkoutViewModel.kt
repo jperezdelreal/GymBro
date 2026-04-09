@@ -281,7 +281,7 @@ class ActiveWorkoutViewModel @Inject constructor(
                 )
                 // Filter to only newly set PRs (where previous value exists and is less than current)
                 val newPRs = exercisePRs.filter { pr ->
-                    pr.previousValue == null || pr.previousValue!! < pr.value
+                    pr.previousValue?.let { it < pr.value } ?: true
                 }
                 allPRs.addAll(newPRs)
             }

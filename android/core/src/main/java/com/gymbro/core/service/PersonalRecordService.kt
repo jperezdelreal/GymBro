@@ -98,8 +98,8 @@ class PersonalRecordService @Inject constructor(
 
         return sets
             .groupBy { Instant.ofEpochMilli(it.completedAt).epochSecond / 86400 }
-            .map { (_, daySets) ->
-                val best = daySets.maxByOrNull { calculateE1RM(it.weight, it.reps) }!!
+            .mapNotNull { (_, daySets) ->
+                val best = daySets.maxByOrNull { calculateE1RM(it.weight, it.reps) } ?: return@mapNotNull null
                 E1RMDataPoint(
                     date = Instant.ofEpochMilli(best.completedAt),
                     e1rm = calculateE1RM(best.weight, best.reps),

@@ -116,8 +116,8 @@ class PlateauDetectionService @Inject constructor(
             weeklyData.getOrPut(weekIndex) { mutableListOf() }.add(point.e1rm)
         }
 
-        return weeklyData.keys.sorted().map { week ->
-            weeklyData[week]!!.average()
+        return weeklyData.keys.sorted().mapNotNull { week ->
+            weeklyData[week]?.average()
         }
     }
 
