@@ -1,5 +1,6 @@
 package com.gymbro.core.service
 
+import android.util.Log
 import com.gymbro.core.database.dao.WorkoutDao
 import com.gymbro.core.repository.ExerciseRepository
 import java.time.Instant
@@ -66,10 +67,11 @@ class AnalyticsService @Inject constructor(
 ) {
 
     suspend fun getWeeklyVolumeData(weeks: Int = 8): List<WeeklyVolumeData> {
-        val workouts = workoutDao.getAllCompletedWorkouts()
-        val now = LocalDate.now()
+        return try {
+            val workouts = workoutDao.getAllCompletedWorkouts()
+            val now = LocalDate.now()
         
-        return (0 until weeks).map { weekOffset ->
+        (0 until weeks).map { weekOffset ->
             val weekStart = now.minusWeeks(weekOffset.toLong()).with(java.time.DayOfWeek.MONDAY)
             val weekEnd = weekStart.plusDays(6)
             
@@ -89,11 +91,16 @@ class AnalyticsService @Inject constructor(
                 workoutCount = weekWorkouts.size,
             )
         }.reversed()
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to get weekly volume data", e)
+            emptyList()
+        }
     }
 
     suspend fun getMuscleGroupDistribution(): List<MuscleGroupDistribution> {
-        val workouts = workoutDao.getAllCompletedWorkouts()
-        val sets = workouts.flatMap { it.sets.filter { s -> !s.isWarmup } }
+        return try {
+            val workouts = workoutDao.getAllCompletedWorkouts()
+            val sets = workouts.flatMap { it.sets.filter { s -> !s.isWarmup } }
         
         val volumeByMuscleGroup = sets
             .groupBy { it.exerciseId }
@@ -120,11 +127,16 @@ class AnalyticsService @Inject constructor(
                 },
             )
         }.sortedByDescending { it.totalVolume }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to get muscle group distribution: ${e.message}", e)
+            throw e
+        }
     }
 
     suspend fun getWorkoutFrequency(weeks: Int = 12): List<WorkoutFrequencyData> {
-        val workouts = workoutDao.getAllCompletedWorkouts()
-        val now = LocalDate.now()
+        return try {
+            val workouts = workoutDao.getAllCompletedWorkouts()
+            val now = LocalDate.now()
         
         return (0 until weeks).map { weekOffset ->
             val weekStart = now.minusWeeks(weekOffset.toLong()).with(java.time.DayOfWeek.MONDAY)
@@ -141,11 +153,16 @@ class AnalyticsService @Inject constructor(
                 workoutCount = weekWorkoutCount,
             )
         }.reversed()
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to get workout frequency: ${e.message}", e)
+            throw e
+        }
     }
 
     suspend fun getConsistencyMetrics(): ConsistencyMetrics {
-        val workouts = workoutDao.getAllCompletedWorkouts()
-        val workoutDates = workouts
+        return try {
+            val workouts = workoutDao.getAllCompletedWorkouts()
+            val workoutDates = workouts
             .map { 
                 Instant.ofEpochMilli(it.workout.startedAt)
                     .atZone(ZoneId.systemDefault()).toLocalDate()
@@ -179,6 +196,10 @@ class AnalyticsService @Inject constructor(
             consistencyScore = consistencyScore,
             workoutDates = workoutDates,
         )
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to get consistency metrics: ${e.message}", e)
+            throw e
+        }
     }
 
     private fun calculateCurrentStreak(sortedDates: List<LocalDate>): Int {
@@ -238,8 +259,9 @@ class AnalyticsService @Inject constructor(
     }
 
     suspend fun getTopExercises(limit: Int = 10): List<TopExercise> {
-        val workouts = workoutDao.getAllCompletedWorkouts()
-        val sets = workouts.flatMap { it.sets.filter { s -> !s.isWarmup } }
+        return try {
+            val workouts = workoutDao.getAllCompletedWorkouts()
+            val sets = workouts.flatMap { it.sets.filter { s -> !s.isWarmup } }
         
         val exerciseStats = sets
             .groupBy { it.exerciseId }
@@ -260,12 +282,17 @@ class AnalyticsService @Inject constructor(
             .sortedByDescending { it.totalVolume }
             .take(limit)
         
-        return exerciseStats
+        exerciseStats
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to get top exercises: ${e.message}", e)
+            throw e
+        }
     }
 
     suspend fun getWorkoutDurationTrend(weeks: Int = 8): List<WorkoutDurationTrend> {
-        val workouts = workoutDao.getAllCompletedWorkouts()
-        val now = LocalDate.now()
+        return try {
+            val workouts = workoutDao.getAllCompletedWorkouts()
+            val now = LocalDate.now()
         
         return (0 until weeks).map { weekOffset ->
             val weekStart = now.minusWeeks(weekOffset.toLong()).with(java.time.DayOfWeek.MONDAY)
@@ -288,12 +315,17 @@ class AnalyticsService @Inject constructor(
                 averageDurationMinutes = avgDuration,
             )
         }.reversed()
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to get workout duration trend: ${e.message}", e)
+            throw e
+        }
     }
 
     suspend fun getWeeklySummary(): WeeklySummary {
-        val now = LocalDate.now()
-        val thisWeekStart = now.with(java.time.DayOfWeek.MONDAY)
-        val lastWeekStart = thisWeekStart.minusWeeks(1)
+        return try {
+            val now = LocalDate.now()
+            val thisWeekStart = now.with(java.time.DayOfWeek.MONDAY)
+            val lastWeekStart = thisWeekStart.minusWeeks(1)
         
         val workouts = workoutDao.getAllCompletedWorkouts()
         
@@ -344,5 +376,13 @@ class AnalyticsService @Inject constructor(
             thisWeekPRs = thisWeekPRs,
             volumeChange = volumeChange,
         )
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to get weekly summary: ${e.message}", e)
+            throw e
+        }
+    }
+
+    companion object {
+        private const val TAG = "AnalyticsService"
     }
 }

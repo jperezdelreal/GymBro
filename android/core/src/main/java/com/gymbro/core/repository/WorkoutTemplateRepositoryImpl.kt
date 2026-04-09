@@ -1,13 +1,18 @@
 package com.gymbro.core.repository
 
+import android.util.Log
 import com.gymbro.core.database.dao.WorkoutTemplateDao
 import com.gymbro.core.database.dao.WorkoutTemplateWithExercises
 import com.gymbro.core.database.entity.TemplateExerciseEntity
 import com.gymbro.core.database.entity.WorkoutTemplateEntity
+import com.gymbro.core.error.AppResult
+import com.gymbro.core.error.retryWithBackoff
+import com.gymbro.core.error.runCatchingAsResult
 import com.gymbro.core.model.MuscleGroup
 import com.gymbro.core.model.TemplateExercise
 import com.gymbro.core.model.WorkoutTemplate
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import java.time.Instant
 import java.util.UUID
@@ -19,63 +24,115 @@ class WorkoutTemplateRepositoryImpl @Inject constructor(
 ) : WorkoutTemplateRepository {
 
     override fun observeAllTemplates(): Flow<List<WorkoutTemplate>> {
-        return templateDao.observeAllTemplates().map { list ->
-            list.map { it.toDomain() }
-        }
+        return templateDao.observeAllTemplates()
+            .map { list -> list.map { it.toDomain() } }
+            .catch { e ->
+                Log.e(TAG, "Error observing all templates", e)
+                emit(emptyList())
+            }
     }
 
     override suspend fun getAllTemplates(): List<WorkoutTemplate> {
-        return templateDao.getAllTemplates().map { it.toDomain() }
+        val result = retryWithBackoff {
+            runCatchingAsResult { templateDao.getAllTemplates().map { it.toDomain() } }
+        }
+        return when (result) {
+            is AppResult.Success -> result.data
+            is AppResult.Error -> {
+                Log.e(TAG, "Failed to get all templates: ${result.error.message}")
+                emptyList()
+            }
+        }
     }
 
     override suspend fun getTemplate(templateId: String): WorkoutTemplate? {
-        return templateDao.getTemplateWithExercises(templateId)?.toDomain()
+        val result = retryWithBackoff {
+            runCatchingAsResult { templateDao.getTemplateWithExercises(templateId) }
+        }
+        return when (result) {
+            is AppResult.Success -> result.data?.toDomain()
+            is AppResult.Error -> {
+                Log.e(TAG, "Failed to get template $templateId: ${result.error.message}")
+                null
+            }
+        }
     }
 
     override suspend fun saveTemplate(template: WorkoutTemplate) {
-        val entity = WorkoutTemplateEntity(
-            id = template.id.toString(),
-            name = template.name,
-            description = template.description,
-            createdAt = template.createdAt.toEpochMilli(),
-            lastUsedAt = template.lastUsedAt?.toEpochMilli(),
-            isBuiltIn = template.isBuiltIn,
-        )
-        templateDao.insertTemplate(entity)
+        val result = retryWithBackoff {
+            runCatchingAsResult {
+                val entity = WorkoutTemplateEntity(
+                    id = template.id.toString(),
+                    name = template.name,
+                    description = template.description,
+                    createdAt = template.createdAt.toEpochMilli(),
+                    lastUsedAt = template.lastUsedAt?.toEpochMilli(),
+                    isBuiltIn = template.isBuiltIn,
+                )
+                templateDao.insertTemplate(entity)
 
-        val exerciseEntities = template.exercises.map { exercise ->
-            TemplateExerciseEntity(
-                id = exercise.id.toString(),
-                templateId = template.id.toString(),
-                exerciseId = exercise.exerciseId.toString(),
-                exerciseName = exercise.exerciseName,
-                muscleGroup = exercise.muscleGroup.name,
-                targetSets = exercise.targetSets,
-                targetReps = exercise.targetReps,
-                targetWeightKg = exercise.targetWeightKg,
-                orderIndex = exercise.order,
-            )
+                val exerciseEntities = template.exercises.map { exercise ->
+                    TemplateExerciseEntity(
+                        id = exercise.id.toString(),
+                        templateId = template.id.toString(),
+                        exerciseId = exercise.exerciseId.toString(),
+                        exerciseName = exercise.exerciseName,
+                        muscleGroup = exercise.muscleGroup.name,
+                        targetSets = exercise.targetSets,
+                        targetReps = exercise.targetReps,
+                        targetWeightKg = exercise.targetWeightKg,
+                        orderIndex = exercise.order,
+                    )
+                }
+                templateDao.deleteTemplateExercises(template.id.toString())
+                templateDao.insertTemplateExercises(exerciseEntities)
+            }
         }
-        templateDao.deleteTemplateExercises(template.id.toString())
-        templateDao.insertTemplateExercises(exerciseEntities)
+        when (result) {
+            is AppResult.Success -> Unit
+            is AppResult.Error -> {
+                Log.e(TAG, "Failed to save template ${template.name}: ${result.error.message}")
+                throw Exception(result.error.message)
+            }
+        }
     }
 
     override suspend fun deleteTemplate(templateId: String) {
-        templateDao.deleteTemplate(templateId)
+        val result = retryWithBackoff {
+            runCatchingAsResult { templateDao.deleteTemplate(templateId) }
+        }
+        when (result) {
+            is AppResult.Success -> Unit
+            is AppResult.Error -> {
+                Log.e(TAG, "Failed to delete template $templateId: ${result.error.message}")
+                throw Exception(result.error.message)
+            }
+        }
     }
 
     override suspend fun updateLastUsed(templateId: String) {
-        templateDao.updateLastUsedTimestamp(templateId, System.currentTimeMillis())
+        val result = retryWithBackoff {
+            runCatchingAsResult { 
+                templateDao.updateLastUsedTimestamp(templateId, System.currentTimeMillis()) 
+            }
+        }
+        when (result) {
+            is AppResult.Success -> Unit
+            is AppResult.Error -> {
+                Log.e(TAG, "Failed to update last used for template $templateId: ${result.error.message}")
+            }
+        }
     }
 
     override suspend fun initializeBuiltInTemplates() {
-        val existingTemplates = templateDao.getAllTemplates()
-        if (existingTemplates.any { it.template.isBuiltIn }) {
-            return // Already initialized
-        }
+        try {
+            val existingTemplates = templateDao.getAllTemplates()
+            if (existingTemplates.any { it.template.isBuiltIn }) {
+                return // Already initialized
+            }
 
-        // Get exercises from the database to build templates
-        exerciseRepository.getAllExercises().collect { allExercises ->
+            // Get exercises from the database to build templates
+            exerciseRepository.getAllExercises().collect { allExercises ->
             // Push Day Template
             val pushExercises = listOf(
                 allExercises.find { it.name.contains("Bench Press", ignoreCase = true) }?.let {
@@ -282,6 +339,14 @@ class WorkoutTemplateRepositoryImpl @Inject constructor(
                 saveTemplate(upperTemplate)
             }
         }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to initialize built-in templates: ${e.message}", e)
+            throw e
+        }
+    }
+
+    companion object {
+        private const val TAG = "WorkoutTemplateRepositoryImpl"
     }
 }
 
