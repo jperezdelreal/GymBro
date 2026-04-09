@@ -732,3 +732,52 @@ av_exercise_library)
 - `android/.maestro/test-data.env` — documents the `:=` syntax (incorrectly suggests it's supported)
 - All 23 flow files — execution results captured in `maestro-results.csv`
 
+---
+
+## Issue #313 — Unit Tests Tier 1: Exploration Complete (2026-04-09)
+
+**Status:** Exploration done, implementation NOT started (Switch crashed after 49min with connection error).
+
+### Codebase Map for Unit Tests
+
+**ViewModels (7 total):**
+1. `OnboardingViewModel` — deps: UserPreferences. Events: PageChanged, UnitSelected, NameChanged, GoalSelected, CompleteOnboarding
+2. `HistoryListViewModel` — deps: WorkoutRepository, ExerciseRepository, PersonalRecordService. Events: LoadHistory, Retry, WorkoutClicked
+3. `SettingsViewModel` — deps: Context, UserPreferences, ReminderScheduler. Events: SetWeightUnit, SetDefaultRestTimer, ClearAllData, etc.
+4. `CoachChatViewModel` — deps: AiCoachService. Events: UpdateInput, SendMessage, QuickPromptClicked, ClearError, ClearHistory
+5. `ProgramsViewModel` — deps: WorkoutTemplateRepository. Events: TemplateClicked, CreateTemplateClicked, DeleteTemplate, StartWorkoutFromTemplate
+6. `AnalyticsViewModel` — deps: AnalyticsService. Events: RefreshData, NavigateBack
+7. `SmartWorkoutViewModel` — deps: WorkoutGeneratorService. Events: RegenerateWorkout, StartWorkout, NavigateBack
+
+**Existing Tests (~156 total):**
+- Feature tests (5 files, ~73 tests): ActiveWorkoutVM(17), ExerciseLibraryVM(14), ProgressVM(11), RecoveryVM(16), ProfileVM(15)
+- Core tests (4 files, ~83 tests): PersonalRecordService(37), WorkoutRepoImpl(15), ExerciseRepoImpl(18), TestInfrastructure(13)
+
+**ViewModels WITHOUT tests (Tier 1 targets):**
+- OnboardingViewModel — no tests
+- HistoryListViewModel — no tests
+- SettingsViewModel — no tests
+- CoachChatViewModel — no tests
+- ProgramsViewModel — no tests
+- AnalyticsViewModel — no tests
+- SmartWorkoutViewModel — no tests
+
+**Test Infrastructure Available:**
+- `MainDispatcherRule` at feature/src/test/.../MainDispatcherRule.kt (UnconfinedTestDispatcher)
+- `TestFixtures` at core/src/test/.../TestFixtures.kt (benchPress, squat, deadlift, bicepCurl, sample workouts, sets, records)
+- `FakeExerciseRepository` at core/src/test/.../fakes/FakeExerciseRepository.kt
+- `FakeWorkoutRepository` at core/src/test/.../fakes/FakeWorkoutRepository.kt
+
+**Missing Fakes Needed:**
+- FakeUserPreferences (for OnboardingVM, SettingsVM)
+- FakeAiCoachService (for CoachChatVM)
+- FakeWorkoutTemplateRepository (for ProgramsVM)
+- FakeAnalyticsService (for AnalyticsVM)
+- FakeWorkoutGeneratorService (for SmartWorkoutVM)
+- FakePersonalRecordService (for HistoryListVM)
+- FakeReminderScheduler (for SettingsVM)
+
+**Pattern to Follow:** See existing ActiveWorkoutViewModelTest for the MVI test pattern: create fakes → instantiate VM → send events → assert state changes.
+
+**Next Session Action:** Jump straight to writing tests. Start with OnboardingViewModel (simplest, 1 dep) then HistoryListViewModel, then the rest. Create missing fakes first as a batch.
+
