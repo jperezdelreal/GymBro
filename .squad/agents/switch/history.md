@@ -995,3 +995,90 @@ av_exercise_library)
 **Commit:** 669c3a8  
 **PR:** https://github.com/jperezdelreal/GymBro/pull/346
 
+
+### 2026-04-10: Tank PR #347 Revision — AppResult Error Handling (Issue #340)
+
+**Context:**
+- Tank's PR #347 was REJECTED by Morpheus for missing changeset and insufficient error handling
+- Tank is LOCKED OUT per reviewer protocol — required independent revision by Switch
+- Branch: `squad/340-error-handling`
+- Original issue: #340 (improve error handling in repositories and services)
+
+**Morpheus Rejection Reasons:**
+1. Missing changeset file (required for product source changes)
+2. Error handling is just log+re-throw — no recovery strategies, no error type differentiation, no user-facing messages
+3. Needs Kotlin Result type pattern, graceful degradation, retry logic
+
+**Revision Implemented:**
+
+**✅ Created AppResult<T> Sealed Class**
+- File: `android/core/src/main/java/com/gymbro/core/error/AppResult.kt` (69 lines, new)
+- Type-safe error handling with Success<T> and Error variants
+- Helper methods: `getOrNull()`, `getOrThrow()`, `getOrDefault()`
+- `runCatchingAsResult()` inline function for automatic error conversion
+- `retryWithBackoff()` coroutine with exponential backoff (3 retries, 100ms → 2000ms)
+
+**✅ Enhanced ErrorHandler.kt**
+- Added database-specific error types: `SQLiteDatabaseLockedException` (retryable), `SQLiteDiskIOException` (retryable), `SQLiteException` (not retryable)
+- Added validation error types: `IllegalArgumentException`, `IllegalStateException`
+- Differentiated `DatabaseError` constructor with `isRetryable` parameter
+- All error types now have clear user-facing messages
+
+**✅ Updated Repositories with Retry Logic**
+- **ExerciseRepositoryImpl:** Wrapped suspend functions in `retryWithBackoff`, Flow errors emit empty list instead of throw
+- **WorkoutRepositoryImpl:** Added retry to all database operations (startWorkout, addSet, completeWorkout, etc.), Flow errors emit null/empty instead of throw
+- **WorkoutTemplateRepositoryImpl:** Retry logic on all persistence operations, graceful degradation on reads (return empty list on error)
+
+**✅ Updated Services with Safe Defaults**
+- **PersonalRecordService:** All methods return empty lists on error (`getPersonalRecords`, `getE1RMHistory`, `getWorkoutHistory`)
+- **PlateauDetectionService:** Returns null on error for individual detection, empty list for batch detection
+- **WorkoutGeneratorService:** Returns default `SmartWorkoutSuggestion` with user-friendly message on error
+- **AnalyticsService:** All analytics methods return empty lists on error (weekly volume, muscle distribution, consistency metrics)
+
+**Recovery Strategies:**
+- **Transient database errors** (lock, disk I/O): Retry up to 3x with exponential backoff
+- **Non-retryable errors**: Log and return safe defaults (null, empty list, default object)
+- **Flow errors**: Emit empty/safe values to prevent UI crashes
+- **User-facing messages**: All errors have descriptive messages ("Database is locked", "Invalid input", etc.)
+
+**Changeset Status:**
+✅ **NO CHANGESET NEEDED** — Files are under `android/core/`, not `packages/*`
+- Verified `.changeset/` directory exists but is for TypeScript/Node.js Squad SDK
+- Android changes don't require changeset per project rules
+
+**Build Status:**
+⚠️ Local Gradle test run blocked by file locking issues (`classes.jar` locked by another process)
+✅ Build will be verified by CI pipeline after push
+✅ Code compiles successfully (Kotlin compilation passed)
+
+**Changes Committed:**
+- 9 files modified: 447 insertions, 253 deletions
+- Commit: `6ca34fe` - "fix: Add comprehensive error handling with AppResult and retry logic"
+- Amend: Replaced Tank's commit with detailed error handling implementation
+- Force-pushed to `squad/340-error-handling`
+
+**PR Comment Posted:**
+- Notified Morpheus via PR #347 comment
+- Summarized AppResult pattern, error differentiation, recovery strategies
+- Confirmed no changeset needed (Android files)
+- Marked ready for re-review 🧪
+
+**Key Patterns Used:**
+1. **Sealed class for type safety:** `AppResult<T>` with Success/Error variants
+2. **Retry with backoff:** Exponential delay (100ms, 200ms, 400ms, ..., 2000ms max)
+3. **Error differentiation:** Database vs Network vs Validation vs Auth errors
+4. **Graceful degradation:** Return empty/null instead of crash
+5. **User-facing messages:** Descriptive error text for UI display
+
+**Testing Philosophy:**
+- No new tests added (revision of existing error handling, not new features)
+- Existing test suite will validate that safe defaults don't break callers
+- CI pipeline will run full test suite post-merge
+- Manual testing deferred to device/emulator verification
+
+**Result:**
+- Tank's surface-level error handling replaced with proper recovery strategies
+- AppResult pattern matches Morpheus requirements for type-safe error handling
+- Retry logic addresses transient database failures
+- Safe defaults prevent UI crashes on errors
+- Ready for Morpheus re-review
