@@ -39,8 +39,8 @@ onFlowComplete:
     direction: LEFT
     duration: 400
 
-- assertVisible: "Let's Get Started"
-- tapOn: "Kilogramos (kg)|Kilograms (kg)"
+- assertVisible: "Comencemos|Let's Get Started"
+- tapOn: "Kilogramos \\(kg\\)|Kilograms \\(kg\\)"
 
 # Try to proceed without entering name
 - tapOn:
@@ -68,7 +68,7 @@ onFlowComplete:
     direction: LEFT
     duration: 400
 
-- tapOn: "Kilogramos (kg)|Kilograms (kg)"
+- tapOn: "Kilogramos \\(kg\\)|Kilograms \\(kg\\)"
 - tapOn:
     id: "onboarding_name_input"
 - inputText: "ThisIsAVeryLongNameThatExceedsFiftyCharactersToTestInputHandling"
@@ -101,7 +101,7 @@ onFlowComplete:
     direction: LEFT
     duration: 400
 
-- tapOn: "Kilogramos (kg)|Kilograms (kg)"
+- tapOn: "Kilogramos \\(kg\\)|Kilograms \\(kg\\)"
 - tapOn:
     id: "onboarding_name_input"
 - inputText: "User@123!#$%"
@@ -133,7 +133,7 @@ onFlowComplete:
     direction: LEFT
     duration: 400
 
-- tapOn: "Kilogramos (kg)|Kilograms (kg)"
+- tapOn: "Kilogramos \\(kg\\)|Kilograms \\(kg\\)"
 - tapOn:
     id: "onboarding_name_input"
 - inputText: "User💪🏋️"

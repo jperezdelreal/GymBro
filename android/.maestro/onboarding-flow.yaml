@@ -22,7 +22,7 @@ onFlowComplete:
 
 # Page 0: Welcome
 - assertVisible: "GymBro"
-- assertVisible: "Your smart gym companion"
+- assertVisible: "Tu compañero de gym inteligente|Your smart gym companion"
 # Screenshot 01: Welcome page (first onboarding screen)
 - takeScreenshot: 01_onboarding_welcome
 
@@ -31,7 +31,7 @@ onFlowComplete:
     direction: LEFT
     duration: 400
 
-- assertVisible: "Ultra-Fast Logging"
+- assertVisible: "Registro Ultra-Rápido|Ultra-Fast Logging"
 # Screenshot 02: Fast Logging page (second onboarding screen)
 - takeScreenshot: 02_onboarding_fast_logging
 
@@ -40,7 +40,7 @@ onFlowComplete:
     direction: LEFT
     duration: 400
 
-- assertVisible: "Track Your Progress"
+- assertVisible: "Rastrea tu Progreso|Track Your Progress"
 # Screenshot 03: Track Progress page (third onboarding screen)
 - takeScreenshot: 03_onboarding_track_progress
 
@@ -49,29 +49,31 @@ onFlowComplete:
     direction: LEFT
     duration: 400
 
-- assertVisible: "Let's Get Started"
-- assertVisible: "Preferred Units"
-- assertVisible: "Kilograms (kg)"
-- assertVisible: "Pounds (lbs)"
+- assertVisible: "Comencemos|Let's Get Started"
+- assertVisible: "Unidades Preferidas|Preferred Units"
+- assertVisible: "Kilogramos \\(kg\\)|Kilograms \\(kg\\)"
+- assertVisible: "Libras \\(lbs\\)|Pounds \\(lbs\\)"
 # Screenshot 04: Get Started page with unit selection (fourth onboarding screen)
 - takeScreenshot: 04_onboarding_get_started
 
 # Select kg unit
-- tapOn: "Kilograms (kg)"
+- tapOn: "Kilogramos \\(kg\\)|Kilograms \\(kg\\)"
 
 # Enter name
-- tapOn: "Enter your name"
+- tapOn:
+    id: "onboarding_name_input"
 - inputText: "${USER_NAME:=TestUser}"
 # Screenshot 05: User name entered in onboarding form
 - takeScreenshot: 05_onboarding_name_entered
 - hideKeyboard
 
 # Complete onboarding
-- tapOn: "Let's Go"
+- tapOn:
+    id: "onboarding_start"
 - waitForAnimationToEnd:
     timeout: 3000
 
 # Verify we landed on Exercise Library
-- assertVisible: "Exercise Library"
+- assertVisible: "Biblioteca de Ejercicios|Exercise Library"
 # Screenshot 06: Successfully completed onboarding, landed on Exercise Library
 - takeScreenshot: 06_onboarding_complete

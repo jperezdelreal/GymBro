@@ -33,51 +33,46 @@ onFlowComplete:
 - takeScreenshot: perf_scroll_library_start
 
 # Scroll down rapidly multiple times to test performance
-- scroll:
-    direction: DOWN
+- scroll
 - waitForAnimationToEnd:
     timeout: 500
 - takeScreenshot: perf_scroll_library_scroll_1
 
-- scroll:
-    direction: DOWN
+- scroll
 - waitForAnimationToEnd:
     timeout: 500
 - takeScreenshot: perf_scroll_library_scroll_2
 
-- scroll:
-    direction: DOWN
+- scroll
 - waitForAnimationToEnd:
     timeout: 500
 - takeScreenshot: perf_scroll_library_scroll_3
 
-- scroll:
-    direction: DOWN
+- scroll
 - waitForAnimationToEnd:
     timeout: 500
 - takeScreenshot: perf_scroll_library_scroll_4
 
-- scroll:
-    direction: DOWN
+- scroll
 - waitForAnimationToEnd:
     timeout: 500
 - takeScreenshot: perf_scroll_library_scroll_5
 
 # Scroll back up to verify bi-directional scrolling
-- scroll:
-    direction: UP
+- swipe:
+    direction: DOWN
 - waitForAnimationToEnd:
     timeout: 500
 - takeScreenshot: perf_scroll_library_scroll_up_1
 
-- scroll:
-    direction: UP
+- swipe:
+    direction: DOWN
 - waitForAnimationToEnd:
     timeout: 500
 - takeScreenshot: perf_scroll_library_scroll_up_2
 
-- scroll:
-    direction: UP
+- swipe:
+    direction: DOWN
 - waitForAnimationToEnd:
     timeout: 500
 - takeScreenshot: perf_scroll_library_scroll_up_3

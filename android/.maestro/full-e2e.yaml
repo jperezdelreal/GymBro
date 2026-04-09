@@ -45,7 +45,7 @@ onFlowComplete:
 - assertVisible: "Comencemos"
 
 # Select units and enter name
-- tapOn: "Kilogramos (kg)"
+- tapOn: "Kilogramos \\(kg\\)|Kilograms \\(kg\\)"
 - tapOn:
     id: "onboarding_name_input"
 - inputText: "${USER_NAME:=E2EUser}"
@@ -64,7 +64,7 @@ onFlowComplete:
 
 # Dismiss tooltip if present
 - tapOn:
-    text: "Got it"
+    text: "Entendido|Got it"
     optional: true
 
 # Verify library content is loaded
@@ -90,7 +90,7 @@ onFlowComplete:
 
 # Pick an exercise
 - tapOn:
-    text: "${EXERCISE_NAME:=Bench Press}"
+    text: "Bench Press"
     index: 0
 - waitForAnimationToEnd:
     timeout: 2000

@@ -84,7 +84,7 @@ onFlowComplete:
 - takeScreenshot: a11y_content_profile
 
 # Verify AI Coach button is identifiable
-- assertVisible: "Hablar con el Entrenador IA"
+- assertVisible: "Hablar con Entrenador IA"
 
 # Start a workout to verify workout-related identifiers
 - tapOn:

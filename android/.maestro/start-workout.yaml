@@ -61,7 +61,7 @@ onFlowComplete:
 
 # Tap the first exercise result
 - tapOn:
-    text: "${EXERCISE_NAME:=Bench Press}"
+    text: "Bench Press"
     index: 0
 
 # Back on workout screen — verify exercise was added
