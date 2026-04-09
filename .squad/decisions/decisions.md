@@ -387,3 +387,192 @@ This syntax crashes Maestro's JS evaluator. Hardcode defaults in selectors. Keep
 - `eraseText` (not `clearTextField`)
 - Plain `scroll` for scrolling down; `swipe: direction: DOWN/UP` for directional control
 - `optional: true` must be nested inside the command's map form, not used with shorthand syntax
+
+---
+
+## 2026-04-09T21:48Z: User directive — Stability First
+
+**By:** Copilot (via user request)
+
+**What:** Stability first — no new features until GymBro is 100% stable, functional, and problem-free. After stability is confirmed, focus shifts to UX improvements: onboarding experience, home page with user's routines/plans, AI-generated workout plans based on goals. Current state is "just an exercise library where users have to figure everything out themselves" — that needs to change, but only after the foundation is rock solid.
+
+**Why:** User request — sustainable growth requires a stable base before feature expansion.
+
+---
+
+## 2026-04-09T21:50Z: User directive — 8-Hour Autonomous Authorization
+
+**By:** Copilot (via user request)
+
+**What:** Full autonomy for the next 8 hours. Morpheus creates all necessary issues, Ralph runs non-stop. Work on stability, new features, UX improvements, E2E tests — everything. No user intervention expected until morning.
+
+**Why:** User request — team has full overnight runway to maximize progress.
+
+---
+
+## 2026-04-10: Stability-First Strategy for GymBro Android
+
+**Decision by:** Morpheus (Lead)  
+**Date:** 2026-04-10  
+**Context:** User directive to prioritize stability over new features
+
+### User Directive (Original)
+
+"No se si tiene sentido onboardear nuevas features o asegurarse de que realmente hoy GymBro es 100% estable, funcional y sin problemas para asegurar un crecimiento sostenible."
+
+Translation: Questioning whether to add new features vs ensuring GymBro is truly 100% stable, functional, and problem-free to ensure sustainable growth.
+
+### The Decision
+
+**STABILITY FIRST.** All new feature work paused until Phase A (Stability) issues resolved.
+
+### Rationale
+
+#### Current State Assessment
+
+GymBro Android is NOT production-ready:
+- **Data Loss Risk:** Database uses destructive migrations (wipes all user data on schema changes)
+- **CI Broken:** Automated tests failing in CI, blocking quality gates
+- **Error Handling Gaps:** Core data operations can crash app on failures
+- **Offline Unverified:** Claims "offline-first" but lacks offline testing
+
+#### Why Stability First Wins
+
+1. **User Trust:** Data loss destroys trust. One schema update = all workout history gone.
+2. **Development Velocity:** Fixing bugs on top of bugs compounds technical debt. Stable foundation = faster feature delivery.
+3. **Dogfooding Readiness:** Cannot give app to user (or broader testers) with critical stability gaps.
+4. **CI Reliability:** Broken CI means no regression detection = features introduce bugs undetected.
+
+#### Cost of Delaying
+
+- **New features delayed 2-3 weeks** while Phase A completes
+- **UX improvements (home screen, onboarding, AI plans) postponed**
+
+#### Cost of NOT Delaying
+
+- **User data loss** on first schema change
+- **App crashes** in production
+- **Wasted effort** building features on unstable foundation (need to rebuild or refactor)
+- **Reputation damage** if early testers experience bugs
+
+### Two-Phase Roadmap
+
+#### Phase A: Stability (BLOCKING)
+
+**Timeline:** 2-3 weeks  
+**Issues Created:** #327-#331
+
+**Must Complete:**
+1. **Database Migrations (#327):** Replace destructive migration with proper Room migrations. NO data loss on updates.
+2. **CI Build Fixes (#328):** Fix Android CI workflow. All 152 tests must pass in CI.
+3. **Error Handling (#328):** Add try-catch to all repository methods. No silent failures.
+4. **Offline Testing (#329):** Verify offline-first functionality works as designed (data persists, syncs on reconnect).
+
+**Success Criteria:**
+- User can update app without losing data
+- CI passes on master branch
+- Critical user paths handle errors gracefully (network failure, disk full, permission denial)
+- Offline logging + sync verified end-to-end
+
+#### Phase B: UX Improvements (POST-STABILITY)
+
+**Timeline:** 3-4 weeks (after Phase A)
+**Issues Created:** #329, #330, #331
+
+**Priorities:**
+1. **1-Tap Logging (#331):** Core value prop. Smart defaults + swipe-to-complete.
+2. **Home Screen (#329):** Replace exercise library with workout plan + quick actions.
+3. **Onboarding (#329):** Goal-setting, experience level, training frequency.
+4. **AI Programs (#330):** Generate personalized workout plans from user profile.
+
+**Success Criteria:**
+- Logging flow requires under 2 taps per set (with smart defaults)
+- New users see onboarding → set profile → land on Home with plan
+- Users can generate AI workout programs based on goals
+
+### Positive Findings
+
+Despite stability gaps, the foundation is strong:
+- ✅ **152 passing unit tests** (ViewModels, services, DAOs, validation)
+- ✅ **Paparazzi visual regression** testing in place
+- ✅ **Maestro E2E flows** comprehensive (24 flows, bilingual, smoke + regression)
+- ✅ **Room database** properly configured with schema exports
+- ✅ **Error handling infrastructure** exists (just needs consistent usage)
+- ✅ **No deprecated APIs** or technical debt markers found
+
+The architecture is solid. We just need to close the stability gaps before shipping.
+
+### Trade-Offs Accepted
+
+#### What We're Delaying
+- Home screen redesign (valuable UX improvement)
+- Improved onboarding (better first impression)
+- AI-generated programs (differentiator feature)
+
+#### What We're Prioritizing
+- User data safety (migrations)
+- Developer velocity (working CI)
+- App reliability (error handling, offline testing)
+
+#### Why This Order
+- **Data safety is non-negotiable.** Users forgive missing features, not lost data.
+- **CI unlocks velocity.** Without working CI, every PR is a gamble.
+- **Stable foundation compounds.** Features built on solid ground ship faster and need less rework.
+
+### Communication Plan
+
+#### To User
+- **Status:** GymBro Android is NOT ready for dogfooding
+- **Timeline:** 2-3 weeks for Phase A (stability), then 3-4 weeks for Phase B (UX)
+- **First Milestone:** After Phase A + 1-tap logging (#331) = dogfood-ready
+- **Transparency:** All stability issues documented in GitHub (public issues)
+
+#### To Squad
+- **Tank:** Lead on Phase A fixes (migrations, error handling, CI)
+- **Switch:** Validate Phase A completion (test offline scenarios, verify migrations)
+- **Trinity:** Pause UX work until Phase A complete (exception: critical bugs)
+- **Neo:** Prepare AI program generation design (Phase B) while Phase A executes
+
+### Success Metrics
+
+#### Phase A (Stability) Complete When:
+- [ ] Database migration tests pass (populate v1 DB, migrate to v4, verify data intact)
+- [ ] Android CI passes on master branch (all 152 tests green)
+- [ ] Offline mode tests pass (workout logged offline, synced on reconnect)
+- [ ] Critical paths handle errors gracefully (user sees meaningful message, not crash)
+
+#### Phase B (UX) Complete When:
+- [ ] Logging flow measured at under 2 taps per set (with smart defaults)
+- [ ] Onboarding completion rate over 90% (measured in analytics)
+- [ ] Home screen shows user's active program + quick-start actions
+- [ ] AI program generation works for all experience levels (validated with test profiles)
+
+### Review Cadence
+
+- **Weekly check-in:** Progress on Phase A issues (#327-#331)
+- **Phase A completion review:** Validate all stability criteria before proceeding to Phase B
+- **Phase B kickoff:** Re-prioritize UX issues based on user feedback and bandwidth
+
+### Alternatives Considered
+
+#### Option 1: Feature-First (Rejected)
+- **Approach:** Build home screen + onboarding first, fix stability later
+- **Pros:** Faster to "looks good" milestone, better first impression
+- **Cons:** Data loss risk remains, wasted effort if stability fixes break features
+- **Verdict:** REJECTED — building on unstable foundation is false velocity
+
+#### Option 2: Parallel Tracks (Rejected)
+- **Approach:** Team splits — some work stability, some work features
+- **Pros:** Both progress simultaneously
+- **Cons:** Small team (4 agents), context switching overhead, risk of conflicts
+- **Verdict:** REJECTED — not enough bandwidth to parallelize effectively
+
+#### Option 3: Stability-First (SELECTED)
+- **Approach:** Pause features, complete Phase A, then tackle Phase B
+- **Pros:** Clear prioritization, no data loss risk, stable foundation for future work
+- **Cons:** Feature delay
+- **Verdict:** SELECTED — aligns with user's sustainability concern
+
+### Next Action
+
+Tank picks up #327 (database migrations) as top priority. Switch prepares migration test cases. Morpheus reviews all Phase A PRs before merge.
