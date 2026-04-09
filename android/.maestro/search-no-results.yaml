@@ -10,10 +10,10 @@ name: "Negative — Search for Nonexistent Exercise"
 tags:
   - negative
 onFlowStart:
+  # Launch app — ensure-post-onboarding.yaml handles onboarding state
   - launchApp
   - waitForAnimationToEnd:
       timeout: 3000
-  - assertVisible: "Biblioteca de Ejercicios"
 
 ---
 

@@ -11,11 +11,10 @@ tags:
   - core
   - regression
 onFlowStart:
-  # Ensure clean state at library
+  # Launch app — ensure-post-onboarding.yaml handles onboarding state
   - launchApp
   - waitForAnimationToEnd:
       timeout: 3000
-  - assertVisible: "Biblioteca de Ejercicios"
 
 onFlowComplete:
   # Return to library
