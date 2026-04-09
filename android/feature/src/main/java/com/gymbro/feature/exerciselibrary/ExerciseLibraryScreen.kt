@@ -56,7 +56,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewModelScope
 import androidx.compose.ui.res.stringResource
 import com.gymbro.core.ui.theme.AccentGreenStart
 import com.gymbro.core.ui.theme.AccentGreenEnd
@@ -73,11 +72,8 @@ import com.gymbro.core.model.MuscleGroup
 import com.gymbro.feature.common.FullScreenLoading
 import com.gymbro.feature.common.GlassmorphicCard
 import com.gymbro.feature.common.ObserveErrors
-import com.gymbro.feature.common.TooltipOverlay
-import com.gymbro.feature.common.TooltipPosition
 import com.gymbro.feature.common.icon
 import com.gymbro.core.R
-import kotlinx.coroutines.launch
 
 // Backwards compatibility
 private val AccentGreen = AccentGreenStart
@@ -94,11 +90,6 @@ fun ExerciseLibraryRoute(
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
-    var showFilterTooltip by remember { mutableStateOf(false) }
-
-    LaunchedEffect(Unit) {
-        showFilterTooltip = viewModel.tooltipManager.shouldShow("exercise_library_filter")
-    }
 
     ObserveErrors(
         errorFlow = viewModel.errorEvents,
@@ -127,13 +118,6 @@ fun ExerciseLibraryRoute(
         onNavigateToCreateExercise = onNavigateToCreateExercise,
         isPickerMode = isPickerMode,
         snackbarHostState = snackbarHostState,
-        showFilterTooltip = showFilterTooltip,
-        onTooltipDismissed = {
-            showFilterTooltip = false
-            viewModel.viewModelScope.launch {
-                viewModel.tooltipManager.markShown("exercise_library_filter")
-            }
-        }
     )
 }
 
@@ -145,8 +129,6 @@ fun ExerciseLibraryScreen(
     onNavigateToCreateExercise: () -> Unit = {},
     isPickerMode: Boolean = false,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
-    showFilterTooltip: Boolean = false,
-    onTooltipDismissed: () -> Unit = {},
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -274,14 +256,6 @@ fun ExerciseLibraryScreen(
             }
         }
 
-        if (showFilterTooltip && !isPickerMode) {
-            TooltipOverlay(
-                message = stringResource(R.string.tooltip_filter_muscle),
-                position = TooltipPosition.TOP_CENTER,
-                offsetY = 300,
-                onDismiss = onTooltipDismissed
-            )
-        }
     }
 }
 
