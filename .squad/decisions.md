@@ -1291,6 +1291,51 @@ This approach:
 
 ### Alternatives Considered
 
+---
+
+## Maestro E2E Suite: 5 Systemic Flow Issues (2026-04-09)
+
+**Author:** Switch (Tester)  
+**Context:** Full Maestro E2E validation after PR #308 (testTagsAsResourceId fix). Validation run: 7/22 flows pass, 15 fail from 5 root causes.
+
+**Status:** Decision captured in decision inbox. Trinity assigned to fix all 5 issues in single PR.
+
+### Issue 1: Regex Escaping in `ensure-post-onboarding.yaml` (BLOCKER)
+The regex `Kilogramos (kg)|Kilograms (kg)` treats `(kg)` as capture groups. Must escape: `Kilogramos \(kg\)|Kilograms \(kg\)`. This blocks every flow using `clearState: true`.
+
+**Fix location:** `e2e/flows/ensure-post-onboarding.yaml`  
+**Impact:** Blocks 3+ flows
+
+### Issue 2: Bilingual Text Assertions Missing (4 flows)
+All onboarding assertions use English-only text on es-ES emulator. Standard pattern should use: `"Spanish text|English text"` for all assertions.
+
+**Affected flows:** Flows with Spanish locale assertions  
+**Impact:** 4 flows fail assertion match
+
+### Issue 3: Profile Screen Text Mismatch (4 flows)
+Current text: "Hablar con **el** Entrenador IA" → Should be: "Hablar con Entrenador IA" (matches actual UI).
+
+**Fix location:** All profile-related flow assertions  
+**Impact:** Unblocks profile-settings, ai-coach, a11y-content-descriptions, a11y-keyboard-navigation
+
+### Issue 4: Invalid `${VAR:=default}` Syntax in `tapOn: text:` (3 flows)
+Maestro evaluates `${VAR:=default}` in `tapOn: text:` as JavaScript, where `:=` is invalid. Solution: hardcode values or define in `test-data.env`. `inputText` handles this syntax correctly — only `tapOn` is broken.
+
+**Impact:** 3 flows fail on tap actions with parameterized text
+
+### Issue 5: YAML/API Syntax Errors (3 flows)
+- `check-progress.yaml:48` — `optional: true` needs indentation under `assertVisible`
+- `search-no-results.yaml` — Replace `clearTextField` with `eraseText` (valid command)
+- `perf-scroll-library.yaml` — Replace `scroll: direction: DOWN` with `swipe: { direction: UP }`
+
+**Impact:** 3 flows fail due to API/syntax violations
+
+### Key Finding
+**testTagsAsResourceId fix works perfectly.** All 15 test failures are pre-existing flow definition issues, not caused by PR #308 or any app regression.
+
+### Recommendation
+Fix all 5 issues in a single PR. Estimated effort: ~2 hours. After fix, expect 18-20/22 flows to pass. No further app changes needed.
+
 ❌ **Per-screen semantics wrapping** — Would require wrapping every screen's root composable. More verbose, harder to maintain.
 
 ❌ **Rewrite Maestro flows to use text selectors** — Text selectors work, but are fragile (break on i18n, copy changes, dynamic text). testTag is more stable.
