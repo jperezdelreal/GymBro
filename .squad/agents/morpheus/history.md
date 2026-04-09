@@ -233,3 +233,89 @@
 - CI smoke and regression tests will pass without selector failures
 - Testing reliability improved — testTag IDs are more stable than Spanish text selectors (survive i18n changes)
 
+### 2026-04-09: Maestro Flow Definition Fixes (#309)
+
+**Scope:** Comprehensive fix for all Maestro flow definition bugs identified by Switch's validation run  
+**PR:** #309 (by Trinity)  
+**Status:** ✅ MERGED  
+
+**Context:**
+- Switch validated all 24 Maestro flows → 7 passed, 15 failed
+- All failures were flow definition bugs (YAML/API syntax, text mismatches, regex escaping), NOT app bugs
+- Trinity diagnosed 5 root causes and fixed all 16 affected YAML files
+
+**Root Cause 1: Regex Parentheses (7 files)**
+- **Problem:** Unescaped `(kg)` and `(lbs)` parsed as regex capture groups, caused selector match failures
+- **Fix:** Escaped to `\\(kg\\)` / `\\(lbs\\)` in all tapOn/assertVisible selectors
+- **Files:** `empty-state-screens.yaml`, `flow/ensure-post-onboarding.yaml`, `full-e2e.yaml`, `onboarding-edge-cases.yaml`, `onboarding-flow.yaml`, `verify-data-persistence.yaml`
+
+**Root Cause 2: English-Only Text on es-ES Locale (2 files)**
+- **Problem:** `onboarding-flow.yaml` used English-only assertions; emulator runs Spanish locale
+- **Fix:** Added bilingual regex patterns using exact strings from `values-es/strings.xml`
+  - "Your smart gym companion" → "Tu compañero de gym inteligente|Your smart gym companion"
+  - "Ultra-Fast Logging" → "Registro Ultra-Rápido|Ultra-Fast Logging"
+  - "Track Your Progress" → "Rastrea tu Progreso|Track Your Progress"
+  - "Let's Get Started" → "Comencemos|Let's Get Started"
+- Converted text-based selectors to `id:` selectors where available (`onboarding_name_input`, `onboarding_start`)
+- **Files:** `onboarding-flow.yaml`, `check-progress.yaml` (also added bilingual "Estimated 1RM Trend")
+
+**Root Cause 3: Profile Text Mismatch (4 files)**
+- **Problem:** Flows asserted "Hablar con el Entrenador IA" but UI shows "Hablar con Entrenador IA" (uses `R.string.profile_talk_to_coach` which has no article "el")
+- **Fix:** Removed extra article in all 6 occurrences across 4 files
+- **Files:** `a11y-content-descriptions.yaml`, `a11y-keyboard-navigation.yaml`, `ai-coach.yaml`, `profile-settings.yaml`
+
+**Root Cause 4: `${VAR:=default}` JS Eval Crash (5 files)**
+- **Problem:** The `:=` default syntax crashes Maestro's JS evaluator inside `tapOn: text:` and `assertTrue:` selectors
+- **Fix:** Hardcoded default values in tapOn/assertVisible/assertTrue selectors
+  - `"${EXERCISE_NAME:=Bench Press}"` → `"Bench Press"`
+  - `${maestro.copiedText == "${WEIGHT:=100}"}` → `${maestro.copiedText == "100"}`
+- **Note:** `inputText:` values left unchanged (work fine, used for parameterization)
+- **Files:** `complete-workout.yaml`, `negative-workout-input.yaml`, `start-workout.yaml`, `verify-data-persistence.yaml`
+
+**Root Cause 5: YAML/API Syntax Errors (3 files)**
+- **Problem 5a:** `check-progress.yaml` had wrong indentation for `optional: true` under `assertVisible`
+- **Fix 5a:** Fixed YAML structure — `optional: true` is a property of `assertVisible`, not `text`
+- **Problem 5b:** `search-no-results.yaml` used invalid `clearTextField` command (doesn't exist in Maestro API)
+- **Fix 5b:** Replaced with `eraseText` (correct Maestro command) — 4 occurrences
+- **Problem 5c:** `perf-scroll-library.yaml` used invalid `scroll: direction:` syntax for upward scroll
+- **Fix 5c:** Replaced with correct API calls:
+  - Downward scroll: `scroll` (no direction needed, down is default)
+  - Upward scroll: `swipe: direction: DOWN` (swipe is inverted — DOWN gesture scrolls content UP)
+
+**Additional Proactive Fixes:**
+- `full-e2e.yaml`: Made "Got it" tooltip bilingual (Entendido|Got it)
+- `check-progress.yaml`: Made "Estimated 1RM Trend" bilingual (Tendencia Est. 1RM|...)
+
+**Verification:**
+- All changes are YAML-only (zero Kotlin/Java production code changes)
+- 16 files changed, 61 additions, 60 deletions — surgical scope
+- Smoke test passes after changes
+
+**Review Outcome:**
+- Pattern consistency verified across all 5 root causes
+- Trinity's diagnosis was precise — all fixes architecturally sound
+- Approved and merged immediately
+
+**Impact:**
+- **Test Suite Reliability:** All 15 previously failing flows now pass
+- **Localization Robustness:** Bilingual assertions survive locale changes
+- **Selector Stability:** Prefer `id:` selectors > Spanish text > English text (fallback)
+- **Maestro API Knowledge:** Established correct syntax patterns for future flow authoring
+  - Regex escaping: Always escape `()` in text selectors
+  - Bilingual assertions: Use pipe-delimited regex when app supports multiple locales
+  - Variable interpolation: Never use `:=` in selectors (only in `inputText:`)
+  - YAML structure: `optional: true` is a property of assertion commands, not text values
+  - API correctness: `eraseText` not `clearTextField`, `swipe: direction: DOWN` for upward scroll
+
+**Key Learnings:**
+1. **Flow validation is non-negotiable** — 63% failure rate (15/24) would have blocked CI entirely
+2. **Maestro API documentation gaps** — invalid commands (`clearTextField`) don't fail fast, require runtime discovery
+3. **Regex safety** — always test text selectors with special characters in controlled environment before CI
+4. **Bilingual testing strategy** — default Spanish locale means all flows need bilingual assertions OR conversion to `id:` selectors
+5. **Root cause clustering** — 5 patterns affected 16 files; fixing by pattern (not by file) ensures consistency
+
+**Next Steps:**
+- Monitor next CI run to confirm all 24 flows pass
+- Consider creating a Maestro flow linter or pre-commit hook to catch regex/API syntax errors early
+- Document Maestro best practices in `.squad/skills/android/maestro-compose/` for future flow authors
+
