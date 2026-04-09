@@ -1,5 +1,5 @@
 appId: com.gymbro.app
-name: "Negative — Rapid Navigation Stress Test"
+name: "Negative - Rapid Navigation Stress Test"
 #
 # Tests: App stability under rapid navigation between tabs (stress test)
 # Preconditions: User has completed onboarding (ensured by ensure-post-onboarding.yaml)

@@ -31,10 +31,13 @@ name: "Ensure Post-Onboarding State"
       - inputText: "TestUser"
       # Tap empty area to dismiss Gboard floating toolbar
       - tapOn:
-          point: "50%,20%"
+          point: "50%,10%"
       - waitForAnimationToEnd:
           timeout: 2000
-      - tapOn: "¡Vamos!"
+      # Tap the start button using coordinates (testTag targets wrapper View, not clickable button)
+      # Button is at left side of screen, center ~(20%, 69%)
+      - tapOn:
+          point: "20%,69%"
       - waitForAnimationToEnd:
           timeout: 3000
 

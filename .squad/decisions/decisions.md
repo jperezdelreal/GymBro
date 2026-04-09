@@ -228,3 +228,162 @@ GymBro is a **specialist for serious lifters**, not a generalist. We don't need 
 - Patterns/reference apps: https://github.com/androiddevnotes/awesome-jetpack-compose-android-apps
 
 **Why:** When we start Android port, analyze these for useful skills, patterns, and best practices to integrate into the team's knowledge base.
+
+---
+
+## 2026-04-09: Maestro Cross-Platform Quirks and Test Infrastructure Standards
+
+**Decision by:** Switch (Tester)  
+**Date:** 2026-04-09  
+**Context:** Issue #311 — Critical regression discovered in Maestro E2E suite after PR #310 (5/23 passing, 18 failures)
+
+### Problem
+
+PR #310 introduced two types of failures affecting 18/23 Maestro flows (78% failure rate):
+
+1. **JavaScript syntax errors** — Using bash/shell `${VAR:=default}` syntax in Maestro's JavaScript evaluator
+2. **UTF-8 encoding issues** — Windows Maestro misreads multi-byte UTF-8 characters (e.g., "¡" becomes "í")
+
+These failures were not caught before merge because there was no pre-merge Maestro validation requirement.
+
+### Decision
+
+#### 1. Maestro JavaScript Syntax Standard
+
+**Rule:** All Maestro `${}` expressions MUST use JavaScript syntax, not bash/shell syntax.
+
+**❌ NEVER:**
+```yaml
+- inputText: "${USER_NAME:=TestUser}"  # bash/shell syntax — BREAKS
+```
+
+**✅ ALWAYS:**
+```yaml
+- inputText: "${USER_NAME || 'TestUser'}"  # JavaScript syntax — WORKS
+```
+
+**Why:** Maestro uses Graal.js for `${}` evaluation. The `:=` operator is bash-specific and causes JavaScript parse errors.
+
+#### 2. UTF-8 Text Selector Avoidance on Windows
+
+**Rule:** Avoid non-ASCII text selectors in Maestro flows intended for cross-platform execution.
+
+**❌ AVOID (Windows Maestro):**
+```yaml
+- tapOn: "¡Vamos!"  # UTF-8 multi-byte char — misread as "íVamos!" on Windows
+```
+
+**✅ PREFER (Cross-platform):**
+```yaml
+- tapOn:
+    id: "onboarding_start_button"  # ID selector — works everywhere
+```
+
+**✅ ACCEPTABLE (Fallback):**
+```yaml
+- tapOn: "[¡í]Vamos!"  # Regex handles both encodings
+```
+
+**Why:** Maestro 2.4.0 on Windows has UTF-8 multi-byte character handling issues. Files are correctly encoded (UTF-8), but the runtime misreads characters like "¡" (C2 A1) as "í" (C3 AD). This affects Spanish text and likely all accented characters.
+
+**Impact:** Affects 16 flows that use `flow/ensure-post-onboarding.yaml` helper.
+
+#### 3. Pre-Merge Maestro Validation Requirement
+
+**Rule:** All PRs that modify Maestro flows or shared helpers MUST include Maestro validation results.
+
+**Required:**
+- Run at least **smoke test suite** (5 core flows) before PR approval
+- Run **full suite** (all 23 flows) for PRs touching shared helpers like `flow/ensure-post-onboarding.yaml`
+- Post pass/fail results in PR description or as a comment
+
+**Why:** PR #310 was merged with 18 new failures. A single pre-merge smoke test run would have caught both issues.
+
+#### 4. Helper Flow Change Protocol
+
+**Rule:** Shared helper flows (e.g., `flow/ensure-post-onboarding.yaml`) require full suite validation before merge.
+
+**Process:**
+1. Make changes to helper flow
+2. Run **all flows** that reference the helper (use `grep -r "runFlow.*helper-name" android/.maestro/`)
+3. Document results: X/Y flows passing
+4. If any failures introduced, investigate root cause before merge
+5. Post full validation results to PR
+
+**Why:** Helper flows have wide blast radius. A single bug in `ensure-post-onboarding.yaml` broke 16 flows (70% of suite).
+
+#### 5. Maestro Test Data Standards
+
+**Rule:** Update `test-data.env` to reflect actual JavaScript syntax, not bash/shell syntax.
+
+**Current (WRONG):**
+```bash
+# Notes:
+# - All flows have sensible defaults embedded using ${VAR:=default} syntax
+```
+
+**Fixed (CORRECT):**
+```bash
+# Notes:
+# - All flows have sensible defaults embedded using ${VAR || "default"} syntax (JavaScript)
+# - Maestro uses Graal.js for ${} evaluation, NOT bash/shell
+# - Avoid non-ASCII text selectors (e.g., "¡Vamos!") — use IDs or ASCII text instead
+```
+
+### Implementation
+
+**Immediate (Issue #311 blockers):**
+1. Fix JavaScript syntax in 2 flows: `onboarding-flow.yaml`, `full-e2e.yaml`
+2. Fix UTF-8 encoding in `flow/ensure-post-onboarding.yaml` (use ID selector for "¡Vamos!" button)
+3. Re-run full suite validation
+4. Update `test-data.env` documentation
+
+**Short-term (CI/CD integration):**
+1. Add Maestro smoke tests to GitHub Actions (5 core flows)
+2. Gate PR merge on smoke test pass
+3. Document Maestro quirks in `android/.maestro/README.md`
+
+**Long-term (quality gate):**
+1. Consider full Maestro suite in nightly CI runs
+2. Add Maestro YAML linting to pre-commit hooks (detect unsupported syntax)
+
+### Lessons Learned
+
+1. **Helper flow bugs have wide blast radius** — 1 bug in ensure-post-onboarding.yaml broke 16 flows (70% of suite)
+2. **Windows Maestro has UTF-8 issues** — Multi-byte UTF-8 chars misread; prefer ASCII or ID selectors
+3. **Maestro uses JavaScript, not bash** — `${VAR:=default}` is invalid; use `${VAR || "default"}`
+4. **Pre-merge validation prevents regressions** — PR #310 would have been caught by a single smoke test run
+5. **Individual flow execution isolates root causes** — Batch mode hides the distinction between error types
+
+### References
+
+- Issue #311: Maestro E2E suite validation (5/23 pass, regression)
+- PR #310: Fix that introduced regressions (approved without Maestro validation)
+- Maestro docs: https://maestro.mobile.dev/reference/javascript-expressions
+- Validation report: Posted to #311 on 2026-04-09
+
+---
+
+## 2026-04-09: Maestro Flow Definition Standards
+
+**Author:** Trinity (iOS/Mobile Dev)  
+**Context:** PR #309 — fixed 15 flow failures from 5 root causes.
+
+### Decisions
+
+#### 1. Always escape regex special chars in Maestro assertions
+Parentheses `()` in `tapOn` / `assertVisible` text are parsed as regex groups. Use `\(` and `\)` for literals. Example: `"Kilogramos \(kg\)"`.
+
+#### 2. All Maestro text assertions must be bilingual
+Since the emulator runs es-ES, every text assertion should use `"Texto Español|English Text"` pattern. Source Spanish strings from `values-es/strings.xml`, not from guessing.
+
+#### 3. Prefer ID-based selectors over text-based
+Use `id:` selectors when testTag IDs exist. They're locale-independent and more stable. Text selectors should be the fallback.
+
+#### 4. No `${VAR:=default}` in tapOn/assertTrue selectors
+This syntax crashes Maestro's JS evaluator. Hardcode defaults in selectors. Keep `${VAR:=default}` only in `inputText:` where it works fine.
+
+#### 5. Maestro API reference
+- `eraseText` (not `clearTextField`)
+- Plain `scroll` for scrolling down; `swipe: direction: DOWN/UP` for directional control
+- `optional: true` must be nested inside the command's map form, not used with shorthand syntax

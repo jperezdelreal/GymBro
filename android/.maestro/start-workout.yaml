@@ -1,5 +1,5 @@
 appId: com.gymbro.app
-name: "Start Workout — Begin workout, add exercises, log sets"
+name: "Start Workout - Begin workout, add exercises, log sets"
 #
 # Tests: Starting a workout, adding exercises via search, and logging set data
 # Preconditions: User has completed onboarding (ensured by ensure-post-onboarding.yaml)
@@ -54,7 +54,7 @@ onFlowComplete:
 # Search and select an exercise
 - tapOn:
     id: "search_bar"
-- inputText: "${EXERCISE_SEARCH:=Bench}"
+- inputText: "${EXERCISE_SEARCH || 'Bench'}"
 # Screenshot 03: Search query entered in exercise picker
 - takeScreenshot: 03_start_workout_exercise_picker_search
 
@@ -72,13 +72,13 @@ onFlowComplete:
 - tapOn:
     id: "weight_input"
     index: 0
-- inputText: "${WEIGHT:=80}"
+- inputText: "${WEIGHT || '80'}"
 
 # Enter reps
 - tapOn:
     id: "reps_input"
     index: 0
-- inputText: "${REPS:=8}"
+- inputText: "${REPS || '8'}"
 
 # Screenshot 05: Set data logged (weight and reps entered)
 - takeScreenshot: 05_start_workout_set_logged

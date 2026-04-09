@@ -1,5 +1,5 @@
 appId: com.gymbro.app
-name: "Negative — Invalid Workout Inputs (zero/negative/extreme values)"
+name: "Negative - Invalid Workout Inputs (zero/negative/extreme values)"
 #
 # Tests: App resilience with invalid workout input values (zero, negative, extreme)
 # Preconditions: User has completed onboarding (ensured by ensure-post-onboarding.yaml)
@@ -47,7 +47,7 @@ onFlowComplete:
 - assertVisible: "Elegir Ejercicio"
 - tapOn:
     id: "search_bar"
-- inputText: "${EXERCISE_SEARCH:=Bench}"
+- inputText: "${EXERCISE_SEARCH || 'Bench'}"
 - hideKeyboard
 - tapOn:
     text: "Bench Press"

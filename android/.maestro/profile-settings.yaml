@@ -1,5 +1,5 @@
 appId: com.gymbro.app
-name: "Profile Settings — Open profile and check settings sections"
+name: "Profile Settings - Open profile and check settings sections"
 #
 # Tests: Profile tab sections and settings visibility
 # Preconditions: User has completed onboarding (ensured by ensure-post-onboarding.yaml)

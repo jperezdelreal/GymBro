@@ -1,5 +1,5 @@
 appId: com.gymbro.app
-name: "Browse Library — Search and filter exercises"
+name: "Browse Library - Search and filter exercises"
 #
 # Tests: Verifying search functionality and muscle group filters in exercise library
 # Preconditions: User has completed onboarding (ensured by ensure-post-onboarding.yaml)
@@ -85,34 +85,34 @@ onFlowComplete:
 - assertVisible: "Biblioteca de Ejercicios"
 
 # Filter by Chest muscle group
-- tapOn: "Pecho"
+- tapOn: "Pecho|Chest"
 - waitForAnimationToEnd:
     timeout: 1000
 # Screenshot 06: Library filtered by Chest/Pecho muscle group
 - takeScreenshot: 06_browse_library_filter_chest
 
 # Deselect Chest, select Back
-- tapOn: "Pecho"
+- tapOn: "Pecho|Chest"
 - waitForAnimationToEnd:
     timeout: 500
-- tapOn: "Espalda"
+- tapOn: "Espalda|Back"
 - waitForAnimationToEnd:
     timeout: 1000
 # Screenshot 07: Library filtered by Back/Espalda muscle group
 - takeScreenshot: 07_browse_library_filter_back
 
 # Deselect Back, select Shoulders
-- tapOn: "Espalda"
+- tapOn: "Espalda|Back"
 - waitForAnimationToEnd:
     timeout: 500
-- tapOn: "Hombros"
+- tapOn: "Hombros|Shoulders"
 - waitForAnimationToEnd:
     timeout: 1000
 # Screenshot 08: Library filtered by Shoulders/Hombros muscle group
 - takeScreenshot: 08_browse_library_filter_shoulders
 
 # Deselect filter
-- tapOn: "Hombros"
+- tapOn: "Hombros|Shoulders"
 - waitForAnimationToEnd:
     timeout: 1000
 # Screenshot 09: Library with no filters applied (all exercises shown)

@@ -1,5 +1,5 @@
 appId: com.gymbro.app
-name: "AI Coach — Open coach and send a message"
+name: "AI Coach - Open coach and send a message"
 #
 # Tests: AI Coach feature accessibility and basic interaction
 # Preconditions: User has completed onboarding (ensured by ensure-post-onboarding.yaml)
