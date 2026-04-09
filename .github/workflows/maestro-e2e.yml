@@ -28,6 +28,10 @@ jobs:
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v4
 
+    - name: Make gradlew executable
+      working-directory: android
+      run: chmod +x gradlew
+
     - name: Build debug APK
       working-directory: android
       run: ./gradlew assembleDebug --no-daemon
@@ -183,6 +187,10 @@ jobs:
 
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v4
+
+    - name: Make gradlew executable
+      working-directory: android
+      run: chmod +x gradlew
 
     - name: Build debug APK
       working-directory: android
