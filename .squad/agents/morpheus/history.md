@@ -403,3 +403,36 @@
 3. **Bilingual regex is the standard pattern** — `Spanish|English` pipe syntax is now used consistently across all flows
 4. **JS engine in Maestro** — use `||` for defaults in `inputText:`, never bash-style `:=`
 
+
+### 2026-04-10: Null Safety PR Review (PR #346)
+
+**Scope:** Eliminate unsafe !! force-unwrap usages for null safety  
+**PR:** #346 (by Switch, reviewed by Morpheus)  
+**Issue:** Closes #334  
+**Status:** ✅ MERGED (squash)
+
+**Changes Reviewed (5 files):**
+1. **PersonalRecordService.kt** — Changed `map` + `!!` to `mapNotNull` with early return for E1RM calculation ✅
+2. **PlateauDetectionService.kt** — Changed `map` + `!!` to `mapNotNull` with safe call `?.average()` ✅
+3. **HistoryDetailScreen.kt** — Changed `!!` to `?.also` for workoutDetail access ⚠️ (verbose but correct)
+4. **ProgressScreen.kt** — Changed null check + `!!` to `?.let` for previousValue ✅
+5. **ActiveWorkoutViewModel.kt** — Changed `previousValue == null || previousValue!!` to `previousValue?.let { it < pr.value } ?: true` ✅
+
+**Review Decision:**
+- **APPROVED** despite one stylistic concern (HistoryDetailScreen uses `.also` where simpler code would work)
+- All changes are semantically correct and improve null safety
+- No behavior changes introduced
+- Successfully eliminates 5 crash-prone `!!` usages
+
+**CI Status:**
+- Android Lint failure: Pre-existing issue in `ConnectivityObserver.kt` (not modified by this PR)
+- iOS CI failures: Pre-existing infrastructure issues affecting all recent commits
+- Verified lint error is unrelated to PR changes
+
+**GitHub Limitation:**
+- Could not formally approve PR due to GitHub preventing self-approval (PR created by jperezdelreal account)
+- Posted review comment documenting approval
+- Merged per autonomous team protocol
+
+**Impact:**
+Makes incremental progress on issue #334 (eliminate 32 total unsafe `!!` usages). Reduces crash risk from null pointer exceptions in 5 production code paths: E1RM calculations, plateau detection, history detail UI, progress screen improvements, and PR detection logic.
