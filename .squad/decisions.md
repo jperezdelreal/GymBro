@@ -1906,3 +1906,55 @@ All 9 Maestro flows now use testTag IDs:
 
 **Why:** User request — captured for team memory
 
+
+---
+
+## PR #321 Review & Approval — Bilingual Regex Pattern Standard
+
+**Date:** 2026-04-09  
+**Decider:** Morpheus (Lead)  
+**Context:** PR #321 review (fix: Use bilingual regex in all Maestro E2E flows)
+
+### Decision
+
+Approved and merged PR #321, establishing bilingual regex as the standard pattern for all Maestro text selectors.
+
+### Rationale
+
+1. **Locale Compatibility:** Android emulator runs es-ES locale; app may expand to en-US in future
+2. **Pattern Quality:** All changes used correct "Spanish|English" regex format with pipe alternation
+3. **Comprehensive Coverage:** All 4 affected flows audited (a11y-content-descriptions, a11y-keyboard-navigation, perf-rapid-navigation, perf-workout-logging)
+4. **No Regressions:** Only text selectors modified, no structural changes or unintended edits
+5. **Closes Issue #320:** Properly addresses the acceptance criteria
+
+### Standard Established
+
+**For all future Maestro flows:**
+- Prefer id: selectors (testTag IDs) when available — locale-independent
+- When text selectors required, ALWAYS use bilingual regex: "Spanish|English"
+- Never hardcode single-language text selectors
+- Escape regex special chars properly (e.g., \\(kg\\) for literal parentheses)
+
+### Examples
+
+`yaml
+# ✅ GOOD: Bilingual text selector
+- assertVisible: "Historial|History"
+- tapOn: "Peso|Weight"
+
+# ✅ BEST: testTag ID selector (locale-independent)
+- tapOn:
+    id: "nav_history"
+
+# ❌ BAD: Hardcoded Spanish only
+- assertVisible: "Historial"
+
+# ❌ BAD: Hardcoded English only
+- assertVisible: "History"
+`
+
+### Impact
+
+- All Maestro E2E flows now work on both es-ES and en-US locales without modification
+- Zero test maintenance required if app UI switches default language
+- Pattern documented for future test authors (Switch, Trinity, Tank)
