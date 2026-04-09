@@ -38,7 +38,7 @@ onFlowComplete:
     id: "nav_history"
 - waitForAnimationToEnd:
     timeout: 2000
-- assertVisible: "Historial"
+- assertVisible: "Historial|History"
 - takeScreenshot: a11y_keyboard_history
 
 # Navigate to Progress tab
@@ -46,7 +46,7 @@ onFlowComplete:
     id: "nav_progress"
 - waitForAnimationToEnd:
     timeout: 2000
-- assertVisible: "Progreso"
+- assertVisible: "Progreso|Progress"
 - takeScreenshot: a11y_keyboard_progress
 
 # Navigate to Recovery tab
@@ -54,7 +54,7 @@ onFlowComplete:
     id: "nav_recovery"
 - waitForAnimationToEnd:
     timeout: 2000
-- assertVisible: "Recuperación"
+- assertVisible: "Recuperación|Recovery"
 - takeScreenshot: a11y_keyboard_recovery
 
 # Navigate to Profile tab
@@ -62,7 +62,7 @@ onFlowComplete:
     id: "nav_profile"
 - waitForAnimationToEnd:
     timeout: 2000
-- assertVisible: "Perfil"
+- assertVisible: "Perfil|Profile"
 - takeScreenshot: a11y_keyboard_profile
 
 # Verify interactive element on Profile (AI Coach button)

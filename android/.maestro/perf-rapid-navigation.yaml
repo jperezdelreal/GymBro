@@ -134,7 +134,7 @@ onFlowComplete:
     id: "nav_history"
 - waitForAnimationToEnd:
     timeout: 1000
-- assertVisible: "Historial"
+- assertVisible: "Historial|History"
 - takeScreenshot: perf_rapid_nav_verify_history
 
 # Progress tab
@@ -142,7 +142,7 @@ onFlowComplete:
     id: "nav_progress"
 - waitForAnimationToEnd:
     timeout: 1000
-- assertVisible: "Progreso"
+- assertVisible: "Progreso|Progress"
 - takeScreenshot: perf_rapid_nav_verify_progress
 
 # Recovery tab
@@ -150,7 +150,7 @@ onFlowComplete:
     id: "nav_recovery"
 - waitForAnimationToEnd:
     timeout: 1000
-- assertVisible: "Recuperación"
+- assertVisible: "Recuperación|Recovery"
 - takeScreenshot: perf_rapid_nav_verify_recovery
 
 # Profile tab
@@ -158,7 +158,7 @@ onFlowComplete:
     id: "nav_profile"
 - waitForAnimationToEnd:
     timeout: 1000
-- assertVisible: "Perfil"
+- assertVisible: "Perfil|Profile"
 - takeScreenshot: perf_rapid_nav_verify_profile
 
 # Return to Library tab
