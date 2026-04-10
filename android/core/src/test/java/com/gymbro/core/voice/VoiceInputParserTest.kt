@@ -123,4 +123,68 @@ class VoiceInputParserTest {
         assertEquals(100.0, result!!.weight, 0.01)
         assertEquals(5, result.reps)
     }
+
+    // --- RPE voice parsing tests (#419) ---
+
+    @Test
+    fun `parse RPE from digit`() {
+        val result = parser.parse("100 kilos 5 reps RPE 8")
+        assertNotNull(result)
+        assertEquals(100.0, result!!.weight, 0.01)
+        assertEquals(5, result.reps)
+        assertEquals(8.0, result.rpe!!, 0.01)
+    }
+
+    @Test
+    fun `parse RPE from decimal digit`() {
+        val result = parser.parse("80 kg 6 reps rpe 8.5")
+        assertNotNull(result)
+        assertEquals(80.0, result!!.weight, 0.01)
+        assertEquals(6, result.reps)
+        assertEquals(8.5, result.rpe!!, 0.01)
+    }
+
+    @Test
+    fun `parse RPE from Spanish word`() {
+        val result = parser.parse("100 kilos 5 reps RPE ocho")
+        assertNotNull(result)
+        assertEquals(100.0, result!!.weight, 0.01)
+        assertEquals(5, result.reps)
+        assertEquals(8.0, result.rpe!!, 0.01)
+    }
+
+    @Test
+    fun `parse RPE from English word`() {
+        val result = parser.parse("100x5 rpe nine")
+        assertNotNull(result)
+        assertEquals(100.0, result!!.weight, 0.01)
+        assertEquals(5, result.reps)
+        assertEquals(9.0, result.rpe!!, 0.01)
+    }
+
+    @Test
+    fun `RPE is null when not mentioned`() {
+        val result = parser.parse("100 kg 5 reps")
+        assertNotNull(result)
+        assertNull(result!!.rpe)
+    }
+
+    @Test
+    fun `RPE out of range is ignored`() {
+        val result = parser.parse("100 kg 5 reps rpe 15")
+        assertNotNull(result)
+        assertNull(result!!.rpe)
+    }
+
+    @Test
+    fun `formatConfirmation includes RPE when present`() {
+        val input = ParsedVoiceInput(weight = 100.0, reps = 5, unit = UserPreferences.WeightUnit.KG, rpe = 8.0)
+        assertEquals("100kg × 5 @ RPE 8", parser.formatConfirmation(input))
+    }
+
+    @Test
+    fun `formatConfirmation excludes RPE when null`() {
+        val input = ParsedVoiceInput(weight = 100.0, reps = 5, unit = UserPreferences.WeightUnit.KG, rpe = null)
+        assertEquals("100kg × 5", parser.formatConfirmation(input))
+    }
 }

@@ -544,6 +544,11 @@
     <string name="voice_input_parse_error">Couldn\'t understand \"%1$s\". Try \"100 kilos 5 reps\".</string>
     <string name="voice_input_confirmed">Set filled: %1$s</string>
 
+    <!-- Fatigue Warnings -->
+    <string name="fatigue_warning_title">⚠️ Fatigue Alert</string>
+    <string name="fatigue_warning_dismiss">Dismiss fatigue warnings</string>
+    <string name="fatigue_warning_detail">%1$s: avg RPE %2$s%3$s — consider reducing load</string>
+
     <!-- Home Screen -->
     <string name="home_title">Home</string>
     <string name="home_quick_start">Quick Start</string>
