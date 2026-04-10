@@ -103,6 +103,17 @@
     <string name="recovery_permissions_title">Conecta tus Datos de Salud</string>
     <string name="recovery_permissions_message">GymBro usa datos de sueño, frecuencia cardíaca y pasos para calcular tu preparación de recuperación y optimizar el entrenamiento.</string>
     <string name="recovery_grant_permissions">Conceder Permisos</string>
+    <string name="recovery_tip_green">¡Excelente recuperación! Estás listo para entrenamiento de alta intensidad. Concéntrate en levantamientos compuestos y desafíate.</string>
+    <string name="recovery_tip_amber">Recuperación moderada. Considera entrenamiento de intensidad media o enfócate en técnica y trabajo de volumen.</string>
+    <string name="recovery_tip_red">Baja recuperación detectada. Prioriza el descanso, trabajo de movilidad ligero o recuperación activa. Escucha a tu cuerpo.</string>
+
+    <!-- Manual Recovery Entry -->
+    <string name="recovery_manual_mode_info">Health Connect no disponible. Rastrea tu recuperación manualmente.</string>
+    <string name="recovery_score_label">Puntuación de Recuperación</string>
+    <string name="recovery_manual_sleep_quality">Calidad del Sueño</string>
+    <string name="recovery_manual_muscle_soreness">Dolor Muscular</string>
+    <string name="recovery_manual_energy_level">Nivel de Energía</string>
+    <string name="recovery_manual_save">Guardar Datos de Recuperación</string>
 
     <!-- Recovery Status Labels -->
     <string name="recovery_status_optimal">Óptimo</string>

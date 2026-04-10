@@ -3,6 +3,7 @@ package com.gymbro.feature.recovery
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gymbro.core.health.HealthConnectRepository
+import com.gymbro.core.preferences.UserPreferences
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,6 +17,7 @@ import javax.inject.Inject
 @HiltViewModel
 class RecoveryViewModel @Inject constructor(
     private val healthConnectRepository: HealthConnectRepository,
+    private val userPreferences: UserPreferences,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(RecoveryState())
@@ -26,6 +28,7 @@ class RecoveryViewModel @Inject constructor(
 
     init {
         checkAvailabilityAndLoad()
+        loadManualEntryData()
     }
 
     fun onEvent(event: RecoveryEvent) {
@@ -36,6 +39,24 @@ class RecoveryViewModel @Inject constructor(
                 }
             }
             is RecoveryEvent.RefreshData -> loadData()
+            is RecoveryEvent.UpdateSleepQuality -> {
+                _state.update { 
+                    it.copy(manualEntry = it.manualEntry.copy(sleepQuality = event.value))
+                }
+            }
+            is RecoveryEvent.UpdateMuscleSoreness -> {
+                _state.update { 
+                    it.copy(manualEntry = it.manualEntry.copy(muscleSoreness = event.value))
+                }
+            }
+            is RecoveryEvent.UpdateEnergyLevel -> {
+                _state.update { 
+                    it.copy(manualEntry = it.manualEntry.copy(energyLevel = event.value))
+                }
+            }
+            is RecoveryEvent.SaveManualEntry -> {
+                saveManualEntry()
+            }
         }
     }
 
@@ -55,6 +76,7 @@ class RecoveryViewModel @Inject constructor(
                 it.copy(
                     healthConnectAvailable = available,
                     permissionsGranted = hasPermissions,
+                    isManualMode = !available,
                 )
             }
 
@@ -89,6 +111,37 @@ class RecoveryViewModel @Inject constructor(
                     )
                 }
             }
+        }
+    }
+
+    private fun loadManualEntryData() {
+        viewModelScope.launch {
+            userPreferences.manualSleepQuality.collect { sleepQuality ->
+                userPreferences.manualMuscleSoreness.collect { soreness ->
+                    userPreferences.manualEnergyLevel.collect { energy ->
+                        _state.update { 
+                            it.copy(
+                                manualEntry = ManualRecoveryEntry(
+                                    sleepQuality = sleepQuality.toFloat(),
+                                    muscleSoreness = soreness.toFloat(),
+                                    energyLevel = energy.toFloat(),
+                                )
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun saveManualEntry() {
+        viewModelScope.launch {
+            val entry = _state.value.manualEntry
+            userPreferences.setManualRecoveryMetrics(
+                sleepQuality = entry.sleepQuality.toInt(),
+                muscleSoreness = entry.muscleSoreness.toInt(),
+                energyLevel = entry.energyLevel.toInt(),
+            )
         }
     }
 }

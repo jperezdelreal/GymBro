@@ -107,6 +107,14 @@
     <string name="recovery_tip_amber">Moderate recovery. Consider medium-intensity training or focus on technique and volume work.</string>
     <string name="recovery_tip_red">Low recovery detected. Prioritize rest, light mobility work, or active recovery. Listen to your body.</string>
 
+    <!-- Manual Recovery Entry -->
+    <string name="recovery_manual_mode_info">Health Connect not available. Track your recovery manually.</string>
+    <string name="recovery_score_label">Recovery Score</string>
+    <string name="recovery_manual_sleep_quality">Sleep Quality</string>
+    <string name="recovery_manual_muscle_soreness">Muscle Soreness</string>
+    <string name="recovery_manual_energy_level">Energy Level</string>
+    <string name="recovery_manual_save">Save Recovery Data</string>
+
     <!-- Recovery Status Labels -->
     <string name="recovery_status_optimal">Optimal</string>
     <string name="recovery_status_good">Good</string>
