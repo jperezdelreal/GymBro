@@ -441,3 +441,151 @@ Analyzes training balance and volume distribution:
 - Empowers users with actionable guidance ("reduce chest volume by 8 sets" vs "you're overtrained")
 - Differentiates GymBro from competitors (no other app has evidence-based volume landmark alerts)
 - Foundation for true adaptive training — app now knows when to push, hold, and back off
+
+
+---
+
+## 2024-12-XX — Training Domain Skill Creation + Exercise Library Re-Audit
+
+**Context:**
+Created comprehensive training domain skill (.squad/skills/training-domain/SKILL.md) to serve as a universal reference for exercise-related work across all agents. Then re-audited the 200-exercise library against this domain knowledge to identify critical gaps.
+
+**Training Domain Skill Coverage:**
+- 5 training modalities (Strength, Hypertrophy, Toning, Calisthenics, Olympic Lifting)
+- 12 movement patterns (horizontal/vertical push/pull, hip hinge, knee dominant, carry, rotation, anti-movement)
+- Equipment knowledge (8 equipment types with alternatives)
+- Calisthenics progressions (6 skill families: push, pull, squat, dip, core, handstand)
+- Goal-based exercise priorities (what to recommend when user says "I want X")
+- Coaching cues by pattern (universal form guidance)
+- Exercise data quality rules (for library expansion)
+
+**Library Audit Results (200 exercises analyzed):**
+
+*Equipment Distribution:*
+- Barbell: 68 | Dumbbell: 36 | Bodyweight: 25 | Machine: 24 | Cable: 23 | Kettlebell: 10 | Band: 7
+
+*Goal-Based Coverage:*
+- ✅ Strength/Powerlifting: COMPLETE (all big lifts + accessories present)
+- ✅ Hypertrophy/Bodybuilding: MOSTLY COMPLETE (excellent isolation variety, minor gaps)
+- ⚠️ General Fitness/Toning: GAPS (missing glute bridge, basic bodyweight movements)
+- ⚠️ Calisthenics: MAJOR GAPS (missing beginner progressions)
+
+*Movement Pattern Coverage:*
+- ✅ Horizontal push: 24 exercises (excellent)
+- ✅ Knee dominant: 28 exercises (excellent)
+- ✅ Hip hinge: 16 exercises (excellent)
+- ✅ Horizontal pull: 18 exercises (excellent)
+- ✅ Vertical push: 7 exercises (good)
+- ✅ Vertical pull: 7 exercises (good)
+- ⚠️ Anti-rotation: 1 exercise (WEAK)
+- ⚠️ Rotation: 2 exercises (WEAK)
+
+**Critical Finding: Calisthenics Progression Gaps**
+
+The library has ADVANCED bodyweight exercises (muscle-ups, front levers, one-arm push-ups) but is MISSING the beginner/intermediate stepping stones. This breaks the progression ladder:
+
+- Push: Has archer push-up and handstand push-up, but MISSING wall/incline/knee/diamond variants
+- Pull: Has muscle-ups and weighted pull-ups, but MISSING dead hang, scapular pulls, negatives, band-assisted
+- Squat: Has pistol squats, but MISSING assisted pistol, box pistol progressions
+- Dip: Has advanced dips, but MISSING bench dip, chair dip entry points
+- Core: Has dragon flags and levers, but MISSING hollow body hold
+- Handstand: Has handstand push-up, but MISSING wall holds, chest-to-wall progressions
+
+**Impact:** A beginner who wants calisthenics training will search for "how do I work up to a pull-up" and find NOTHING. We have the destination but not the journey.
+
+**Equipment-Based Gaps:**
+- Bodyweight-only users: Missing bodyweight squat, pike push-up, glute bridge, calf raise
+- Home gym users: Mostly covered (dumbbells + pull-up bar = complete programming possible)
+
+**Key Learnings:**
+
+1. **Exercise libraries need PROGRESSIONS, not just exercises** — Having muscle-ups without the prerequisite steps is like having calculus without algebra
+2. **Beginner accessibility > Advanced showcase** — Most users are NOT doing one-arm push-ups; they're trying to get their first full push-up
+3. **Movement pattern balance matters** — 24 horizontal push variations is great, but 1 anti-rotation exercise creates program design holes
+4. **Goal-based auditing reveals different gaps than category auditing** — We have 200 exercises but can't build a complete beginner bodyweight program
+5. **Equipment-free training is a PRIMARY use case** — Home/bodyweight training is not a nice-to-have; it's a core modality
+
+**Phase 1 Expansion Priority (informed by skill knowledge):**
+1. Calisthenics beginner progressions (12 exercises) — CRITICAL for accessibility
+2. Bodyweight basics (5 exercises) — CRITICAL for home training
+3. Core training gaps (3 exercises) — rotation/anti-rotation weak
+4. General fitness essentials (3 exercises) — toning/circuit gaps
+
+Total: 23 exercises to close critical modality gaps
+
+**Decision:**
+The training domain skill is now the authoritative reference for:
+- Library expansion decisions (what exercises to add)
+- AI coach prompts (modality-specific programming)
+- Exercise swap logic (movement pattern matching)
+- Program validation (can we build a complete program for this goal?)
+
+Any agent working on exercise-related tasks should read this skill first.
+
+**Files:**
+- Created: .squad/skills/training-domain/SKILL.md (18KB, comprehensive reference)
+- Analyzed: shared/data/exercises-seed.json (200 exercises)
+
+**Next Steps:**
+- Implement Phase 1 expansion (23 exercises)
+- Build calisthenics progression UI (show user their current level + next step)
+- Add movement pattern tags to existing exercises (enables swap logic)
+- Create "beginner bodyweight program" template to validate coverage
+
+### 2026-04-10: Adaptive Split Selection (Issue #381, PR #385)
+**The Problem:**
+- WorkoutPlanGenerator was generating workout days arbitrarily based on days/week but wasn't optimizing the *split type*
+- 3-day program used Upper/Lower/Full which is suboptimal — Full Body 3x is better for beginners
+- 6-day program used 5-day PPL structure — should be PPL 2x per week for optimal frequency
+
+**The Solution — Split-Based Plan Generation:**
+Implemented intelligent split selection based on training frequency and goals:
+
+1. **TrainingSplit enum** with evidence-based selection logic:
+   - 2 days/week → Full Body (only way to hit everything 2x)
+   - 3 days/week → Full Body (optimal for beginners) OR Powerlifting 3-Day (squat/bench/deadlift focus)
+   - 4 days/week → Upper/Lower (classic balanced split)
+   - 5 days/week → PPLUL (PPL + Upper/Lower hybrid for advanced lifters)
+   - 6+ days/week → PPL 2x per week (optimal hypertrophy frequency)
+
+2. **Refactored WorkoutPlanGenerator** to use split-based day generation:
+   - Created helper functions: generateFullBodyDays(), generateUpperLowerDays(), generatePPLDays(), generatePPLULDays()
+   - Each function creates appropriate muscle group distributions for its split type
+   - Removed arbitrary branching logic (when daysPerWeek == 3 { ... }) in favor of split-driven generation
+   - Added split field to WorkoutPlan model to track which split was used
+
+3. **Enhanced AI Coach awareness:**
+   - Updated system prompt with split knowledge (Full Body, Upper/Lower, PPL, PPLUL characteristics)
+   - Plan descriptions now explain the chosen split: "Upper/Lower split focused on muscle growth for 4 days/week"
+   - Sets foundation for AI coach to explain split trade-offs when users ask
+
+4. **Comprehensive test coverage:**
+   - TrainingSplitTest: 9 test cases covering all frequency ranges and goals
+   - WorkoutPlanGeneratorTest: 8 integration tests verifying split selection and application
+   - All 17 tests passing
+
+**Key design decisions:**
+- **Evidence-based split recommendations** from training-domain skill (compiled from Mike Israetel, Renaissance Periodization, Starting Strength)
+- **Goal-aware selection** — Powerlifting goal gets specialized 3-day split (squat/bench/deadlift focus) instead of generic full body
+- **Explicit enum over magic numbers** — TrainingSplit.UPPER_LOWER is clearer than "mode 2" or hardcoded strings
+- **Split type as first-class entity** — Added to WorkoutPlan model so UI/AI can reference it later
+- **Backward compatible** — split field is optional, existing plans without split still work
+
+**Impact on adaptive training:**
+- Foundation for AI coach to recommend split changes: "You're training 6 days/week but on Upper/Lower — consider switching to PPL for better frequency"
+- Enables split-specific progression rules: PPL can push harder per muscle per session since 3-day recovery window
+- Sets up recovery-aware split adaptation: if readiness drops, suggest consolidating 6-day PPL to 4-day Upper/Lower
+- Complements existing SmartDefaults, ReadinessScore, and PlateauDetection for holistic adaptive training
+
+**Technical implementation:**
+- \ndroid/core/src/main/java/com/gymbro/core/model/TrainingSplit.kt\ — enum with selectOptimalSplit() companion method
+- \ndroid/core/src/main/java/com/gymbro/core/service/WorkoutPlanGenerator.kt\ — refactored from 462 to 526 lines, much cleaner split-based logic
+- \ndroid/core/src/main/java/com/gymbro/core/model/WorkoutPlan.kt\ — added optional split field
+- \ndroid/core/src/main/java/com/gymbro/core/ai/AiCoachService.kt\ — enhanced system prompt with split knowledge
+
+**Next steps:**
+- Add UI to display split type on plan cards ("Full Body • 3 days/week")
+- Implement split change recommendations in PlateauDetectionService
+- Add readiness-aware split downscaling (6d PPL → 4d U/L when fatigued)
+- Track split adherence in ComplianceService (did user actually follow the split structure?)
+
