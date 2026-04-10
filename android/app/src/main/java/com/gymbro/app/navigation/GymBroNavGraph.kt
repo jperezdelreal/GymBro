@@ -173,7 +173,7 @@ fun GymBroNavGraph(
         composable("onboarding") {
             OnboardingRoute(
                 onNavigateToMain = {
-                    navController.navigate("exercise_library") {
+                    navController.navigate("programs") {
                         popUpTo("onboarding") { inclusive = true }
                     }
                 },

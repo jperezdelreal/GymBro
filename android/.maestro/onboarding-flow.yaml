@@ -4,7 +4,7 @@ name: "Onboarding - Complete 4-page onboarding flow"
 # Tests: Complete onboarding flow from welcome through name/unit selection
 # Preconditions: App launched with clearState (fresh install state)
 # Test data: USER_NAME env var (defaults to "TestUser"), units selection (kg)
-# Assertions: All 4 onboarding pages visible, name and units saved, lands on Exercise Library
+# Assertions: All 4 onboarding pages visible, name and units saved, lands on Programs with auto-generated plan
 # Cleanup: App state cleared via stopApp and clearState
 # Dependencies: None
 tags:
@@ -73,9 +73,9 @@ onFlowComplete:
 - tapOn:
     point: "20%,69%"
 - waitForAnimationToEnd:
-    timeout: 3000
+    timeout: 5000
 
-# Verify we landed on Exercise Library
-- assertVisible: "Biblioteca de Ejercicios|Exercise Library"
-# Screenshot 06: Successfully completed onboarding, landed on Exercise Library
+# Verify we landed on Programs (plan auto-generated from onboarding data)
+- assertVisible: "Programas|Programs"
+# Screenshot 06: Successfully completed onboarding, landed on Programs with first plan
 - takeScreenshot: 06_onboarding_complete

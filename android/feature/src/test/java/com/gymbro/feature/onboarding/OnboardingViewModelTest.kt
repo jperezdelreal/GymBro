@@ -1,15 +1,22 @@
 package com.gymbro.feature.onboarding
 
 import app.cash.turbine.test
+import com.gymbro.core.model.WorkoutPlan
 import com.gymbro.core.preferences.UserPreferences
+import com.gymbro.core.preferences.UserPreferences.ExperienceLevel
+import com.gymbro.core.preferences.UserPreferences.TrainingGoal
 import com.gymbro.core.preferences.UserPreferences.WeightUnit
+import com.gymbro.core.service.ActivePlanStore
+import com.gymbro.core.service.WorkoutPlanGenerator
 import com.gymbro.feature.MainDispatcherRule
+import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -20,12 +27,16 @@ class OnboardingViewModelTest {
     val mainDispatcherRule = MainDispatcherRule()
 
     private lateinit var userPreferences: UserPreferences
+    private lateinit var workoutPlanGenerator: WorkoutPlanGenerator
+    private lateinit var activePlanStore: ActivePlanStore
     private lateinit var viewModel: OnboardingViewModel
 
     @Before
     fun setup() {
         userPreferences = mockk(relaxed = true)
-        viewModel = OnboardingViewModel(userPreferences)
+        workoutPlanGenerator = mockk(relaxed = true)
+        activePlanStore = ActivePlanStore()
+        viewModel = OnboardingViewModel(userPreferences, workoutPlanGenerator, activePlanStore)
     }
 
     @Test
@@ -34,7 +45,7 @@ class OnboardingViewModelTest {
         assertEquals(0, state.currentPage)
         assertEquals(WeightUnit.KG, state.selectedUnit)
         assertEquals("", state.userName)
-        assertNull(state.selectedGoal)
+        assertEquals(TrainingGoal.HYPERTROPHY, state.selectedGoal)
     }
 
     @Test
@@ -75,6 +86,58 @@ class OnboardingViewModelTest {
             coVerify { userPreferences.setWeightUnit(WeightUnit.LBS) }
             coVerify { userPreferences.setUserName("John") }
             coVerify { userPreferences.setOnboardingComplete(true) }
+        }
+    }
+
+    @Test
+    fun `complete onboarding generates plan and stores it`() = runTest {
+        val mockPlan = WorkoutPlan(
+            name = "Hypertrophy Program",
+            description = "Test plan",
+            goal = TrainingGoal.HYPERTROPHY,
+            experienceLevel = ExperienceLevel.INTERMEDIATE,
+            daysPerWeek = 4,
+            workoutDays = emptyList(),
+        )
+        coEvery {
+            workoutPlanGenerator.generatePlan(any(), any(), any())
+        } returns mockPlan
+
+        viewModel.onEvent(OnboardingEvent.GoalSelected(TrainingGoal.HYPERTROPHY))
+        viewModel.onEvent(OnboardingEvent.ExperienceSelected(ExperienceLevel.INTERMEDIATE))
+        viewModel.onEvent(OnboardingEvent.TrainingDaysSelected(4))
+
+        viewModel.effects.test {
+            viewModel.onEvent(OnboardingEvent.CompleteOnboarding)
+            awaitItem() // NavigateToMain
+
+            coVerify {
+                workoutPlanGenerator.generatePlan(
+                    TrainingGoal.HYPERTROPHY,
+                    ExperienceLevel.INTERMEDIATE,
+                    4,
+                )
+            }
+
+            val storedPlan = activePlanStore.getPlan()
+            assertEquals("Your First Program", storedPlan?.name)
+            assertTrue(activePlanStore.isFromOnboarding.value)
+        }
+    }
+
+    @Test
+    fun `complete onboarding still navigates if plan generation fails`() = runTest {
+        coEvery {
+            workoutPlanGenerator.generatePlan(any(), any(), any())
+        } throws RuntimeException("Failed to generate plan")
+
+        viewModel.effects.test {
+            viewModel.onEvent(OnboardingEvent.CompleteOnboarding)
+
+            val effect = awaitItem()
+            assertEquals(OnboardingEffect.NavigateToMain, effect)
+
+            assertNull(activePlanStore.getPlan())
         }
     }
 }

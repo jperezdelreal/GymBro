@@ -11,6 +11,7 @@ data class ProgramsState(
     val isGeneratingPlan: Boolean = false,
     val error: UiError? = null,
     val showCreateDialog: Boolean = false,
+    val showFirstProgramBanner: Boolean = false,
 )
 
 sealed interface ProgramsEvent {

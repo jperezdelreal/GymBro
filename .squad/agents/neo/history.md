@@ -583,6 +583,24 @@ Implemented intelligent split selection based on training frequency and goals:
 
 **Architecture notes:**
 - ProgressionEngine injected via Hilt constructor injection (WorkoutDao dependency)
+
+### 2026-04-10: Onboarding → Auto-Generated First Program (Issue #394, PR #408)
+**What was built:**
+- Connected onboarding data (goal, experience, frequency) to WorkoutPlanGenerator to auto-generate a personalized plan on onboarding completion
+- OnboardingViewModel now injects WorkoutPlanGenerator + ActivePlanStore, generates plan after saving preferences
+- ActivePlanStore gained `isFromOnboarding` flag for distinguishing onboarding-generated plans
+- ProgramsViewModel loads active plan from store on init, shows welcome banner when from onboarding
+- Post-onboarding navigation changed from Exercise Library to Programs screen
+- Added FirstProgramBanner composable with encouraging "Based on your goals" message
+- Plan generation is gracefully degraded — failure doesn't block onboarding completion
+- Updated Maestro E2E tests (onboarding-flow, ensure-post-onboarding, edge-cases) to expect Programs screen
+
+**Key learnings:**
+- Onboarding data should always have an immediate payoff — collecting info without using it feels like busywork
+- The WorkoutPlanGenerator already accepted exactly the data onboarding collects (goal, experience, daysPerWeek) — zero new ML logic needed
+- ActivePlanStore's in-memory singleton pattern works well as a bridge between ViewModels across navigation boundaries
+- Plan generation try/catch is critical — ExerciseRepository may return empty list on fresh install before seeding completes
+- The `nav_programs` string was missing (pre-existing bug) — the Programs bottom nav tab wouldn't have rendered correctly
 - SmartDefaultsService now has 2 dependencies (WorkoutDao + ProgressionEngine)
 - Trend analysis uses 7-day windows, comparing recent vs previous 7 days (14-day lookback total)
 - Fatigue warning threshold: rising trend AND current average ≥ 8.5 (avoids false positives)

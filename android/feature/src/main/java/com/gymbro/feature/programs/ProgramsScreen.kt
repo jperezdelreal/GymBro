@@ -146,10 +146,21 @@ fun ProgramsScreen(
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
+                // Welcome banner for first program from onboarding
+                if (state.showFirstProgramBanner) {
+                    item {
+                        FirstProgramBanner()
+                    }
+                }
+
                 // Active Plan Section
                 item {
                     Text(
-                        text = stringResource(R.string.programs_active_plan_title),
+                        text = if (state.showFirstProgramBanner) {
+                            stringResource(R.string.programs_your_first_program)
+                        } else {
+                            stringResource(R.string.programs_active_plan_title)
+                        },
                         style = MaterialTheme.typography.titleLarge.copy(
                             fontWeight = FontWeight.Bold,
                         ),
@@ -344,6 +355,43 @@ private fun MuscleGroupChip(muscleGroup: MuscleGroup) {
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
+    }
+}
+
+@Composable
+private fun FirstProgramBanner() {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = AccentGreen.copy(alpha = 0.12f),
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp),
+        ) {
+            Text(
+                text = "🎯",
+                style = MaterialTheme.typography.headlineMedium,
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = stringResource(R.string.programs_first_program_title),
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontWeight = FontWeight.Bold,
+                ),
+                color = AccentGreen,
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = stringResource(R.string.programs_first_program_subtitle),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
     }
 }
 
