@@ -1,7 +1,9 @@
 package com.gymbro.core.fakes
 
+import com.gymbro.core.model.Equipment
 import com.gymbro.core.model.Exercise
 import com.gymbro.core.repository.ExerciseRepository
+import com.gymbro.core.repository.ExerciseSubstitutionEngine
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
@@ -10,6 +12,7 @@ import java.util.UUID
 class FakeExerciseRepository : ExerciseRepository {
     
     private val exercises = MutableStateFlow<List<Exercise>>(emptyList())
+    private val substitutionEngine = ExerciseSubstitutionEngine()
     
     fun setExercises(vararg exercises: Exercise) {
         this.exercises.value = exercises.toList()
@@ -53,5 +56,20 @@ class FakeExerciseRepository : ExerciseRepository {
 
     override suspend fun isExerciseNameTaken(name: String): Boolean {
         return exercises.value.any { it.name.equals(name, ignoreCase = true) }
+    }
+
+    override suspend fun findSubstitutes(
+        exerciseId: String,
+        availableEquipment: Set<Equipment>?,
+        limit: Int
+    ): List<Exercise> {
+        val targetExercise = getExerciseById(exerciseId) ?: return emptyList()
+        
+        return substitutionEngine.findSubstitutes(
+            targetExercise = targetExercise,
+            availableExercises = exercises.value,
+            availableEquipment = availableEquipment,
+            limit = limit
+        )
     }
 }

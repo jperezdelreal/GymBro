@@ -18,6 +18,7 @@ import javax.inject.Inject
 
 class ExerciseRepositoryImpl @Inject constructor(
     private val exerciseDao: ExerciseDao,
+    private val substitutionEngine: ExerciseSubstitutionEngine = ExerciseSubstitutionEngine(),
 ) : ExerciseRepository {
 
     override fun getAllExercises(): Flow<List<Exercise>> =
@@ -71,6 +72,45 @@ class ExerciseRepositoryImpl @Inject constructor(
             is AppResult.Error -> {
                 Log.e(TAG, "Failed to check if exercise name is taken: $name: ${result.error.message}")
                 false
+            }
+        }
+    }
+
+    override suspend fun findSubstitutes(
+        exerciseId: String,
+        availableEquipment: Set<Equipment>?,
+        limit: Int
+    ): List<Exercise> {
+        val targetExercise = getExerciseById(exerciseId) ?: run {
+            Log.e(TAG, "Cannot find substitutes: exercise $exerciseId not found")
+            return emptyList()
+        }
+
+        val result = retryWithBackoff {
+            runCatchingAsResult {
+                exerciseDao.getAllExercises()
+            }
+        }
+
+        return when (result) {
+            is AppResult.Success -> {
+                val allExercisesFlow = result.data
+                // Convert flow to list synchronously  - we know the DAO returns a hot flow
+                var exercisesList: List<Exercise> = emptyList()
+                allExercisesFlow.collect { entities ->
+                    exercisesList = entities.map { it.toDomain() }
+                }
+                
+                substitutionEngine.findSubstitutes(
+                    targetExercise = targetExercise,
+                    availableExercises = exercisesList,
+                    availableEquipment = availableEquipment,
+                    limit = limit
+                )
+            }
+            is AppResult.Error -> {
+                Log.e(TAG, "Failed to find substitutes for $exerciseId: ${result.error.message}")
+                emptyList()
             }
         }
     }
