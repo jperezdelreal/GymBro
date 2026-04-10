@@ -70,6 +70,7 @@ dependencies {
 
     // Serialization
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.gson)
 
     // DataStore
     implementation(libs.datastore.preferences)

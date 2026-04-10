@@ -13,6 +13,7 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -57,11 +58,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
@@ -74,6 +77,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.res.stringResource
+import kotlin.math.abs
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
@@ -630,6 +634,10 @@ private fun SetRow(
             .fillMaxWidth()
             .clip(RoundedCornerShape(8.dp))
             .background(rowBackground)
+            .clickable(enabled = !setUi.isCompleted && setUi.weight.isNotEmpty() && setUi.reps.isNotEmpty()) {
+                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                onEvent(ActiveWorkoutEvent.QuickCompleteSet(exerciseIndex, setIndex))
+            }
             .padding(horizontal = 4.dp, vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -651,27 +659,29 @@ private fun SetRow(
             )
         }
 
-        // Weight
-        BiggerNumberField(
+        // Weight with gesture support
+        GestureNumberField(
             value = setUi.weight,
             onValueChange = { onEvent(ActiveWorkoutEvent.UpdateSetWeight(exerciseIndex, setIndex, it)) },
             enabled = !setUi.isCompleted,
             modifier = Modifier.weight(1f).testTag("weight_input"),
+            stepSize = 2.5,
         )
 
         Spacer(modifier = Modifier.width(8.dp))
 
-        // Reps
-        BiggerNumberField(
+        // Reps with gesture support
+        GestureNumberField(
             value = setUi.reps,
             onValueChange = { onEvent(ActiveWorkoutEvent.UpdateSetReps(exerciseIndex, setIndex, it)) },
             enabled = !setUi.isCompleted,
             modifier = Modifier.weight(1f).testTag("reps_input"),
+            stepSize = 1.0,
         )
 
         Spacer(modifier = Modifier.width(8.dp))
 
-        // Complete button with GradientButton
+        // Complete button
         if (setUi.isCompleted) {
             Box(
                 modifier = Modifier
@@ -698,6 +708,7 @@ private fun SetRow(
                         onEvent(ActiveWorkoutEvent.CompleteSet(exerciseIndex, setIndex))
                     }
                     .background(Brush.horizontalGradient(listOf(AccentGreenStart, AccentGreenEnd)))
+                    .alpha(if (setUi.weight.isNotEmpty() && setUi.reps.isNotEmpty()) 1f else 0.4f)
                     .semantics { contentDescription = completeDescription },
                 contentAlignment = Alignment.Center,
             ) {
@@ -710,6 +721,76 @@ private fun SetRow(
             }
         }
     }
+}
+
+@Composable
+private fun GestureNumberField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    enabled: Boolean,
+    modifier: Modifier = Modifier,
+    stepSize: Double = 1.0,
+) {
+    val haptic = LocalHapticFeedback.current
+    var dragOffset by remember { mutableStateOf(0f) }
+    val dragThreshold = 40f
+
+    TextField(
+        value = value,
+        onValueChange = { input ->
+            if (input.isEmpty() || input.matches(Regex("^\\d*\\.?\\d*$"))) {
+                onValueChange(input)
+            }
+        },
+        enabled = enabled,
+        modifier = modifier
+            .height(56.dp)
+            .pointerInput(enabled) {
+                if (!enabled) return@pointerInput
+                detectVerticalDragGestures(
+                    onDragStart = { dragOffset = 0f },
+                    onDrag = { _, dragAmount ->
+                        dragOffset += dragAmount
+                        val threshold = dragThreshold
+                        
+                        if (abs(dragOffset) >= threshold) {
+                            val currentValue = value.toDoubleOrNull() ?: 0.0
+                            val delta = if (dragOffset < 0) stepSize else -stepSize
+                            val newValue = (currentValue + delta).coerceAtLeast(0.0)
+                            
+                            val formatted = if (stepSize >= 1.0) {
+                                newValue.toInt().toString()
+                            } else {
+                                String.format("%.1f", newValue)
+                            }
+                            onValueChange(formatted)
+                            
+                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            dragOffset = 0f
+                        }
+                    },
+                    onDragEnd = { dragOffset = 0f }
+                )
+            },
+        textStyle = MaterialTheme.typography.titleMedium.copy(
+            textAlign = TextAlign.Center,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 20.sp,
+            color = if (enabled) Color.White else Color.White.copy(alpha = 0.5f),
+        ),
+        singleLine = true,
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = Color.White.copy(alpha = 0.08f),
+            unfocusedContainerColor = Color.White.copy(alpha = 0.05f),
+            disabledContainerColor = Color.White.copy(alpha = 0.03f),
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent,
+            disabledIndicatorColor = Color.Transparent,
+            cursorColor = AccentGreenStart,
+        ),
+        shape = RoundedCornerShape(8.dp),
+    )
 }
 
 @Composable
