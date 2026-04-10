@@ -580,3 +580,44 @@ Makes incremental progress on issue #334 (eliminate 32 total unsafe `!!` usages)
 - Ralph will pick up new issues in next orchestration cycle
 - Squad members (Trinity, Tank, Neo) assigned via labels
 - Feature audit + competitive analysis now form comprehensive product intelligence baseline
+
+---
+
+## PR Review & Merge: #403 & #404 (2026-04-10T13:45Z)
+
+**Reviews Completed:**
+
+### PR #403 — Fix Settings screen dead buttons (#383)
+**Author:** Tank (Android)
+**Scope:** Remove non-functional Sign In button (auth backend is NoOp stub), make App Version read-only
+**Architecture Review:**
+- ✅ Correctly identifies dead button pattern (auth backend has no real implementation)
+- ✅ SettingsRow refactored cleanly: onClick parameter now optional (nullable)
+- ✅ Removes dead Sign In dialog and App Version click handler
+- ✅ Scope tight and focused — no unrelated changes
+- ✅ String resources remain in place (ready for future auth implementation)
+**Decision:** APPROVED — merged with squash (commit 156fc55 → master)
+
+### PR #404 — Create PlanDayDetailScreen (#382)
+**Author:** Trinity (iOS)
+**Scope:** New screen for viewing daily exercises in generated plans
+**Architecture Review:**
+- ✅ **ActivePlanStore @Singleton** — correct pattern for shared state across nav destinations (ProgramsViewModel writes, PlanDayDetailViewModel reads)
+- ✅ **MVI pattern** — PlanDayDetailViewModel + Contract properly implements state/intent separation with loading/error states
+- ✅ **Screen extraction** — PlanDayDetailScreen decoupled from ProgramsScreen, clean responsibility boundary
+- ✅ **Accessibility** — full EN/ES support, semantic labels, contentDescription attributes
+- ✅ **Data flow** — ProgramsViewModel calls activePlanStore.setPlan() on plan generation, PlanDayDetailViewModel reads synchronously (acceptable for generated in-memory state)
+- ✅ Integration: GymBroNavGraph updated correctly, no Hilt scoping conflicts
+**Note:** No unit tests added (acceptable for MVP but should add PlanDayDetailViewModel tests before v1.1)
+**Decision:** APPROVED — merged with squash (commit c2c5540 → master)
+
+**Summary:**
+- Both PRs follow squad conventions: focused scope, clean architecture, proper Kotlin/Compose idioms
+- No blocking issues found
+- Both merged to master with branch cleanup
+- Feature drill-down now works end-to-end (Plans → Day Detail → Start Workout)
+
+**Architectural Decisions Validated:**
+1. In-memory singleton for cross-destination state sharing (vs SavedStateHandle or remotes) — correct for generated, non-persistent UI state
+2. Lazy loading via MVI intents — supports future incremental loading if plan size grows
+3. Read-only pattern in SettingsRow (optional onClick) — enables flexibility for future settings rows without refactoring
