@@ -6,6 +6,7 @@ import com.gymbro.core.model.Exercise
 import com.gymbro.core.model.ExerciseSet
 import com.gymbro.core.repository.WorkoutRepository
 import com.gymbro.core.service.PersonalRecordService
+import com.gymbro.core.service.SmartDefaultsService
 import com.gymbro.feature.common.BaseViewModel
 import com.gymbro.feature.common.TooltipManager
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -25,6 +26,7 @@ import javax.inject.Inject
 class ActiveWorkoutViewModel @Inject constructor(
     private val workoutRepository: WorkoutRepository,
     private val personalRecordService: PersonalRecordService,
+    private val smartDefaultsService: SmartDefaultsService,
     val tooltipManager: TooltipManager,
 ) : BaseViewModel() {
 
@@ -108,17 +110,22 @@ class ActiveWorkoutViewModel @Inject constructor(
     }
 
     private fun addExercise(exercise: Exercise) {
-        _state.update { current ->
-            val newExercise = WorkoutExerciseUi(
-                exercise = exercise,
-                sets = listOf(
-                    WorkoutSetUi(
-                        id = UUID.randomUUID().toString(),
-                        setNumber = 1,
+        safeLaunch {
+            val defaults = smartDefaultsService.getDefaults(exercise.id.toString())
+            _state.update { current ->
+                val newExercise = WorkoutExerciseUi(
+                    exercise = exercise,
+                    sets = listOf(
+                        WorkoutSetUi(
+                            id = UUID.randomUUID().toString(),
+                            setNumber = 1,
+                            weight = defaults.weight?.toString() ?: "",
+                            reps = defaults.reps?.toString() ?: "",
+                        ),
                     ),
-                ),
-            )
-            current.copy(exercises = current.exercises + newExercise)
+                )
+                current.copy(exercises = current.exercises + newExercise)
+            }
         }
     }
 
