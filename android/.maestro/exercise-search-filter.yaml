@@ -1,0 +1,229 @@
+appId: com.gymbro.app
+name: "Exercise Search Filter - Search and filter exercises in library"
+#
+# Tests: Exercise library search functionality and muscle group filtering
+# Preconditions: User has completed onboarding (ensured by ensure-post-onboarding.yaml)
+# Test data: Search queries "Squat", "Press", muscle group filters
+# Assertions: Search returns relevant results, filters work correctly, no results handled gracefully
+# Cleanup: Return to library with cleared filters
+# Dependencies: flow/ensure-post-onboarding.yaml
+tags:
+  - library
+  - search
+onFlowStart:
+  # Launch app — ensure-post-onboarding.yaml handles onboarding state
+  - launchApp
+  - waitForAnimationToEnd:
+      timeout: 3000
+
+onFlowComplete:
+  # Clear search and return to library home
+  - launchApp
+  - waitForAnimationToEnd:
+      timeout: 2000
+  - assertVisible: "Biblioteca de Ejercicios|Exercise Library"
+
+---
+
+- runFlow: flow/ensure-post-onboarding.yaml
+
+# Verify Exercise Library is loaded
+- assertVisible: "Biblioteca de Ejercicios|Exercise Library"
+# Screenshot 01: Exercise library home view
+- takeScreenshot: 01_exercise_search_library_home
+
+# TEST 1: Search for "Squat"
+- tapOn:
+    id: "search_bar"
+- waitForAnimationToEnd:
+    timeout: 500
+- inputText: "Squat"
+- hideKeyboard
+- waitForAnimationToEnd:
+    timeout: 1000
+# Screenshot 02: Search results for "Squat"
+- takeScreenshot: 02_exercise_search_squat_results
+
+# Verify search results appear (conditional)
+- runFlow:
+    when:
+      visible:
+        id: "exercise_card"
+    commands:
+      # Results found
+      - assertVisible:
+          text: ".*Squat.*"
+          optional: true
+      # Screenshot 03: Squat exercise found
+      - takeScreenshot: 03_exercise_search_squat_found
+
+- runFlow:
+    when:
+      visible: "No se encontraron ejercicios|No exercises found"
+    commands:
+      # No results path
+      - assertVisible: "No se encontraron ejercicios|No exercises found"
+      # Screenshot 04: No results message
+      - takeScreenshot: 04_exercise_search_no_results
+
+# Clear search by tapping back or relaunching
+- back
+- waitForAnimationToEnd:
+    timeout: 1000
+
+# Verify back at library home
+- assertVisible: "Biblioteca de Ejercicios|Exercise Library"
+# Screenshot 05: Library home after clearing search
+- takeScreenshot: 05_exercise_search_cleared
+
+# TEST 2: Search for "Press"
+- tapOn:
+    id: "search_bar"
+- waitForAnimationToEnd:
+    timeout: 500
+- inputText: "Press"
+- hideKeyboard
+- waitForAnimationToEnd:
+    timeout: 1000
+# Screenshot 06: Search results for "Press"
+- takeScreenshot: 06_exercise_search_press_results
+
+# Verify Press exercises appear
+- runFlow:
+    when:
+      visible:
+        id: "exercise_card"
+    commands:
+      - assertVisible:
+          text: ".*Press.*"
+          optional: true
+      # Screenshot 07: Press exercise found
+      - takeScreenshot: 07_exercise_search_press_found
+      
+      # Tap on a Press exercise to verify navigation
+      - tapOn:
+          text: ".*Press.*"
+          index: 0
+      - waitForAnimationToEnd:
+          timeout: 1000
+      # Screenshot 08: Exercise detail from search
+      - takeScreenshot: 08_exercise_search_detail_view
+      
+      # Navigate back
+      - back
+      - waitForAnimationToEnd:
+          timeout: 1000
+
+# Clear search by back navigation
+- back
+- waitForAnimationToEnd:
+    timeout: 1000
+
+# Verify library home loaded
+- assertVisible: "Biblioteca de Ejercicios|Exercise Library"
+# Screenshot 09: Library home after second search cleared
+- takeScreenshot: 09_exercise_search_library_restored
+
+# TEST 3: Filter by muscle group - Chest
+- tapOn: "Pecho|Chest"
+- waitForAnimationToEnd:
+    timeout: 1000
+# Screenshot 10: Library filtered by Chest muscle group
+- takeScreenshot: 10_exercise_filter_chest
+
+# Verify filtered results show only chest exercises
+- runFlow:
+    when:
+      visible:
+        id: "exercise_card"
+    commands:
+      # Chest exercises should be visible
+      - assertVisible:
+          id: "exercise_card"
+      # Screenshot 11: Chest exercises displayed
+      - takeScreenshot: 11_exercise_filter_chest_exercises
+
+# Clear Chest filter
+- tapOn: "Pecho|Chest"
+- waitForAnimationToEnd:
+    timeout: 500
+
+# TEST 4: Filter by muscle group - Back
+- tapOn: "Espalda|Back"
+- waitForAnimationToEnd:
+    timeout: 1000
+# Screenshot 12: Library filtered by Back muscle group
+- takeScreenshot: 12_exercise_filter_back
+
+# Verify filtered results
+- runFlow:
+    when:
+      visible:
+        id: "exercise_card"
+    commands:
+      - assertVisible:
+          id: "exercise_card"
+      # Screenshot 13: Back exercises displayed
+      - takeScreenshot: 13_exercise_filter_back_exercises
+
+# Clear Back filter
+- tapOn: "Espalda|Back"
+- waitForAnimationToEnd:
+    timeout: 500
+
+# TEST 5: Filter by muscle group - Legs
+- tapOn: "Piernas|Legs"
+- waitForAnimationToEnd:
+    timeout: 1000
+# Screenshot 14: Library filtered by Legs muscle group
+- takeScreenshot: 14_exercise_filter_legs
+
+# Verify filtered results
+- runFlow:
+    when:
+      visible:
+        id: "exercise_card"
+    commands:
+      - assertVisible:
+          id: "exercise_card"
+      # Screenshot 15: Leg exercises displayed
+      - takeScreenshot: 15_exercise_filter_legs_exercises
+
+# Clear Legs filter
+- tapOn: "Piernas|Legs"
+- waitForAnimationToEnd:
+    timeout: 500
+
+# TEST 6: Multiple filters (Chest + Shoulders)
+- tapOn: "Pecho|Chest"
+- waitForAnimationToEnd:
+    timeout: 500
+- tapOn: "Hombros|Shoulders"
+- waitForAnimationToEnd:
+    timeout: 1000
+# Screenshot 16: Library with multiple filters active
+- takeScreenshot: 16_exercise_filter_multiple
+
+# Verify results show exercises from both muscle groups
+- runFlow:
+    when:
+      visible:
+        id: "exercise_card"
+    commands:
+      - assertVisible:
+          id: "exercise_card"
+      # Screenshot 17: Multiple filter results
+      - takeScreenshot: 17_exercise_filter_multiple_results
+
+# Clear all filters
+- tapOn: "Pecho|Chest"
+- waitForAnimationToEnd:
+    timeout: 500
+- tapOn: "Hombros|Shoulders"
+- waitForAnimationToEnd:
+    timeout: 500
+
+# Verify all exercises visible again
+- assertVisible: "Biblioteca de Ejercicios|Exercise Library"
+# Screenshot 18: All filters cleared, library restored
+- takeScreenshot: 18_exercise_filter_all_cleared

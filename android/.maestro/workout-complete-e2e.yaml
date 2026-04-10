@@ -1,0 +1,211 @@
+appId: com.gymbro.app
+name: "Workout Complete E2E - Full workout lifecycle from start to history verification"
+#
+# Tests: Complete end-to-end workout flow including exercise selection, set logging, completion, and history persistence
+# Preconditions: User has completed onboarding (ensured by ensure-post-onboarding.yaml)
+# Test data: Exercise search "Press", WEIGHT (85), REPS (10), multiple sets
+# Assertions: Exercise added, sets logged, workout completed with summary, persists in history
+# Cleanup: None (workout data persists)
+# Dependencies: flow/ensure-post-onboarding.yaml
+tags:
+  - e2e
+  - core
+onFlowStart:
+  # Launch app — ensure-post-onboarding.yaml handles onboarding state
+  - launchApp
+  - waitForAnimationToEnd:
+      timeout: 3000
+
+---
+
+- runFlow: flow/ensure-post-onboarding.yaml
+
+# Start from Exercise Library
+- assertVisible: "Biblioteca de Ejercicios|Exercise Library"
+# Screenshot 01: Exercise Library starting point
+- takeScreenshot: 01_workout_e2e_library_start
+
+# Tap FAB to start new workout
+- tapOn:
+    id: "workout_fab"
+- waitForAnimationToEnd:
+    timeout: 2000
+
+# Verify Active Workout screen loaded
+- assertVisible: "Entrenamiento Activo|Active Workout"
+# Screenshot 02: Active workout screen opened
+- takeScreenshot: 02_workout_e2e_workout_started
+
+# Tap Add Exercise button
+- tapOn: "Añadir Ejercicio|Add Exercise"
+- waitForAnimationToEnd:
+    timeout: 2000
+
+# Verify exercise picker opens
+- assertVisible: "Elegir Ejercicio|Choose Exercise"
+# Screenshot 03: Exercise picker opened
+- takeScreenshot: 03_workout_e2e_exercise_picker
+
+# Search for an exercise
+- tapOn:
+    id: "search_bar"
+- waitForAnimationToEnd:
+    timeout: 500
+- inputText: "Press"
+- hideKeyboard
+- waitForAnimationToEnd:
+    timeout: 1000
+# Screenshot 04: Search results for "Press"
+- takeScreenshot: 04_workout_e2e_search_results
+
+# Select the first exercise result
+- tapOn:
+    text: ".*Press.*"
+    index: 0
+- waitForAnimationToEnd:
+    timeout: 2000
+
+# Verify back on Active Workout screen with exercise added
+- assertVisible: "Entrenamiento Activo|Active Workout"
+- assertVisible: ".*Press.*"
+# Screenshot 05: Exercise added to workout
+- takeScreenshot: 05_workout_e2e_exercise_added
+
+# Log first set
+- tapOn:
+    id: "weight_input"
+    index: 0
+- inputText: "85"
+- tapOn:
+    id: "reps_input"
+    index: 0
+- inputText: "10"
+- hideKeyboard
+- waitForAnimationToEnd:
+    timeout: 500
+# Screenshot 06: First set data entered
+- takeScreenshot: 06_workout_e2e_set1_entered
+
+# Complete first set
+- tapOn:
+    text: "Completar serie.*|Complete set.*"
+- waitForAnimationToEnd:
+    timeout: 1000
+# Screenshot 07: First set completed
+- takeScreenshot: 07_workout_e2e_set1_completed
+
+# Log second set
+- tapOn:
+    id: "weight_input"
+    index: 0
+- inputText: "85"
+- tapOn:
+    id: "reps_input"
+    index: 0
+- inputText: "10"
+- hideKeyboard
+- waitForAnimationToEnd:
+    timeout: 500
+# Screenshot 08: Second set data entered
+- takeScreenshot: 08_workout_e2e_set2_entered
+
+# Complete second set
+- tapOn:
+    text: "Completar serie.*|Complete set.*"
+- waitForAnimationToEnd:
+    timeout: 1000
+# Screenshot 09: Second set completed
+- takeScreenshot: 09_workout_e2e_set2_completed
+
+# Log third set with different values
+- tapOn:
+    id: "weight_input"
+    index: 0
+- inputText: "90"
+- tapOn:
+    id: "reps_input"
+    index: 0
+- inputText: "8"
+- hideKeyboard
+- waitForAnimationToEnd:
+    timeout: 500
+# Screenshot 10: Third set data entered (different weight/reps)
+- takeScreenshot: 10_workout_e2e_set3_entered
+
+# Complete third set
+- tapOn:
+    text: "Completar serie.*|Complete set.*"
+- waitForAnimationToEnd:
+    timeout: 1000
+# Screenshot 11: Third set completed
+- takeScreenshot: 11_workout_e2e_set3_completed
+
+# Finish the workout
+- tapOn: "Finalizar Entrenamiento|Finish Workout"
+- waitForAnimationToEnd:
+    timeout: 2000
+
+# Verify workout summary screen
+- assertVisible: "¡Entrenamiento Completado!|Workout Complete!"
+- assertVisible: "Estadísticas del Entrenamiento|Workout Statistics"
+# Screenshot 12: Workout summary displayed
+- takeScreenshot: 12_workout_e2e_summary
+
+# Verify stats are visible (sets and duration)
+- assertVisible:
+    text: "\\d+.*series|\\d+.*sets"
+- assertVisible:
+    text: "\\d+.*min|\\d+.*seg|\\d+.*sec"
+# Screenshot 13: Workout stats visible
+- takeScreenshot: 13_workout_e2e_stats_visible
+
+# Tap Done to return
+- tapOn: "Listo|Done"
+- waitForAnimationToEnd:
+    timeout: 2000
+
+# Verify back at Exercise Library
+- assertVisible: "Biblioteca de Ejercicios|Exercise Library"
+# Screenshot 14: Returned to library after completion
+- takeScreenshot: 14_workout_e2e_back_to_library
+
+# Navigate to History to verify persistence
+- tapOn:
+    id: "nav_history"
+- waitForAnimationToEnd:
+    timeout: 2000
+- assertVisible: "Historial de Entrenamientos|Workout History"
+# Screenshot 15: History tab opened
+- takeScreenshot: 15_workout_e2e_history_opened
+
+# Verify completed workout appears in history
+- assertVisible: ".*Press.*"
+# Screenshot 16: Workout visible in history (persistence verified)
+- takeScreenshot: 16_workout_e2e_workout_in_history
+
+# Tap on the workout to see details
+- tapOn:
+    text: ".*Press.*"
+    index: 0
+- waitForAnimationToEnd:
+    timeout: 2000
+# Screenshot 17: Workout detail view from history
+- takeScreenshot: 17_workout_e2e_workout_detail
+
+# Verify exercise name and sets are displayed
+- assertVisible: ".*Press.*"
+- assertVisible: "85|90"
+# Screenshot 18: Workout details showing logged sets
+- takeScreenshot: 18_workout_e2e_detail_verified
+
+# Return to Exercise Library
+- back
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    id: "nav_exercise_library"
+- waitForAnimationToEnd:
+    timeout: 1000
+- assertVisible: "Biblioteca de Ejercicios|Exercise Library"
+# Screenshot 19: Full E2E flow complete, returned to library
+- takeScreenshot: 19_workout_e2e_flow_complete
