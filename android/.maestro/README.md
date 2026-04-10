@@ -106,7 +106,8 @@ These hooks ensure flows are idempotent and don't interfere with each other.
 ## Spanish Locale
 
 The app uses Spanish locale by default:
-- "Biblioteca de Ejercicios" (Exercise Library)
+- "Inicio" (Home)
+- "Programas" (Programs)
 - "Entrenamiento Activo" (Active Workout)
 - "Historial de Entrenamientos" (Workout History)
 - "Kilogramos (kg)" (Kilograms)
@@ -116,13 +117,15 @@ When creating new flows or customizing exercise names, ensure they match the app
 ## Test IDs
 
 Key test IDs available for reliable element selection:
-- `workout_fab` — FAB to start workout
+- `workout_fab` — FAB to start workout (visible on all tab screens)
 - `weight_input` — Weight input field
 - `reps_input` — Reps input field
 - `search_bar` — Exercise search bar
-- `nav_exercise_library` — Exercise Library tab
+- `quick_start_card` — Quick start card on Home screen
+- `quick_start_button` — Quick start button on Home screen
+- `nav_home` — Home tab
+- `nav_programs` — Programs tab
 - `nav_history` — History tab
-- `nav_progress` — Progress tab
 - `nav_profile` — Profile tab
 - `onboarding_name_input` — Onboarding name input
 - `onboarding_start` — Onboarding start button
@@ -147,11 +150,10 @@ When creating new flows, follow these conventions:
    ```yaml
    onFlowStart:
      - launchApp
-     - assertVisible: "Biblioteca de Ejercicios"
    
    onFlowComplete:
      - tapOn:
-         id: "nav_exercise_library"
+         id: "nav_home"
          optional: true
    ```
 

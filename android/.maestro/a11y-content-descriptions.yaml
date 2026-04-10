@@ -7,20 +7,19 @@ tags:
 # Preconditions: Post-onboarding state, all key screens loaded
 # Test data: None required
 # Assertions: testTag IDs exist and are visible on all main screens
-# Cleanup: Return to Library tab
+# Cleanup: Return to Home tab
 # Dependencies: ensure-post-onboarding flow
 
 onFlowStart:
-  # Start at library with clean state
+  # Start with clean state
   - launchApp
   - waitForAnimationToEnd:
       timeout: 3000
-  - assertVisible: "Biblioteca de Ejercicios"
 
 onFlowComplete:
-  # Return to Library tab
+  # Return to Home tab
   - tapOn:
-      id: "nav_exercise_library"
+      id: "nav_home"
       optional: true
   - waitForAnimationToEnd:
       timeout: 1000
@@ -29,19 +28,28 @@ onFlowComplete:
 
 - runFlow: flow/ensure-post-onboarding.yaml
 
-# Library Screen — Verify key element identifiers
-- assertVisible: "Biblioteca de Ejercicios"
+# Home Screen — Verify key element identifiers
+- tapOn:
+    id: "nav_home"
+- waitForAnimationToEnd:
+    timeout: 2000
+- assertVisible: "Inicio|Home"
 - assertVisible:
-    id: "search_bar"
+    id: "quick_start_card"
+    optional: true
 - assertVisible:
     id: "workout_fab"
-- takeScreenshot: a11y_content_library
+- takeScreenshot: a11y_content_home
 
-# Check exercise cards are identifiable
+# Programs Screen — Verify navigation identifier
+- tapOn:
+    id: "nav_programs"
+- waitForAnimationToEnd:
+    timeout: 2000
+- assertVisible: "Programas|Programs"
 - assertVisible:
-    id: "exercise_card"
-    optional: true
-- takeScreenshot: a11y_content_exercise_cards
+    id: "nav_programs"
+- takeScreenshot: a11y_content_programs
 
 # History Screen — Verify navigation identifier
 - tapOn:
@@ -52,26 +60,6 @@ onFlowComplete:
 - assertVisible:
     id: "nav_history"
 - takeScreenshot: a11y_content_history
-
-# Progress Screen — Verify navigation identifier
-- tapOn:
-    id: "nav_progress"
-- waitForAnimationToEnd:
-    timeout: 2000
-- assertVisible: "Progreso|Progress"
-- assertVisible:
-    id: "nav_progress"
-- takeScreenshot: a11y_content_progress
-
-# Recovery Screen — Verify navigation identifier
-- tapOn:
-    id: "nav_recovery"
-- waitForAnimationToEnd:
-    timeout: 2000
-- assertVisible: "Recuperación|Recovery"
-- assertVisible:
-    id: "nav_recovery"
-- takeScreenshot: a11y_content_recovery
 
 # Profile Screen — Verify navigation identifier
 - tapOn:
@@ -88,10 +76,9 @@ onFlowComplete:
 
 # Start a workout to verify workout-related identifiers
 - tapOn:
-    id: "nav_exercise_library"
+    id: "nav_home"
 - waitForAnimationToEnd:
     timeout: 2000
-- assertVisible: "Biblioteca de Ejercicios"
 
 - tapOn:
     id: "workout_fab"
@@ -104,7 +91,7 @@ onFlowComplete:
     optional: true
 - takeScreenshot: a11y_content_workout_inputs
 
-# Return to library
+# Return to Home
 - back
 - waitForAnimationToEnd:
     timeout: 1000

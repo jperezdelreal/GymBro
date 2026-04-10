@@ -1,11 +1,11 @@
 appId: com.gymbro.app
 name: "Browse Library - Search and filter exercises"
 #
-# Tests: Verifying search functionality and muscle group filters in exercise library
+# Tests: Verifying search functionality and muscle group filters in exercise picker
 # Preconditions: User has completed onboarding (ensured by ensure-post-onboarding.yaml)
 # Test data: Search query "Press", muscle groups "Pecho", "Espalda", "Hombros"
 # Assertions: Search results display correctly, filters toggle on/off, no results message appears when applicable
-# Cleanup: App relaunched with clean filters
+# Cleanup: Cancel active workout
 # Dependencies: flow/ensure-post-onboarding.yaml
 tags:
   - library
@@ -17,18 +17,39 @@ onFlowStart:
       timeout: 3000
 
 onFlowComplete:
-  # Clear any active search/filter state
-  - launchApp
-  - assertVisible: "Biblioteca de Ejercicios"
+  # Cancel any active workout and return to Home
+  - back:
+      optional: true
+  - tapOn:
+      text: "Cancelar Entrenamiento|Cancel Workout|Descartar"
+      optional: true
+  - tapOn:
+      id: "nav_home"
+      optional: true
 
 ---
 
 - runFlow: flow/ensure-post-onboarding.yaml
 
-# Verify Exercise Library is visible
-- assertVisible: "Biblioteca de Ejercicios"
-# Screenshot 01: Exercise library home screen with default view
-- takeScreenshot: 01_browse_library_home
+# Navigate to Home tab
+- tapOn:
+    id: "nav_home"
+- waitForAnimationToEnd:
+    timeout: 2000
+
+# Start a workout to access exercise picker
+- tapOn:
+    id: "workout_fab"
+- waitForAnimationToEnd:
+    timeout: 2000
+
+# Tap Add Exercise to open exercise picker (browse library)
+- tapOn: "Añadir Ejercicio|Add Exercise"
+- waitForAnimationToEnd:
+    timeout: 2000
+- assertVisible: "Elegir Ejercicio|Choose Exercise"
+# Screenshot 01: Exercise picker opened for browsing
+- takeScreenshot: 01_browse_library_picker
 
 # Tap on search bar and type a query
 - tapOn:
@@ -54,18 +75,6 @@ onFlowComplete:
           timeout: 5000
       # Screenshot 03: Specific exercise found in search results
       - takeScreenshot: 03_browse_library_exercise_found
-      
-      # Tap the found exercise
-      - tapOn:
-          text: ".*Press.*"
-          index: 0
-      - waitForAnimationToEnd:
-          timeout: 1000
-      # Screenshot 04: Exercise detail view after tapping from search
-      - takeScreenshot: 04_browse_library_exercise_detail
-      
-      # Navigate back
-      - back
 
 - runFlow:
     when:
@@ -76,19 +85,22 @@ onFlowComplete:
       # Screenshot 05: Empty search results message
       - takeScreenshot: 05_browse_library_no_search_results
 
-# Relaunch app to clear search
-- launchApp
+# Clear search — go back and reopen picker
+- back
 - waitForAnimationToEnd:
-    timeout: 3000
+    timeout: 2000
 
-# Wait for library to load
-- assertVisible: "Biblioteca de Ejercicios"
+# Re-open exercise picker to test filters
+- tapOn: "Añadir Ejercicio|Add Exercise"
+- waitForAnimationToEnd:
+    timeout: 2000
+- assertVisible: "Elegir Ejercicio|Choose Exercise"
 
 # Filter by Chest muscle group
 - tapOn: "Pecho|Chest"
 - waitForAnimationToEnd:
     timeout: 1000
-# Screenshot 06: Library filtered by Chest/Pecho muscle group
+# Screenshot 06: Picker filtered by Chest/Pecho muscle group
 - takeScreenshot: 06_browse_library_filter_chest
 
 # Deselect Chest, select Back
@@ -98,7 +110,7 @@ onFlowComplete:
 - tapOn: "Espalda|Back"
 - waitForAnimationToEnd:
     timeout: 1000
-# Screenshot 07: Library filtered by Back/Espalda muscle group
+# Screenshot 07: Picker filtered by Back/Espalda muscle group
 - takeScreenshot: 07_browse_library_filter_back
 
 # Deselect Back, select Shoulders
@@ -108,12 +120,23 @@ onFlowComplete:
 - tapOn: "Hombros|Shoulders"
 - waitForAnimationToEnd:
     timeout: 1000
-# Screenshot 08: Library filtered by Shoulders/Hombros muscle group
+# Screenshot 08: Picker filtered by Shoulders/Hombros muscle group
 - takeScreenshot: 08_browse_library_filter_shoulders
 
 # Deselect filter
 - tapOn: "Hombros|Shoulders"
 - waitForAnimationToEnd:
     timeout: 1000
-# Screenshot 09: Library with no filters applied (all exercises shown)
+# Screenshot 09: Picker with no filters applied (all exercises shown)
 - takeScreenshot: 09_browse_library_no_filter
+
+# Cancel workout to clean up
+- back
+- waitForAnimationToEnd:
+    timeout: 1000
+- back
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    text: "Cancelar Entrenamiento|Cancel Workout|Descartar"
+    optional: true

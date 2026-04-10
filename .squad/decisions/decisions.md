@@ -1044,3 +1044,145 @@ Added comprehensive unit tests:
 All tests passing ✅
 
 **Status:** Implemented (PR #396)
+
+---
+
+## 2026-04-10: Voice Input UX — Placement & Permission Handling
+
+**Decision by:** Trinity (Mobile Dev)  
+**Date:** 2026-04-10  
+**Issue:** #392  
+**PR:** (merged in Round 5)
+
+### Decision
+
+Voice input button is placed in the **exercise card header** (next to delete icon), not per-set-row. When triggered, it auto-fills the **first incomplete set** for that exercise.
+
+### Rationale
+
+- Adding a mic button to every SetRow creates visual clutter in an already compact layout (Set# | Weight | Reps | Complete).
+- One mic per exercise is sufficient — users typically voice-log the current working set.
+- Auto-targeting the first incomplete set matches natural workout flow (sets are completed in order).
+- Feedback toast shows parsed result beneath the header so user can verify before completing.
+
+### Permission Flow — Three-State Handling
+
+1. **First request**: Direct system permission dialog
+2. **Previously denied**: Rationale dialog explaining why mic is needed, then system dialog
+3. **Permanently denied**: Dialog with "Open Settings" button redirecting to app settings
+
+### Implications
+
+- All voice input strings must be maintained in both `values/strings.xml` and `values-es/strings.xml`.
+- VoiceRecognitionService uses device locale instead of hardcoded en-US — future locale additions only require VoiceInputParser updates.
+- The `ActiveWorkoutEvent.VoiceInput` event already existed; no ViewModel changes were needed.
+
+---
+
+## 2026-04-10: Home Screen Redesign — Navigation Structure
+
+**Decision by:** Trinity (Mobile Dev)  
+**Date:** 2026-04-10  
+**Issue:** #335  
+**PR:** #409 (merged in Round 5)
+
+### Decision
+
+The default Android landing screen is now a dedicated **HomeScreen** instead of ExerciseLibrary.
+
+### Bottom Navigation — 4-Tab Layout
+
+| Position | Tab | Route | Icon |
+|----------|-----|-------|------|
+| 1 | Home | `home` | Home |
+| 2 | Programs | `programs` | CalendarMonth |
+| 3 | History | `history` | History |
+| 4 | Profile | `profile` | Person |
+
+**Removed from bottom nav:**
+- **Exercise Library** — now accessible as exercise picker within workout flows
+- **Progress** — still accessible via History/Profile screens, just not a primary tab
+
+### Rationale
+
+- Users opening the app want to **do something**, not browse a reference library
+- "What should I do today?" is the core question the home screen answers
+- 4 tabs instead of 5 reduces cognitive load and improves thumb reachability
+- Exercise Library is a support tool, not a primary action — fits better as sub-navigation
+
+### Impact
+
+- Navigation routes: `home` is new start destination (was `exercise_library`)
+- Onboarding completion navigates to `home` (was `programs`)
+- Workout summary "Done" returns to `home` (was `exercise_library`)
+- All existing routes remain functional — no breaking changes
+
+---
+
+## 2026-04-10: RPE-Based Progression Engine Design
+
+**Decision by:** Neo (AI/ML Engineer)  
+**Date:** 2026-04-10  
+**Issue:** #393  
+**PR:** #406 (merged in Round 4)
+
+### Decision
+
+Progression logic uses simple heuristic rules (not ML) based on RPE data:
+- **Progress:** All working sets RPE ≤7 → +2.5kg
+- **Regress:** Last 2 sets RPE 10 → −5% (rounded to 2.5kg)
+- **Maintain:** RPE 8-9 → same weight
+
+RPE picker is a tap-to-cycle widget (6→7→8→9→10→clear) rather than dropdown or slider, because speed matters during active workouts.
+
+### Design Rationale
+
+Heuristics before ML — a well-tuned rule set is more explainable and debuggable than a black-box model. Users can understand "your RPE was low, so we increased weight" far better than "the model predicted you should increase weight."
+
+### Implications
+
+- **Trinity (UI):** RPE column is 48dp wide in the set row. If layout feels cramped on smaller screens, we may need to make RPE collapsible or show it only after first set completion.
+- **Tank (Data):** Room DB is now version 6. Migration adds `rir INTEGER` column to `workout_sets`.
+- **Switch (Testing):** ProgressionEngine and RpeTrendService have unit tests. Integration tests for the full flow (log sets → get suggestion → verify weight) would be valuable.
+- **Neo (Future):** This heuristic engine is the foundation. Future ML-based autoregulation can replace the rules with a trained model once we have enough RPE data to train on.
+
+---
+
+## 2026-04-10: Onboarding Data → Auto-Generated First Program
+
+**Decision by:** Neo (AI/ML Engineer)  
+**Date:** 2026-04-10  
+**Issue:** #394  
+**PR:** #408 (merged in Round 4)
+
+### Decision
+
+After onboarding completes, the app now auto-generates a personalized workout plan using the collected data (goal, experience level, training frequency) and routes the user to the Programs screen instead of the Exercise Library.
+
+### Rationale
+
+- Onboarding collected valuable data (goal, experience, frequency) but discarded it — user landed on an empty Exercise Library with no guidance
+- The `WorkoutPlanGenerator` already existed and accepted exactly the data onboarding collects
+- Routing to Programs with a pre-generated plan creates an immediate payoff for completing onboarding
+- Plan generation is fire-and-forget with graceful degradation — if generation fails, onboarding still completes normally
+
+### Architecture
+
+- `OnboardingViewModel` now injects `WorkoutPlanGenerator` + `ActivePlanStore` (both are already Hilt-provided singletons)
+- `ActivePlanStore` gained an `isFromOnboarding` flag to distinguish onboarding-generated plans from manual generation
+- `ProgramsViewModel` loads the active plan from the store on init, so it's immediately visible on navigation
+- Plan is named "Your First Program" to differentiate from manually generated plans
+
+### Implications
+
+- **Trinity (UX):** The post-onboarding destination changed from Exercise Library to Programs. Any onboarding flow changes should verify this routing.
+- **Tank (Architecture):** `ActivePlanStore` is in-memory only. If plan persistence to database is needed later, this is the hook point.
+- **Switch (QA):** Maestro E2E tests updated to expect Programs screen after onboarding. The `waitForAnimationToEnd` timeout was increased to 5s to account for plan generation time.
+
+---
+
+## 2026-04-10T15:55:00Z: User Directive — Ralph Never Stops
+
+**By:** Copilot (via user request)  
+**What:** Ralph NEVER stops. Context is at 18%, user will /compact if needed. Continue until the board is completely empty. No excuses. Emulator available for Android testing issues.  
+**Why:** User request — captured for team memory during Round 5 completion sprint.

@@ -19,8 +19,21 @@ onFlowStart:
 
 - runFlow: flow/ensure-post-onboarding.yaml
 
-# Start from Exercise Library
-- assertVisible: "Biblioteca de Ejercicios"
+# Navigate to Home and start workout to access exercise picker
+- tapOn:
+    id: "nav_home"
+- waitForAnimationToEnd:
+    timeout: 2000
+- tapOn:
+    id: "workout_fab"
+- waitForAnimationToEnd:
+    timeout: 2000
+- tapOn: "Añadir Ejercicio|Add Exercise"
+- waitForAnimationToEnd:
+    timeout: 2000
+
+# Start from Exercise Picker
+- assertVisible: "Elegir Ejercicio|Choose Exercise"
 # Screenshot 01: Search no results test starting point
 - takeScreenshot: 01_search_no_results_start
 
@@ -80,7 +93,7 @@ onFlowStart:
     id: "search_bar"
 - eraseText
 - hideKeyboard
-- assertVisible: "Biblioteca de Ejercicios"
+- assertVisible: "Elegir Ejercicio|Choose Exercise"
 
 # Verify search still works with valid term
 - tapOn:

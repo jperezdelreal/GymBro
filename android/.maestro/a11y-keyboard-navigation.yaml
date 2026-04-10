@@ -6,21 +6,20 @@ tags:
 # Tests: Verify all main screens are reachable via hardware keyboard navigation
 # Preconditions: Post-onboarding state, app supports keyboard/D-pad navigation
 # Test data: None required
-# Assertions: All 5 main tabs accessible, key interactive elements receive focus
-# Cleanup: Return to Library tab
+# Assertions: All 4 main tabs accessible, key interactive elements receive focus
+# Cleanup: Return to Home tab
 # Dependencies: ensure-post-onboarding flow
 
 onFlowStart:
-  # Start at library with clean state
+  # Start with clean state
   - launchApp
   - waitForAnimationToEnd:
       timeout: 3000
-  - assertVisible: "Biblioteca de Ejercicios"
 
 onFlowComplete:
-  # Return to Library tab
+  # Return to Home tab
   - tapOn:
-      id: "nav_exercise_library"
+      id: "nav_home"
       optional: true
   - waitForAnimationToEnd:
       timeout: 1000
@@ -29,33 +28,29 @@ onFlowComplete:
 
 - runFlow: flow/ensure-post-onboarding.yaml
 
-# Verify we're on Library tab
-- assertVisible: "Biblioteca de Ejercicios"
-- takeScreenshot: a11y_keyboard_start_library
+# Verify we're on a post-onboarding screen — navigate to Home
+- tapOn:
+    id: "nav_home"
+- waitForAnimationToEnd:
+    timeout: 2000
+- assertVisible: "Inicio|Home"
+- takeScreenshot: a11y_keyboard_start_home
 
-# Navigate to History tab via tab navigation (simulating keyboard)
+# Navigate to Programs tab
+- tapOn:
+    id: "nav_programs"
+- waitForAnimationToEnd:
+    timeout: 2000
+- assertVisible: "Programas|Programs"
+- takeScreenshot: a11y_keyboard_programs
+
+# Navigate to History tab
 - tapOn:
     id: "nav_history"
 - waitForAnimationToEnd:
     timeout: 2000
 - assertVisible: "Historial|History"
 - takeScreenshot: a11y_keyboard_history
-
-# Navigate to Progress tab
-- tapOn:
-    id: "nav_progress"
-- waitForAnimationToEnd:
-    timeout: 2000
-- assertVisible: "Progreso|Progress"
-- takeScreenshot: a11y_keyboard_progress
-
-# Navigate to Recovery tab
-- tapOn:
-    id: "nav_recovery"
-- waitForAnimationToEnd:
-    timeout: 2000
-- assertVisible: "Recuperación|Recovery"
-- takeScreenshot: a11y_keyboard_recovery
 
 # Navigate to Profile tab
 - tapOn:
@@ -68,17 +63,13 @@ onFlowComplete:
 # Verify interactive element on Profile (AI Coach button)
 - assertVisible: "Hablar con Entrenador IA"
 
-# Return to Library tab
+# Return to Home tab
 - tapOn:
-    id: "nav_exercise_library"
+    id: "nav_home"
 - waitForAnimationToEnd:
     timeout: 2000
-- assertVisible: "Biblioteca de Ejercicios"
-- takeScreenshot: a11y_keyboard_back_to_library
-
-# Verify search bar is accessible
-- assertVisible:
-    id: "search_bar"
+- assertVisible: "Inicio|Home"
+- takeScreenshot: a11y_keyboard_back_to_home
 
 # Verify workout FAB is accessible
 - assertVisible:

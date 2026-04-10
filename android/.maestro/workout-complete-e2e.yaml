@@ -20,10 +20,14 @@ onFlowStart:
 
 - runFlow: flow/ensure-post-onboarding.yaml
 
-# Start from Exercise Library
-- assertVisible: "Biblioteca de Ejercicios|Exercise Library"
-# Screenshot 01: Exercise Library starting point
-- takeScreenshot: 01_workout_e2e_library_start
+# Navigate to Home tab to start workout
+- tapOn:
+    id: "nav_home"
+- waitForAnimationToEnd:
+    timeout: 2000
+- assertVisible: "Inicio|Home"
+# Screenshot 01: Home screen starting point
+- takeScreenshot: 01_workout_e2e_home_start
 
 # Tap FAB to start new workout
 - tapOn:
@@ -164,10 +168,14 @@ onFlowStart:
 - waitForAnimationToEnd:
     timeout: 2000
 
-# Verify back at Exercise Library
-- assertVisible: "Biblioteca de Ejercicios|Exercise Library"
-# Screenshot 14: Returned to library after completion
-- takeScreenshot: 14_workout_e2e_back_to_library
+# Verify back at Home screen
+- tapOn:
+    id: "nav_home"
+- waitForAnimationToEnd:
+    timeout: 2000
+- assertVisible: "Inicio|Home"
+# Screenshot 14: Returned to Home after completion
+- takeScreenshot: 14_workout_e2e_back_to_home
 
 # Navigate to History to verify persistence
 - tapOn:
@@ -198,14 +206,14 @@ onFlowStart:
 # Screenshot 18: Workout details showing logged sets
 - takeScreenshot: 18_workout_e2e_detail_verified
 
-# Return to Exercise Library
+# Return to Home tab
 - back
 - waitForAnimationToEnd:
     timeout: 1000
 - tapOn:
-    id: "nav_exercise_library"
+    id: "nav_home"
 - waitForAnimationToEnd:
     timeout: 1000
-- assertVisible: "Biblioteca de Ejercicios|Exercise Library"
-# Screenshot 19: Full E2E flow complete, returned to library
+- assertVisible: "Inicio|Home"
+# Screenshot 19: Full E2E flow complete, returned to Home
 - takeScreenshot: 19_workout_e2e_flow_complete

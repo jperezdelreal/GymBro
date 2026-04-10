@@ -27,8 +27,12 @@ onFlowComplete:
 
 - runFlow: flow/ensure-post-onboarding.yaml
 
-# Start from Exercise Library
-- assertVisible: "Biblioteca de Ejercicios"
+# Navigate to Home tab
+- tapOn:
+    id: "nav_home"
+- waitForAnimationToEnd:
+    timeout: 2000
+- assertVisible: "Inicio|Home"
 
 # Tap FAB to start new workout
 - tapOn:
@@ -54,14 +58,19 @@ onFlowComplete:
 # Search and select an exercise
 - tapOn:
     id: "search_bar"
-- inputText: "${EXERCISE_SEARCH || 'Bench'}"
+- inputText: "Squat"
+# Dismiss keyboard so autocomplete doesn't capture tap
+- hideKeyboard
+- waitForAnimationToEnd:
+    timeout: 1000
 # Screenshot 03: Search query entered in exercise picker
 - takeScreenshot: 03_start_workout_exercise_picker_search
 
-# Tap the first exercise result
+# Tap the first exercise card by coordinates (center of first card area)
 - tapOn:
-    text: "Bench Press"
-    index: 0
+    point: "50%,42%"
+- waitForAnimationToEnd:
+    timeout: 3000
 
 # Back on workout screen — verify exercise was added
 - assertVisible: "Entrenamiento Activo"

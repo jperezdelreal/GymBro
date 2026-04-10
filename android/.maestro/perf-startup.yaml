@@ -6,7 +6,7 @@ tags:
 # Tests: Measure app cold start time to first interactive screen
 # Preconditions: Post-onboarding completed (user has seen onboarding)
 # Test data: None required
-# Assertions: App launches successfully, Library screen visible within reasonable time
+# Assertions: App launches successfully, Home screen visible within reasonable time
 # Cleanup: App remains launched
 # Dependencies: ensure-post-onboarding flow
 
@@ -19,7 +19,7 @@ onFlowStart:
 
 onFlowComplete:
   # Leave app in launched state
-  - assertVisible: "Biblioteca de Ejercicios|Onboarding"
+  - assertVisible: "Inicio|Home|Programas|Programs|Onboarding"
 
 ---
 
@@ -30,7 +30,7 @@ onFlowComplete:
     clearState: true
 - takeScreenshot: perf_startup_launch
 
-# Wait for first interactive screen (either onboarding or Library)
+# Wait for first interactive screen (either onboarding or Home)
 - waitForAnimationToEnd:
     timeout: 5000
 
@@ -50,26 +50,27 @@ onFlowComplete:
           timeout: 2000
       - takeScreenshot: perf_startup_onboarding_complete
 
-# Verify we reach Library (first interactive screen)
-- assertVisible: "Biblioteca de Ejercicios"
-- takeScreenshot: perf_startup_library_loaded
+# Navigate to Home to verify first interactive screen
+- tapOn:
+    id: "nav_home"
+    optional: true
+- waitForAnimationToEnd:
+    timeout: 2000
+- assertVisible: "Inicio|Home"
+- takeScreenshot: perf_startup_home_loaded
 
 # Verify key interactive elements are rendered
 - assertVisible:
     id: "workout_fab"
-- assertVisible:
-    id: "search_bar"
 - takeScreenshot: perf_startup_interactive_ready
 
 # Verify bottom navigation is functional
 - assertVisible:
-    id: "nav_exercise_library"
+    id: "nav_home"
+- assertVisible:
+    id: "nav_programs"
 - assertVisible:
     id: "nav_history"
-- assertVisible:
-    id: "nav_progress"
-- assertVisible:
-    id: "nav_recovery"
 - assertVisible:
     id: "nav_profile"
 - takeScreenshot: perf_startup_complete

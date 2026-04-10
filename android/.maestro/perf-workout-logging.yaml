@@ -11,14 +11,13 @@ tags:
 # Dependencies: ensure-post-onboarding flow
 
 onFlowStart:
-  # Start at library
+  # Start at Home
   - launchApp
   - waitForAnimationToEnd:
       timeout: 3000
-  - assertVisible: "Biblioteca de Ejercicios"
 
 onFlowComplete:
-  # Exit workout and return to library
+  # Exit workout and return to Home
   - back
   - waitForAnimationToEnd:
       timeout: 1000
@@ -28,15 +27,19 @@ onFlowComplete:
   - waitForAnimationToEnd:
       timeout: 1000
   - tapOn:
-      id: "nav_exercise_library"
+      id: "nav_home"
       optional: true
 
 ---
 
 - runFlow: flow/ensure-post-onboarding.yaml
 
-# Start a workout
-- assertVisible: "Biblioteca de Ejercicios"
+# Start a workout from Home
+- tapOn:
+    id: "nav_home"
+- waitForAnimationToEnd:
+    timeout: 2000
+- assertVisible: "Inicio|Home"
 - takeScreenshot: perf_workout_logging_start
 
 - tapOn:
