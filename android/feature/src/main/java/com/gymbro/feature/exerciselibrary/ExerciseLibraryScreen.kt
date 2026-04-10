@@ -72,6 +72,7 @@ import com.gymbro.core.model.MuscleGroup
 import com.gymbro.feature.common.FullScreenLoading
 import com.gymbro.feature.common.GlassmorphicCard
 import com.gymbro.feature.common.ObserveErrors
+import com.gymbro.feature.common.EmptyState
 import com.gymbro.feature.common.icon
 import com.gymbro.core.R
 
@@ -235,7 +236,7 @@ fun ExerciseLibraryScreen(
                     FullScreenLoading(message = stringResource(R.string.exercise_library_loading))
                 }
                 state.exercises.isEmpty() -> {
-                    EmptyExercisesView()
+                    EmptyExercisesView(onNavigateToCreateExercise)
                 }
                 else -> {
                     LazyColumn(

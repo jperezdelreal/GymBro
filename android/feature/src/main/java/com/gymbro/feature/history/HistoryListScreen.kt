@@ -80,6 +80,7 @@ private val SurfaceDark = Color(0xFF0A0A0A)
 fun HistoryListRoute(
     onNavigateBack: () -> Unit,
     onNavigateToDetail: (String) -> Unit,
+    onNavigateToActiveWorkout: () -> Unit = {},
     viewModel: HistoryListViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsState()
@@ -121,6 +122,8 @@ fun HistoryListRoute(
                         icon = Icons.Default.History,
                         title = stringResource(R.string.history_empty_title),
                         subtitle = stringResource(R.string.history_empty_subtitle),
+                        actionText = stringResource(R.string.history_empty_cta),
+                        onActionClick = onNavigateToActiveWorkout,
                     )
                 }
                 else -> {

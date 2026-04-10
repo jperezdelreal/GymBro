@@ -103,6 +103,7 @@ fun ProgressRoute(
     onNavigateToWorkoutDetail: (String) -> Unit = {},
     onNavigateToAnalytics: () -> Unit = {},
     onNavigateToCoach: (String) -> Unit = {},
+    onNavigateToActiveWorkout: () -> Unit = {},
 ) {
     val viewModel: ProgressViewModel = hiltViewModel()
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -127,6 +128,7 @@ fun ProgressRoute(
         state = state,
         onEvent = viewModel::onEvent,
         onNavigateToAnalytics = onNavigateToAnalytics,
+        onNavigateToActiveWorkout = onNavigateToActiveWorkout,
         showChartTooltip = showChartTooltip,
         onTooltipDismissed = {
             showChartTooltip = false
@@ -142,6 +144,7 @@ private fun ProgressScreen(
     state: ProgressState,
     onEvent: (ProgressEvent) -> Unit,
     onNavigateToAnalytics: () -> Unit = {},
+    onNavigateToActiveWorkout: () -> Unit = {},
     showChartTooltip: Boolean = false,
     onTooltipDismissed: () -> Unit = {},
 ) {
@@ -151,7 +154,7 @@ private fun ProgressScreen(
     }
 
     if (state.workoutHistory.isEmpty() && state.personalRecords.isEmpty()) {
-        EmptyProgressState()
+        EmptyProgressState(onNavigateToActiveWorkout)
         return
     }
 
@@ -284,11 +287,13 @@ private fun ProgressScreen(
 }
 
 @Composable
-private fun EmptyProgressState() {
+private fun EmptyProgressState(onNavigateToActiveWorkout: () -> Unit = {}) {
     EmptyState(
         icon = Icons.Default.EmojiEvents,
         title = stringResource(R.string.progress_empty_title),
-        subtitle = stringResource(R.string.progress_empty_subtitle_alt),
+        subtitle = stringResource(R.string.progress_empty_subtitle),
+        actionText = stringResource(R.string.progress_empty_cta),
+        onActionClick = onNavigateToActiveWorkout,
     )
 }
 

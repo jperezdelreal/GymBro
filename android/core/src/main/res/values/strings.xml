@@ -32,6 +32,7 @@
     <string name="exercise_library_search">Search exercises…</string>
     <string name="exercise_library_empty_title">No exercises found</string>
     <string name="exercise_library_empty_subtitle">Try adjusting your search or filters</string>
+    <string name="exercise_library_empty_cta">Create Custom Exercise</string>
     <string name="exercise_library_loading">Loading exercises...</string>
     <string name="exercise_library_view_details">View exercise details</string>
 
@@ -73,6 +74,7 @@
     <string name="history_title">Workout History</string>
     <string name="history_empty_title">No Workouts Yet</string>
     <string name="history_empty_subtitle">Start training to build your history!</string>
+    <string name="history_empty_cta">Start Your First Workout</string>
     <string name="history_loading">Loading history...</string>
     <string name="history_error_title">Error</string>
     <string name="history_exercises_count">%d exercises</string>
@@ -82,7 +84,8 @@
     <!-- Progress -->
     <string name="progress_title">Progress</string>
     <string name="progress_empty_title">No workouts yet</string>
-    <string name="progress_empty_subtitle">Start training to track progress!</string>
+    <string name="progress_empty_subtitle">Log 3 workouts to see trends and analytics</string>
+    <string name="progress_empty_cta">Start Workout</string>
     <string name="progress_loading">Loading progress...</string>
     <string name="progress_total_workouts">Total Workouts</string>
     <string name="progress_total_volume">Total Volume</string>
