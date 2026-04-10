@@ -148,6 +148,7 @@ private class FakeWorkoutRepository : WorkoutRepository {
     override suspend fun saveInProgressWorkout(inProgressWorkout: com.gymbro.core.model.InProgressWorkout) {}
     override suspend fun getInProgressWorkout(): com.gymbro.core.model.InProgressWorkout? = null
     override suspend fun clearInProgressWorkout(workoutId: String) {}
+
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -164,7 +165,7 @@ class ActiveWorkoutViewModelTest {
     @Before
     fun setup() = runTest(testDispatcher) {
         workoutRepository = FakeWorkoutRepository()
-        viewModel = ActiveWorkoutViewModel(workoutRepository, mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true))
+        viewModel = ActiveWorkoutViewModel(workoutRepository, mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true))
         advanceUntilIdle()
     }
 
