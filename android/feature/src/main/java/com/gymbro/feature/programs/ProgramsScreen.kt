@@ -131,15 +131,8 @@ fun ProgramsScreen(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         containerColor = MaterialTheme.colorScheme.background,
     ) { innerPadding ->
-        if (state.isLoading && state.templates.isEmpty()) {
+        if (state.isLoading && state.templates.isEmpty() && state.activePlan == null) {
             FullScreenLoading()
-        } else if (state.templates.isEmpty()) {
-            EmptyState(
-                icon = Icons.Default.FitnessCenter,
-                title = stringResource(R.string.programs_empty_title),
-                subtitle = stringResource(R.string.programs_empty_subtitle),
-                modifier = Modifier.padding(innerPadding),
-            )
         } else {
             LazyColumn(
                 modifier = Modifier
@@ -148,12 +141,57 @@ fun ProgramsScreen(
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                items(state.templates, key = { it.id.toString() }) { template ->
-                    TemplateCard(
-                        template = template,
-                        onClick = { onEvent(ProgramsEvent.TemplateClicked(template)) },
-                        onStartWorkout = { onEvent(ProgramsEvent.StartWorkoutFromTemplate(template)) },
+                // Active Plan Section
+                item {
+                    Text(
+                        text = stringResource(R.string.programs_active_plan_title),
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            fontWeight = FontWeight.Bold,
+                        ),
+                        color = MaterialTheme.colorScheme.onBackground,
                     )
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+
+                if (state.activePlan != null) {
+                    item {
+                        ActivePlanCard(
+                            plan = state.activePlan,
+                            onViewDay = { dayNumber ->
+                                onEvent(ProgramsEvent.ViewPlanDay(dayNumber))
+                            },
+                        )
+                    }
+                } else {
+                    item {
+                        GenerateNewPlanCard(
+                            isGenerating = state.isGeneratingPlan,
+                            onGenerate = { onEvent(ProgramsEvent.GenerateNewPlan) },
+                        )
+                    }
+                }
+
+                // Templates Section
+                if (state.templates.isNotEmpty()) {
+                    item {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            text = stringResource(R.string.programs_templates_title),
+                            style = MaterialTheme.typography.titleLarge.copy(
+                                fontWeight = FontWeight.Bold,
+                            ),
+                            color = MaterialTheme.colorScheme.onBackground,
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
+
+                    items(state.templates, key = { it.id.toString() }) { template ->
+                        TemplateCard(
+                            template = template,
+                            onClick = { onEvent(ProgramsEvent.TemplateClicked(template)) },
+                            onStartWorkout = { onEvent(ProgramsEvent.StartWorkoutFromTemplate(template)) },
+                        )
+                    }
                 }
             }
         }
@@ -301,6 +339,202 @@ private fun MuscleGroupChip(muscleGroup: MuscleGroup) {
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
+    }
+}
+
+@Composable
+private fun GenerateNewPlanCard(
+    isGenerating: Boolean,
+    onGenerate: () -> Unit,
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(enabled = !isGenerating, onClick = onGenerate),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Icon(
+                Icons.Default.Add,
+                contentDescription = null,
+                modifier = Modifier.size(48.dp),
+                tint = AccentGreen,
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = if (isGenerating) {
+                    stringResource(R.string.programs_generating_plan)
+                } else {
+                    stringResource(R.string.programs_generate_new_plan)
+                },
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontWeight = FontWeight.Bold,
+                ),
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = stringResource(R.string.programs_generate_description),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun ActivePlanCard(
+    plan: com.gymbro.core.model.WorkoutPlan,
+    onViewDay: (Int) -> Unit,
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = plan.name,
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            fontWeight = FontWeight.Bold,
+                        ),
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = plan.description,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                InfoChip(
+                    label = stringResource(R.string.programs_weeks_count, plan.weeks),
+                    color = AccentCyan,
+                )
+                InfoChip(
+                    label = stringResource(R.string.programs_days_per_week, plan.daysPerWeek),
+                    color = AccentGreen,
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            Text(
+                text = stringResource(R.string.programs_workout_days),
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontWeight = FontWeight.SemiBold,
+                ),
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+            
+            Spacer(modifier = Modifier.height(8.dp))
+
+            plan.workoutDays.forEach { day ->
+                WorkoutDayItem(
+                    day = day,
+                    onClick = { onViewDay(day.dayNumber) },
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+        }
+    }
+}
+
+@Composable
+private fun WorkoutDayItem(
+    day: com.gymbro.core.model.WorkoutDay,
+    onClick: () -> Unit,
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        shape = RoundedCornerShape(8.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+        ),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = stringResource(R.string.programs_day_number, day.dayNumber),
+                    style = MaterialTheme.typography.labelLarge.copy(
+                        fontWeight = FontWeight.Bold,
+                    ),
+                    color = AccentGreen,
+                )
+                Text(
+                    text = day.name,
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.SemiBold,
+                    ),
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.weight(1f).padding(start = 12.dp),
+                )
+                Text(
+                    text = stringResource(R.string.programs_exercises_in_day, day.exercises.size),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            day.exercises.take(3).forEach { exercise ->
+                Text(
+                    text = "• ${exercise.exerciseName} - ${exercise.sets}×${exercise.repsRange}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            
+            if (day.exercises.size > 3) {
+                Text(
+                    text = stringResource(R.string.programs_more_exercises, day.exercises.size - 3),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
     }
 }
 

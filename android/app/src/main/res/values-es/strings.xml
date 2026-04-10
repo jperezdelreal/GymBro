@@ -197,4 +197,25 @@
     <string name="common_sets">series</string>
     <string name="common_duration_hours" formatted="false">%dh %dm</string>
     <string name="common_duration_minutes">%dm</string>
+
+    <!-- Programs -->
+    <string name="programs_title">Programas</string>
+    <string name="programs_create_template">Crear Plantilla</string>
+    <string name="programs_start_workout">Iniciar Entrenamiento</string>
+    <string name="programs_empty_title">Sin programas aún</string>
+    <string name="programs_empty_subtitle">¡Genera un plan de entrenamiento personalizado!</string>
+    <string name="programs_exercises_count">%d ejercicios</string>
+    <string name="programs_built_in">Predefinido</string>
+    <string name="programs_last_used">Último uso: %s</string>
+    <string name="programs_active_plan_title">Plan Activo</string>
+    <string name="programs_templates_title">Plantillas Guardadas</string>
+    <string name="programs_generate_new_plan">Generar Nuevo Plan de Entrenamiento</string>
+    <string name="programs_generating_plan">Generando plan...</string>
+    <string name="programs_generate_description">Obtén un programa de entrenamiento personalizado basado en tus objetivos</string>
+    <string name="programs_weeks_count">%d semanas</string>
+    <string name="programs_days_per_week">%d días/semana</string>
+    <string name="programs_workout_days">Días de Entrenamiento</string>
+    <string name="programs_day_number">Día %d</string>
+    <string name="programs_exercises_in_day">%d ejercicios</string>
+    <string name="programs_more_exercises">+%d más</string>
 </resources>
