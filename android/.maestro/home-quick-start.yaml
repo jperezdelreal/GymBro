@@ -1,0 +1,119 @@
+appId: com.gymbro.app
+name: "Home Quick Start - Start workout from home screen quick-start button"
+#
+# Tests: Home screen quick-start flow — tap quick start card to begin workout
+# Preconditions: User has completed onboarding (ensured by ensure-post-onboarding.yaml)
+# Test data: None
+# Assertions: Home screen loads, quick start card visible, tapping it starts active workout
+# Cleanup: Cancel active workout
+# Dependencies: flow/ensure-post-onboarding.yaml
+tags:
+  - core
+  - regression
+onFlowStart:
+  - launchApp
+  - waitForAnimationToEnd:
+      timeout: 3000
+
+onFlowComplete:
+  # Cancel any active workout to clean up
+  - back:
+      optional: true
+  - tapOn:
+      text: "Cancelar Entrenamiento|Cancel Workout|Descartar"
+      optional: true
+
+---
+
+- runFlow: flow/ensure-post-onboarding.yaml
+
+# Navigate to Home tab
+- tapOn:
+    id: "nav_home"
+- waitForAnimationToEnd:
+    timeout: 2000
+
+# Verify Home screen loaded
+- assertVisible: "Inicio|Home"
+# Screenshot 01: Home screen loaded
+- takeScreenshot: 01_home_quick_start_home_screen
+
+# Verify Quick Start card is visible
+- assertVisible:
+    id: "quick_start_card"
+# Screenshot 02: Quick Start card visible on Home screen
+- takeScreenshot: 02_home_quick_start_card_visible
+
+# Verify quick start prompt text (conditional based on workout history)
+- assertVisible:
+    text: "Inicio Rápido|Quick Start"
+# Screenshot 03: Quick Start button text visible
+- takeScreenshot: 03_home_quick_start_button_text
+
+# Tap the Quick Start button to begin workout
+- tapOn:
+    id: "quick_start_button"
+- waitForAnimationToEnd:
+    timeout: 2000
+
+# Verify Active Workout screen opened
+- assertVisible: "Entrenamiento Activo|Active Workout"
+# Screenshot 04: Active Workout started from Quick Start
+- takeScreenshot: 04_home_quick_start_workout_started
+
+# Verify workout screen is functional — add exercise button visible
+- assertVisible: "Añadir Ejercicio|Add Exercise"
+# Screenshot 05: Add Exercise button visible in quick-started workout
+- takeScreenshot: 05_home_quick_start_add_exercise_visible
+
+# Add an exercise to verify the quick-started workout works
+- tapOn: "Añadir Ejercicio|Add Exercise"
+- waitForAnimationToEnd:
+    timeout: 2000
+- assertVisible: "Elegir Ejercicio|Choose Exercise"
+# Screenshot 06: Exercise picker opened from quick-started workout
+- takeScreenshot: 06_home_quick_start_exercise_picker
+
+# Select an exercise
+- tapOn:
+    id: "search_bar"
+- inputText: "Squat"
+- tapOn:
+    text: "Squat"
+    index: 0
+- waitForAnimationToEnd:
+    timeout: 2000
+
+# Verify exercise was added
+- assertVisible: "Entrenamiento Activo|Active Workout"
+- assertVisible: "Squat"
+# Screenshot 07: Exercise added to quick-started workout
+- takeScreenshot: 07_home_quick_start_exercise_added
+
+# Enter set data to verify workout is fully functional
+- tapOn:
+    id: "weight_input"
+    index: 0
+- inputText: "100"
+- tapOn:
+    id: "reps_input"
+    index: 0
+- inputText: "5"
+# Screenshot 08: Set data entered in quick-started workout
+- takeScreenshot: 08_home_quick_start_set_entered
+
+# Cancel workout to clean up (don't complete to avoid data pollution)
+- back
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    text: "Cancelar Entrenamiento|Cancel Workout|Descartar"
+    optional: true
+- waitForAnimationToEnd:
+    timeout: 2000
+
+# Verify we're back on a main screen
+- assertVisible:
+    text: "Inicio|Home|Programas|Programs"
+# Screenshot 09: Quick Start flow complete, back to main screen
+- takeScreenshot: 09_home_quick_start_flow_complete
