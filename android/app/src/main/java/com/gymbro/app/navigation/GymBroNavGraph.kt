@@ -15,9 +15,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ShowChart
 import androidx.compose.material.icons.automirrored.outlined.ShowChart
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.MonitorHeart
+import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.FitnessCenter
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.MonitorHeart
@@ -86,7 +88,7 @@ private enum class BottomNavTab(
     LIBRARY("exercise_library", R.string.nav_library, Icons.Filled.FitnessCenter, Icons.Outlined.FitnessCenter),
     HISTORY("history", R.string.nav_history, Icons.Filled.History, Icons.Outlined.History),
     PROGRESS("progress", R.string.nav_progress, Icons.AutoMirrored.Filled.ShowChart, Icons.AutoMirrored.Outlined.ShowChart),
-    RECOVERY("recovery", R.string.nav_recovery, Icons.Filled.MonitorHeart, Icons.Outlined.MonitorHeart),
+    PROGRAMS("programs", R.string.nav_programs, Icons.Filled.CalendarMonth, Icons.Outlined.CalendarMonth),
     PROFILE("profile", R.string.nav_profile, Icons.Filled.Person, Icons.Outlined.Person),
 }
 
