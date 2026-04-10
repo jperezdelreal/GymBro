@@ -119,4 +119,24 @@ object Migrations {
             db.execSQL("CREATE INDEX IF NOT EXISTS index_template_exercises_exerciseId ON template_exercises (exerciseId)")
         }
     }
+    
+    val MIGRATION_4_5 = object : Migration(4, 5) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            // Create in_progress_workouts table for persisting active workout state
+            db.execSQL("""
+                CREATE TABLE IF NOT EXISTS in_progress_workouts (
+                    workoutId TEXT NOT NULL,
+                    exercisesJson TEXT NOT NULL,
+                    elapsedSeconds INTEGER NOT NULL,
+                    totalVolume REAL NOT NULL,
+                    totalSets INTEGER NOT NULL,
+                    restTimerSeconds INTEGER NOT NULL,
+                    restTimerTotal INTEGER NOT NULL,
+                    isRestTimerActive INTEGER NOT NULL,
+                    lastSavedAt INTEGER NOT NULL,
+                    PRIMARY KEY(workoutId)
+                )
+            """.trimIndent())
+        }
+    }
 }

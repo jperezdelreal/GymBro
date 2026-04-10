@@ -12,6 +12,7 @@ import java.util.UUID
 class FakeWorkoutRepository : WorkoutRepository {
     
     private val workouts = MutableStateFlow<Map<String, Workout>>(emptyMap())
+    private var inProgressWorkout: com.gymbro.core.model.InProgressWorkout? = null
     
     fun setWorkouts(vararg workouts: Workout) {
         this.workouts.value = workouts.associateBy { it.id.toString() }
@@ -99,5 +100,19 @@ class FakeWorkoutRepository : WorkoutRepository {
         val now = Instant.now()
         val daysBetween = java.time.Duration.between(lastWorkout.completedAt, now).toDays()
         return daysBetween.toInt()
+    }
+
+    override suspend fun saveInProgressWorkout(inProgressWorkout: com.gymbro.core.model.InProgressWorkout) {
+        this.inProgressWorkout = inProgressWorkout
+    }
+
+    override suspend fun getInProgressWorkout(): com.gymbro.core.model.InProgressWorkout? {
+        return inProgressWorkout
+    }
+
+    override suspend fun clearInProgressWorkout(workoutId: String) {
+        if (inProgressWorkout?.workoutId == workoutId) {
+            inProgressWorkout = null
+        }
     }
 }

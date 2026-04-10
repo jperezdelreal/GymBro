@@ -14,4 +14,8 @@ interface WorkoutRepository {
     fun getRecentWorkouts(limit: Int = 20): Flow<List<Workout>>
     suspend fun getBestWeight(exerciseId: String, reps: Int): Double?
     suspend fun getDaysSinceLastWorkout(): Int?
+    
+    suspend fun saveInProgressWorkout(inProgressWorkout: com.gymbro.core.model.InProgressWorkout)
+    suspend fun getInProgressWorkout(): com.gymbro.core.model.InProgressWorkout?
+    suspend fun clearInProgressWorkout(workoutId: String)
 }

@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.google.gson.Gson
 import com.gymbro.core.database.GymBroDatabase
 import com.gymbro.core.database.Migrations
 import com.gymbro.core.database.dao.ExerciseDao
@@ -38,7 +39,8 @@ object DatabaseModule {
             .addMigrations(
                 Migrations.MIGRATION_1_2,
                 Migrations.MIGRATION_2_3,
-                Migrations.MIGRATION_3_4
+                Migrations.MIGRATION_3_4,
+                Migrations.MIGRATION_4_5
             )
             .addCallback(SeedDatabaseCallback(context))
             .build()
@@ -57,6 +59,12 @@ object DatabaseModule {
     @Provides
     fun provideWorkoutTemplateDao(database: GymBroDatabase): WorkoutTemplateDao {
         return database.workoutTemplateDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideGson(): Gson {
+        return Gson()
     }
 }
 

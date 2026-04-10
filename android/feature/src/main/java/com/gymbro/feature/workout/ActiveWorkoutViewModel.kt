@@ -38,9 +38,35 @@ class ActiveWorkoutViewModel @Inject constructor(
 
     private var timerJob: Job? = null
     private var restTimerJob: Job? = null
+    private var shouldAutoSave = true
 
     init {
-        startWorkout()
+        checkForInProgressWorkout()
+    }
+
+    private fun checkForInProgressWorkout() {
+        safeLaunch(
+            onError = { error ->
+                _state.update { 
+                    it.copy(
+                        isLoading = false,
+                        errorMessage = "Failed to check for in-progress workout: ${error.toUserMessage()}"
+                    )
+                }
+            }
+        ) {
+            val inProgress = workoutRepository.getInProgressWorkout()
+            if (inProgress != null) {
+                _state.update { 
+                    it.copy(
+                        hasInProgressWorkout = true,
+                        isLoading = false,
+                    )
+                }
+            } else {
+                startWorkout()
+            }
+        }
     }
 
     private fun startWorkout() {
@@ -72,6 +98,8 @@ class ActiveWorkoutViewModel @Inject constructor(
 
     fun onEvent(event: ActiveWorkoutEvent) {
         when (event) {
+            is ActiveWorkoutEvent.ResumeWorkout -> resumeWorkout()
+            is ActiveWorkoutEvent.StartNewWorkout -> startNewWorkout()
             is ActiveWorkoutEvent.AddExerciseClicked -> {
                 viewModelScope.launch {
                     _effect.send(ActiveWorkoutEffect.ShowExercisePicker)
@@ -127,6 +155,7 @@ class ActiveWorkoutViewModel @Inject constructor(
                 )
                 current.copy(exercises = current.exercises + newExercise)
             }
+            autoSaveState()
         }
     }
 
@@ -147,6 +176,7 @@ class ActiveWorkoutViewModel @Inject constructor(
             exercises[exerciseIndex] = exerciseUi.copy(sets = exerciseUi.sets + newSet)
             current.copy(exercises = exercises)
         }
+        autoSaveState()
     }
 
     private fun updateSetField(exerciseIndex: Int, setIndex: Int, transform: (WorkoutSetUi) -> WorkoutSetUi) {
@@ -197,6 +227,9 @@ class ActiveWorkoutViewModel @Inject constructor(
 
             // Recalculate totals
             recalculateTotals()
+
+            // Auto-save state
+            autoSaveState()
 
             // Auto-start rest timer
             startRestTimer()
@@ -266,6 +299,7 @@ class ActiveWorkoutViewModel @Inject constructor(
             _state.update { it.copy(isRestTimerActive = false) }
             _effect.send(ActiveWorkoutEffect.RestTimerFinished)
         }
+        autoSaveState()
     }
 
     private fun skipRestTimer() {
@@ -302,6 +336,10 @@ class ActiveWorkoutViewModel @Inject constructor(
                 durationSeconds = currentState.elapsedSeconds,
                 notes = "",
             )
+            
+            // Clear in-progress state
+            workoutRepository.clearInProgressWorkout(workoutId)
+            
             timerJob?.cancel()
             restTimerJob?.cancel()
 
@@ -334,10 +372,127 @@ class ActiveWorkoutViewModel @Inject constructor(
     }
 
     private fun discardWorkout() {
+        val workoutId = _state.value.workoutId
         timerJob?.cancel()
         restTimerJob?.cancel()
         viewModelScope.launch {
+            if (workoutId != null) {
+                workoutRepository.clearInProgressWorkout(workoutId)
+            }
             _effect.send(ActiveWorkoutEffect.NavigateBack)
+        }
+    }
+
+    private fun resumeWorkout() {
+        safeLaunch(
+            onError = { error ->
+                _state.update { 
+                    it.copy(
+                        isLoading = false,
+                        errorMessage = "Failed to resume workout: ${error.toUserMessage()}"
+                    )
+                }
+            }
+        ) {
+            val inProgress = workoutRepository.getInProgressWorkout()
+            if (inProgress != null) {
+                shouldAutoSave = false
+                _state.update { current ->
+                    current.copy(
+                        workoutId = inProgress.workoutId,
+                        exercises = inProgress.exercises.map { ex ->
+                            WorkoutExerciseUi(
+                                exercise = ex.exercise,
+                                sets = ex.sets.map { set ->
+                                    WorkoutSetUi(
+                                        id = set.id,
+                                        setNumber = set.setNumber,
+                                        weight = set.weight,
+                                        reps = set.reps,
+                                        rpe = set.rpe,
+                                        isWarmup = set.isWarmup,
+                                        isCompleted = set.isCompleted,
+                                    )
+                                }
+                            )
+                        },
+                        elapsedSeconds = inProgress.elapsedSeconds,
+                        totalVolume = inProgress.totalVolume,
+                        totalSets = inProgress.totalSets,
+                        restTimerSeconds = inProgress.restTimerSeconds,
+                        restTimerTotal = inProgress.restTimerTotal,
+                        isRestTimerActive = inProgress.isRestTimerActive,
+                        hasInProgressWorkout = false,
+                        isLoading = false,
+                    )
+                }
+                shouldAutoSave = true
+                startElapsedTimer()
+                if (inProgress.isRestTimerActive) {
+                    startRestTimer()
+                }
+            } else {
+                startWorkout()
+            }
+        }
+    }
+
+    private fun startNewWorkout() {
+        safeLaunch(
+            onError = { error ->
+                _state.update { 
+                    it.copy(
+                        isLoading = false,
+                        errorMessage = "Failed to clear old workout: ${error.toUserMessage()}"
+                    )
+                }
+            }
+        ) {
+            val inProgress = workoutRepository.getInProgressWorkout()
+            if (inProgress != null) {
+                workoutRepository.clearInProgressWorkout(inProgress.workoutId)
+            }
+            startWorkout()
+        }
+    }
+
+    private fun autoSaveState() {
+        if (!shouldAutoSave) return
+        val currentState = _state.value
+        val workoutId = currentState.workoutId ?: return
+
+        viewModelScope.launch {
+            try {
+                val inProgressWorkout = com.gymbro.core.model.InProgressWorkout(
+                    workoutId = workoutId,
+                    exercises = currentState.exercises.map { ex ->
+                        com.gymbro.core.model.InProgressExercise(
+                            exercise = ex.exercise,
+                            sets = ex.sets.map { set ->
+                                com.gymbro.core.model.InProgressSet(
+                                    id = set.id,
+                                    setNumber = set.setNumber,
+                                    weight = set.weight,
+                                    reps = set.reps,
+                                    rpe = set.rpe,
+                                    isWarmup = set.isWarmup,
+                                    isCompleted = set.isCompleted,
+                                )
+                            }
+                        )
+                    },
+                    elapsedSeconds = currentState.elapsedSeconds,
+                    totalVolume = currentState.totalVolume,
+                    totalSets = currentState.totalSets,
+                    restTimerSeconds = currentState.restTimerSeconds,
+                    restTimerTotal = currentState.restTimerTotal,
+                    isRestTimerActive = currentState.isRestTimerActive,
+                )
+                workoutRepository.saveInProgressWorkout(inProgressWorkout)
+            } catch (e: Exception) {
+                // Silent failure - don't interrupt user's workout
+                android.util.Log.e("ActiveWorkoutViewModel", "Failed to auto-save workout state", e)
+            }
         }
     }
 

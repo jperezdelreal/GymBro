@@ -29,7 +29,7 @@ class WorkoutRepositoryFailureTest {
     @Before
     fun setup() {
         workoutDao = mockk()
-        repository = WorkoutRepositoryImpl(workoutDao)
+        repository = WorkoutRepositoryImpl(workoutDao, com.google.gson.Gson())
     }
 
     // ============ startWorkout Failure Tests ============

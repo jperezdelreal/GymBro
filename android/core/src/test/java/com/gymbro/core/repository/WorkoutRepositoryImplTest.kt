@@ -28,7 +28,7 @@ class WorkoutRepositoryImplTest {
     @Before
     fun setup() {
         workoutDao = mockk()
-        repository = WorkoutRepositoryImpl(workoutDao)
+        repository = WorkoutRepositoryImpl(workoutDao, com.google.gson.Gson())
     }
 
     @Test

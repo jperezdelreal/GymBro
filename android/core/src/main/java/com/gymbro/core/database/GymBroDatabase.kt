@@ -6,6 +6,7 @@ import com.gymbro.core.database.dao.ExerciseDao
 import com.gymbro.core.database.dao.WorkoutDao
 import com.gymbro.core.database.dao.WorkoutTemplateDao
 import com.gymbro.core.database.entity.ExerciseEntity
+import com.gymbro.core.database.entity.InProgressWorkoutEntity
 import com.gymbro.core.database.entity.TemplateExerciseEntity
 import com.gymbro.core.database.entity.WorkoutEntity
 import com.gymbro.core.database.entity.WorkoutSetEntity
@@ -18,8 +19,9 @@ import com.gymbro.core.database.entity.WorkoutTemplateEntity
         WorkoutSetEntity::class,
         WorkoutTemplateEntity::class,
         TemplateExerciseEntity::class,
+        InProgressWorkoutEntity::class,
     ],
-    version = 4,
+    version = 5,
     exportSchema = true,
 )
 abstract class GymBroDatabase : RoomDatabase() {

@@ -84,4 +84,19 @@ interface WorkoutDao {
 
     @Query("SELECT * FROM workout_sets WHERE workoutId = :workoutId")
     suspend fun getSetsForWorkout(workoutId: String): List<WorkoutSetEntity>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun saveInProgressWorkout(inProgressWorkout: com.gymbro.core.database.entity.InProgressWorkoutEntity)
+
+    @Query("SELECT * FROM in_progress_workouts WHERE workoutId = :workoutId")
+    suspend fun getInProgressWorkout(workoutId: String): com.gymbro.core.database.entity.InProgressWorkoutEntity?
+
+    @Query("SELECT * FROM in_progress_workouts LIMIT 1")
+    suspend fun getAnyInProgressWorkout(): com.gymbro.core.database.entity.InProgressWorkoutEntity?
+
+    @Query("DELETE FROM in_progress_workouts WHERE workoutId = :workoutId")
+    suspend fun clearInProgressWorkout(workoutId: String)
+
+    @Query("DELETE FROM in_progress_workouts")
+    suspend fun clearAllInProgressWorkouts()
 }

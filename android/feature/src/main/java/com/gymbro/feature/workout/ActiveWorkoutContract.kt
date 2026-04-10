@@ -15,6 +15,7 @@ data class ActiveWorkoutState(
     val isCompleting: Boolean = false,
     val isLoading: Boolean = true,
     val errorMessage: String? = null,
+    val hasInProgressWorkout: Boolean = false,
 )
 
 data class WorkoutExerciseUi(
@@ -52,6 +53,8 @@ sealed interface ActiveWorkoutEvent {
     data object DiscardWorkout : ActiveWorkoutEvent
     data object ClearError : ActiveWorkoutEvent
     data object RetryStartWorkout : ActiveWorkoutEvent
+    data object ResumeWorkout : ActiveWorkoutEvent
+    data object StartNewWorkout : ActiveWorkoutEvent
 }
 
 sealed interface ActiveWorkoutEffect {
