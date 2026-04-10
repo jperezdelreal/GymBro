@@ -26,6 +26,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -65,6 +66,14 @@ fun VoiceInputButton(
     val parser = remember { VoiceInputParser() }
     var showRationaleDialog by remember { mutableStateOf(false) }
     var showSettingsDialog by remember { mutableStateOf(false) }
+    var lastTapTime by remember { mutableStateOf(0L) }
+
+    // Clean up SpeechRecognizer when composable leaves composition
+    DisposableEffect(voiceRecognitionService) {
+        onDispose {
+            voiceRecognitionService.destroy()
+        }
+    }
 
     val hasPermission = remember(context) {
         mutableStateOf(
@@ -175,6 +184,17 @@ fun VoiceInputButton(
 
         IconButton(
             onClick = {
+                // Debounce rapid taps — ignore taps within 500ms
+                val now = System.currentTimeMillis()
+                if (now - lastTapTime < 500L) return@IconButton
+                lastTapTime = now
+
+                if (isListening) {
+                    voiceRecognitionService.stopListening()
+                    isListening = false
+                    return@IconButton
+                }
+
                 if (!voiceRecognitionService.isAvailable()) {
                     onError(context.getString(R.string.voice_input_not_available))
                     return@IconButton
