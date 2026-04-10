@@ -838,3 +838,58 @@ ProGuard rules follow official library documentation and Android best practices.
 - ndroid/core/src/androidTest/java/com/gymbro/core/database/MigrationTest.kt (created)
 
 **Outcome:** Users can now update the app without losing their workout history. The pipes are clean—data flows safely through schema changes.
+
+### 2026-01-08: Smart Defaults for Workout Logging (Issue #331, PR #351)
+
+**Problem:** Workout logging required 4-5 taps per set. Goal: reduce to 1-2 taps by providing intelligent defaults.
+
+**Solution — SmartDefaultsService:**
+- Created new service in core module to query workout history
+- Returns last used weight and reps for each exercise
+- Auto-fills first set of each exercise with these defaults
+- Leverages existing addSet() logic which already copies from previous set
+
+**Implementation Details:**
+- **SmartDefaultsService**: Simple service with three methods:
+  - getDefaultWeight(exerciseId) — returns last weight or null
+  - getDefaultReps(exerciseId) — returns last reps or null
+  - getDefaults(exerciseId) — returns both in a data class
+- Uses existing WorkoutDao.getSetsByExercise() query which returns sets ordered by completedAt ASC
+- Takes .lastOrNull() to get most recent set
+- Wrapped in etryWithBackoff + unCatchingAsResult for error resilience
+
+- **ActiveWorkoutViewModel Changes:**
+  - Injected SmartDefaultsService via Hilt constructor injection
+  - Modified ddExercise() to:
+    1. Launch coroutine with safeLaunch
+    2. Query defaults for the exercise
+    3. Pre-fill first set's weight and reps fields (or empty string if no history)
+  - No changes needed to ddSet() — already copies from last set
+
+**Testing:**
+- Created SmartDefaultsServiceTest with 7 test cases:
+  - Returns last values when history exists
+  - Returns null when no history
+  - Handles multiple sets correctly (takes most recent)
+  - Individual getDefaultWeight/getDefaultReps methods
+- All tests use MockK for DAO, no database required
+
+**Impact:**
+- **First set of new exercise:** Pre-filled with last workout → user just taps complete (1 tap if correct)
+- **Additional sets:** Already copy from previous set → adjust if needed + complete (1-2 taps)
+- **No UI changes needed:** Existing TextField components already support pre-filled editable values
+
+**What's NOT in This PR:**
+- Swipe-to-complete gesture (future enhancement)
+- +/- increment buttons (future enhancement)
+- Visual indicators for "suggested" values (future enhancement)
+- Smart program-based defaults (future enhancement)
+
+**Files Created/Modified (3 files, 207 insertions):**
+- Created: ndroid/core/src/main/java/com/gymbro/core/service/SmartDefaultsService.kt (60 lines)
+- Created: ndroid/core/src/test/java/com/gymbro/core/service/SmartDefaultsServiceTest.kt (130 lines)
+- Modified: ndroid/feature/src/main/java/com/gymbro/feature/workout/ActiveWorkoutViewModel.kt (+17, -10)
+
+**Branch:** squad/331-1tap-logging
+**PR:** #351 (targeting master, label: feat)
+**Status:** Awaiting CI + review
