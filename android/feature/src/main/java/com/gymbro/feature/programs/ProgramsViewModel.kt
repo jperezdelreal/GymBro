@@ -65,7 +65,9 @@ class ProgramsViewModel @Inject constructor(
                 generateWorkoutPlan()
             }
             is ProgramsEvent.ViewPlanDay -> {
-                // Future: navigate to day detail
+                viewModelScope.launch {
+                    _effect.send(ProgramsEffect.NavigateToPlanDayDetail(event.dayNumber))
+                }
             }
         }
     }

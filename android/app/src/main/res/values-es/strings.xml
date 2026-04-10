@@ -218,4 +218,8 @@
     <string name="programs_day_number">Día %d</string>
     <string name="programs_exercises_in_day">%d ejercicios</string>
     <string name="programs_more_exercises">+%d más</string>
+    <string name="programs_day_detail_title" formatted="false">Día %d: %s</string>
+    <string name="programs_start_this_workout">Iniciar Este Entrenamiento</string>
+    <string name="programs_exercise_sets_reps" formatted="false">%d × %s</string>
+    <string name="programs_rest_time">Descanso: %ds</string>
 </resources>

@@ -20,6 +20,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.PlayArrow
@@ -68,6 +69,7 @@ fun ProgramsRoute(
     viewModel: ProgramsViewModel = hiltViewModel(),
     onNavigateToCreateTemplate: (String?) -> Unit = {},
     onNavigateToActiveWorkout: (WorkoutTemplate) -> Unit = {},
+    onNavigateToPlanDayDetail: (Int) -> Unit = {},
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -85,6 +87,9 @@ fun ProgramsRoute(
                 }
                 is ProgramsEffect.NavigateToActiveWorkout -> {
                     onNavigateToActiveWorkout(effect.template)
+                }
+                is ProgramsEffect.NavigateToPlanDayDetail -> {
+                    onNavigateToPlanDayDetail(effect.dayNumber)
                 }
             }
         }
@@ -535,6 +540,183 @@ private fun WorkoutDayItem(
                 )
             }
         }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun PlanDayDetailRoute(
+    dayNumber: Int,
+    viewModel: ProgramsViewModel = hiltViewModel(),
+    onNavigateBack: () -> Unit,
+    onNavigateToActiveWorkout: () -> Unit,
+) {
+    val state = viewModel.state.collectAsStateWithLifecycle()
+    
+    val workoutDay = state.value.activePlan?.workoutDays?.find { it.dayNumber == dayNumber }
+    
+    if (workoutDay == null) {
+        LaunchedEffect(Unit) {
+            onNavigateBack()
+        }
+        return
+    }
+    
+    PlanDayDetailScreen(
+        day = workoutDay,
+        onNavigateBack = onNavigateBack,
+        onStartWorkout = onNavigateToActiveWorkout,
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun PlanDayDetailScreen(
+    day: com.gymbro.core.model.WorkoutDay,
+    onNavigateBack: () -> Unit,
+    onStartWorkout: () -> Unit,
+) {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = stringResource(R.string.programs_day_detail_title, day.dayNumber, day.name),
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            fontWeight = FontWeight.Bold,
+                        ),
+                    )
+                },
+                navigationIcon = {
+                    IconButton(onClick = onNavigateBack) {
+                        Icon(
+                            imageVector = androidx.compose.material.icons.Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.common_navigate_back),
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background,
+                    titleContentColor = MaterialTheme.colorScheme.onBackground,
+                ),
+            )
+        },
+        containerColor = MaterialTheme.colorScheme.background,
+    ) { paddingValues ->
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(horizontal = 16.dp),
+            contentPadding = PaddingValues(vertical = 16.dp),
+        ) {
+            items(day.exercises) { exercise ->
+                ExerciseCard(exercise = exercise)
+                Spacer(modifier = Modifier.height(12.dp))
+            }
+            
+            item {
+                Spacer(modifier = Modifier.height(8.dp))
+                
+                Card(
+                    onClick = onStartWorkout,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = AccentGreen,
+                    ),
+                    shape = RoundedCornerShape(12.dp),
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.PlayArrow,
+                            contentDescription = null,
+                            tint = Color.Black,
+                            modifier = Modifier.size(24.dp),
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = stringResource(R.string.programs_start_this_workout),
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.Bold,
+                            ),
+                            color = Color.Black,
+                        )
+                    }
+                }
+                
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+        }
+    }
+}
+
+@Composable
+private fun ExerciseCard(exercise: com.gymbro.core.model.PlannedExercise) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+        ),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+        ) {
+            Text(
+                text = exercise.exerciseName,
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontWeight = FontWeight.SemiBold,
+                ),
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+            
+            Spacer(modifier = Modifier.height(12.dp))
+            
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                ExerciseDetailItem(
+                    label = stringResource(R.string.workout_sets),
+                    value = stringResource(R.string.programs_exercise_sets_reps, exercise.sets, exercise.repsRange),
+                )
+                
+                ExerciseDetailItem(
+                    label = stringResource(R.string.workout_rest_timer),
+                    value = stringResource(R.string.programs_rest_time, exercise.restSeconds),
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ExerciseDetailItem(
+    label: String,
+    value: String,
+) {
+    Column {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodyLarge.copy(
+                fontWeight = FontWeight.Medium,
+            ),
+            color = AccentGreen,
+        )
     }
 }
 

@@ -347,6 +347,22 @@ fun GymBroNavGraph(
                 onNavigateToActiveWorkout = { template ->
                     navController.navigate("active_workout")
                 },
+                onNavigateToPlanDayDetail = { dayNumber ->
+                    navController.navigate("programs/day/$dayNumber")
+                },
+            )
+        }
+        composable(
+            route = "programs/day/{dayNumber}",
+            arguments = listOf(
+                navArgument("dayNumber") { type = NavType.IntType },
+            ),
+        ) { backStackEntry ->
+            val dayNumber = backStackEntry.arguments?.getInt("dayNumber") ?: 1
+            com.gymbro.feature.programs.PlanDayDetailRoute(
+                dayNumber = dayNumber,
+                onNavigateBack = { navController.popBackStack() },
+                onNavigateToActiveWorkout = { navController.navigate("active_workout") },
             )
         }
         composable("coach") {
