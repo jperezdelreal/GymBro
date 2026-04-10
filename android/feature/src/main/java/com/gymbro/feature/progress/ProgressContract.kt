@@ -34,8 +34,10 @@ sealed interface ProgressEvent {
     data object RefreshData : ProgressEvent
     data class ViewWorkoutDetail(val workoutId: String) : ProgressEvent
     data class DismissPlateauAlert(val exerciseId: String) : ProgressEvent
+    data class GetCoachingAdvice(val exerciseName: String, val weeksDuration: Int) : ProgressEvent
 }
 
 sealed interface ProgressEffect {
     data class NavigateToWorkoutDetail(val workoutId: String) : ProgressEffect
+    data class NavigateToCoach(val prompt: String) : ProgressEffect
 }

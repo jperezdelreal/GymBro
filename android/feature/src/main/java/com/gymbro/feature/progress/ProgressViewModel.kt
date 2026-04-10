@@ -52,6 +52,12 @@ class ProgressViewModel @Inject constructor(
                     )
                 }
             }
+            is ProgressEvent.GetCoachingAdvice -> {
+                viewModelScope.launch {
+                    val prompt = "I've plateaued on ${event.exerciseName} for ${event.weeksDuration} weeks. What should I do?"
+                    _effects.send(ProgressEffect.NavigateToCoach(prompt))
+                }
+            }
         }
     }
 
@@ -81,6 +87,14 @@ class ProgressViewModel @Inject constructor(
 
             val plateauAlerts = plateauDetectionService.detectAllPlateaus(
                 exerciseOptions.map { it.id to it.name }
+            ).sortedWith(
+                compareBy<com.gymbro.core.model.PlateauAlert> { 
+                    when (it.severity) {
+                        com.gymbro.core.model.PlateauSeverity.SEVERE -> 0
+                        com.gymbro.core.model.PlateauSeverity.MODERATE -> 1
+                        com.gymbro.core.model.PlateauSeverity.MILD -> 2
+                    }
+                }.thenByDescending { it.weeksDuration }
             )
 
             // Calculate KPI metrics

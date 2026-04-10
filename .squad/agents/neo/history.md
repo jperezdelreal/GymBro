@@ -57,6 +57,30 @@
 - **Target Market (Morpheus):** Serious lifters 2+ years experience. Validates Neo's choice of sophisticated ML models (heuristics-first, multi-factor progression) over simple linear progression.
 - **MVP Scope (Morpheus):** AI coach chat + adaptive training engine IN v1.0. Recovery integration (HealthKit HRV/sleep) IN v1.0. Full adaptive training validated in MVP.
 
+### 2026-04-07: Plateau Alert Enhancements (Issue #363)
+**Implemented sophisticated severity-based plateau detection with coaching integration:**
+- Extended PlateauAlert model with PlateauSeverity enum (MILD: 3-4 weeks, MODERATE: 5-6 weeks, SEVERE: 7+ weeks) and daysSinceLastPR field
+- Updated PlateauDetectionService to calculate severity from weeksDuration and compute days since last PR by fetching PersonalRecords
+- Implemented color-coded severity UI: amber for mild, orange for moderate, red for severe
+- Added "Get Coaching Advice" CTA button on each alert card that navigates to AI Coach with pre-filled prompt format: "I've plateaued on {exercise} for {N} weeks. What should I do?"
+- Wired navigation through ProgressEffect.NavigateToCoach → savedStateHandle → CoachChatRoute with initialPrompt parameter
+- Added empty state when no plateaus detected: "No plateaus detected — keep crushing it!" (positive reinforcement pattern)
+- Sorted plateau alerts by severity (severe first) then by weeks duration for prioritized user attention
+- Enhanced alert details to show both weeks stalled and days since last PR for comprehensive context
+
+**Key ML/UX learnings:**
+- Severity thresholds align with training periodization literature (3-4 weeks = deload territory, 7+ weeks = programming issue)
+- Pre-filled coaching prompts reduce user friction—direct path from problem detection to AI-assisted solution
+- Sorting by severity ensures critical plateaus get immediate attention (information hierarchy principle)
+- Empty state reinforcement important—absence of problems is also valuable feedback for motivation
+- Days since last PR is more precise metric than weeks stalled for user understanding ("28 days" vs "4 weeks")
+
+**Technical notes:**
+- PlateauDetectionService now makes additional async call to PersonalRecordService.getPersonalRecords per exercise for daysSinceLastPR calculation
+- CoachChatRoute now supports initialPrompt parameter—LaunchedEffect triggers UpdateInput + SendMessage on mount if provided
+- Navigation uses savedStateHandle pattern for passing data across nav graph boundaries (cleaner than URL encoding)
+- Spanish translations updated for all new strings (emulator runs es-ES locale)
+
 
 ### 2026-04-06: Data Models from Tank (Scaffold & Models)  
 **Why this matters for Neo's AI work:**

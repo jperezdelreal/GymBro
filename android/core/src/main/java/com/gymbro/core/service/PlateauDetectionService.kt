@@ -3,6 +3,7 @@ package com.gymbro.core.service
 import android.util.Log
 import com.gymbro.core.model.E1RMDataPoint
 import com.gymbro.core.model.PlateauAlert
+import com.gymbro.core.model.PlateauSeverity
 import com.gymbro.core.model.PlateauType
 import java.time.Instant
 import java.time.temporal.ChronoUnit
@@ -35,7 +36,7 @@ class PlateauDetectionService @Inject constructor(
         }
     }
 
-    private fun detectRegression(
+    private suspend fun detectRegression(
         data: List<E1RMDataPoint>,
         exerciseId: String,
         exerciseName: String,
@@ -62,19 +63,25 @@ class PlateauDetectionService @Inject constructor(
                 "Check your recovery: ensure adequate sleep and nutrition",
                 "Review your form to ensure you're not compensating with poor technique",
             )
+            
+            val severity = calculateSeverity(consecutiveDecreasingWeeks)
+            val daysSinceLastPR = calculateDaysSinceLastPR(exerciseId, exerciseName, now)
+            
             return PlateauAlert(
                 exerciseId = exerciseId,
                 exerciseName = exerciseName,
                 type = PlateauType.REGRESSION,
                 weeksDuration = consecutiveDecreasingWeeks,
                 suggestion = suggestions.random(),
+                severity = severity,
+                daysSinceLastPR = daysSinceLastPR,
             )
         }
 
         return null
     }
 
-    private fun detectStagnation(
+    private suspend fun detectStagnation(
         data: List<E1RMDataPoint>,
         exerciseId: String,
         exerciseName: String,
@@ -101,17 +108,48 @@ class PlateauDetectionService @Inject constructor(
                     "Add volume: increase sets by 20-30% for 2-3 weeks",
                     "Take a deload week and return with refreshed intensity",
                 )
+                
+                val severity = calculateSeverity(weeksDuration)
+                val daysSinceLastPR = calculateDaysSinceLastPR(exerciseId, exerciseName, now)
+                
                 return PlateauAlert(
                     exerciseId = exerciseId,
                     exerciseName = exerciseName,
                     type = PlateauType.STAGNATION,
                     weeksDuration = weeksDuration,
                     suggestion = suggestions.random(),
+                    severity = severity,
+                    daysSinceLastPR = daysSinceLastPR,
                 )
             }
         }
 
         return null
+    }
+    
+    private fun calculateSeverity(weeksDuration: Int): PlateauSeverity {
+        return when {
+            weeksDuration >= 7 -> PlateauSeverity.SEVERE
+            weeksDuration >= 5 -> PlateauSeverity.MODERATE
+            else -> PlateauSeverity.MILD
+        }
+    }
+    
+    private suspend fun calculateDaysSinceLastPR(exerciseId: String, exerciseName: String, now: Instant): Int {
+        return try {
+            val records = prService.getPersonalRecords(exerciseId, exerciseName)
+            if (records.isEmpty()) return 0
+            
+            val latestPR = records.maxByOrNull { it.date }
+            if (latestPR != null) {
+                ChronoUnit.DAYS.between(latestPR.date, now).toInt()
+            } else {
+                0
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to calculate days since last PR", e)
+            0
+        }
     }
 
     private fun groupByWeek(data: List<E1RMDataPoint>, now: Instant): List<Double> {

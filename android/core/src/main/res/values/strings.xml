@@ -346,6 +346,9 @@
     <string name="progress_plateau_detected_regression">Regression detected on %1$s</string>
     <string name="progress_plateau_duration">No progress in %1$d weeks.</string>
     <string name="progress_plateau_consider">Consider:</string>
+    <string name="progress_plateau_duration_days">No progress in %1$d weeks (%2$d days since last PR).</string>
+    <string name="progress_plateau_get_coaching">Get Coaching Advice</string>
+    <string name="progress_plateau_empty_state">No plateaus detected — keep crushing it!</string>
 
     <!-- History -->
     <string name="history_workout_details">Workout Details</string>

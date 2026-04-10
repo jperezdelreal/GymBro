@@ -328,7 +328,13 @@ fun GymBroNavGraph(
         }
         composable("progress") {
             ProgressRoute(
-                onNavigateToAnalytics = { navController.navigate("analytics") }
+                onNavigateToAnalytics = { navController.navigate("analytics") },
+                onNavigateToCoach = { prompt ->
+                    navController.currentBackStackEntry
+                        ?.savedStateHandle
+                        ?.set("coach_initial_prompt", prompt)
+                    navController.navigate("coach")
+                }
             )
         }
         composable("analytics") {
@@ -365,11 +371,19 @@ fun GymBroNavGraph(
                 onNavigateToActiveWorkout = { navController.navigate("active_workout") },
             )
         }
-        composable("coach") {
+        composable("coach") { backStackEntry ->
+            val initialPrompt = navController.previousBackStackEntry
+                ?.savedStateHandle
+                ?.get<String>("coach_initial_prompt")
+            navController.previousBackStackEntry
+                ?.savedStateHandle
+                ?.remove<String>("coach_initial_prompt")
+            
             CoachChatRoute(
                 onNavigateBack = {
                     navController.popBackStack()
                 },
+                initialPrompt = initialPrompt,
             )
         }
         composable("profile") {

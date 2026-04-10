@@ -66,9 +66,17 @@ private val UserBubble = Color(0xFF2D2D2D)
 fun CoachChatRoute(
     onNavigateBack: () -> Unit,
     viewModel: CoachChatViewModel = hiltViewModel(),
+    initialPrompt: String? = null,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
+
+    LaunchedEffect(initialPrompt) {
+        if (initialPrompt != null && state.messages.isEmpty()) {
+            viewModel.onEvent(CoachChatEvent.UpdateInput(initialPrompt))
+            viewModel.onEvent(CoachChatEvent.SendMessage)
+        }
+    }
 
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
