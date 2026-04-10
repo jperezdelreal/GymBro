@@ -16,6 +16,14 @@ data class ActiveWorkoutState(
     val isLoading: Boolean = true,
     val errorMessage: String? = null,
     val hasInProgressWorkout: Boolean = false,
+    val fatigueWarnings: List<FatigueWarningUi> = emptyList(),
+)
+
+data class FatigueWarningUi(
+    val exerciseId: String,
+    val exerciseName: String,
+    val currentAvgRpe: Double,
+    val rpeDelta: Double?,
 )
 
 data class WorkoutExerciseUi(
@@ -45,13 +53,14 @@ sealed interface ActiveWorkoutEvent {
     data class QuickCompleteSet(val exerciseIndex: Int, val setIndex: Int) : ActiveWorkoutEvent
     data class RemoveSet(val exerciseIndex: Int, val setIndex: Int) : ActiveWorkoutEvent
     data class RemoveExercise(val exerciseIndex: Int) : ActiveWorkoutEvent
-    data class VoiceInput(val exerciseIndex: Int, val setIndex: Int, val weight: String, val reps: String) : ActiveWorkoutEvent
+    data class VoiceInput(val exerciseIndex: Int, val setIndex: Int, val weight: String, val reps: String, val rpe: String = "") : ActiveWorkoutEvent
     data object StartRestTimer : ActiveWorkoutEvent
     data object SkipRestTimer : ActiveWorkoutEvent
     data class AdjustRestTimer(val deltaSeconds: Int) : ActiveWorkoutEvent
     data object CompleteWorkout : ActiveWorkoutEvent
     data object DiscardWorkout : ActiveWorkoutEvent
     data object ClearError : ActiveWorkoutEvent
+    data object DismissFatigueWarnings : ActiveWorkoutEvent
     data object RetryStartWorkout : ActiveWorkoutEvent
     data object ResumeWorkout : ActiveWorkoutEvent
     data object StartNewWorkout : ActiveWorkoutEvent

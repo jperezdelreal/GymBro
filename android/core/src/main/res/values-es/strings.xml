@@ -544,6 +544,11 @@
     <string name="voice_input_parse_error">No se pudo entender \"%1$s\". Intenta \"100 kilos 5 repeticiones\".</string>
     <string name="voice_input_confirmed">Serie llenada: %1$s</string>
 
+    <!-- Fatigue Warnings -->
+    <string name="fatigue_warning_title">⚠️ Alerta de Fatiga</string>
+    <string name="fatigue_warning_dismiss">Descartar alertas de fatiga</string>
+    <string name="fatigue_warning_detail">%1$s: RPE promedio %2$s%3$s — considera reducir la carga</string>
+
     <!-- Home Screen -->
     <string name="home_title">Inicio</string>
     <string name="home_quick_start">Inicio Rápido</string>

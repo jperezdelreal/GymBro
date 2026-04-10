@@ -4,7 +4,9 @@ import androidx.lifecycle.viewModelScope
 import com.gymbro.core.error.toUserMessage
 import com.gymbro.core.model.Exercise
 import com.gymbro.core.model.ExerciseSet
+import com.gymbro.core.repository.ExerciseRepository
 import com.gymbro.core.repository.WorkoutRepository
+import com.gymbro.core.service.RpeTrendService
 import com.gymbro.core.service.PersonalRecordService
 import com.gymbro.core.service.SmartDefaultsService
 import com.gymbro.feature.common.BaseViewModel
@@ -27,6 +29,8 @@ class ActiveWorkoutViewModel @Inject constructor(
     private val workoutRepository: WorkoutRepository,
     private val personalRecordService: PersonalRecordService,
     private val smartDefaultsService: SmartDefaultsService,
+    private val rpeTrendService: RpeTrendService,
+    private val exerciseRepository: ExerciseRepository,
     val tooltipManager: TooltipManager,
 ) : BaseViewModel() {
 
@@ -42,6 +46,7 @@ class ActiveWorkoutViewModel @Inject constructor(
 
     init {
         checkForInProgressWorkout()
+        loadFatigueWarnings()
     }
 
     private fun checkForInProgressWorkout() {
@@ -96,6 +101,29 @@ class ActiveWorkoutViewModel @Inject constructor(
         }
     }
 
+    private fun loadFatigueWarnings() {
+        viewModelScope.launch {
+            try {
+                val warnings = rpeTrendService.getFatigueWarnings()
+                if (warnings.isNotEmpty()) {
+                    val warningUis = warnings.mapNotNull { trend ->
+                        val exercise = exerciseRepository.getExerciseById(trend.exerciseId)
+                        val name = exercise?.name ?: return@mapNotNull null
+                        FatigueWarningUi(
+                            exerciseId = trend.exerciseId,
+                            exerciseName = name,
+                            currentAvgRpe = trend.currentAvgRpe,
+                            rpeDelta = trend.previousAvgRpe?.let { trend.currentAvgRpe - it },
+                        )
+                    }
+                    _state.update { it.copy(fatigueWarnings = warningUis) }
+                }
+            } catch (_: Exception) {
+                // Non-critical — silently ignore if fatigue data unavailable
+            }
+        }
+    }
+
     fun onEvent(event: ActiveWorkoutEvent) {
         when (event) {
             is ActiveWorkoutEvent.ResumeWorkout -> resumeWorkout()
@@ -125,7 +153,8 @@ class ActiveWorkoutViewModel @Inject constructor(
             is ActiveWorkoutEvent.RemoveExercise -> removeExercise(event.exerciseIndex)
             is ActiveWorkoutEvent.VoiceInput -> {
                 updateSetField(event.exerciseIndex, event.setIndex) {
-                    it.copy(weight = event.weight, reps = event.reps)
+                    val updated = it.copy(weight = event.weight, reps = event.reps)
+                    if (event.rpe.isNotBlank()) updated.copy(rpe = event.rpe) else updated
                 }
             }
             is ActiveWorkoutEvent.StartRestTimer -> startRestTimer()
@@ -134,6 +163,7 @@ class ActiveWorkoutViewModel @Inject constructor(
             is ActiveWorkoutEvent.CompleteWorkout -> completeWorkout()
             is ActiveWorkoutEvent.DiscardWorkout -> discardWorkout()
             is ActiveWorkoutEvent.ClearError -> _state.update { it.copy(errorMessage = null) }
+            is ActiveWorkoutEvent.DismissFatigueWarnings -> _state.update { it.copy(fatigueWarnings = emptyList()) }
             is ActiveWorkoutEvent.RetryStartWorkout -> startWorkout()
         }
     }
