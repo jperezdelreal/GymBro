@@ -26,4 +26,5 @@ sealed interface ProgramsEvent {
 sealed interface ProgramsEffect {
     data class NavigateToCreateTemplate(val templateId: String?) : ProgramsEffect
     data class NavigateToActiveWorkout(val template: WorkoutTemplate) : ProgramsEffect
+    data class NavigateToPlanDayDetail(val dayNumber: Int) : ProgramsEffect
 }
