@@ -564,6 +564,29 @@ Implemented intelligent split selection based on training frequency and goals:
    - WorkoutPlanGeneratorTest: 8 integration tests verifying split selection and application
    - All 17 tests passing
 
+### 2026-04-08: RPE/RIR Tracking & Performance-Based Progression (Issue #393, PR #406)
+**What was built:**
+- Added RIR (Reps in Reserve) field to WorkoutSetEntity and ExerciseSet model with Room migration 5→6
+- RPE quick picker UI in set logging row: compact tap-to-cycle (6-10), color-coded (green/amber/red)
+- ProgressionEngine service: auto-progress +2.5kg when all sets RPE ≤7, auto-regress −5% when last 2 sets RPE 10, maintain at RPE 8-9
+- RpeTrendService: 7-day rolling RPE average per exercise with fatigue warning flags (rising trend + avg ≥ 8.5)
+- RIR auto-calculated from RPE on set completion (RPE 10 = 0 RIR, RPE 7 = 3 RIR)
+- SmartDefaultsService now uses ProgressionEngine for weight suggestions instead of just last-used weight
+- 13 new tests (8 ProgressionEngine + 5 RpeTrendService), existing SmartDefaultsServiceTest updated
+
+**Key design decisions:**
+- RPE picker uses tap-to-cycle (not dropdown/slider) because speed matters mid-workout — 1 tap to set RPE
+- Heuristics-first approach: simple rule-based progression before ML (consistent with Neo's philosophy)
+- RPE 6-10 range only (sub-6 isn't meaningful for progression decisions)
+- Regression rounds to nearest 2.5kg plate increment for practical gym use
+- RIR stored alongside RPE for future use in more sophisticated autoregulation algorithms
+
+**Architecture notes:**
+- ProgressionEngine injected via Hilt constructor injection (WorkoutDao dependency)
+- SmartDefaultsService now has 2 dependencies (WorkoutDao + ProgressionEngine)
+- Trend analysis uses 7-day windows, comparing recent vs previous 7 days (14-day lookback total)
+- Fatigue warning threshold: rising trend AND current average ≥ 8.5 (avoids false positives)
+
 **Key design decisions:**
 - **Evidence-based split recommendations** from training-domain skill (compiled from Mike Israetel, Renaissance Periodization, Starting Strength)
 - **Goal-aware selection** — Powerlifting goal gets specialized 3-day split (squat/bench/deadlift focus) instead of generic full body
