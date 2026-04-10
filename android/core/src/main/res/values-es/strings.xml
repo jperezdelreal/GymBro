@@ -329,6 +329,7 @@
     <string name="active_workout_title">Entrenamiento Activo</string>
     <string name="active_workout_starting">Iniciando entrenamiento...</string>
     <string name="active_workout_add_exercise">Añadir Ejercicio</string>
+    <string name="active_workout_coach_fab">Hablar con el Entrenador IA</string>
     <string name="active_workout_remove_exercise">Eliminar ejercicio</string>
     <string name="active_workout_tap_to_complete">Toca para completar la serie</string>
     <string name="active_workout_rest">DESCANSO</string>

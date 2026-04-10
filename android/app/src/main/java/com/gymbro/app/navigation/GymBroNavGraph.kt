@@ -238,6 +238,9 @@ fun GymBroNavGraph(
                 onNavigateBack = {
                     navController.popBackStack()
                 },
+                onNavigateToCoach = {
+                    navController.navigate("coach")
+                },
                 pickedExercise = pickedExercise,
             )
         }

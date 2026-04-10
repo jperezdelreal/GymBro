@@ -37,6 +37,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.FitnessCenter
+import androidx.compose.material.icons.filled.SmartToy
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -118,6 +119,7 @@ fun ActiveWorkoutRoute(
     onNavigateToExercisePicker: () -> Unit = {},
     onNavigateToSummary: (Long, Double, Int, Int, List<com.gymbro.core.model.PersonalRecord>) -> Unit = { _, _, _, _, _ -> },
     onNavigateBack: () -> Unit = {},
+    onNavigateToCoach: () -> Unit = {},
     pickedExercise: Exercise? = null,
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle()
@@ -180,7 +182,8 @@ fun ActiveWorkoutRoute(
             viewModel.viewModelScope.launch {
                 viewModel.tooltipManager.markShown("active_workout_complete_set")
             }
-        }
+        },
+        onNavigateToCoach = onNavigateToCoach
     )
 }
 
@@ -205,6 +208,7 @@ fun ActiveWorkoutScreen(
     defaultWeightUnit: UserPreferences.WeightUnit,
     showCompleteSetTooltip: Boolean = false,
     onTooltipDismissed: () -> Unit = {},
+    onNavigateToCoach: () -> Unit = {},
 ) {
     if (state.isLoading) {
         FullScreenLoading(message = stringResource(R.string.active_workout_starting))
@@ -257,20 +261,41 @@ fun ActiveWorkoutScreen(
             }
         },
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = { 
-                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                    onEvent(ActiveWorkoutEvent.AddExerciseClicked) 
-                },
-                containerColor = Color.Transparent,
-                modifier = Modifier.drawBehind {
-                    val gradient = Brush.horizontalGradient(
-                        colors = listOf(AccentGreenStart, AccentGreenEnd)
-                    )
-                    drawCircle(gradient)
-                }
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.padding(bottom = if (!state.isRestTimerActive) 16.dp else 0.dp)
             ) {
-                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.active_workout_add_exercise), tint = Color.White)
+                // AI Coach FAB
+                FloatingActionButton(
+                    onClick = { 
+                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                        onNavigateToCoach()
+                    },
+                    containerColor = Color(0xFF1E1E1E),
+                    contentColor = Color(0xFF00FF87),
+                ) {
+                    Icon(
+                        Icons.Default.SmartToy, 
+                        contentDescription = stringResource(R.string.active_workout_coach_fab)
+                    )
+                }
+                
+                // Add Exercise FAB
+                FloatingActionButton(
+                    onClick = { 
+                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                        onEvent(ActiveWorkoutEvent.AddExerciseClicked) 
+                    },
+                    containerColor = Color.Transparent,
+                    modifier = Modifier.drawBehind {
+                        val gradient = Brush.horizontalGradient(
+                            colors = listOf(AccentGreenStart, AccentGreenEnd)
+                        )
+                        drawCircle(gradient)
+                    }
+                ) {
+                    Icon(Icons.Default.Add, contentDescription = stringResource(R.string.active_workout_add_exercise), tint = Color.White)
+                }
             }
         },
         containerColor = Background,
@@ -749,7 +774,7 @@ private fun GestureNumberField(
                 if (!enabled) return@pointerInput
                 detectVerticalDragGestures(
                     onDragStart = { dragOffset = 0f },
-                    onDrag = { _, dragAmount ->
+                    onVerticalDrag = { _, dragAmount ->
                         dragOffset += dragAmount
                         val threshold = dragThreshold
                         

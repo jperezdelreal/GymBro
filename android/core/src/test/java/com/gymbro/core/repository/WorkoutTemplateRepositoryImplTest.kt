@@ -123,4 +123,174 @@ class WorkoutTemplateRepositoryImplTest {
 
         coVerify { templateDao.updateLastUsedTimestamp(templateId, any()) }
     }
+
+    @Test
+    fun `initializeBuiltInTemplates skips if templates already exist`() = runTest {
+        val existingTemplate = WorkoutTemplateWithExercises(
+            template = WorkoutTemplateEntity(
+                id = UUID.randomUUID().toString(),
+                name = "Existing",
+                description = "",
+                isBuiltIn = true,
+            ),
+            exercises = emptyList()
+        )
+        coEvery { templateDao.getAllTemplates() } returns listOf(existingTemplate)
+
+        repository.initializeBuiltInTemplates()
+
+        coVerify(exactly = 0) { templateDao.insertTemplate(any()) }
+    }
+
+    @Test
+    fun `initializeBuiltInTemplates creates Starting Strength templates`() = runTest {
+        coEvery { templateDao.getAllTemplates() } returns emptyList()
+        coEvery { exerciseRepository.getAllExercises() } returns flowOf(listOf(
+            createMockExercise("Barbell Back Squat", MuscleGroup.QUADRICEPS),
+            createMockExercise("Barbell Bench Press", MuscleGroup.CHEST),
+            createMockExercise("Barbell Row", MuscleGroup.BACK),
+            createMockExercise("Barbell Overhead Press", MuscleGroup.SHOULDERS),
+            createMockExercise("Conventional Deadlift", MuscleGroup.HAMSTRINGS),
+        ))
+
+        repository.initializeBuiltInTemplates()
+
+        coVerify(atLeast = 2) { templateDao.insertTemplate(
+            match { it.name.contains("Starting Strength 5×5") }
+        ) }
+    }
+
+    @Test
+    fun `initializeBuiltInTemplates creates PPL templates`() = runTest {
+        coEvery { templateDao.getAllTemplates() } returns emptyList()
+        coEvery { exerciseRepository.getAllExercises() } returns flowOf(listOf(
+            createMockExercise("Barbell Bench Press", MuscleGroup.CHEST),
+            createMockExercise("Barbell Overhead Press", MuscleGroup.SHOULDERS),
+            createMockExercise("Incline Barbell Bench Press", MuscleGroup.CHEST),
+            createMockExercise("Cable Tricep Extension (Rope)", MuscleGroup.TRICEPS),
+            createMockExercise("Lateral Raise", MuscleGroup.SHOULDERS),
+            createMockExercise("Cable Crossover", MuscleGroup.CHEST),
+            createMockExercise("Conventional Deadlift", MuscleGroup.HAMSTRINGS),
+            createMockExercise("Pull-Up", MuscleGroup.BACK),
+            createMockExercise("Barbell Row", MuscleGroup.BACK),
+            createMockExercise("Cable Lat Pulldown (Wide Grip)", MuscleGroup.BACK),
+            createMockExercise("Cable Bicep Curl", MuscleGroup.BICEPS),
+            createMockExercise("Face Pull", MuscleGroup.SHOULDERS),
+            createMockExercise("Barbell Back Squat", MuscleGroup.QUADRICEPS),
+            createMockExercise("Romanian Deadlift", MuscleGroup.HAMSTRINGS),
+            createMockExercise("Leg Press", MuscleGroup.QUADRICEPS),
+            createMockExercise("Leg Curl", MuscleGroup.HAMSTRINGS),
+            createMockExercise("Leg Extension", MuscleGroup.QUADRICEPS),
+            createMockExercise("Standing Calf Raise", MuscleGroup.CALVES),
+        ))
+
+        repository.initializeBuiltInTemplates()
+
+        coVerify(atLeast = 1) { templateDao.insertTemplate(
+            match { it.name == "PPL - Push Day" }
+        ) }
+        coVerify(atLeast = 1) { templateDao.insertTemplate(
+            match { it.name == "PPL - Pull Day" }
+        ) }
+        coVerify(atLeast = 1) { templateDao.insertTemplate(
+            match { it.name == "PPL - Leg Day" }
+        ) }
+    }
+
+    @Test
+    fun `initializeBuiltInTemplates creates Upper Lower templates`() = runTest {
+        coEvery { templateDao.getAllTemplates() } returns emptyList()
+        coEvery { exerciseRepository.getAllExercises() } returns flowOf(listOf(
+            createMockExercise("Barbell Bench Press", MuscleGroup.CHEST),
+            createMockExercise("Barbell Row", MuscleGroup.BACK),
+            createMockExercise("Barbell Overhead Press", MuscleGroup.SHOULDERS),
+            createMockExercise("Lat Pulldown", MuscleGroup.BACK),
+            createMockExercise("Cable Bicep Curl", MuscleGroup.BICEPS),
+            createMockExercise("Cable Tricep Extension (Rope)", MuscleGroup.TRICEPS),
+            createMockExercise("Barbell Back Squat", MuscleGroup.QUADRICEPS),
+            createMockExercise("Romanian Deadlift", MuscleGroup.HAMSTRINGS),
+            createMockExercise("Bulgarian Split Squat", MuscleGroup.QUADRICEPS),
+            createMockExercise("Leg Curl", MuscleGroup.HAMSTRINGS),
+            createMockExercise("Standing Calf Raise", MuscleGroup.CALVES),
+            createMockExercise("Incline Barbell Bench Press", MuscleGroup.CHEST),
+            createMockExercise("Pull-Up", MuscleGroup.BACK),
+            createMockExercise("Dumbbell Shoulder Press", MuscleGroup.SHOULDERS),
+            createMockExercise("Cable Row", MuscleGroup.BACK),
+            createMockExercise("Lateral Raise", MuscleGroup.SHOULDERS),
+            createMockExercise("Face Pull", MuscleGroup.SHOULDERS),
+            createMockExercise("Conventional Deadlift", MuscleGroup.HAMSTRINGS),
+            createMockExercise("Front Squat", MuscleGroup.QUADRICEPS),
+            createMockExercise("Leg Press", MuscleGroup.QUADRICEPS),
+            createMockExercise("Leg Extension", MuscleGroup.QUADRICEPS),
+            createMockExercise("Seated Calf Raise", MuscleGroup.CALVES),
+        ))
+
+        repository.initializeBuiltInTemplates()
+
+        coVerify(atLeast = 1) { templateDao.insertTemplate(
+            match { it.name == "Upper/Lower - Upper A" }
+        ) }
+        coVerify(atLeast = 1) { templateDao.insertTemplate(
+            match { it.name == "Upper/Lower - Lower A" }
+        ) }
+        coVerify(atLeast = 1) { templateDao.insertTemplate(
+            match { it.name == "Upper/Lower - Upper B" }
+        ) }
+        coVerify(atLeast = 1) { templateDao.insertTemplate(
+            match { it.name == "Upper/Lower - Lower B" }
+        ) }
+    }
+
+    @Test
+    fun `initializeBuiltInTemplates creates Full Body templates`() = runTest {
+        coEvery { templateDao.getAllTemplates() } returns emptyList()
+        coEvery { exerciseRepository.getAllExercises() } returns flowOf(listOf(
+            createMockExercise("Barbell Back Squat", MuscleGroup.QUADRICEPS),
+            createMockExercise("Barbell Bench Press", MuscleGroup.CHEST),
+            createMockExercise("Barbell Row", MuscleGroup.BACK),
+            createMockExercise("Barbell Overhead Press", MuscleGroup.SHOULDERS),
+            createMockExercise("Romanian Deadlift", MuscleGroup.HAMSTRINGS),
+            createMockExercise("Plank", MuscleGroup.CORE),
+            createMockExercise("Conventional Deadlift", MuscleGroup.HAMSTRINGS),
+            createMockExercise("Pull-Up", MuscleGroup.BACK),
+            createMockExercise("Incline Barbell Bench Press", MuscleGroup.CHEST),
+            createMockExercise("Bulgarian Split Squat", MuscleGroup.QUADRICEPS),
+            createMockExercise("Ab Wheel Rollout", MuscleGroup.CORE),
+            createMockExercise("Front Squat", MuscleGroup.QUADRICEPS),
+            createMockExercise("Dumbbell Bench Press", MuscleGroup.CHEST),
+            createMockExercise("Cable Row", MuscleGroup.BACK),
+            createMockExercise("Dumbbell Shoulder Press", MuscleGroup.SHOULDERS),
+            createMockExercise("Leg Curl", MuscleGroup.HAMSTRINGS),
+            createMockExercise("Hanging Leg Raise", MuscleGroup.CORE),
+        ))
+
+        repository.initializeBuiltInTemplates()
+
+        coVerify(atLeast = 1) { templateDao.insertTemplate(
+            match { it.name == "Full Body - Day 1" }
+        ) }
+        coVerify(atLeast = 1) { templateDao.insertTemplate(
+            match { it.name == "Full Body - Day 2" }
+        ) }
+        coVerify(atLeast = 1) { templateDao.insertTemplate(
+            match { it.name == "Full Body - Day 3" }
+        ) }
+    }
+
+    @Test
+    fun `initializeBuiltInTemplates handles missing exercises gracefully`() = runTest {
+        coEvery { templateDao.getAllTemplates() } returns emptyList()
+        coEvery { exerciseRepository.getAllExercises() } returns flowOf(emptyList())
+
+        repository.initializeBuiltInTemplates()
+
+        coVerify(exactly = 0) { templateDao.insertTemplate(any()) }
+    }
+
+    private fun createMockExercise(name: String, muscleGroup: MuscleGroup) =
+        com.gymbro.core.model.Exercise(
+            id = UUID.randomUUID(),
+            name = name,
+            muscleGroup = muscleGroup,
+        )
 }
