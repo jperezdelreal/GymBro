@@ -13,6 +13,7 @@ import com.gymbro.core.model.TemplateExercise
 import com.gymbro.core.model.WorkoutTemplate
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import java.time.Instant
 import java.util.UUID
@@ -131,9 +132,14 @@ class WorkoutTemplateRepositoryImpl @Inject constructor(
                 return // Already initialized
             }
 
-            exerciseRepository.getAllExercises().collect { allExercises ->
-                // Helper function to find exercise by name
-                fun findExercise(name: String) = allExercises.find { it.name == name }
+            // Wait for exercises to be seeded before building templates
+            val allExercises = exerciseRepository.getAllExercises().first()
+            if (allExercises.isEmpty()) {
+                return // No exercises available yet, skip template initialization
+            }
+
+            // Helper function to find exercise by name
+            fun findExercise(name: String) = allExercises.find { it.name == name }
 
                 // 1. Starting Strength 5x5 - Day A
                 val ss5x5DayA = listOf(
@@ -546,7 +552,6 @@ class WorkoutTemplateRepositoryImpl @Inject constructor(
                         isBuiltIn = true,
                     ))
                 }
-            }
         } catch (e: Exception) {
             Log.e(TAG, "Failed to initialize built-in templates: ${e.message}", e)
             throw e
