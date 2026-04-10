@@ -163,13 +163,33 @@ private fun ProgressScreen(
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
+        // Time Period Selector
+        item {
+            TimePeriodSelector(
+                selectedPeriod = state.selectedTimePeriod,
+                onPeriodSelected = { onEvent(ProgressEvent.SelectTimePeriod(it)) }
+            )
+        }
+
         // Hero KPI Cards (3 across)
         item {
             HeroKPISection(
                 totalVolume = state.totalVolume,
                 workoutsThisWeek = state.workoutsThisWeek,
                 recentPRs = state.recentPRs,
+                volumeChangePercent = state.volumeChangePercent,
+                workoutFrequencyGoal = state.workoutFrequencyGoal,
             )
+        }
+
+        // Top 5 Exercises Section
+        if (state.topExercises.isNotEmpty()) {
+            item {
+                SectionHeader(title = stringResource(R.string.progress_top_exercises), icon = "💪")
+            }
+            item {
+                TopExercisesSection(exercises = state.topExercises)
+            }
         }
 
         // Volume Chart Section
@@ -201,14 +221,12 @@ private fun ProgressScreen(
         }
 
         // PR Showcase Section
-        if (state.personalRecords.isNotEmpty()) {
+        if (state.recentPRsWithDetails.isNotEmpty()) {
             item {
                 SectionHeader(title = stringResource(R.string.progress_recent_prs), icon = "🏆")
             }
-            val recentPRs = state.personalRecords
-                .sortedByDescending { it.date }
-                .take(5)
-            items(recentPRs) { pr ->
+            val displayPRs = state.recentPRsWithDetails.take(5)
+            items(displayPRs) { pr ->
                 PRShowcaseCard(record = pr)
             }
         }
@@ -705,6 +723,8 @@ private fun HeroKPISection(
     totalVolume: Double,
     workoutsThisWeek: Int,
     recentPRs: Int,
+    volumeChangePercent: Double?,
+    workoutFrequencyGoal: Int,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -728,6 +748,20 @@ private fun HeroKPISection(
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (volumeChangePercent != null) {
+                        val changeColor = when {
+                            volumeChangePercent > 0 -> Color(AccentGreenStart.value)
+                            volumeChangePercent < 0 -> Color(AccentRed.value)
+                            else -> MaterialTheme.colorScheme.onSurfaceVariant
+                        }
+                        Text(
+                            text = "${if (volumeChangePercent > 0) "+" else ""}${String.format("%.1f", volumeChangePercent)}%",
+                            fontSize = 11.sp,
+                            color = changeColor,
+                            fontWeight = FontWeight.SemiBold,
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                    }
                     Icon(
                         Icons.Default.TrendingUp,
                         contentDescription = null,
@@ -761,7 +795,7 @@ private fun HeroKPISection(
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = stringResource(R.string.progress_this_week),
+                    text = stringResource(R.string.progress_workout_goal, workoutsThisWeek, workoutFrequencyGoal),
                     fontSize = 11.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -1065,6 +1099,112 @@ private fun PRShowcaseCard(record: PersonalRecord) {
                             fontWeight = FontWeight.Bold,
                         )
                     }
+                }
+            }
+        }
+    }
+}
+
+
+@Composable
+private fun TimePeriodSelector(
+    selectedPeriod: TimePeriod,
+    onPeriodSelected: (TimePeriod) -> Unit,
+) {
+    val haptic = LocalHapticFeedback.current
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        FilterChip(
+            selected = selectedPeriod == TimePeriod.THIS_WEEK,
+            onClick = {
+                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                onPeriodSelected(TimePeriod.THIS_WEEK)
+            },
+            label = { Text(stringResource(R.string.progress_period_this_week)) },
+            modifier = Modifier.weight(1f),
+            colors = FilterChipDefaults.filterChipColors(
+                selectedContainerColor = Color(AccentGreenStart.value).copy(alpha = 0.2f),
+                selectedLabelColor = Color(AccentGreenStart.value),
+                containerColor = Color(SurfaceVariant.value),
+                labelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            ),
+        )
+        FilterChip(
+            selected = selectedPeriod == TimePeriod.LAST_WEEK,
+            onClick = {
+                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                onPeriodSelected(TimePeriod.LAST_WEEK)
+            },
+            label = { Text(stringResource(R.string.progress_period_last_week)) },
+            modifier = Modifier.weight(1f),
+            colors = FilterChipDefaults.filterChipColors(
+                selectedContainerColor = Color(AccentGreenStart.value).copy(alpha = 0.2f),
+                selectedLabelColor = Color(AccentGreenStart.value),
+                containerColor = Color(SurfaceVariant.value),
+                labelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            ),
+        )
+        FilterChip(
+            selected = selectedPeriod == TimePeriod.THIS_MONTH,
+            onClick = {
+                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                onPeriodSelected(TimePeriod.THIS_MONTH)
+            },
+            label = { Text(stringResource(R.string.progress_period_this_month)) },
+            modifier = Modifier.weight(1f),
+            colors = FilterChipDefaults.filterChipColors(
+                selectedContainerColor = Color(AccentGreenStart.value).copy(alpha = 0.2f),
+                selectedLabelColor = Color(AccentGreenStart.value),
+                containerColor = Color(SurfaceVariant.value),
+                labelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            ),
+        )
+    }
+}
+
+@Composable
+private fun TopExercisesSection(exercises: List<TopExercise>) {
+    Card(
+        colors = CardDefaults.cardColors(containerColor = Color(Surface.value)),
+        shape = RoundedCornerShape(12.dp),
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            exercises.forEachIndexed { index, exercise ->
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.weight(1f),
+                    ) {
+                        Text(
+                            text = "#${index + 1}",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = Color(AccentCyanStart.value),
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.width(40.dp),
+                        )
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = exercise.exerciseName,
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                fontWeight = FontWeight.Medium,
+                            )
+                        }
+                    }
+                    Text(
+                        text = stringResource(R.string.progress_set_count, exercise.setCount),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                if (index < exercises.size - 1) {
+                    Spacer(modifier = Modifier.height(12.dp))
                 }
             }
         }
