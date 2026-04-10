@@ -64,6 +64,7 @@ class WorkoutRepositoryImpl @Inject constructor(
                     weight = set.weightKg,
                     reps = set.reps,
                     rpe = set.rpe,
+                    rir = set.rir,
                     isWarmup = set.isWarmup,
                     completedAt = set.completedAt.toEpochMilli(),
                 )
@@ -318,6 +319,7 @@ private fun WorkoutWithSets.toDomain(): Workout {
             weightKg = set.weight,
             reps = set.reps,
             rpe = set.rpe,
+            rir = set.rir,
             isWarmup = set.isWarmup,
             completedAt = Instant.ofEpochMilli(set.completedAt),
         )

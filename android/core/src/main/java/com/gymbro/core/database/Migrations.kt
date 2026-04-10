@@ -139,4 +139,11 @@ object Migrations {
             """.trimIndent())
         }
     }
+
+    val MIGRATION_5_6 = object : Migration(5, 6) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            // Add RIR (Reps in Reserve) column to workout_sets for RPE-based progression
+            db.execSQL("ALTER TABLE workout_sets ADD COLUMN rir INTEGER")
+        }
+    }
 }

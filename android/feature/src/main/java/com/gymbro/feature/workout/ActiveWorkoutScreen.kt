@@ -751,6 +751,16 @@ private fun SetRow(
             stepSize = 1.0,
         )
 
+        Spacer(modifier = Modifier.width(4.dp))
+
+        // RPE quick picker — compact tap-to-cycle selector
+        RpeQuickPicker(
+            selectedRpe = setUi.rpe,
+            onRpeSelected = { onEvent(ActiveWorkoutEvent.UpdateSetRpe(exerciseIndex, setIndex, it)) },
+            enabled = !setUi.isCompleted,
+            modifier = Modifier.width(48.dp),
+        )
+
         Spacer(modifier = Modifier.width(8.dp))
 
         // Complete button
@@ -909,6 +919,55 @@ private fun setHeaderStyle() = MaterialTheme.typography.labelSmall.copy(
     fontWeight = FontWeight.Bold,
     letterSpacing = 1.sp,
 )
+
+/**
+ * Compact RPE quick picker — tap to cycle through RPE values (6-10).
+ * Speed matters during a workout, so this is a single-tap cycle, not a dropdown.
+ * Displays current RPE with color coding: green (6-7), amber (8), red (9-10).
+ */
+@Composable
+private fun RpeQuickPicker(
+    selectedRpe: String,
+    onRpeSelected: (String) -> Unit,
+    enabled: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    val haptic = LocalHapticFeedback.current
+    val rpeValues = listOf("", "6", "7", "8", "9", "10")
+    val currentIndex = rpeValues.indexOf(selectedRpe).coerceAtLeast(0)
+
+    val displayText = if (selectedRpe.isEmpty()) "—" else selectedRpe
+    val rpeColor = when (selectedRpe.toIntOrNull()) {
+        in 6..7 -> AccentGreenStart
+        8 -> AccentAmberStart
+        in 9..10 -> AccentRed
+        else -> Color.White.copy(alpha = 0.4f)
+    }
+
+    Box(
+        modifier = modifier
+            .height(48.dp)
+            .clip(RoundedCornerShape(8.dp))
+            .background(
+                if (selectedRpe.isNotEmpty()) rpeColor.copy(alpha = 0.12f)
+                else Color.White.copy(alpha = 0.05f)
+            )
+            .clickable(enabled = enabled) {
+                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                val nextIndex = (currentIndex + 1) % rpeValues.size
+                onRpeSelected(rpeValues[nextIndex])
+            }
+            .testTag("rpe_picker"),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            text = displayText,
+            style = MaterialTheme.typography.bodyLarge,
+            fontWeight = FontWeight.Bold,
+            color = if (enabled) rpeColor else rpeColor.copy(alpha = 0.4f),
+        )
+    }
+}
 
 private fun formatDuration(totalSeconds: Long): String {
     val hours = totalSeconds / 3600

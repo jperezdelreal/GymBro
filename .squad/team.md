@@ -13,7 +13,7 @@
 | Name | Role | Charter | Status |
 |------|------|---------|--------|
 | Morpheus | Lead | .squad/agents/morpheus/charter.md | 🏗️ Lead |
-| Trinity | iOS Dev | .squad/agents/trinity/charter.md | ⚛️ Active |
+| Trinity | Mobile Dev | .squad/agents/trinity/charter.md | ⚛️ Active |
 | Neo | AI/ML Engineer | .squad/agents/neo/charter.md | 🔧 Active |
 | Tank | Backend Dev | .squad/agents/tank/charter.md | 🔧 Active |
 | Switch | Tester | .squad/agents/switch/charter.md | 🧪 Active |

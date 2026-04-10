@@ -18,6 +18,7 @@ data class ExerciseSet(
     val weightKg: Double,
     val reps: Int,
     val rpe: Double? = null,
+    val rir: Int? = null,
     val isWarmup: Boolean = false,
     val completedAt: Instant = Instant.now(),
 ) {
@@ -28,4 +29,12 @@ data class ExerciseSet(
     /** Convert stored kg to lbs for display */
     val weightLbs: Double
         get() = weightKg * 2.20462
+
+    companion object {
+        /** Convert RPE (1-10) to RIR (Reps in Reserve). RPE 10 = 0 RIR, RPE 7 = 3 RIR */
+        fun rpeToRir(rpe: Double): Int = (10 - rpe).coerceIn(0.0, 5.0).toInt()
+
+        /** Convert RIR (0-5) to RPE (1-10). 0 RIR = RPE 10, 3 RIR = RPE 7 */
+        fun rirToRpe(rir: Int): Double = (10.0 - rir).coerceIn(5.0, 10.0)
+    }
 }

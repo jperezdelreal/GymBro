@@ -8,6 +8,7 @@ import javax.inject.Inject
 
 class SmartDefaultsService @Inject constructor(
     private val workoutDao: WorkoutDao,
+    private val progressionEngine: ProgressionEngine,
 ) {
     
     suspend fun getDefaultWeight(exerciseId: String): Double? {
@@ -39,16 +40,19 @@ class SmartDefaultsService @Inject constructor(
     data class SmartDefaults(
         val weight: Double?,
         val reps: Int?,
+        val progressionReason: ProgressionEngine.ProgressionReason? = null,
     )
     
     suspend fun getDefaults(exerciseId: String): SmartDefaults {
         val result = retryWithBackoff {
             runCatchingAsResult {
+                val suggestion = progressionEngine.getSuggestion(exerciseId)
                 val sets = workoutDao.getSetsByExercise(exerciseId)
                 val lastSet = sets.lastOrNull()
                 SmartDefaults(
-                    weight = lastSet?.weight,
+                    weight = suggestion?.suggestedWeightKg ?: lastSet?.weight,
                     reps = lastSet?.reps,
+                    progressionReason = suggestion?.reason,
                 )
             }
         }
