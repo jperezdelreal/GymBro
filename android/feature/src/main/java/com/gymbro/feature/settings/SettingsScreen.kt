@@ -105,6 +105,8 @@ internal fun SettingsScreen(
     onNavigateBack: () -> Unit,
 ) {
     var showClearDataDialog by remember { mutableStateOf(false) }
+    var showSignInDialog by remember { mutableStateOf(false) }
+    var showVersionDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -150,7 +152,7 @@ internal fun SettingsScreen(
                         title = stringResource(R.string.settings_sign_in_status),
                         subtitle = stringResource(R.string.settings_sign_in_subtitle),
                         iconTint = AccentGreen,
-                        onClick = { },
+                        onClick = { showSignInDialog = true },
                     )
                     SettingsDivider()
                     SettingsRow(
@@ -311,7 +313,7 @@ internal fun SettingsScreen(
                         title = stringResource(R.string.settings_app_version),
                         subtitle = state.appVersion,
                         iconTint = AccentGreen,
-                        onClick = { },
+                        onClick = { showVersionDialog = true },
                     )
                     SettingsDivider()
                     SettingsRow(
@@ -362,6 +364,58 @@ internal fun SettingsScreen(
             dismissButton = {
                 OutlinedButton(onClick = { showClearDataDialog = false }) {
                     Text(stringResource(R.string.action_cancel), color = Color.White)
+                }
+            },
+        )
+    }
+
+    // Sign In Dialog
+    if (showSignInDialog) {
+        AlertDialog(
+            onDismissRequest = { showSignInDialog = false },
+            containerColor = CardBackground,
+            title = {
+                Text(
+                    text = stringResource(R.string.settings_sign_in_dialog_title),
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                )
+            },
+            text = {
+                Text(
+                    text = stringResource(R.string.settings_sign_in_dialog_message),
+                    color = Color(0xFF9E9E9E),
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = { showSignInDialog = false }) {
+                    Text(stringResource(R.string.action_ok), color = AccentGreen)
+                }
+            },
+        )
+    }
+
+    // App Version Dialog
+    if (showVersionDialog) {
+        AlertDialog(
+            onDismissRequest = { showVersionDialog = false },
+            containerColor = CardBackground,
+            title = {
+                Text(
+                    text = stringResource(R.string.settings_version_dialog_title),
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                )
+            },
+            text = {
+                Text(
+                    text = stringResource(R.string.settings_version_dialog_message, state.appVersion),
+                    color = Color(0xFF9E9E9E),
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = { showVersionDialog = false }) {
+                    Text(stringResource(R.string.action_ok), color = AccentGreen)
                 }
             },
         )

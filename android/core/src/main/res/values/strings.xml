@@ -17,6 +17,7 @@
     <!-- Common Actions -->
     <string name="action_back">Back</string>
     <string name="action_cancel">Cancel</string>
+    <string name="action_ok">OK</string>
     <string name="action_save">Save</string>
     <string name="action_delete">Delete</string>
     <string name="action_retry">Retry</string>
@@ -173,6 +174,10 @@
     <string name="settings_app_version">App Version</string>
     <string name="settings_send_feedback">Send Feedback</string>
     <string name="settings_send_feedback_subtitle">Report issues or suggest features</string>
+    <string name="settings_sign_in_dialog_title">Sign In Coming Soon</string>
+    <string name="settings_sign_in_dialog_message">Sign in functionality is coming in a future update. Your workout data is currently saved locally on your device.</string>
+    <string name="settings_version_dialog_title">App Version</string>
+    <string name="settings_version_dialog_message">GymBro v%1$s</string>
 
     <!-- Onboarding -->
     <string name="onboarding_app_title">GymBro</string>
