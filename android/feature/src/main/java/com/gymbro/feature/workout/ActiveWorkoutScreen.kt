@@ -1,6 +1,7 @@
 package com.gymbro.feature.workout
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -1020,12 +1021,17 @@ private fun RpeQuickPicker(
     val currentIndex = rpeValues.indexOf(selectedRpe).coerceAtLeast(0)
 
     val displayText = if (selectedRpe.isEmpty()) "—" else selectedRpe
-    val rpeColor = when (selectedRpe.toIntOrNull()) {
+    val targetRpeColor = when (selectedRpe.toIntOrNull()) {
         in 6..7 -> AccentGreenStart
         8 -> AccentAmberStart
         in 9..10 -> AccentRed
         else -> Color.White.copy(alpha = 0.4f)
     }
+    val rpeColor by animateColorAsState(
+        targetValue = targetRpeColor,
+        animationSpec = tween(durationMillis = 300),
+        label = "rpeColor",
+    )
 
     Box(
         modifier = modifier

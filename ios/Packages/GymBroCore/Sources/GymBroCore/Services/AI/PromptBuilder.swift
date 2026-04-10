@@ -16,6 +16,10 @@ public struct PromptBuilder {
 
         if !context.recentWorkouts.isEmpty {
             parts.append(recentWorkoutsSection(context.recentWorkouts))
+            let rpeSection = rpeTrendsSection(context.recentWorkouts)
+            if !rpeSection.isEmpty {
+                parts.append(rpeSection)
+            }
         }
 
         if let program = context.activeProgram {
@@ -64,7 +68,13 @@ public struct PromptBuilder {
         var lines = ["## Recent Workouts (last \(workouts.count))"]
         for workout in workouts.prefix(5) {
             let dateStr = formatter.string(from: workout.date)
-            let exercises = workout.exercises.map { "\($0.name) \($0.sets)×\($0.bestReps)@\(String(format: "%.1f", $0.bestWeight))kg" }
+            let exercises = workout.exercises.map { ex in
+                var desc = "\(ex.name) \(ex.sets)×\(ex.bestReps)@\(String(format: "%.1f", ex.bestWeight))kg"
+                if let rpe = ex.avgRpe {
+                    desc += " RPE \(String(format: "%.0f", rpe))"
+                }
+                return desc
+            }
             let duration = workout.durationMinutes.map { " (\(Int($0))min)" } ?? ""
             lines.append("- \(dateStr)\(duration): \(exercises.joined(separator: ", "))")
         }
@@ -89,6 +99,33 @@ public struct PromptBuilder {
             let dateStr = formatter.string(from: pr.date)
             lines.append("- \(pr.exerciseName): \(String(format: "%.1f", pr.weightKg))kg × \(pr.reps) (\(dateStr))")
         }
+        return lines.joined(separator: "\n")
+    }
+
+    private func rpeTrendsSection(_ workouts: [WorkoutSnapshot]) -> String {
+        let exercisesWithRpe = workouts.flatMap(\.exercises).filter { $0.avgRpe != nil }
+        guard !exercisesWithRpe.isEmpty else { return "" }
+
+        let allRpes = exercisesWithRpe.compactMap(\.avgRpe)
+        let overallAvg = allRpes.reduce(0, +) / Double(allRpes.count)
+
+        var lines = ["## RPE Trends"]
+        lines.append("- Overall average RPE (recent): \(String(format: "%.1f", overallAvg))")
+
+        // Flag high-RPE exercises (avg ≥ 8.5 = potential fatigue)
+        let fatigued = Dictionary(grouping: exercisesWithRpe, by: \.name)
+            .compactMap { name, snapshots -> (String, Double)? in
+                let avg = snapshots.compactMap(\.avgRpe).reduce(0, +) / Double(snapshots.count)
+                return avg >= 8.5 ? (name, avg) : nil
+            }
+
+        if !fatigued.isEmpty {
+            lines.append("- ⚠ High-effort exercises (avg RPE ≥ 8.5):")
+            for (name, avg) in fatigued {
+                lines.append("  * \(name): avg RPE \(String(format: "%.1f", avg))")
+            }
+        }
+
         return lines.joined(separator: "\n")
     }
 

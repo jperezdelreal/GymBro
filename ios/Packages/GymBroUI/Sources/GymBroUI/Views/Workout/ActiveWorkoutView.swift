@@ -249,7 +249,20 @@ public struct ActiveWorkoutView: View {
                 }
             }
             .font(GymBroTypography.subheadline)
-            .foregroundStyle(viewModel.currentRPE != nil ? GymBroColors.accentAmber : GymBroColors.textSecondary)
+            .foregroundStyle(rpeColor)
+        }
+        .animation(.easeInOut(duration: 0.3), value: viewModel.currentRPE)
+    }
+
+    private var rpeColor: Color {
+        guard let rpe = viewModel.currentRPE else {
+            return GymBroColors.textSecondary
+        }
+        switch Int(rpe) {
+        case 6...7: return GymBroColors.accentGreen
+        case 8: return GymBroColors.accentAmber
+        case 9...10: return GymBroColors.accentRed
+        default: return GymBroColors.accentAmber
         }
     }
 

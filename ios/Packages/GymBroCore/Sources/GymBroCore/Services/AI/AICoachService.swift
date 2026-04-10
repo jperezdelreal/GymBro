@@ -63,12 +63,14 @@ public struct ExerciseSnapshot {
     public let sets: Int
     public let bestWeight: Double
     public let bestReps: Int
+    public let avgRpe: Double?
 
-    public init(name: String, sets: Int, bestWeight: Double, bestReps: Int) {
+    public init(name: String, sets: Int, bestWeight: Double, bestReps: Int, avgRpe: Double? = nil) {
         self.name = name
         self.sets = sets
         self.bestWeight = bestWeight
         self.bestReps = bestReps
+        self.avgRpe = avgRpe
     }
 }
 
