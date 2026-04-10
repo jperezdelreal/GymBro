@@ -1,0 +1,110 @@
+appId: com.gymbro.app
+name: "Home↔Programs Plan Refresh - Verify plan generated in Programs appears on Home"
+#
+# Tests: Reactive refresh — plan created during onboarding shows on Home via today_workout_card
+# Preconditions: User has completed onboarding with auto-generated plan (ensured by ensure-post-onboarding.yaml)
+# Test data: None (uses auto-generated plan from onboarding)
+# Assertions: Programs shows active plan, switching to Home reveals today_workout_card (not create_program_cta)
+# Cleanup: Return to Home tab
+# Dependencies: flow/ensure-post-onboarding.yaml
+# Validates: HomeScreen reactive refresh fix (#416)
+tags:
+  - e2e
+  - regression
+onFlowStart:
+  - launchApp
+  - waitForAnimationToEnd:
+      timeout: 3000
+
+onFlowComplete:
+  - tapOn:
+      id: "nav_home"
+      optional: true
+
+---
+
+- runFlow: flow/ensure-post-onboarding.yaml
+
+# === PHASE 1: VERIFY PLAN EXISTS ON PROGRAMS TAB ===
+
+- tapOn:
+    id: "nav_programs"
+- waitForAnimationToEnd:
+    timeout: 2000
+
+# Confirm Programs screen loaded with an active plan
+- assertVisible: "Programas|Programs"
+- assertVisible:
+    text: "Plan Activo|Active Plan|Tu Primer Programa|Your First Program"
+# Screenshot 01: Programs tab showing active plan
+- takeScreenshot: 01_plan_refresh_programs_plan_visible
+
+# Verify workout days exist in the plan
+- scrollUntilVisible:
+    element:
+      text: "Día 1|Day 1"
+    timeout: 5000
+# Screenshot 02: Day 1 card visible in Programs plan
+- takeScreenshot: 02_plan_refresh_programs_day1
+
+# === PHASE 2: SWITCH TO HOME AND VERIFY PLAN APPEARS ===
+
+- tapOn:
+    id: "nav_home"
+- waitForAnimationToEnd:
+    timeout: 3000
+
+# Dismiss tooltip if present
+- tapOn:
+    text: "Entendido|Got it"
+    optional: true
+
+# Verify Home screen loaded
+- assertVisible: "Inicio|Home"
+# Screenshot 03: Home screen loaded after switching from Programs
+- takeScreenshot: 03_plan_refresh_home_loaded
+
+# Core assertion: today_workout_card must be visible (reactive refresh working)
+- scrollUntilVisible:
+    element:
+      id: "today_workout_card"
+    timeout: 5000
+# Screenshot 04: Today's Workout card visible — plan refresh confirmed
+- takeScreenshot: 04_plan_refresh_today_workout_card
+
+# Verify the card shows plan-related content
+- assertVisible:
+    text: "Entrenamiento de Hoy|Today's Workout"
+# Screenshot 05: Today's Workout label confirmed
+- takeScreenshot: 05_plan_refresh_today_label
+
+# Verify the "View all programs" link is present (confirms plan data loaded)
+- assertVisible:
+    text: "Ver todos los programas|View all programs"
+# Screenshot 06: View all programs link present
+- takeScreenshot: 06_plan_refresh_view_programs_link
+
+# Negative assertion: create_program_cta should NOT be visible (plan exists)
+- assertNotVisible:
+    id: "create_program_cta"
+
+# === PHASE 3: ROUND-TRIP — GO BACK TO PROGRAMS AND RETURN ===
+
+- tapOn:
+    id: "nav_programs"
+- waitForAnimationToEnd:
+    timeout: 2000
+- assertVisible: "Programas|Programs"
+# Screenshot 07: Back on Programs after round-trip
+- takeScreenshot: 07_plan_refresh_programs_roundtrip
+
+- tapOn:
+    id: "nav_home"
+- waitForAnimationToEnd:
+    timeout: 2000
+
+# Confirm today_workout_card still visible after second navigation
+- assertVisible:
+    id: "today_workout_card"
+# Screenshot 08: Today's Workout card still present after round-trip
+- takeScreenshot: 08_plan_refresh_roundtrip_confirmed
