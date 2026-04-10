@@ -287,11 +287,14 @@ public final class CoachChatViewModel {
                 guard !sets.isEmpty else { return nil }
                 let bestWeight = sets.map(\.weightKg).max() ?? 0
                 let bestReps = sets.map(\.reps).max() ?? 0
+                let rpeSets = sets.compactMap(\.rpe)
+                let avgRpe = rpeSets.isEmpty ? nil : rpeSets.reduce(0, +) / Double(rpeSets.count)
                 return ExerciseSnapshot(
                     name: name,
                     sets: sets.count,
                     bestWeight: bestWeight,
-                    bestReps: bestReps
+                    bestReps: bestReps,
+                    avgRpe: avgRpe
                 )
             }
             

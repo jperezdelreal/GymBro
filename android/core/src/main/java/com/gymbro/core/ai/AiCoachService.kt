@@ -8,6 +8,7 @@ import com.gymbro.core.model.PersonalRecord
 import com.gymbro.core.model.RecordType
 import com.gymbro.core.repository.WorkoutRepository
 import com.gymbro.core.service.PersonalRecordService
+import com.gymbro.core.service.RpeTrendService
 import kotlinx.coroutines.flow.first
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -18,6 +19,7 @@ import javax.inject.Singleton
 class AiCoachService @Inject constructor(
     private val workoutRepository: WorkoutRepository,
     private val personalRecordService: PersonalRecordService,
+    private val rpeTrendService: RpeTrendService,
 ) {
     private val chatHistory = mutableListOf<ChatMessage>()
     
@@ -121,6 +123,23 @@ class AiCoachService @Inject constructor(
             }
         }
 
+        // Gather RPE trends and fatigue warnings
+        val rpeTrends = exerciseIds.take(5).mapNotNull { exerciseId ->
+            try {
+                rpeTrendService.getTrend(exerciseId.toString())
+            } catch (e: Exception) {
+                null
+            }
+        }
+        val fatigueWarnings = rpeTrends.filter { it.isFatigueWarning }
+
+        // Compute overall average RPE from recent sets
+        val recentRpeSets = recentWorkouts.flatMap { it.sets }
+            .filter { !it.isWarmup && it.rpe != null }
+        val overallAvgRpe = if (recentRpeSets.isNotEmpty()) {
+            recentRpeSets.mapNotNull { it.rpe }.average()
+        } else null
+
         return buildString {
             append("USER CONTEXT:\n")
             
@@ -140,6 +159,25 @@ class AiCoachService @Inject constructor(
                     append("- Total volume (recent): ${String.format("%.0f", totalVolume)} kg\n")
                 } catch (e: Exception) {
                     // Skip volume calculation if error
+                }
+            }
+
+            // RPE trends
+            if (overallAvgRpe != null) {
+                append("- Recent average RPE: ${String.format("%.1f", overallAvgRpe)}\n")
+            }
+            if (fatigueWarnings.isNotEmpty()) {
+                append("- ⚠ Fatigue warnings (RPE trending up):\n")
+                fatigueWarnings.forEach { trend ->
+                    val prev = trend.previousAvgRpe?.let { String.format("%.1f", it) } ?: "N/A"
+                    append("  * Exercise ${trend.exerciseId}: avg RPE ${String.format("%.1f", trend.currentAvgRpe)} (was $prev)\n")
+                }
+            }
+            if (rpeTrends.isNotEmpty()) {
+                val risingCount = rpeTrends.count { it.trend == RpeTrendService.TrendDirection.RISING }
+                val fallingCount = rpeTrends.count { it.trend == RpeTrendService.TrendDirection.FALLING }
+                if (risingCount > 0 || fallingCount > 0) {
+                    append("- RPE trends: $risingCount exercises rising, $fallingCount falling\n")
                 }
             }
             
