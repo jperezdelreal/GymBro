@@ -4098,5 +4098,212 @@
     "videoURL": null,
     "imageURL": null,
     "muscleImageURL": null
+  },
+  {
+    "name": "Sled Push",
+    "category": "cardio",
+    "equipment": "other",
+    "instructions": "Load sled with appropriate weight. Lean into sled with arms extended, drive through legs in powerful strides. Explosive lower body conditioning and power development.",
+    "muscleGroups": [
+      {
+        "name": "Full Body",
+        "isPrimary": true
+      },
+      {
+        "name": "Quadriceps",
+        "isPrimary": false
+      },
+      {
+        "name": "Glutes",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Sled Pull",
+    "category": "cardio",
+    "equipment": "other",
+    "instructions": "Attach rope or harness to sled. Walk backward pulling sled with steady tension. Emphasizes posterior chain and improves conditioning with eccentric loading.",
+    "muscleGroups": [
+      {
+        "name": "Full Body",
+        "isPrimary": true
+      },
+      {
+        "name": "Hamstrings",
+        "isPrimary": false
+      },
+      {
+        "name": "Glutes",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Battle Ropes",
+    "category": "cardio",
+    "equipment": "other",
+    "instructions": "Hold rope ends in each hand. Create waves by alternating arm movements or simultaneous slams. Maintain athletic stance, engage core. High-intensity upper body conditioning.",
+    "muscleGroups": [
+      {
+        "name": "Full Body",
+        "isPrimary": true
+      },
+      {
+        "name": "Shoulders",
+        "isPrimary": false
+      },
+      {
+        "name": "Core",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Rowing Intervals",
+    "category": "cardio",
+    "equipment": "machine",
+    "instructions": "On rowing machine (Concept2 or similar), perform high-intensity intervals. Drive through legs, finish with upper body pull. Full-body conditioning with low impact.",
+    "muscleGroups": [
+      {
+        "name": "Full Body",
+        "isPrimary": true
+      },
+      {
+        "name": "Lats",
+        "isPrimary": false
+      },
+      {
+        "name": "Quadriceps",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Assault Bike",
+    "category": "cardio",
+    "equipment": "machine",
+    "instructions": "Push and pull handles while pedaling on air bike. Maintain steady or interval pace. Arms and legs work simultaneously for maximum metabolic demand.",
+    "muscleGroups": [
+      {
+        "name": "Full Body",
+        "isPrimary": true
+      },
+      {
+        "name": "Quadriceps",
+        "isPrimary": false
+      },
+      {
+        "name": "Shoulders",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Jump Rope",
+    "category": "cardio",
+    "equipment": "other",
+    "instructions": "Rotate rope with wrists, jump with minimal ground contact. Stay on balls of feet. Excellent for footwork, coordination, and cardiovascular conditioning.",
+    "muscleGroups": [
+      {
+        "name": "Full Body",
+        "isPrimary": true
+      },
+      {
+        "name": "Calves",
+        "isPrimary": false
+      },
+      {
+        "name": "Shoulders",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Box Jumps",
+    "category": "cardio",
+    "equipment": "other",
+    "instructions": "Stand facing box. Explosively jump onto box, landing softly with full foot contact. Step down carefully. Builds explosive power and conditioning.",
+    "muscleGroups": [
+      {
+        "name": "Full Body",
+        "isPrimary": true
+      },
+      {
+        "name": "Quadriceps",
+        "isPrimary": false
+      },
+      {
+        "name": "Glutes",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Kettlebell Swings",
+    "category": "cardio",
+    "equipment": "kettlebell",
+    "instructions": "Hinge at hips, swing kettlebell between legs. Explosively drive hips forward to swing kettlebell to shoulder height. Powerful hip hinge conditioning work, not a squat.",
+    "muscleGroups": [
+      {
+        "name": "Full Body",
+        "isPrimary": true
+      },
+      {
+        "name": "Glutes",
+        "isPrimary": false
+      },
+      {
+        "name": "Hamstrings",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Med Ball Slams",
+    "category": "cardio",
+    "equipment": "other",
+    "instructions": "Raise medicine ball overhead. Forcefully slam ball to ground, catch on bounce. Explosive full-body movement for power and conditioning. Keep core engaged.",
+    "muscleGroups": [
+      {
+        "name": "Full Body",
+        "isPrimary": true
+      },
+      {
+        "name": "Core",
+        "isPrimary": false
+      },
+      {
+        "name": "Shoulders",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
   }
 ]

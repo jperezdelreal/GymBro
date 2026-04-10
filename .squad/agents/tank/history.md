@@ -893,3 +893,68 @@ ProGuard rules follow official library documentation and Android best practices.
 **Branch:** squad/331-1tap-logging
 **PR:** #351 (targeting master, label: feat)
 **Status:** Awaiting CI + review
+
+### 2025-01-18: Conditioning Exercise Library Expansion (Issue #380)
+
+**Task Context:**
+- Added 9 gym-based conditioning exercises to the exercise library
+- Issue requested: sled push/pull, battle ropes, rowing, assault bike, jump rope, box jumps, kettlebell swings, med ball slams
+- Scope: NOT running/cycling/swimming programs (gym equipment only)
+
+**Key Decisions:**
+
+**Category Choice: "cardio" (not new "conditioning" category):**
+- Found existing ExerciseCategory.CARDIO enum in Exercise.kt (line 34)
+- The enum already supported cardio exercises, just none had been added to seed data yet
+- Used lowercase "cardio" in JSON to match existing pattern (compound/isolation/accessory)
+- Decision: Reuse existing category rather than adding new one
+
+**Muscle Group Strategy: Full Body Primary:**
+- All conditioning exercises target "Full Body" as primary muscle group
+- Added specific secondary targets (e.g., Sled Push → Quadriceps, Glutes)
+- Matches existing pattern where Full Body exercises have granular secondaries
+
+**Equipment Types:**
+- Used existing equipment types: kettlebell, machine, other
+- "other" covers: sled, battle ropes, jump rope, box, med ball
+- No new equipment enum values needed
+
+**File Sync Strategy:**
+- Two seed files must be kept in sync:
+  1. shared/data/exercises-seed.json — canonical shared data
+  2. ndroid/core/src/main/assets/exercises-seed.json — Android runtime data
+- Files differ in size (236 vs 209 exercises before this PR)
+- Decisions file mentions future task to create shared data loader
+- For now: manually apply same changes to both files
+
+**Exercise Quality Standards:**
+- Instructions: 2-3 sentences (Setup → Execution → Key cues)
+- Emphasized form and safety (e.g., "Step down carefully" for box jumps)
+- Distinguished patterns (e.g., kettlebell swing is "hip hinge, not a squat")
+- Left videoURL, imageURL, muscleImageURL as null (follow-up task to add media)
+
+**Exercises Added:**
+1. Sled Push (equipment: other) — Explosive lower body
+2. Sled Pull (equipment: other) — Posterior chain emphasis
+3. Battle Ropes (equipment: other) — Upper body conditioning
+4. Rowing Intervals (equipment: machine) — Full-body, low-impact
+5. Assault Bike (equipment: machine) — Maximum metabolic demand
+6. Jump Rope (equipment: other) — Footwork and cardio
+7. Box Jumps (equipment: other) — Explosive power
+8. Kettlebell Swings (equipment: kettlebell) — Hip hinge conditioning
+9. Med Ball Slams (equipment: other) — Explosive full-body
+
+**Key File Paths:**
+- Exercise model: ndroid/core/src/main/java/com/gymbro/core/model/Exercise.kt
+- Shared seed data: shared/data/exercises-seed.json
+- Android seed data: ndroid/core/src/main/assets/exercises-seed.json
+- Training domain skill: .squad/skills/training-domain/SKILL.md
+
+**Impact:**
+- Total exercises: 236 (shared), 209 (android) → now +9 cardio each
+- Exercise library now supports filtering by cardio category
+- Users can add conditioning work to programs without custom exercises
+
+**Branch:** squad/380-conditioning-exercises
+**PR:** #384 (draft, targeting master, label: feat)
+**Status:** Ready for review
