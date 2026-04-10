@@ -21,25 +21,27 @@ class GymBroApplication : Application(), Configuration.Provider {
     lateinit var workerFactory: HiltWorkerFactory
 
     @Inject
-    lateinit var notificationHelper: NotificationHelper
+    lateinit var notificationHelper: dagger.Lazy<NotificationHelper>
 
     @Inject
-    lateinit var reminderScheduler: ReminderScheduler
+    lateinit var reminderScheduler: dagger.Lazy<ReminderScheduler>
 
     @Inject
-    lateinit var userPreferences: UserPreferences
+    lateinit var userPreferences: dagger.Lazy<UserPreferences>
 
     private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
     override fun onCreate() {
         super.onCreate()
-        
-        notificationHelper.createNotificationChannels()
-        
+
+        // Defer all non-essential initialization to background thread
+        // to avoid blocking the main thread during cold start
         applicationScope.launch {
-            val notificationsEnabled = userPreferences.notificationsEnabled.first()
+            notificationHelper.get().createNotificationChannels()
+
+            val notificationsEnabled = userPreferences.get().notificationsEnabled.first()
             if (notificationsEnabled) {
-                reminderScheduler.scheduleWorkoutReminders()
+                reminderScheduler.get().scheduleWorkoutReminders()
             }
         }
     }

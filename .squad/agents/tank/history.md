@@ -1078,3 +1078,42 @@ Sled push, battle ropes, assault bike, jump rope, rowing machine, medicine ball 
 
 **Status:** PR #384 draft ready for review. Unrelated: Morpheus has lockout on PR #375 (Tank's earlier work)—does not affect this PR.  
 **Reference:** .squad/decisions.md (new entry: "Reuse CARDIO Category")
+
+### 2026-04-11: App Startup Performance Audit (Issue #338)
+
+**Problem:** Cold start performance wasn't measured or optimized. Multiple startup bottlenecks identified through code path analysis.
+
+**Bottlenecks Found:**
+1. **Synchronous notification channel creation on main thread** — `notificationHelper.createNotificationChannels()` ran in `Application.onCreate()` before first frame
+2. **Eager Hilt injection** — `NotificationHelper`, `ReminderScheduler`, `UserPreferences` all constructed at app startup even though only needed later
+3. **Start destination flash** — `hasCompletedOnboarding` used `initialValue = false`, causing returning users to briefly see onboarding screen before DataStore loaded
+4. **No SplashScreen API** — Android 12+ splash attributes in themes.xml but no `installSplashScreen()` or compat library for pre-12 devices
+5. **No TTFD measurement** — No `reportFullyDrawn()` call for proper Time-To-Full-Display tracking
+6. **Repeated Firebase init check** — `isFirebaseInitialized()` caught/threw exceptions on every call instead of caching result
+7. **Missing @Inject on ExerciseSubstitutionEngine** — Pre-existing Hilt build failure
+
+**Optimizations Applied:**
+- **dagger.Lazy<>** for NotificationHelper, ReminderScheduler, UserPreferences — defers construction until first use
+- **Background thread for all Application.onCreate() work** — notification channels and reminder scheduling moved into `applicationScope.launch`
+- **AndroidX SplashScreen compat library** (1.0.1) — consistent splash experience on API 26-36, `installSplashScreen()` in MainActivity
+- **Null initial value for DataStore** — distinguishes "not loaded yet" from "false", shows empty Box while loading (splash covers this)
+- **reportFullyDrawn()** — called via `onFullyDrawn` callback once NavGraph resolves start destination
+- **Lazy `by lazy` for Firebase check** — cached result avoids repeated try-catch
+- **@Inject constructor on ExerciseSubstitutionEngine** — fixes pre-existing Hilt build failure
+
+**Expected Impact:**
+- ~200-400ms improvement in cold start (deferred Hilt construction + background notification setup)
+- Elimination of onboarding screen flash for returning users
+- Proper TTFD reporting in Logcat for future benchmarking
+- Consistent splash screen across all Android versions
+
+**Files Changed:**
+- `GymBroApplication.kt` — lazy injection, deferred initialization
+- `MainActivity.kt` — installSplashScreen(), reportFullyDrawn()
+- `GymBroNavGraph.kt` — null initial value, onFullyDrawn callback
+- `FirebaseModule.kt` — cached initialization check
+- `ExerciseSubstitutionEngine.kt` — added @Inject constructor
+- `themes.xml` — splash screen compat theme
+- `AndroidManifest.xml` — splash theme for MainActivity
+- `build.gradle.kts` — splashscreen dependency
+- `libs.versions.toml` — splashscreen version catalog entry
