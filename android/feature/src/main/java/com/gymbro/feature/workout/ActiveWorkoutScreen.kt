@@ -331,6 +331,16 @@ fun ActiveWorkoutScreen(
                     }
                 }
 
+                // Fatigue warnings banner (#418)
+                if (state.fatigueWarnings.isNotEmpty()) {
+                    item {
+                        FatigueWarningBanner(
+                            warnings = state.fatigueWarnings,
+                            onDismiss = { onEvent(ActiveWorkoutEvent.DismissFatigueWarnings) },
+                        )
+                    }
+                }
+
                 // Exercise cards
                 itemsIndexed(
                     items = state.exercises,
@@ -396,6 +406,64 @@ private fun StatItem(label: String, value: String, color: Color) {
             style = MaterialTheme.typography.labelSmall,
             color = Color.White.copy(alpha = 0.6f),
         )
+    }
+}
+
+@Composable
+private fun FatigueWarningBanner(
+    warnings: List<FatigueWarningUi>,
+    onDismiss: () -> Unit,
+) {
+    val warningColor = Color(0xFFFF9800)
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .background(warningColor.copy(alpha = 0.15f))
+            .border(1.dp, warningColor.copy(alpha = 0.4f), RoundedCornerShape(12.dp))
+            .padding(12.dp),
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = stringResource(R.string.fatigue_warning_title),
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Bold,
+                color = warningColor,
+                modifier = Modifier.weight(1f),
+            )
+            IconButton(
+                onClick = onDismiss,
+                modifier = Modifier.size(24.dp),
+            ) {
+                Icon(
+                    Icons.Default.Close,
+                    contentDescription = stringResource(R.string.fatigue_warning_dismiss),
+                    tint = Color.White.copy(alpha = 0.6f),
+                    modifier = Modifier.size(16.dp),
+                )
+            }
+        }
+        Spacer(modifier = Modifier.height(4.dp))
+        warnings.forEach { warning ->
+            val deltaText = warning.rpeDelta?.let { d ->
+                " (+${String.format("%.1f", d)})"
+            } ?: ""
+            Text(
+                text = stringResource(
+                    R.string.fatigue_warning_detail,
+                    warning.exerciseName,
+                    String.format("%.1f", warning.currentAvgRpe),
+                    deltaText,
+                ),
+                style = MaterialTheme.typography.bodySmall,
+                color = Color.White.copy(alpha = 0.8f),
+                modifier = Modifier.padding(bottom = 2.dp),
+            )
+        }
     }
 }
 
@@ -594,6 +662,9 @@ private fun ExerciseCardContent(
                                     if (w == w.toLong().toDouble()) w.toLong().toString() else w.toString()
                                 },
                                 reps = parsed.reps.toString(),
+                                rpe = parsed.rpe?.let { r ->
+                                    if (r == r.toLong().toDouble()) r.toLong().toString() else r.toString()
+                                } ?: "",
                             )
                         )
                         voiceToast = parser.formatConfirmation(parsed)

@@ -17,8 +17,8 @@ val AccentAmberStart = Color(0xFFFFB800)
 val AccentAmberEnd = Color(0xFFFF8A00)
 val AccentRed = Color(0xFFFF3B30)
 
-// Glassmorphic Overlays
-val GlassOverlay = Color(0x1AFFFFFF)
+// Glassmorphic Overlays — 25% opacity meets WCAG AA 4.5:1 contrast on dark backgrounds
+val GlassOverlay = Color(0x40FFFFFF)
 val GlassBorder = Color(0x33FFFFFF)
 
 // Backwards compatibility aliases

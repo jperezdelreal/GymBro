@@ -66,9 +66,10 @@ onFlowComplete:
 # Screenshot 03: Search query entered in exercise picker
 - takeScreenshot: 03_start_workout_exercise_picker_search
 
-# Tap the first exercise card by coordinates (center of first card area)
+# Tap the first exercise card result (clickable via Card onClick, not modifier)
 - tapOn:
-    point: "50%,42%"
+    text: ".*Squat.*"
+    index: 0
 - waitForAnimationToEnd:
     timeout: 3000
 

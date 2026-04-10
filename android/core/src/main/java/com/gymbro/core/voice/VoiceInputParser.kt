@@ -6,6 +6,7 @@ data class ParsedVoiceInput(
     val weight: Double,
     val reps: Int,
     val unit: UserPreferences.WeightUnit,
+    val rpe: Double? = null,
 )
 
 class VoiceInputParser {
@@ -27,15 +28,19 @@ class VoiceInputParser {
     fun parse(transcript: String, defaultUnit: UserPreferences.WeightUnit = UserPreferences.WeightUnit.KG): ParsedVoiceInput? {
         val normalized = transcript.lowercase().trim()
         
+        // Extract RPE before removing it from the string for weight/reps parsing
+        val rpe = extractRpe(normalized)
+        val withoutRpe = removeRpeSegment(normalized)
+
         // Extract unit from keywords
         val unit = when {
-            normalized.contains("kilo") || normalized.contains("kg") -> UserPreferences.WeightUnit.KG
-            normalized.contains("pound") || normalized.contains("lbs") || normalized.contains("lb") -> UserPreferences.WeightUnit.LBS
+            withoutRpe.contains("kilo") || withoutRpe.contains("kg") -> UserPreferences.WeightUnit.KG
+            withoutRpe.contains("pound") || withoutRpe.contains("lbs") || withoutRpe.contains("lb") -> UserPreferences.WeightUnit.LBS
             else -> defaultUnit
         }
 
         // Extract numbers
-        val numbers = extractNumbers(normalized)
+        val numbers = extractNumbers(withoutRpe)
         if (numbers.isEmpty()) return null
 
         // Pattern matching for different formats
@@ -46,7 +51,7 @@ class VoiceInputParser {
 
         // Check for "x" format: "100x5" or "100 x 5"
         val xPattern = Regex("""(\d+\.?\d*)\s*[x×]\s*(\d+)""")
-        val xMatch = xPattern.find(normalized)
+        val xMatch = xPattern.find(withoutRpe)
         if (xMatch != null) {
             weight = xMatch.groupValues[1].toDoubleOrNull()
             reps = xMatch.groupValues[2].toIntOrNull()
@@ -55,7 +60,7 @@ class VoiceInputParser {
         // Check for "for" format: "100 for 5"
         if (weight == null || reps == null) {
             val forPattern = Regex("""(\d+\.?\d*)\s+for\s+(\d+)""")
-            val forMatch = forPattern.find(normalized)
+            val forMatch = forPattern.find(withoutRpe)
             if (forMatch != null) {
                 weight = forMatch.groupValues[1].toDoubleOrNull()
                 reps = forMatch.groupValues[2].toIntOrNull()
@@ -65,7 +70,7 @@ class VoiceInputParser {
         // Check for "at" format: "5 reps at 100"
         if (weight == null || reps == null) {
             val atPattern = Regex("""(\d+)\s+(?:reps?)?\s*at\s+(\d+\.?\d*)""")
-            val atMatch = atPattern.find(normalized)
+            val atMatch = atPattern.find(withoutRpe)
             if (atMatch != null) {
                 reps = atMatch.groupValues[1].toIntOrNull()
                 weight = atMatch.groupValues[2].toDoubleOrNull()
@@ -85,7 +90,7 @@ class VoiceInputParser {
                 }
             } else if (numbers.size == 1) {
                 // Only one number - check context
-                if (normalized.contains("rep")) {
+                if (withoutRpe.contains("rep")) {
                     reps = numbers[0].toInt()
                 } else {
                     weight = numbers[0]
@@ -95,7 +100,7 @@ class VoiceInputParser {
 
         // Validate and return
         if (weight != null && weight > 0 && reps != null && reps > 0) {
-            return ParsedVoiceInput(weight, reps, unit)
+            return ParsedVoiceInput(weight, reps, unit, rpe)
         }
 
         return null
@@ -128,6 +133,52 @@ class VoiceInputParser {
             UserPreferences.WeightUnit.KG -> "kg"
             UserPreferences.WeightUnit.LBS -> "lbs"
         }
-        return "${input.weight.toInt()}$unitSymbol × ${input.reps}"
+        val base = "${input.weight.toInt()}$unitSymbol × ${input.reps}"
+        return if (input.rpe != null) {
+            "$base @ RPE ${formatRpe(input.rpe)}"
+        } else {
+            base
+        }
+    }
+
+    private fun formatRpe(rpe: Double): String {
+        return if (rpe == rpe.toLong().toDouble()) rpe.toLong().toString() else rpe.toString()
+    }
+
+    /**
+     * Extracts RPE value from phrases like "RPE 8", "RPE ocho", "rpe 9.5".
+     * Supports English and Spanish number words.
+     */
+    private fun extractRpe(text: String): Double? {
+        // Match "rpe" followed by a number (digit or word)
+        val digitPattern = Regex("""rpe\s+(\d+\.?\d*)""")
+        val digitMatch = digitPattern.find(text)
+        if (digitMatch != null) {
+            val value = digitMatch.groupValues[1].toDoubleOrNull()
+            if (value != null && value in 1.0..10.0) return value
+        }
+
+        // Match "rpe" followed by a number word
+        val wordPattern = Regex("""rpe\s+(\w+)""")
+        val wordMatch = wordPattern.find(text)
+        if (wordMatch != null) {
+            val word = wordMatch.groupValues[1]
+            val value = numberWords[word]
+            if (value != null && value in 1..10) return value.toDouble()
+        }
+
+        return null
+    }
+
+    /**
+     * Removes the RPE segment from input so RPE numbers don't interfere
+     * with weight/reps extraction.
+     */
+    private fun removeRpeSegment(text: String): String {
+        // Remove "rpe <number>" or "rpe <word>"
+        return text
+            .replace(Regex("""rpe\s+\d+\.?\d*"""), "")
+            .replace(Regex("""rpe\s+\w+"""), "")
+            .trim()
     }
 }
