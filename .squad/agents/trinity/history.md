@@ -403,3 +403,19 @@
 - Health Connect availability check already existed — no changes needed there.
 
 **PR #374 opened, closes #367.**
+
+### 2026-04-10: Voice Input Wiring + RECORD_AUDIO Permission (Issue #392)
+**Implementation highlights:**
+- **VoiceInputButton wired** into ExerciseCardContent header. Tapping the mic icon triggers Android SpeechRecognizer and auto-fills the first incomplete set with parsed weight/reps.
+- **Full RECORD_AUDIO runtime permission flow**: (1) First tap → system permission dialog. (2) If denied once → rationale dialog explaining why mic is needed. (3) If permanently denied → dialog with "Open Settings" button to app settings.
+- **Coroutine scope fix**: Original code used `CoroutineScope(Dispatchers.Main).launch` which leaked. Replaced with `rememberCoroutineScope()` for lifecycle-safe collection.
+- **Bilingual voice recognition**: Changed SpeechRecognizer from hardcoded `en-US` to device locale (`Locale.getDefault().toLanguageTag()`), so Spanish speakers get native recognition. VoiceInputParser already handles both English and Spanish number words.
+- **Voice feedback**: Animated toast beneath exercise header shows parsed confirmation (e.g., "100kg × 5") or error message. Auto-dismisses after 2.5s.
+- **UX placement decision**: Mic button placed in exercise card header (not per-set-row) to avoid visual clutter. Targets first incomplete set automatically.
+
+**Key patterns:**
+- `Context.findActivity()` extension walks `ContextWrapper` chain to find the Activity, needed for `shouldShowRequestPermissionRationale()`.
+- `ActivityResultContracts.RequestPermission()` handles the system permission dialog lifecycle correctly in Compose.
+- Voice result flows: SpeechRecognizer → Flow<VoiceRecognitionState> → VoiceInputParser.parse() → ActiveWorkoutEvent.VoiceInput → ViewModel auto-fills set fields.
+
+**PR #405 opened, closes #392.**

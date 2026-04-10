@@ -515,4 +515,16 @@
 
     <!-- Create Exercise (additional new) -->
     <string name="create_exercise_description_label">Descripción (Opcional)</string>
+
+    <!-- Voice Input -->
+    <string name="voice_input_button">Entrada de voz</string>
+    <string name="voice_input_listening">Escuchando…</string>
+    <string name="voice_input_permission_rationale_title">Acceso al Micrófono</string>
+    <string name="voice_input_permission_rationale_message">GymBro necesita acceso al micrófono para registrar series por voz. Di algo como \"100 kilos 5 repeticiones\" para llenar peso y repeticiones al instante.</string>
+    <string name="voice_input_permission_denied">Permiso de micrófono denegado. La entrada de voz está deshabilitada.</string>
+    <string name="voice_input_permission_settings">Abrir Configuración</string>
+    <string name="voice_input_permission_denied_permanently">El permiso de micrófono fue denegado. Habilítalo en Configuración para usar entrada de voz.</string>
+    <string name="voice_input_not_available">Reconocimiento de voz no disponible en este dispositivo</string>
+    <string name="voice_input_parse_error">No se pudo entender \"%1$s\". Intenta \"100 kilos 5 repeticiones\".</string>
+    <string name="voice_input_confirmed">Serie llenada: %1$s</string>
 </resources>

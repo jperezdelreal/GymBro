@@ -2395,3 +2395,53 @@ User directive for scope control. Audit sprint focused on closing MVP readiness 
 - Trinity: UI layer (resume prompt, event handling)
 
 **Status:** Implemented. PR #399 merged 2026-04-10. Feature live.
+
+---
+
+## Decision: Remove Dead Buttons from Settings (Tank)
+
+**By:** Tank (Backend Dev)  
+**Date:** 2026-04-10  
+**Issue:** #383  
+**PR:** #403  
+
+### Decision
+
+Remove non-functional Sign In button from SettingsScreen rather than leaving it visible with a stub dialog. The auth backend is \NoOpAuthService\ — the button does nothing. The Sign In row will be re-added when real authentication (Firebase or OAuth) is implemented.
+
+Also made App Version row non-clickable (read-only display). No reason for it to be tappable.
+
+### Rationale
+
+- Dead buttons erode user trust. If it doesn't work, don't show it.
+- NoOpAuthService explicitly returns \Result.failure()\ — there's no partial functionality to preserve.
+- Clean removal is safer than a "Coming Soon" label that might ship to production and stay forever.
+
+### Impact
+
+- **Trinity:** SettingsScreen layout changed — Sign In row removed from Account section. SettingsRow composable now accepts optional \onClick\ parameter.
+- **Tank (future):** When real auth is implemented, add Sign In row back with proper AuthService integration.
+- **No breaking changes:** SettingsViewModel and SettingsContract unchanged.
+
+---
+
+## Directive: Ralph Must Persist Across Context Limits (Copilot)
+
+**By:** Copilot (user request)  
+**Date:** 2026-04-10  
+**Captured for:** Team memory  
+
+### Directive
+
+Ralph must never stop due to context window or session time limits. Before stopping, validate context usage and compact the session to reduce usage. Keep Ralph running as long as possible.
+
+### Rationale
+
+User request — captured for team memory. Ralph's continuous improvement cycles depend on sustained context to track progress, validate changes, and iterate without interruption.
+
+### Implementation
+
+- Before shutdown: check token usage via Claude API
+- Compact session state (archive completed todos, merge duplicate learnings)
+- Persist checkpoint with technical details for next session rehydration
+- Avoid hard context limits — prefer graceful degradation (summarize oldest turns if needed)
