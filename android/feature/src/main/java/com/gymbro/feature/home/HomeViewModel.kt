@@ -29,7 +29,7 @@ class HomeViewModel @Inject constructor(
     val effect = _effect.receiveAsFlow()
 
     init {
-        loadActivePlan()
+        collectActivePlan()
         loadRecentWorkouts()
         loadDaysSinceLastWorkout()
     }
@@ -64,16 +64,26 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun loadActivePlan() {
-        val plan = activePlanStore.getPlan()
-        if (plan != null) {
-            val dayIndex = (java.time.LocalDate.now().dayOfWeek.value - 1) % plan.workoutDays.size
-            val todayWorkout = plan.workoutDays.getOrNull(dayIndex)
-            _state.update {
-                it.copy(
-                    activePlan = plan,
-                    todayWorkout = todayWorkout,
-                )
+    private fun collectActivePlan() {
+        viewModelScope.launch {
+            activePlanStore.activePlan.collect { plan ->
+                if (plan != null) {
+                    val dayIndex = (java.time.LocalDate.now().dayOfWeek.value - 1) % plan.workoutDays.size
+                    val todayWorkout = plan.workoutDays.getOrNull(dayIndex)
+                    _state.update {
+                        it.copy(
+                            activePlan = plan,
+                            todayWorkout = todayWorkout,
+                        )
+                    }
+                } else {
+                    _state.update {
+                        it.copy(
+                            activePlan = null,
+                            todayWorkout = null,
+                        )
+                    }
+                }
             }
         }
     }

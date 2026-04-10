@@ -25,6 +25,7 @@ class VoiceRecognitionService @Inject constructor(
     @ApplicationContext private val context: Context,
 ) {
     private var speechRecognizer: SpeechRecognizer? = null
+    private var isListeningActive = false
 
     fun isAvailable(): Boolean {
         return SpeechRecognizer.isRecognitionAvailable(context)
@@ -36,6 +37,11 @@ class VoiceRecognitionService @Inject constructor(
             close()
             return@callbackFlow
         }
+
+        // Tear down any prior instance to prevent duplicate recognizers
+        releaseRecognizer()
+
+        isListeningActive = true
 
         speechRecognizer = SpeechRecognizer.createSpeechRecognizer(context).apply {
             setRecognitionListener(object : RecognitionListener {
@@ -115,8 +121,21 @@ class VoiceRecognitionService @Inject constructor(
     }
 
     fun stopListening() {
-        speechRecognizer?.stopListening()
-        speechRecognizer?.destroy()
+        isListeningActive = false
+        releaseRecognizer()
+    }
+
+    /** Release the SpeechRecognizer instance and free native resources. */
+    private fun releaseRecognizer() {
+        speechRecognizer?.run {
+            try { stopListening() } catch (_: Exception) {}
+            destroy()
+        }
         speechRecognizer = null
+    }
+
+    /** Call from Activity.onDestroy or DisposableEffect to prevent leaks. */
+    fun destroy() {
+        stopListening()
     }
 }
