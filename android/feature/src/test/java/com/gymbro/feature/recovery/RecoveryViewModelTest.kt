@@ -21,11 +21,13 @@ class RecoveryViewModelTest {
     val mainDispatcherRule = MainDispatcherRule()
 
     private lateinit var mockHealthConnectRepository: HealthConnectRepository
+    private lateinit var mockUserPreferences: com.gymbro.core.preferences.UserPreferences
     private lateinit var viewModel: RecoveryViewModel
 
     @Before
     fun setup() {
         mockHealthConnectRepository = mockk(relaxed = true)
+        mockUserPreferences = mockk(relaxed = true)
     }
 
     @Test
@@ -44,7 +46,7 @@ class RecoveryViewModelTest {
         coEvery { mockHealthConnectRepository.getRecoveryMetrics() } returns TestFixtures.goodRecovery
         coEvery { mockHealthConnectRepository.getSleepHistory(7) } returns sleepHistory
 
-        viewModel = RecoveryViewModel(mockHealthConnectRepository)
+        viewModel = RecoveryViewModel(mockHealthConnectRepository, mockUserPreferences)
 
         viewModel.state.test {
             val state = expectMostRecentItem()
@@ -62,7 +64,7 @@ class RecoveryViewModelTest {
     fun `initial state when health connect not available`() = runTest {
         coEvery { mockHealthConnectRepository.isAvailable() } returns false
 
-        viewModel = RecoveryViewModel(mockHealthConnectRepository)
+        viewModel = RecoveryViewModel(mockHealthConnectRepository, mockUserPreferences)
 
         viewModel.state.test {
             val state = expectMostRecentItem()
@@ -77,7 +79,7 @@ class RecoveryViewModelTest {
         coEvery { mockHealthConnectRepository.isAvailable() } returns true
         coEvery { mockHealthConnectRepository.hasPermissions() } returns false
 
-        viewModel = RecoveryViewModel(mockHealthConnectRepository)
+        viewModel = RecoveryViewModel(mockHealthConnectRepository, mockUserPreferences)
 
         viewModel.state.test {
             val state = expectMostRecentItem()
@@ -92,7 +94,7 @@ class RecoveryViewModelTest {
         coEvery { mockHealthConnectRepository.isAvailable() } returns true
         coEvery { mockHealthConnectRepository.hasPermissions() } returns false
 
-        viewModel = RecoveryViewModel(mockHealthConnectRepository)
+        viewModel = RecoveryViewModel(mockHealthConnectRepository, mockUserPreferences)
 
         viewModel.effects.test {
             viewModel.onEvent(RecoveryEvent.RequestPermissions)
@@ -109,7 +111,7 @@ class RecoveryViewModelTest {
         coEvery { mockHealthConnectRepository.getRecoveryMetrics() } returns TestFixtures.goodRecovery
         coEvery { mockHealthConnectRepository.getSleepHistory(7) } returns emptyList()
 
-        viewModel = RecoveryViewModel(mockHealthConnectRepository)
+        viewModel = RecoveryViewModel(mockHealthConnectRepository, mockUserPreferences)
 
         viewModel.state.test {
             skipItems(1)
@@ -131,7 +133,7 @@ class RecoveryViewModelTest {
         coEvery { mockHealthConnectRepository.isAvailable() } returns true
         coEvery { mockHealthConnectRepository.hasPermissions() } returns false
 
-        viewModel = RecoveryViewModel(mockHealthConnectRepository)
+        viewModel = RecoveryViewModel(mockHealthConnectRepository, mockUserPreferences)
 
         viewModel.state.test {
             skipItems(1)
@@ -151,7 +153,7 @@ class RecoveryViewModelTest {
         coEvery { mockHealthConnectRepository.getRecoveryMetrics() } returns TestFixtures.goodRecovery andThen TestFixtures.poorRecovery
         coEvery { mockHealthConnectRepository.getSleepHistory(7) } returns emptyList()
 
-        viewModel = RecoveryViewModel(mockHealthConnectRepository)
+        viewModel = RecoveryViewModel(mockHealthConnectRepository, mockUserPreferences)
 
         viewModel.state.test {
             val initialState = expectMostRecentItem()
@@ -173,7 +175,7 @@ class RecoveryViewModelTest {
         coEvery { mockHealthConnectRepository.hasPermissions() } returns true
         coEvery { mockHealthConnectRepository.getRecoveryMetrics() } throws Exception("Network error")
 
-        viewModel = RecoveryViewModel(mockHealthConnectRepository)
+        viewModel = RecoveryViewModel(mockHealthConnectRepository, mockUserPreferences)
 
         viewModel.state.test {
             val state = expectMostRecentItem()
@@ -190,7 +192,7 @@ class RecoveryViewModelTest {
         coEvery { mockHealthConnectRepository.getRecoveryMetrics() } returns TestFixtures.goodRecovery
         coEvery { mockHealthConnectRepository.getSleepHistory(7) } returns emptyList()
 
-        viewModel = RecoveryViewModel(mockHealthConnectRepository)
+        viewModel = RecoveryViewModel(mockHealthConnectRepository, mockUserPreferences)
 
         viewModel.state.test {
             val state = expectMostRecentItem()
@@ -205,7 +207,7 @@ class RecoveryViewModelTest {
         coEvery { mockHealthConnectRepository.getRecoveryMetrics() } returns TestFixtures.poorRecovery
         coEvery { mockHealthConnectRepository.getSleepHistory(7) } returns emptyList()
 
-        viewModel = RecoveryViewModel(mockHealthConnectRepository)
+        viewModel = RecoveryViewModel(mockHealthConnectRepository, mockUserPreferences)
 
         viewModel.state.test {
             val state = expectMostRecentItem()
@@ -220,7 +222,7 @@ class RecoveryViewModelTest {
         coEvery { mockHealthConnectRepository.getRecoveryMetrics() } returns TestFixtures.unknownRecovery
         coEvery { mockHealthConnectRepository.getSleepHistory(7) } returns emptyList()
 
-        viewModel = RecoveryViewModel(mockHealthConnectRepository)
+        viewModel = RecoveryViewModel(mockHealthConnectRepository, mockUserPreferences)
 
         viewModel.state.test {
             val state = expectMostRecentItem()
@@ -260,7 +262,7 @@ class RecoveryViewModelTest {
         coEvery { mockHealthConnectRepository.getRecoveryMetrics() } returns TestFixtures.goodRecovery
         coEvery { mockHealthConnectRepository.getSleepHistory(7) } returns sleepHistory
 
-        viewModel = RecoveryViewModel(mockHealthConnectRepository)
+        viewModel = RecoveryViewModel(mockHealthConnectRepository, mockUserPreferences)
 
         viewModel.state.test {
             val state = expectMostRecentItem()
@@ -278,7 +280,7 @@ class RecoveryViewModelTest {
         coEvery { mockHealthConnectRepository.getRecoveryMetrics() } returns TestFixtures.goodRecovery
         coEvery { mockHealthConnectRepository.getSleepHistory(7) } returns emptyList()
 
-        viewModel = RecoveryViewModel(mockHealthConnectRepository)
+        viewModel = RecoveryViewModel(mockHealthConnectRepository, mockUserPreferences)
 
         viewModel.state.test {
             val state = expectMostRecentItem()
@@ -293,7 +295,7 @@ class RecoveryViewModelTest {
         coEvery { mockHealthConnectRepository.getRecoveryMetrics() } returns TestFixtures.goodRecovery
         coEvery { mockHealthConnectRepository.getSleepHistory(7) } returns emptyList()
 
-        viewModel = RecoveryViewModel(mockHealthConnectRepository)
+        viewModel = RecoveryViewModel(mockHealthConnectRepository, mockUserPreferences)
 
         viewModel.state.test {
             val state = expectMostRecentItem()
@@ -308,7 +310,7 @@ class RecoveryViewModelTest {
         coEvery { mockHealthConnectRepository.getRecoveryMetrics() } throws Exception("Error") andThen TestFixtures.goodRecovery
         coEvery { mockHealthConnectRepository.getSleepHistory(7) } returns emptyList()
 
-        viewModel = RecoveryViewModel(mockHealthConnectRepository)
+        viewModel = RecoveryViewModel(mockHealthConnectRepository, mockUserPreferences)
 
         viewModel.state.test {
             val errorState = expectMostRecentItem()
