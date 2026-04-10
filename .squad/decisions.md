@@ -2445,3 +2445,127 @@ User request — captured for team memory. Ralph's continuous improvement cycles
 - Compact session state (archive completed todos, merge duplicate learnings)
 - Persist checkpoint with technical details for next session rehydration
 - Avoid hard context limits — prefer graceful degradation (summarize oldest turns if needed)
+
+---
+
+## Decision: Training Phase Selector (Trinity)
+
+**By:** Trinity (Mobile Dev)  
+**Date:** 2026-04-10  
+**Issue:** #379  
+**PR:** #407
+
+### Decision
+
+Training phase (Bulk/Cut/Maintenance) is stored in DataStore as a string preference, not as a Room entity. It lives in \UserPreferences\ alongside \TrainingGoal\ and \ExperienceLevel\.
+
+### Rationale
+
+- Training phase is a single-value user preference, not relational data — DataStore is the right fit.
+- Follows the existing pattern for TrainingGoal and ExperienceLevel (enum → string → DataStore).
+- No Room migration required; seamless for existing users (defaults to MAINTENANCE).
+
+### Implications
+
+- **WorkoutPlanGenerator** now accepts an optional \	rainingPhase\ parameter. Neo/Tank should wire this into plan generation flows where volume/intensity adjustments are needed.
+- **AI Coach** should read \	rainingPhase\ from UserPreferences to tailor recommendations (e.g., caloric surplus advice during bulk, volume reduction during cut).
+- **Progress expectations** should be phase-aware: slower strength gains during cut are normal, not a plateau signal.
+
+### UI Pattern
+
+- Material3 \SingleChoiceSegmentedButtonRow\ with 3 options — column layout (label above buttons) to avoid horizontal crowding.
+- Immediate save on tap — no confirm dialog needed since phase changes are non-destructive.
+
+---
+
+## Decision: Onboarding Data → Auto-Generated First Program (Neo)
+
+**By:** Neo (AI/ML Engineer)  
+**Date:** 2026-04-10  
+**Issue:** #394  
+**PR:** #408
+
+### Decision
+
+After onboarding completes, the app now auto-generates a personalized workout plan using the collected data (goal, experience level, training frequency) and routes the user to the Programs screen instead of the Exercise Library.
+
+### Rationale
+
+- Onboarding collected valuable data (goal, experience, frequency) but discarded it — user landed on an empty Exercise Library with no guidance
+- The \WorkoutPlanGenerator\ already existed and accepted exactly the data onboarding collects
+- Routing to Programs with a pre-generated plan creates an immediate payoff for completing onboarding
+- Plan generation is fire-and-forget with graceful degradation — if generation fails, onboarding still completes normally
+
+### Architecture
+
+- \OnboardingViewModel\ now injects \WorkoutPlanGenerator\ + \ActivePlanStore\ (both are already Hilt-provided singletons)
+- \ActivePlanStore\ gained an \isFromOnboarding\ flag to distinguish onboarding-generated plans from manual generation
+- \ProgramsViewModel\ loads the active plan from the store on init, so it's immediately visible on navigation
+- Plan is named "Your First Program" to differentiate from manually generated plans
+
+### Implications
+
+- **Trinity (UX):** The post-onboarding destination changed from Exercise Library to Programs. Any onboarding flow changes should verify this routing.
+- **Tank (Architecture):** \ActivePlanStore\ is in-memory only. If plan persistence to database is needed later, this is the hook point.
+- **Switch (QA):** Maestro E2E tests updated to expect Programs screen after onboarding. The \waitForAnimationToEnd\ timeout was increased to 5s to account for plan generation time.
+
+---
+
+## Decision: Voice Input UX Placement (Trinity)
+
+**By:** Trinity (iOS/Android Dev)  
+**Date:** 2026-04-10  
+**Issue:** #392
+
+### Decision
+
+Voice input button is placed in the **exercise card header** (next to delete icon), not per-set-row. When triggered, it auto-fills the **first incomplete set** for that exercise.
+
+### Rationale
+
+- Adding a mic button to every SetRow creates visual clutter in an already compact layout (Set# | Weight | Reps | Complete).
+- One mic per exercise is sufficient — users typically voice-log the current working set.
+- Auto-targeting the first incomplete set matches natural workout flow (sets are completed in order).
+- Feedback toast shows parsed result beneath the header so user can verify before completing.
+
+### Permission Flow
+
+Three-state RECORD_AUDIO permission handling:
+1. **First request**: Direct system permission dialog
+2. **Previously denied**: Rationale dialog explaining why mic is needed, then system dialog
+3. **Permanently denied**: Dialog with "Open Settings" button redirecting to app settings
+
+### Implications
+
+- All voice input strings must be maintained in both \alues/strings.xml\ and \alues-es/strings.xml\.
+- VoiceRecognitionService uses device locale instead of hardcoded en-US — future locale additions only require VoiceInputParser updates.
+- The \ActiveWorkoutEvent.VoiceInput\ event already existed; no ViewModel changes were needed.
+
+---
+
+## Decision: RPE-Based Progression Engine Design (Neo)
+
+**By:** Neo (AI/ML Engineer)  
+**Date:** 2026-04-08  
+**Issue:** #393  
+**PR:** #406
+
+### Decision
+
+Progression logic uses simple heuristic rules (not ML) based on RPE data:
+- **Progress:** All working sets RPE ≤7 → +2.5kg
+- **Regress:** Last 2 sets RPE 10 → −5% (rounded to 2.5kg)
+- **Maintain:** RPE 8-9 → same weight
+
+RPE picker is a tap-to-cycle widget (6→7→8→9→10→clear) rather than dropdown or slider, because speed matters during active workouts.
+
+### Implications
+
+- **Trinity (UI):** RPE column is 48dp wide in the set row. If layout feels cramped on smaller screens, we may need to make RPE collapsible or show it only after first set completion.
+- **Tank (Data):** Room DB is now version 6. Migration adds \ir INTEGER\ column to \workout_sets\.
+- **Switch (Testing):** ProgressionEngine and RpeTrendService have unit tests. Integration tests for the full flow (log sets → get suggestion → verify weight) would be valuable.
+- **Neo (Future):** This heuristic engine is the foundation. Future ML-based autoregulation can replace the rules with a trained model once we have enough RPE data to train on.
+
+### Rationale
+
+Heuristics before ML — a well-tuned rule set is more explainable and debuggable than a black-box model. Users can understand "your RPE was low, so we increased weight" far better than "the model predicted you should increase weight."
