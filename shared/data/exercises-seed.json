@@ -4560,5 +4560,92 @@
     "videoURL": null,
     "imageURL": null,
     "muscleImageURL": null
+  },
+  {
+    "name": "Hip Adduction Machine",
+    "category": "isolation",
+    "equipment": "machine",
+    "instructions": "Sit in machine, pads against inner thighs. Squeeze legs together against resistance. Control the return. Targets inner thigh muscles for hip stability.",
+    "muscleGroups": [
+      {
+        "name": "Adductors",
+        "isPrimary": true
+      },
+      {
+        "name": "Inner Thigh",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Hip Abduction Machine",
+    "category": "isolation",
+    "equipment": "machine",
+    "instructions": "Sit in machine, pads against outer thighs. Push legs apart against resistance. Control the return. Targets gluteus medius for hip stability and lateral glute development.",
+    "muscleGroups": [
+      {
+        "name": "Glutes",
+        "isPrimary": true
+      },
+      {
+        "name": "Outer Thigh",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Torso Rotation Machine",
+    "category": "isolation",
+    "equipment": "machine",
+    "instructions": "Sit in machine, chest pad secured. Rotate torso against resistance to one side, then return slowly. Alternate sides. Controlled rotational core work.",
+    "muscleGroups": [
+      {
+        "name": "Obliques",
+        "isPrimary": true
+      },
+      {
+        "name": "Core",
+        "isPrimary": false
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Donkey Calf Raise",
+    "category": "isolation",
+    "equipment": "machine",
+    "instructions": "Position yourself in donkey calf raise machine or with partner on lower back. Rise onto toes with maximum stretch at bottom. Superior calf stretch position for gastrocnemius development.",
+    "muscleGroups": [
+      {
+        "name": "Calves",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
+  },
+  {
+    "name": "Leg Press Calf Raise",
+    "category": "isolation",
+    "equipment": "machine",
+    "instructions": "Position feet at bottom of leg press platform with only toes/balls of feet on the edge. Push through toes to extend ankles. Allows heavy loading for calf development.",
+    "muscleGroups": [
+      {
+        "name": "Calves",
+        "isPrimary": true
+      }
+    ],
+    "videoURL": null,
+    "imageURL": null,
+    "muscleImageURL": null
   }
 ]
