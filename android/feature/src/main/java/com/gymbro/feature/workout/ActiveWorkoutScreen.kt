@@ -537,7 +537,16 @@ private fun ExerciseCardContent(
     defaultWeightUnit: com.gymbro.core.preferences.UserPreferences.WeightUnit,
 ) {
     val haptic = LocalHapticFeedback.current
-    
+    var voiceToast by remember { mutableStateOf<String?>(null) }
+
+    // Auto-dismiss voice feedback after a delay
+    LaunchedEffect(voiceToast) {
+        if (voiceToast != null) {
+            kotlinx.coroutines.delay(2500)
+            voiceToast = null
+        }
+    }
+
     Column(modifier = Modifier.fillMaxWidth()) {
         // Exercise header
         Row(
@@ -558,6 +567,32 @@ private fun ExerciseCardContent(
                 color = Color.White,
                 modifier = Modifier.weight(1f).semantics { heading() },
             )
+            // Voice input — auto-fills the first incomplete set
+            VoiceInputButton(
+                voiceRecognitionService = voiceRecognitionService,
+                defaultWeightUnit = defaultWeightUnit,
+                onVoiceResult = { parsed ->
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    val targetSetIndex = exerciseUi.sets.indexOfFirst { !it.isCompleted }
+                    if (targetSetIndex >= 0) {
+                        val parser = com.gymbro.core.voice.VoiceInputParser()
+                        onEvent(
+                            ActiveWorkoutEvent.VoiceInput(
+                                exerciseIndex = exerciseIndex,
+                                setIndex = targetSetIndex,
+                                weight = parsed.weight.let { w ->
+                                    if (w == w.toLong().toDouble()) w.toLong().toString() else w.toString()
+                                },
+                                reps = parsed.reps.toString(),
+                            )
+                        )
+                        voiceToast = parser.formatConfirmation(parsed)
+                    }
+                },
+                onError = { errorMsg ->
+                    voiceToast = errorMsg
+                },
+            )
             IconButton(
                 onClick = { 
                     haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
@@ -570,6 +605,22 @@ private fun ExerciseCardContent(
                     contentDescription = stringResource(R.string.active_workout_remove_exercise),
                     tint = Color.White.copy(alpha = 0.4f),
                     modifier = Modifier.size(18.dp),
+                )
+            }
+        }
+
+        // Voice feedback toast
+        AnimatedVisibility(
+            visible = voiceToast != null,
+            enter = fadeIn() + slideInVertically(),
+            exit = fadeOut() + slideOutVertically(),
+        ) {
+            voiceToast?.let { msg ->
+                Text(
+                    text = msg,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = AccentCyanStart,
+                    modifier = Modifier.padding(start = 28.dp, top = 2.dp),
                 )
             }
         }
@@ -605,8 +656,6 @@ private fun ExerciseCardContent(
                 exerciseIndex = exerciseIndex,
                 setIndex = setIndex,
                 onEvent = onEvent,
-                voiceRecognitionService = voiceRecognitionService,
-                defaultWeightUnit = defaultWeightUnit,
             )
             if (setIndex < exerciseUi.sets.lastIndex) {
                 Spacer(modifier = Modifier.height(8.dp))
@@ -642,8 +691,6 @@ private fun SetRow(
     exerciseIndex: Int,
     setIndex: Int,
     onEvent: (ActiveWorkoutEvent) -> Unit,
-    voiceRecognitionService: VoiceRecognitionService,
-    defaultWeightUnit: UserPreferences.WeightUnit,
 ) {
     val haptic = LocalHapticFeedback.current
     val completedDescription = stringResource(R.string.active_workout_set_completed, setUi.setNumber)

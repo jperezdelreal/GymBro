@@ -515,4 +515,16 @@
 
     <!-- Create Exercise (additional new) -->
     <string name="create_exercise_description_label">Description (Optional)</string>
+
+    <!-- Voice Input -->
+    <string name="voice_input_button">Voice input</string>
+    <string name="voice_input_listening">Listening…</string>
+    <string name="voice_input_permission_rationale_title">Microphone Access</string>
+    <string name="voice_input_permission_rationale_message">GymBro needs microphone access to log sets by voice. Say something like \"100 kilos 5 reps\" to fill in weight and reps instantly.</string>
+    <string name="voice_input_permission_denied">Microphone permission denied. Voice input is disabled.</string>
+    <string name="voice_input_permission_settings">Open Settings</string>
+    <string name="voice_input_permission_denied_permanently">Microphone permission was denied. Enable it in Settings to use voice input.</string>
+    <string name="voice_input_not_available">Speech recognition not available on this device</string>
+    <string name="voice_input_parse_error">Couldn\'t understand \"%1$s\". Try \"100 kilos 5 reps\".</string>
+    <string name="voice_input_confirmed">Set filled: %1$s</string>
 </resources>
