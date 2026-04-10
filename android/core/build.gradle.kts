@@ -33,6 +33,10 @@ android {
     }
 }
 
+ksp {
+    arg("correctErrorTypes", "true")
+}
+
 dependencies {
     // AndroidX Core
     implementation(libs.androidx.core.ktx)
@@ -48,7 +52,6 @@ dependencies {
     // WorkManager with Hilt
     implementation(libs.workmanager)
     implementation(libs.hilt.work)
-    ksp(libs.hilt.compiler)
 
     // Room
     implementation(libs.room.runtime)
@@ -74,9 +77,6 @@ dependencies {
 
     // DataStore
     implementation(libs.datastore.preferences)
-
-    // WorkManager
-    implementation(libs.workmanager)
 
     // Testing
     testImplementation(libs.junit)

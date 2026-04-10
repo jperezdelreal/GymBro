@@ -63,6 +63,10 @@ android {
     }
 }
 
+ksp {
+    arg("correctErrorTypes", "true")
+}
+
 dependencies {
     implementation(project(":core"))
     implementation(project(":feature"))
