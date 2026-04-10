@@ -2124,3 +2124,204 @@ Coverage: All major training goals (strength, hypertrophy, powerlifting, beginne
 - **Tank:** Add Room persistence if custom programs become a feature request
 
 **PR:** #373 (opened 2026-04-10T06:25Z)
+
+---
+
+### Editable AI Workout Plans — Immutable Original Copy Pattern (Tank, 2026-04-10)
+
+**Decision:** Use **immutable original copy + modification flag** pattern for plan editing (issue #365), rather than delta tracking or copy-on-write mutations.
+
+**Problem Solved:**
+Users want to edit AI-generated plans (change exercises, adjust sets/reps) but also revert to the original plan if changes don't feel right. Need a clean, non-lossy way to track "what the original was" and switch back.
+
+**Architecture Choices:**
+
+### 1. Immutable Original Copy (Not Delta Tracking)
+**Chose:** Store original plan as immutable reference, modify active plan in place  
+**Not:** Track edit operations as delta events (command pattern, event sourcing)
+
+**Rationale:**
+- **Simple revert:** Restoring original is a single pointer swap (`activePlan = originalPlan`), not traversing undo stack
+- **No undo complexity:** Command pattern or event sourcing adds complexity; MVP doesn't need full undo/redo
+- **Clear state:** `isModified` boolean flag is sufficient UX signal
+- **Cheap storage:** WorkoutPlan is small (~10KB typical); storing two copies is negligible
+
+### 2. Lazy `originalPlanId` (Not Self-Reference)
+**Chose:** Only set `originalPlanId` when user first edits a plan  
+**Not:** Set `originalPlanId` to self on plan creation
+
+**Rationale:**
+- Fresh AI plans don't need to reference their own ID until edited
+- Avoids circular reference awkwardness in model semantics
+- `markAsModified()` method sets it on first save — cleaner initialization
+
+### 3. UUID-Based Exercise IDs (Not Index-Based)
+**Chose:** Each Exercise gets a UUID field for identification  
+**Not:** Refer to exercises by index position in list
+
+**Rationale:**
+- Index-based targeting is fragile if UI and ViewModel get out of sync
+- UUIDs enable unambiguous targeting even if exercise order changes mid-edit
+- Future-proofs for drag-and-drop exercise reordering (issue #368)
+
+### 4. Separate `originalPlan` Field (Not Serialized)
+**Design:**
+```kotlin
+data class WorkoutPlan(
+    val id: String,
+    val name: String,
+    val isModified: Boolean = false,
+    val originalPlanId: String? = null,  // lazy, set on first edit
+    val exercises: List<Exercise> = emptyList(),
+    // Transient in persistence layer:
+    @Transient val originalPlan: WorkoutPlan? = null  // in-memory only
+)
+```
+
+**Rationale:**
+- `originalPlan` stored in-memory only (not serialized to database)
+- `originalPlanId` persisted to restore original plan reference if app restarts
+- Avoids infinite recursion in serialization
+
+### 5. Edit Operations (Deferred to ViewModel)
+**Planned operations:**
+- `updateExerciseSets(exerciseId, newSets)` — Modify set counts for an exercise
+- `swapExercises(id1, id2)` — Reorder exercises
+- `removeExercise(exerciseId)` — Delete an exercise
+- `replaceExercise(exerciseId, newExercise)` — Swap one exercise for another
+- `revert()` — Restore original plan
+
+Each operation sets `isModified = true` and triggers `markAsModified()` on save.
+
+## Consequences
+
+✅ **Pros:**
+- Revert is instant and bug-free
+- Model changes are minimal (2 fields + `markAsModified()` helper)
+- No dependencies on persistence layer yet (in-memory pattern)
+- Backward compatible with existing WorkoutPlan serialization
+
+⚠️ **Cons:**
+- Two plan copies in memory during edit (negligible for typical plans ~10KB)
+- `originalPlan` must be null-checked in UI (Kotlin handles this cleanly)
+- Edge case: If user generates new AI plan while editing, old `originalPlan` becomes orphaned → UX dialog needed
+
+## Edge Cases Documented
+
+1. **New AI plan during edit:** If user taps "Get new AI plan" while editing, current plan's `originalPlan` orphans. Solution: Show dialog "Save changes first?" or "Discard changes?"
+2. **Multiple edits without save:** Each edit modifies active plan; save triggers `markAsModified()` once. Revert always restores from `originalPlan`, not intermediate state.
+3. **Null-check pattern:** Kotlin's null-safety ensures `originalPlan?.name` or `originalPlan ?: defaultValue` prevents crashes
+
+## Follow-Up Work
+
+- **ViewModel:** Implement edit operations (UpdateExerciseSets, SwapExercises, RemoveExercise, ReplaceExercise, Revert)
+- **UI:** ProgramsScreen edit mode (inline editing or modal workflow)
+- **Persistence:** Save edited plans as WorkoutTemplates (optional enhancement — deferred to post-MVP)
+- **Drag-and-drop:** Use exercise UUIDs to enable reordering (issue #368)
+
+**PR:** #375 (draft, opened 2026-04-10T06:30Z)
+
+---
+
+### Recovery Fallback: Manual Entry Simplification (Trinity, 2026-04-10)
+
+**Decision:** Simplify manual recovery entry from 3 metrics (sleep quality, muscle soreness, energy level) to 2 focused metrics (sleep hours, readiness score) for users without Health Connect integration (issue #367).
+
+**Problem Solved:**
+Users without fitness tracker data need a fallback to log recovery metrics. Original implementation had 3 subjective 1-10 sliders (sleep quality, soreness, energy), which felt redundant and lacked actionable baseline.
+
+**Architecture Choices:**
+
+### 1. Objective Sleep Hours + Subjective Readiness (Not 3 Subjective Sliders)
+**Chose:** 
+- **Sleep Hours:** 0-12 range, 0.5-hour increments (objective, quantifiable)
+- **Readiness Score:** 1-10 scale with gym culture labels (subjective engagement metric)
+
+**Not:** Keep sleep quality, muscle soreness, energy level (3 subjective 1-10 scales)
+
+**Rationale:**
+- **Objective baseline:** Sleep hours is quantifiable ("I slept 7.5 hours" is concrete, not fuzzy)
+- **Reduced cognitive load:** One subjective metric (readiness) instead of three, each claiming to measure recovery
+- **Clearer UX:** Soreness and energy feel redundant — what matters for recovery is "am I ready to train hard today?"
+- **Gym culture language:** "Crushed" and "Wrecked" are terms lifters understand better than numbered scales
+
+### 2. Recovery Score Formula: 50/50 Weighting
+**Formula:**
+```
+recoveryScore = (sleepHours / 8) * 0.5 + (readiness / 10) * 0.5
+```
+
+**Design:**
+- 8 hours sleep = 0.5 contribution (assumed optimal baseline for recovery)
+- Readiness 10/10 = 0.5 contribution
+- Final score: 0.0–1.0, displayed as percentage or 0–100 scale
+
+**Rationale:**
+- Equal weighting respects both sleep (objective) and readiness (subjective perception)
+- 8-hour baseline aligns with sleep science recommendation for strength athletes
+- Simple linear formula is transparent and trustworthy (no black-box algorithm)
+
+### 3. Manual Entry Localization (English + Spanish)
+**New strings:**
+- `recovery_sleep_hours_label`: "Sleep Hours"
+- `recovery_readiness_label`: "Readiness"
+- `readiness_wrecked`: "Wrecked"
+- `readiness_tired`: "Tired"
+- `readiness_ok`: "OK"
+- `readiness_good`: "Good"
+- `readiness_crushed`: "Crushed"
+
+All added in both `strings.xml` (en-US) and `strings-es.xml` (es-ES).
+
+### 4. Backward Compatibility (Not Forced Migration)
+**Pattern:**
+- Deprecated old `UserPreferences` methods for 3-slider system
+- New `RecoveryMetrics` accepts 2-value tuple (sleepHours, readiness)
+- App converts old data to new format on first load (if present)
+- No user-facing migration dialog (silent upgrade)
+
+**Rationale:**
+- Graceful degradation for users who previously logged recovery
+- Zero friction for new users (only see new 2-slider system)
+
+## Implementation
+
+**UI Components:**
+- `RecoveryMetricsFragment` — Manual entry screen
+- Sleep slider: 0–12 hours, 0.5 increments, shows "X.X hours"
+- Readiness slider: 1–10 with labeled stops (Wrecked, Tired, OK, Good, Crushed)
+
+**Data Layer:**
+- `RecoveryMetrics` data class with `sleepHours: Float`, `readinessScore: Int`
+- `UserPreferences` — New methods for 2-value storage; deprecated 3-value methods
+
+**Integration:**
+- RecoveryViewModel calculates `recoveryScore` from formula
+- Display score as percentage or visual indicator (e.g., color gradient)
+
+## Consequences
+
+✅ **Pros:**
+- Simpler UX: 2 sliders instead of 3
+- Objective sleep data provides context for AI coach recommendations
+- Gym-culture language increases user engagement
+- Backward compatible with existing storage
+
+⚠️ **Cons:**
+- Sleep hours may be less accurate than Health Connect (self-reported vs tracked)
+- Single readiness slider can't capture "I'm sore but have high energy" nuance
+- Formula transparency depends on UI explaining the 50/50 weighting
+
+## Edge Cases Documented
+
+1. **No sleep data yet:** If user hasn't set sleep hours, default to 8 (neutral recovery score)
+2. **Midnight edge cases:** Manual logging at 11 PM (did they sleep last night or tonight?) → Defer to user intent; no smart defaults
+3. **Mixed mode (future):** If user has Health Connect + manually logs, should we blend? Deferred to issue #367b (mixed-mode recovery)
+
+## Follow-Up Work
+
+- **Health Connect integration validation:** Verify fallback activates only when Health Connect unavailable
+- **Mixed-mode recovery (deferred):** Support both tracked + manual metrics in single session
+- **Historical entry support (deferred):** Let users log past days' recovery (currently only today)
+
+**PR:** #374 (opened 2026-04-10T06:30Z)

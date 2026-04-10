@@ -110,6 +110,8 @@
     <!-- Manual Recovery Entry -->
     <string name="recovery_manual_mode_info">Health Connect not available. Track your recovery manually.</string>
     <string name="recovery_score_label">Recovery Score</string>
+    <string name="recovery_manual_sleep_hours">Sleep Hours</string>
+    <string name="recovery_manual_readiness">Readiness Score</string>
     <string name="recovery_manual_sleep_quality">Sleep Quality</string>
     <string name="recovery_manual_muscle_soreness">Muscle Soreness</string>
     <string name="recovery_manual_energy_level">Energy Level</string>
@@ -282,6 +284,19 @@
     <string name="programs_start_this_workout">Start This Workout</string>
     <string name="programs_exercise_sets_reps" formatted="false">%d × %s</string>
     <string name="programs_rest_time">Rest: %ds</string>
+    <string name="programs_edit_plan">Edit Plan</string>
+    <string name="programs_save_edits">Save Changes</string>
+    <string name="programs_cancel_edits">Cancel</string>
+    <string name="programs_revert_to_original">Revert to Original</string>
+    <string name="programs_plan_modified">Modified Plan</string>
+    <string name="programs_sets">Sets</string>
+    <string name="programs_reps">Reps</string>
+    <string name="programs_weight_kg">Weight (kg)</string>
+    <string name="programs_rest_seconds">Rest (s)</string>
+    <string name="programs_remove_exercise">Remove</string>
+    <string name="programs_add_exercise">Add Exercise</string>
+    <string name="programs_swap_up">Move Up</string>
+    <string name="programs_swap_down">Move Down</string>
 
     <!-- Coach / AI Chat -->
     <string name="coach_title">GymBro AI Coach</string>
@@ -455,6 +470,12 @@
     <string name="progress_last_8_weeks">Last 8 Weeks</string>
     <string name="progress_weeks_no_progress">%d weeks with no progress</string>
     <string name="progress_workouts_label">Workouts</string>
+    <string name="progress_top_exercises">Top Exercises</string>
+    <string name="progress_period_this_week">This Week</string>
+    <string name="progress_period_last_week">Last Week</string>
+    <string name="progress_period_this_month">This Month</string>
+    <string name="progress_workout_goal">%1$d of %2$d goal</string>
+    <string name="progress_set_count">%d sets</string>
 
     <!-- Profile (additional) -->
     <string name="profile_health_integration">Health Integration</string>

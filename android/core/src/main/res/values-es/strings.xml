@@ -110,6 +110,8 @@
     <!-- Manual Recovery Entry -->
     <string name="recovery_manual_mode_info">Health Connect no disponible. Rastrea tu recuperación manualmente.</string>
     <string name="recovery_score_label">Puntuación de Recuperación</string>
+    <string name="recovery_manual_sleep_hours">Horas de Sueño</string>
+    <string name="recovery_manual_readiness">Puntuación de Preparación</string>
     <string name="recovery_manual_sleep_quality">Calidad del Sueño</string>
     <string name="recovery_manual_muscle_soreness">Dolor Muscular</string>
     <string name="recovery_manual_energy_level">Nivel de Energía</string>
@@ -282,6 +284,19 @@
     <string name="programs_start_this_workout">Iniciar Este Entrenamiento</string>
     <string name="programs_exercise_sets_reps" formatted="false">%d × %s</string>
     <string name="programs_rest_time">Descanso: %ds</string>
+    <string name="programs_edit_plan">Editar Plan</string>
+    <string name="programs_save_edits">Guardar Cambios</string>
+    <string name="programs_cancel_edits">Cancelar</string>
+    <string name="programs_revert_to_original">Revertir al Original</string>
+    <string name="programs_plan_modified">Plan Modificado</string>
+    <string name="programs_sets">Series</string>
+    <string name="programs_reps">Reps</string>
+    <string name="programs_weight_kg">Peso (kg)</string>
+    <string name="programs_rest_seconds">Descanso (s)</string>
+    <string name="programs_remove_exercise">Eliminar</string>
+    <string name="programs_add_exercise">Agregar Ejercicio</string>
+    <string name="programs_swap_up">Subir</string>
+    <string name="programs_swap_down">Bajar</string>
 
     <!-- Coach / AI Chat -->
     <string name="coach_title">GymBro Entrenador IA</string>
@@ -455,6 +470,12 @@
     <string name="progress_last_8_weeks">Últimas 8 semanas</string>
     <string name="progress_weeks_no_progress">%d semanas sin progreso</string>
     <string name="progress_workouts_label">Entrenamientos</string>
+    <string name="progress_top_exercises">Ejercicios Principales</string>
+    <string name="progress_period_this_week">Esta Semana</string>
+    <string name="progress_period_last_week">Semana Pasada</string>
+    <string name="progress_period_this_month">Este Mes</string>
+    <string name="progress_workout_goal">%1$d de %2$d objetivo</string>
+    <string name="progress_set_count">%d series</string>
 
     <!-- Profile (additional new) -->
     <string name="profile_health_integration">Integración de Salud</string>

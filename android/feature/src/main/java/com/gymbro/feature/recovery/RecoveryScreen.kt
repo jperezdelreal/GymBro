@@ -142,9 +142,9 @@ internal fun RecoveryScreen(
             !state.healthConnectAvailable -> {
                 ManualRecoveryEntryCard(
                     manualEntry = state.manualEntry,
-                    onSleepQualityChange = { onEvent(RecoveryEvent.UpdateSleepQuality(it)) },
-                    onMuscleSorenessChange = { onEvent(RecoveryEvent.UpdateMuscleSoreness(it)) },
-                    onEnergyLevelChange = { onEvent(RecoveryEvent.UpdateEnergyLevel(it)) },
+                    onSleepQualityChange = { onEvent(RecoveryEvent.UpdateSleepHours(it)) },
+                    onMuscleSorenessChange = { onEvent(RecoveryEvent.UpdateReadinessScore(it)) },
+                    onEnergyLevelChange = { },
                     onSave = { onEvent(RecoveryEvent.SaveManualEntry) },
                 )
             }
@@ -547,7 +547,7 @@ private fun ManualRecoveryEntryCard(
             }
         }
 
-        // Sleep Quality Slider
+        // Sleep Hours Input
         GlassmorphicCard(modifier = Modifier.fillMaxWidth()) {
             Column(modifier = Modifier.padding(20.dp)) {
                 Row(
@@ -569,13 +569,13 @@ private fun ManualRecoveryEntryCard(
                     }
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = stringResource(R.string.recovery_manual_sleep_quality),
+                            text = stringResource(R.string.recovery_manual_sleep_hours),
                             style = MaterialTheme.typography.titleMedium,
                             color = Color.White,
                             fontWeight = FontWeight.SemiBold,
                         )
                         Text(
-                            text = "${manualEntry.sleepQuality.toInt()}/10",
+                            text = String.format("%.1f hours", manualEntry.sleepHours),
                             style = MaterialTheme.typography.bodyMedium,
                             color = OnSurfaceVariant,
                         )
@@ -585,10 +585,10 @@ private fun ManualRecoveryEntryCard(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Slider(
-                    value = manualEntry.sleepQuality,
+                    value = manualEntry.sleepHours,
                     onValueChange = onSleepQualityChange,
-                    valueRange = 1f..10f,
-                    steps = 8,
+                    valueRange = 0f..12f,
+                    steps = 23,
                     colors = SliderDefaults.colors(
                         thumbColor = Color(0xFF7C4DFF),
                         activeTrackColor = Color(0xFF7C4DFF),
@@ -598,58 +598,7 @@ private fun ManualRecoveryEntryCard(
             }
         }
 
-        // Muscle Soreness Slider
-        GlassmorphicCard(modifier = Modifier.fillMaxWidth()) {
-            Column(modifier = Modifier.padding(20.dp)) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(40.dp)
-                            .background(Color(0xFFFF5252).copy(alpha = 0.15f), CircleShape),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Icon(
-                            Icons.Default.FitnessCenter,
-                            contentDescription = null,
-                            tint = Color(0xFFFF5252),
-                            modifier = Modifier.size(20.dp),
-                        )
-                    }
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = stringResource(R.string.recovery_manual_muscle_soreness),
-                            style = MaterialTheme.typography.titleMedium,
-                            color = Color.White,
-                            fontWeight = FontWeight.SemiBold,
-                        )
-                        Text(
-                            text = "${manualEntry.muscleSoreness.toInt()}/10",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = OnSurfaceVariant,
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Slider(
-                    value = manualEntry.muscleSoreness,
-                    onValueChange = onMuscleSorenessChange,
-                    valueRange = 1f..10f,
-                    steps = 8,
-                    colors = SliderDefaults.colors(
-                        thumbColor = Color(0xFFFF5252),
-                        activeTrackColor = Color(0xFFFF5252),
-                        inactiveTrackColor = Color(0xFFFF5252).copy(alpha = 0.3f),
-                    ),
-                )
-            }
-        }
-
-        // Energy Level Slider
+        // Readiness Score Slider
         GlassmorphicCard(modifier = Modifier.fillMaxWidth()) {
             Column(modifier = Modifier.padding(20.dp)) {
                 Row(
@@ -671,13 +620,13 @@ private fun ManualRecoveryEntryCard(
                     }
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = stringResource(R.string.recovery_manual_energy_level),
+                            text = stringResource(R.string.recovery_manual_readiness),
                             style = MaterialTheme.typography.titleMedium,
                             color = Color.White,
                             fontWeight = FontWeight.SemiBold,
                         )
                         Text(
-                            text = "${manualEntry.energyLevel.toInt()}/10",
+                            text = "${manualEntry.readinessScore.toInt()}/10 — ${manualEntry.readinessLabel}",
                             style = MaterialTheme.typography.bodyMedium,
                             color = OnSurfaceVariant,
                         )
@@ -687,8 +636,8 @@ private fun ManualRecoveryEntryCard(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Slider(
-                    value = manualEntry.energyLevel,
-                    onValueChange = onEnergyLevelChange,
+                    value = manualEntry.readinessScore,
+                    onValueChange = onMuscleSorenessChange,
                     valueRange = 1f..10f,
                     steps = 8,
                     colors = SliderDefaults.colors(
@@ -697,6 +646,38 @@ private fun ManualRecoveryEntryCard(
                         inactiveTrackColor = AccentGreen.copy(alpha = 0.3f),
                     ),
                 )
+                
+                // Readiness labels row
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    Text(
+                        text = "Wrecked",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = Color(0xFF9E9E9E),
+                    )
+                    Text(
+                        text = "Tired",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = Color(0xFF9E9E9E),
+                    )
+                    Text(
+                        text = "OK",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = Color(0xFF9E9E9E),
+                    )
+                    Text(
+                        text = "Good",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = Color(0xFF9E9E9E),
+                    )
+                    Text(
+                        text = "Crushed",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = Color(0xFF9E9E9E),
+                    )
+                }
             }
         }
 
