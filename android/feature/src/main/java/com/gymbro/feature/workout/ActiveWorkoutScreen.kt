@@ -407,6 +407,8 @@ private fun HeroRestTimer(
     onAdjust: (Int) -> Unit,
 ) {
     val haptic = LocalHapticFeedback.current
+    val subtractTimeDescription = stringResource(R.string.rest_timer_cd_subtract_time)
+    val addTimeDescription = stringResource(R.string.rest_timer_cd_add_time)
     val progress = if (totalSeconds > 0) (totalSeconds - remainingSeconds).toFloat() / totalSeconds else 0f
     
     val infiniteTransition = rememberInfiniteTransition(label = "glow_transition")
@@ -463,8 +465,12 @@ private fun HeroRestTimer(
                     onAdjust(-15) 
                 },
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White),
+                modifier = Modifier.height(48.dp),
             ) { 
-                Text("-15s") 
+                Text(
+                    text = "-15s",
+                    modifier = Modifier.semantics { contentDescription = subtractTimeDescription },
+                )
             }
             GradientButton(text = stringResource(R.string.active_workout_skip), onClick = onSkip)
             OutlinedButton(
@@ -473,8 +479,12 @@ private fun HeroRestTimer(
                     onAdjust(15) 
                 },
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White),
+                modifier = Modifier.height(48.dp),
             ) { 
-                Text("+15s") 
+                Text(
+                    text = "+15s",
+                    modifier = Modifier.semantics { contentDescription = addTimeDescription },
+                )
             }
         }
     }
@@ -598,7 +608,7 @@ private fun ExerciseCardContent(
                     haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                     onEvent(ActiveWorkoutEvent.RemoveExercise(exerciseIndex)) 
                 },
-                modifier = Modifier.size(32.dp),
+                modifier = Modifier.size(48.dp),
             ) {
                 Icon(
                     Icons.Default.Delete,
@@ -678,7 +688,7 @@ private fun ExerciseCardContent(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Icon(Icons.Default.Add, contentDescription = null, tint = AccentGreenStart, modifier = Modifier.size(16.dp))
+            Icon(Icons.Default.Add, contentDescription = stringResource(R.string.active_workout_cd_add_set), tint = AccentGreenStart, modifier = Modifier.size(16.dp))
             Spacer(modifier = Modifier.width(4.dp))
             Text(stringResource(R.string.workout_add_set), color = AccentGreenStart, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
         }
@@ -695,6 +705,7 @@ private fun SetRow(
     val haptic = LocalHapticFeedback.current
     val completedDescription = stringResource(R.string.active_workout_set_completed, setUi.setNumber)
     val completeDescription = stringResource(R.string.active_workout_complete_set, setUi.setNumber)
+    val warmupToggleDescription = stringResource(R.string.active_workout_cd_warmup_toggle)
     val rowBackground = when {
         setUi.isCompleted -> AccentGreenStart.copy(alpha = 0.08f)
         setUi.isWarmup -> AccentAmberStart.copy(alpha = 0.05f)
@@ -716,11 +727,12 @@ private fun SetRow(
         // Set number + warmup indicator
         Box(
             modifier = Modifier
-                .width(40.dp)
+                .size(48.dp)
                 .clickable { 
                     haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                     onEvent(ActiveWorkoutEvent.ToggleWarmup(exerciseIndex, setIndex)) 
-                },
+                }
+                .semantics { contentDescription = warmupToggleDescription },
             contentAlignment = Alignment.Center,
         ) {
             Text(

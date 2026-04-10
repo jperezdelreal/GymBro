@@ -249,7 +249,7 @@ private fun QuickStartCard(
                 ) {
                     Icon(
                         Icons.Default.PlayArrow,
-                        contentDescription = null,
+                        contentDescription = stringResource(R.string.home_cd_start_workout),
                         modifier = Modifier.size(24.dp),
                     )
                     Spacer(modifier = Modifier.width(8.dp))
@@ -325,7 +325,7 @@ private fun TodayWorkoutCard(
                 ) {
                     Icon(
                         Icons.Default.PlayArrow,
-                        contentDescription = null,
+                        contentDescription = stringResource(R.string.home_cd_start_workout),
                         modifier = Modifier.size(18.dp),
                     )
                     Spacer(modifier = Modifier.width(4.dp))
@@ -426,7 +426,7 @@ private fun CreateProgramCta(
         ) {
             Icon(
                 Icons.Default.CalendarMonth,
-                contentDescription = null,
+                contentDescription = stringResource(R.string.home_cd_create_program),
                 modifier = Modifier.size(48.dp),
                 tint = AccentGreen,
             )

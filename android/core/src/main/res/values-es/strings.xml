@@ -558,4 +558,13 @@
     <string name="home_create_program_subtitle">Obtén un plan de entrenamiento personalizado basado en tus objetivos</string>
     <string name="home_recent_workouts">Entrenamientos Recientes</string>
     <string name="home_exercises_count">%d ejercicios</string>
+
+    <!-- Accessibility — Content Descriptions -->
+    <string name="home_cd_start_workout">Iniciar entrenamiento</string>
+    <string name="home_cd_create_program">Crear programa</string>
+    <string name="active_workout_cd_add_set">Añadir serie</string>
+    <string name="active_workout_cd_warmup_toggle">Alternar serie de calentamiento</string>
+    <string name="rest_timer_cd_subtract_time">Restar 15 segundos</string>
+    <string name="rest_timer_cd_add_time">Añadir 15 segundos</string>
+    <string name="settings_cd_training_phase">Selector de fase de entrenamiento</string>
 </resources>
