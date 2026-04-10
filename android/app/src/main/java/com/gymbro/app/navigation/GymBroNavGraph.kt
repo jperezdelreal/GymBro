@@ -7,6 +7,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -18,10 +19,12 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.MonitorHeart
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.FitnessCenter
 import androidx.compose.material.icons.outlined.History
+import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.MonitorHeart
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.outlined.Person
@@ -58,6 +61,7 @@ import com.gymbro.core.model.MuscleGroup
 import com.gymbro.core.preferences.UserPreferences
 import com.gymbro.feature.exerciselibrary.CreateExerciseRoute
 import com.gymbro.feature.exerciselibrary.ExerciseLibraryRoute
+import com.gymbro.feature.home.HomeRoute
 import com.gymbro.feature.history.HistoryDetailRoute
 import com.gymbro.feature.history.HistoryListRoute
 import com.gymbro.feature.onboarding.OnboardingRoute
@@ -86,16 +90,16 @@ private enum class BottomNavTab(
     val selectedIcon: ImageVector,
     val unselectedIcon: ImageVector,
 ) {
-    LIBRARY("exercise_library", R.string.nav_library, Icons.Filled.FitnessCenter, Icons.Outlined.FitnessCenter),
-    HISTORY("history", R.string.nav_history, Icons.Filled.History, Icons.Outlined.History),
-    PROGRESS("progress", R.string.nav_progress, Icons.AutoMirrored.Filled.ShowChart, Icons.AutoMirrored.Outlined.ShowChart),
+    HOME("home", R.string.nav_home, Icons.Filled.Home, Icons.Outlined.Home),
     PROGRAMS("programs", R.string.nav_programs, Icons.Filled.CalendarMonth, Icons.Outlined.CalendarMonth),
+    HISTORY("history", R.string.nav_history, Icons.Filled.History, Icons.Outlined.History),
     PROFILE("profile", R.string.nav_profile, Icons.Filled.Person, Icons.Outlined.Person),
 }
 
 @Composable
 fun GymBroNavGraph(
     userPreferences: UserPreferences = hiltViewModel<GymBroNavGraphViewModel>().userPreferences,
+    onFullyDrawn: () -> Unit = {},
 ) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -103,8 +107,23 @@ fun GymBroNavGraph(
 
     val showBottomBar = currentDestination?.route in BottomNavTab.entries.map { it.route }
 
-    val hasCompletedOnboarding by userPreferences.hasCompletedOnboarding.collectAsStateWithLifecycle(initialValue = false)
-    val startDestination = if (hasCompletedOnboarding) "exercise_library" else "onboarding"
+    // Use null initial value to distinguish "not yet loaded" from "false"
+    val hasCompletedOnboarding by userPreferences.hasCompletedOnboarding.collectAsStateWithLifecycle(initialValue = null)
+
+    // Wait for DataStore to load before deciding start destination — avoids flashing wrong screen
+    val resolvedOnboarding = hasCompletedOnboarding
+    if (resolvedOnboarding == null) {
+        // Show nothing while preferences load — splash screen covers this gap
+        Box(modifier = Modifier.fillMaxSize())
+        return
+    }
+
+    val startDestination = if (resolvedOnboarding) "home" else "onboarding"
+
+    // Report fully drawn once we know which screen to show
+    LaunchedEffect(Unit) {
+        onFullyDrawn()
+    }
 
     Scaffold(
         modifier = Modifier.semantics {
@@ -173,9 +192,28 @@ fun GymBroNavGraph(
         composable("onboarding") {
             OnboardingRoute(
                 onNavigateToMain = {
-                    navController.navigate("programs") {
+                    navController.navigate("home") {
                         popUpTo("onboarding") { inclusive = true }
                     }
+                },
+            )
+        }
+        composable("home") {
+            HomeRoute(
+                onNavigateToActiveWorkout = {
+                    navController.navigate("active_workout")
+                },
+                onNavigateToPrograms = {
+                    navController.navigate("programs") {
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            saveState = true
+                        }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToWorkoutDetail = { workoutId ->
+                    navController.navigate("history/$workoutId")
                 },
             )
         }
@@ -306,8 +344,8 @@ fun GymBroNavGraph(
                 exerciseCount = exercises,
                 personalRecords = prs,
                 onDone = {
-                    navController.navigate("exercise_library") {
-                        popUpTo("exercise_library") { inclusive = true }
+                    navController.navigate("home") {
+                        popUpTo("home") { inclusive = true }
                     }
                 },
             )

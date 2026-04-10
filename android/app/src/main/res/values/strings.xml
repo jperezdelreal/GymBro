@@ -8,6 +8,7 @@
     <string name="stats_widget_description">View your weekly workout stats</string>
 
     <!-- Bottom Navigation -->
+    <string name="nav_home">Home</string>
     <string name="nav_library">Library</string>
     <string name="nav_history">History</string>
     <string name="nav_progress">Progress</string>
@@ -231,4 +232,19 @@
     <string name="programs_total_sets_desc" formatted="false">%d total sets</string>
     <string name="programs_exercise_accessibility" formatted="false">%s: %d sets of %s reps, %d seconds rest</string>
     <string name="common_retry">Retry</string>
+
+    <!-- Home Screen -->
+    <string name="home_title">Home</string>
+    <string name="home_quick_start">Quick Start</string>
+    <string name="home_quick_start_first">Ready for your first workout?</string>
+    <string name="home_quick_start_today">Already trained today — go again?</string>
+    <string name="home_quick_start_yesterday">Last workout was yesterday</string>
+    <string name="home_quick_start_days_ago">Last workout %d days ago</string>
+    <string name="home_todays_workout">Today\'s Workout</string>
+    <string name="home_start">Start</string>
+    <string name="home_view_all_programs">View all programs →</string>
+    <string name="home_create_program_title">Create Your First Program</string>
+    <string name="home_create_program_subtitle">Get a personalized training plan based on your goals</string>
+    <string name="home_recent_workouts">Recent Workouts</string>
+    <string name="home_exercises_count">%d exercises</string>
 </resources>
