@@ -1,14 +1,20 @@
 package com.gymbro.core.repository
 
 import android.util.Log
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.gymbro.core.database.dao.WorkoutDao
 import com.gymbro.core.database.dao.WorkoutWithSets
+import com.gymbro.core.database.entity.InProgressWorkoutEntity
 import com.gymbro.core.database.entity.WorkoutEntity
 import com.gymbro.core.database.entity.WorkoutSetEntity
 import com.gymbro.core.error.AppResult
 import com.gymbro.core.error.retryWithBackoff
 import com.gymbro.core.error.runCatchingAsResult
 import com.gymbro.core.model.ExerciseSet
+import com.gymbro.core.model.InProgressExercise
+import com.gymbro.core.model.InProgressSet
+import com.gymbro.core.model.InProgressWorkout
 import com.gymbro.core.model.Workout
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -19,6 +25,7 @@ import javax.inject.Inject
 
 class WorkoutRepositoryImpl @Inject constructor(
     private val workoutDao: WorkoutDao,
+    private val gson: Gson,
 ) : WorkoutRepository {
 
     override suspend fun startWorkout(): Workout {
@@ -168,6 +175,132 @@ class WorkoutRepositoryImpl @Inject constructor(
             is AppResult.Error -> {
                 Log.e(TAG, "Failed to get days since last workout: ${result.error.message}")
                 null
+            }
+        }
+    }
+
+    override suspend fun saveInProgressWorkout(inProgressWorkout: InProgressWorkout) {
+        val result = retryWithBackoff {
+            runCatchingAsResult {
+                val exercisesJson = gson.toJson(inProgressWorkout.exercises.map { exercise ->
+                    mapOf(
+                        "exerciseId" to exercise.exercise.id.toString(),
+                        "exerciseName" to exercise.exercise.name,
+                        "muscleGroup" to exercise.exercise.muscleGroup.name,
+                        "sets" to exercise.sets.map { set ->
+                            mapOf(
+                                "id" to set.id,
+                                "setNumber" to set.setNumber,
+                                "weight" to set.weight,
+                                "reps" to set.reps,
+                                "rpe" to set.rpe,
+                                "isWarmup" to set.isWarmup,
+                                "isCompleted" to set.isCompleted,
+                            )
+                        }
+                    )
+                })
+                
+                val entity = InProgressWorkoutEntity(
+                    workoutId = inProgressWorkout.workoutId,
+                    exercisesJson = exercisesJson,
+                    elapsedSeconds = inProgressWorkout.elapsedSeconds,
+                    totalVolume = inProgressWorkout.totalVolume,
+                    totalSets = inProgressWorkout.totalSets,
+                    restTimerSeconds = inProgressWorkout.restTimerSeconds,
+                    restTimerTotal = inProgressWorkout.restTimerTotal,
+                    isRestTimerActive = inProgressWorkout.isRestTimerActive,
+                )
+                workoutDao.saveInProgressWorkout(entity)
+            }
+        }
+        when (result) {
+            is AppResult.Success -> Unit
+            is AppResult.Error -> {
+                Log.e(TAG, "Failed to save in-progress workout: ${result.error.message}")
+                throw Exception(result.error.message)
+            }
+        }
+    }
+
+    override suspend fun getInProgressWorkout(): InProgressWorkout? {
+        val result = retryWithBackoff {
+            runCatchingAsResult {
+                workoutDao.getAnyInProgressWorkout()?.let { entity ->
+                    try {
+                        val listType = object : TypeToken<List<Map<String, Any>>>() {}.type
+                        val exercisesList: List<Map<String, Any>> = gson.fromJson(entity.exercisesJson, listType)
+                        
+                        val exercises = exercisesList.map { exerciseMap ->
+                            val exerciseId = UUID.fromString(exerciseMap["exerciseId"] as String)
+                            val exerciseName = exerciseMap["exerciseName"] as String
+                            val muscleGroupStr = exerciseMap["muscleGroup"] as String
+                            
+                            @Suppress("UNCHECKED_CAST")
+                            val setsArray = exerciseMap["sets"] as List<Map<String, Any>>
+                            
+                            InProgressExercise(
+                                exercise = com.gymbro.core.model.Exercise(
+                                    id = exerciseId,
+                                    name = exerciseName,
+                                    muscleGroup = try {
+                                        com.gymbro.core.model.MuscleGroup.valueOf(muscleGroupStr)
+                                    } catch (e: Exception) {
+                                        com.gymbro.core.model.MuscleGroup.FULL_BODY
+                                    },
+                                    category = com.gymbro.core.model.ExerciseCategory.COMPOUND,
+                                    equipment = com.gymbro.core.model.Equipment.OTHER,
+                                    description = "",
+                                ),
+                                sets = setsArray.map { setMap ->
+                                    InProgressSet(
+                                        id = setMap["id"] as String,
+                                        setNumber = (setMap["setNumber"] as Double).toInt(),
+                                        weight = setMap["weight"] as String,
+                                        reps = setMap["reps"] as String,
+                                        rpe = setMap["rpe"] as String,
+                                        isWarmup = setMap["isWarmup"] as Boolean,
+                                        isCompleted = setMap["isCompleted"] as Boolean,
+                                    )
+                                }
+                            )
+                        }
+                        
+                        InProgressWorkout(
+                            workoutId = entity.workoutId,
+                            exercises = exercises,
+                            elapsedSeconds = entity.elapsedSeconds,
+                            totalVolume = entity.totalVolume,
+                            totalSets = entity.totalSets,
+                            restTimerSeconds = entity.restTimerSeconds,
+                            restTimerTotal = entity.restTimerTotal,
+                            isRestTimerActive = entity.isRestTimerActive,
+                        )
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Failed to deserialize in-progress workout", e)
+                        workoutDao.clearInProgressWorkout(entity.workoutId)
+                        null
+                    }
+                }
+            }
+        }
+        return when (result) {
+            is AppResult.Success -> result.data
+            is AppResult.Error -> {
+                Log.e(TAG, "Failed to get in-progress workout: ${result.error.message}")
+                null
+            }
+        }
+    }
+
+    override suspend fun clearInProgressWorkout(workoutId: String) {
+        val result = retryWithBackoff {
+            runCatchingAsResult { workoutDao.clearInProgressWorkout(workoutId) }
+        }
+        when (result) {
+            is AppResult.Success -> Unit
+            is AppResult.Error -> {
+                Log.e(TAG, "Failed to clear in-progress workout $workoutId: ${result.error.message}")
             }
         }
     }

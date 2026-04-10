@@ -35,7 +35,7 @@ class OfflineModeTest {
         workoutDao = mockk(relaxed = true)
         cloudSyncService = mockk(relaxed = true)
         connectivityObserver = FakeConnectivityObserver()
-        workoutRepository = WorkoutRepositoryImpl(workoutDao)
+        workoutRepository = WorkoutRepositoryImpl(workoutDao, com.google.gson.Gson())
     }
 
     @Test
