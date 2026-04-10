@@ -38,6 +38,7 @@ class ProgressViewModel @Inject constructor(
         when (event) {
             is ProgressEvent.SelectExercise -> selectExercise(event.exerciseId)
             is ProgressEvent.RefreshData -> loadData()
+            is ProgressEvent.SelectTimePeriod -> selectTimePeriod(event.period)
             is ProgressEvent.ViewWorkoutDetail -> {
                 viewModelScope.launch {
                     _effects.send(ProgressEffect.NavigateToWorkoutDetail(event.workoutId))
@@ -98,12 +99,54 @@ class ProgressViewModel @Inject constructor(
             )
 
             // Calculate KPI metrics
-            val totalVolume = history.sumOf { it.totalVolume }
             val now = java.time.Instant.now()
-            val weekStart = now.minusSeconds(7 * 24 * 60 * 60)
-            val workoutsThisWeek = history.count { it.date.isAfter(weekStart) }
+            val (periodStart, periodEnd) = when (_state.value.selectedTimePeriod) {
+                TimePeriod.THIS_WEEK -> {
+                    val weekStart = now.minusSeconds(7 * 24 * 60 * 60)
+                    weekStart to now
+                }
+                TimePeriod.LAST_WEEK -> {
+                    val lastWeekEnd = now.minusSeconds(7 * 24 * 60 * 60)
+                    val lastWeekStart = lastWeekEnd.minusSeconds(7 * 24 * 60 * 60)
+                    lastWeekStart to lastWeekEnd
+                }
+                TimePeriod.THIS_MONTH -> {
+                    val monthStart = now.minusSeconds(30 * 24 * 60 * 60)
+                    monthStart to now
+                }
+            }
+
+            val periodWorkouts = history.filter { it.date.isAfter(periodStart) && !it.date.isAfter(periodEnd) }
+            val totalVolume = periodWorkouts.sumOf { it.totalVolume }
+            val workoutsCount = periodWorkouts.size
+            
+            // Calculate % change vs previous period
+            val previousPeriodStart = periodStart.minusSeconds(periodEnd.epochSecond - periodStart.epochSecond)
+            val previousPeriodWorkouts = history.filter { 
+                it.date.isAfter(previousPeriodStart) && !it.date.isAfter(periodStart)
+            }
+            val previousVolume = previousPeriodWorkouts.sumOf { it.totalVolume }
+            val volumeChangePercent = if (previousVolume > 0) {
+                ((totalVolume - previousVolume) / previousVolume * 100)
+            } else null
+
+            // Get recent PRs with details
             val twoWeeksAgo = now.minusSeconds(14 * 24 * 60 * 60)
-            val recentPRs = allRecords.count { it.date.isAfter(twoWeeksAgo) }
+            val recentPRsWithDetails = allRecords.filter { it.date.isAfter(twoWeeksAgo) }
+                .sortedByDescending { it.date }
+            val recentPRs = recentPRsWithDetails.size
+
+            // Calculate top 5 exercises in period by set count
+            val topExercises = periodWorkouts
+                .flatMap { workout ->
+                    workout.exerciseNames
+                }
+                .groupingBy { it }
+                .eachCount()
+                .entries
+                .sortedByDescending { it.value }
+                .take(5)
+                .map { TopExercise(exerciseName = it.key, setCount = it.value) }
 
             // Calculate weekly volume data for last 8 weeks
             val weeklyVolumeData = calculateWeeklyVolume(history)
@@ -117,13 +160,21 @@ class ProgressViewModel @Inject constructor(
                     chartData = chartData,
                     plateauAlerts = plateauAlerts,
                     totalVolume = totalVolume,
-                    workoutsThisWeek = workoutsThisWeek,
+                    workoutsThisWeek = workoutsCount,
                     recentPRs = recentPRs,
                     weeklyVolumeData = weeklyVolumeData,
+                    volumeChangePercent = volumeChangePercent,
+                    topExercises = topExercises,
+                    recentPRsWithDetails = recentPRsWithDetails,
                     isLoading = false,
                 )
             }
         }
+    }
+
+    private fun selectTimePeriod(period: TimePeriod) {
+        _state.update { it.copy(selectedTimePeriod = period) }
+        loadData()
     }
 
     private fun calculateWeeklyVolume(history: List<com.gymbro.core.model.WorkoutHistoryItem>): List<WeeklyVolume> {

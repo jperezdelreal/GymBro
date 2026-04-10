@@ -455,6 +455,12 @@
     <string name="progress_last_8_weeks">Últimas 8 semanas</string>
     <string name="progress_weeks_no_progress">%d semanas sin progreso</string>
     <string name="progress_workouts_label">Entrenamientos</string>
+    <string name="progress_top_exercises">Ejercicios Principales</string>
+    <string name="progress_period_this_week">Esta Semana</string>
+    <string name="progress_period_last_week">Semana Pasada</string>
+    <string name="progress_period_this_month">Este Mes</string>
+    <string name="progress_workout_goal">%1$d de %2$d objetivo</string>
+    <string name="progress_set_count">%d series</string>
 
     <!-- Profile (additional new) -->
     <string name="profile_health_integration">Integración de Salud</string>

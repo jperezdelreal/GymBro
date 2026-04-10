@@ -5,6 +5,12 @@ import com.gymbro.core.model.PersonalRecord
 import com.gymbro.core.model.PlateauAlert
 import com.gymbro.core.model.WorkoutHistoryItem
 
+enum class TimePeriod {
+    THIS_WEEK,
+    LAST_WEEK,
+    THIS_MONTH
+}
+
 data class ProgressState(
     val workoutHistory: List<WorkoutHistoryItem> = emptyList(),
     val personalRecords: List<PersonalRecord> = emptyList(),
@@ -17,6 +23,11 @@ data class ProgressState(
     val workoutsThisWeek: Int = 0,
     val recentPRs: Int = 0,
     val weeklyVolumeData: List<WeeklyVolume> = emptyList(),
+    val selectedTimePeriod: TimePeriod = TimePeriod.THIS_WEEK,
+    val volumeChangePercent: Double? = null,
+    val topExercises: List<TopExercise> = emptyList(),
+    val workoutFrequencyGoal: Int = 5,
+    val recentPRsWithDetails: List<PersonalRecord> = emptyList(),
 )
 
 data class WeeklyVolume(
@@ -29,12 +40,18 @@ data class ExerciseOption(
     val name: String,
 )
 
+data class TopExercise(
+    val exerciseName: String,
+    val setCount: Int,
+)
+
 sealed interface ProgressEvent {
     data class SelectExercise(val exerciseId: String) : ProgressEvent
     data object RefreshData : ProgressEvent
     data class ViewWorkoutDetail(val workoutId: String) : ProgressEvent
     data class DismissPlateauAlert(val exerciseId: String) : ProgressEvent
     data class GetCoachingAdvice(val exerciseName: String, val weeksDuration: Int) : ProgressEvent
+    data class SelectTimePeriod(val period: TimePeriod) : ProgressEvent
 }
 
 sealed interface ProgressEffect {
