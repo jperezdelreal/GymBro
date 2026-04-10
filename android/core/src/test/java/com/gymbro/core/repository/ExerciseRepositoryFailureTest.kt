@@ -14,7 +14,7 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
@@ -38,32 +38,29 @@ class ExerciseRepositoryFailureTest {
     @Test
     fun `getAllExercises emits empty list on Flow error`() = runTest {
         // Given
-        every { exerciseDao.getAllExercises() } returns flowOf<List<ExerciseEntity>>().also {
+        every { exerciseDao.getAllExercises() } returns flow {
             throw RuntimeException("Flow error")
         }
 
-        // When/Then - Flow catch block should emit empty list
-        try {
-            val result = repository.getAllExercises().first()
-            // If we get here, check it's handled gracefully
-        } catch (e: Exception) {
-            fail("Flow should catch errors and emit empty list, not propagate exception")
-        }
+        // When - Flow catch block should emit empty list
+        val result = repository.getAllExercises().first()
+
+        // Then
+        assertTrue(result.isEmpty())
     }
 
     @Test
     fun `getAllExercises emits empty list on SQLiteException`() = runTest {
         // Given
-        every { exerciseDao.getAllExercises() } returns flowOf<List<ExerciseEntity>>().also {
+        every { exerciseDao.getAllExercises() } returns flow {
             throw SQLiteException("Database corrupted")
         }
 
-        // When/Then
-        try {
-            val result = repository.getAllExercises().first()
-        } catch (e: Exception) {
-            fail("Flow should catch SQLiteException and emit empty list")
-        }
+        // When - Flow catch block should emit empty list
+        val result = repository.getAllExercises().first()
+
+        // Then
+        assertTrue(result.isEmpty())
     }
 
     // ============ getFilteredExercises Failure Tests ============
@@ -71,31 +68,29 @@ class ExerciseRepositoryFailureTest {
     @Test
     fun `getFilteredExercises emits empty list on Flow error`() = runTest {
         // Given
-        every { exerciseDao.getFilteredExercises(any(), any()) } returns flowOf<List<ExerciseEntity>>().also {
+        every { exerciseDao.getFilteredExercises(any(), any()) } returns flow {
             throw RuntimeException("Flow error")
         }
 
-        // When/Then
-        try {
-            val result = repository.getFilteredExercises("Chest", "bench").first()
-        } catch (e: Exception) {
-            fail("Flow should catch errors and emit empty list")
-        }
+        // When - Flow catch block should emit empty list
+        val result = repository.getFilteredExercises("Chest", "bench").first()
+
+        // Then
+        assertTrue(result.isEmpty())
     }
 
     @Test
     fun `getFilteredExercises emits empty list on IOException`() = runTest {
         // Given
-        every { exerciseDao.getFilteredExercises(null, "squat") } returns flowOf<List<ExerciseEntity>>().also {
+        every { exerciseDao.getFilteredExercises(null, "squat") } returns flow {
             throw IOException("Network timeout")
         }
 
-        // When/Then
-        try {
-            val result = repository.getFilteredExercises(null, "squat").first()
-        } catch (e: Exception) {
-            fail("Flow should catch IOException and emit empty list")
-        }
+        // When - Flow catch block should emit empty list
+        val result = repository.getFilteredExercises(null, "squat").first()
+
+        // Then
+        assertTrue(result.isEmpty())
     }
 
     // ============ getExerciseById Failure Tests ============

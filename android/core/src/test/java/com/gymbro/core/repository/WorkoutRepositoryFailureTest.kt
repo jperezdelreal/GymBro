@@ -12,7 +12,7 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
@@ -261,19 +261,15 @@ class WorkoutRepositoryFailureTest {
     fun `observeWorkout emits null on Flow error`() = runTest {
         // Given
         val workoutId = UUID.randomUUID().toString()
-        every { workoutDao.observeWorkoutWithSets(workoutId) } returns flowOf<WorkoutWithSets>().also {
+        every { workoutDao.observeWorkoutWithSets(workoutId) } returns flow {
             throw RuntimeException("Flow error")
         }
 
-        // When/Then - Flow catch block should emit null
-        try {
-            val result = repository.observeWorkout(workoutId).first()
-            // If we get here, the catch worked but no emission happened
-            // The actual behavior depends on Flow implementation
-        } catch (e: Exception) {
-            // Flow error not caught - this would be a real issue
-            fail("Flow should catch errors and emit null, not propagate exception")
-        }
+        // When - Flow catch block should emit null
+        val result = repository.observeWorkout(workoutId).first()
+
+        // Then
+        assertNull(result)
     }
 
     // ============ getRecentWorkouts Failure Tests ============
@@ -281,17 +277,15 @@ class WorkoutRepositoryFailureTest {
     @Test
     fun `getRecentWorkouts emits empty list on Flow error`() = runTest {
         // Given
-        every { workoutDao.getRecentWorkouts(20) } returns flowOf<List<WorkoutWithSets>>().also {
+        every { workoutDao.getRecentWorkouts(20) } returns flow {
             throw RuntimeException("Flow error")
         }
 
-        // When/Then - Flow catch block should emit empty list
-        try {
-            val result = repository.getRecentWorkouts().first()
-            // If we get here, check if it's empty list from catch
-        } catch (e: Exception) {
-            fail("Flow should catch errors and emit empty list, not propagate exception")
-        }
+        // When - Flow catch block should emit empty list
+        val result = repository.getRecentWorkouts().first()
+
+        // Then
+        assertTrue(result.isEmpty())
     }
 
     // ============ getBestWeight Failure Tests ============
