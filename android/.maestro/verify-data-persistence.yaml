@@ -17,17 +17,21 @@ onFlowStart:
       timeout: 3000
 
 onFlowComplete:
-  # Return to library
+  # Return to Home tab
   - tapOn:
-      id: "nav_exercise_library"
+      id: "nav_home"
       optional: true
 
 ---
 
 - runFlow: flow/ensure-post-onboarding.yaml
 
-# Start from Exercise Library
-- assertVisible: "Biblioteca de Ejercicios"
+# Navigate to Home tab to start workout
+- tapOn:
+    id: "nav_home"
+- waitForAnimationToEnd:
+    timeout: 2000
+- assertVisible: "Inicio|Home"
 # Screenshot 01: Data persistence flow starting point
 - takeScreenshot: 01_verify_data_persistence_flow_start
 
@@ -84,11 +88,15 @@ onFlowComplete:
 # Screenshot 05: Workout summary displayed
 - takeScreenshot: 05_verify_data_persistence_workout_summary
 
-# Return to library
+# Return to Home tab
 - tapOn: "Listo"
 - waitForAnimationToEnd:
     timeout: 2000
-- assertVisible: "Biblioteca de Ejercicios"
+- tapOn:
+    id: "nav_home"
+- waitForAnimationToEnd:
+    timeout: 2000
+- assertVisible: "Inicio|Home"
 
 # VERIFICATION 1: Check History for workout
 - tapOn:
@@ -115,40 +123,15 @@ onFlowComplete:
 # Screenshot 08: Workout detail view with set data
 - takeScreenshot: 08_verify_data_persistence_history_detail
 
-# Go back to history list
+# VERIFICATION 2: Check back on History list
 - back
 - waitForAnimationToEnd:
     timeout: 2000
 - assertVisible: "Historial de Entrenamientos"
 
-# VERIFICATION 2: Check Progress for updated stats
+# VERIFICATION 3: Return to Home tab and verify state
 - tapOn:
-    id: "nav_progress"
-- waitForAnimationToEnd:
-    timeout: 2000
-- assertVisible:
-    text: "Volumen Semanal|Sin entrenamientos aún"
-# Screenshot 09: Progress tab opened to verify persistence
-- takeScreenshot: 09_verify_data_persistence_verify_progress
-
-# Verify progress data shows (not empty state)
-- assertVisible: "Volumen Semanal"
-# Screenshot 10: Progress stats visible confirming data persistence
-- takeScreenshot: 10_verify_data_persistence_progress_stats_visible
-
-# Verify PRs section is present (indicates data exists)
-- assertVisible:
-    text: "PRs Recientes"
-    optional: true
-
-# Scroll to see more stats
-- scroll
-# Screenshot 11: Progress scrolled to show additional stats
-- takeScreenshot: 11_verify_data_persistence_progress_scrolled
-
-# VERIFICATION 3: Return to library and verify state
-- tapOn:
-    id: "nav_exercise_library"
-- assertVisible: "Biblioteca de Ejercicios"
-# Screenshot 12: Data persistence flow completed, back at Library
+    id: "nav_home"
+- assertVisible: "Inicio|Home"
+# Screenshot 12: Data persistence flow completed, back at Home
 - takeScreenshot: 12_verify_data_persistence_flow_complete

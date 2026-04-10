@@ -19,8 +19,12 @@ onFlowStart:
 
 - runFlow: flow/ensure-post-onboarding.yaml
 
-# Start from Exercise Library
-- assertVisible: "Biblioteca de Ejercicios"
+# Navigate to Home tab to start workout
+- tapOn:
+    id: "nav_home"
+- waitForAnimationToEnd:
+    timeout: 2000
+- assertVisible: "Inicio|Home"
 
 # Tap FAB to start workout
 - tapOn:
@@ -117,9 +121,13 @@ onFlowStart:
 - waitForAnimationToEnd:
     timeout: 2000
 
-# Back at exercise library
-- assertVisible: "Biblioteca de Ejercicios"
-# Screenshot 06: Returned to Exercise Library after workout completion
+# Back at Home screen
+- tapOn:
+    id: "nav_home"
+- waitForAnimationToEnd:
+    timeout: 2000
+- assertVisible: "Inicio|Home"
+# Screenshot 06: Returned to Home screen after workout completion
 - takeScreenshot: 06_complete_workout_flow_complete
 
 # PERSISTENCE VERIFICATION: Navigate to History
@@ -136,24 +144,7 @@ onFlowStart:
 # Screenshot 08: Workout appears in history confirming data persistence
 - takeScreenshot: 08_complete_workout_persistence_workout_in_history
 
-# PERSISTENCE VERIFICATION: Navigate to Progress
+# Return to Home tab
 - tapOn:
-    id: "nav_progress"
-- waitForAnimationToEnd:
-    timeout: 2000
-- assertVisible:
-    text: "Volumen Semanal|Sin entrenamientos aún"
-# Screenshot 09: Progress tab opened for persistence verification
-- takeScreenshot: 09_complete_workout_persistence_check_progress
-
-# If progress data exists, verify it's updated (not empty state)
-- assertVisible:
-    text: "Volumen Semanal"
-    optional: true
-# Screenshot 10: Progress data updated after workout completion
-- takeScreenshot: 10_complete_workout_persistence_progress_updated
-
-# Return to Exercise Library
-- tapOn:
-    id: "nav_exercise_library"
-- assertVisible: "Biblioteca de Ejercicios"
+    id: "nav_home"
+- assertVisible: "Inicio|Home"

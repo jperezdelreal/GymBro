@@ -16,9 +16,9 @@ onFlowStart:
       timeout: 3000
 
 onFlowComplete:
-  # Return to Library tab
+  # Return to Home tab
   - tapOn:
-      id: "nav_exercise_library"
+      id: "nav_home"
       optional: true
 
 ---

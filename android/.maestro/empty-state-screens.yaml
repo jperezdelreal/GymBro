@@ -4,7 +4,7 @@ name: "Negative - Empty State UI (fresh app with no data)"
 # Tests: Empty state UI across all tabs with fresh app install
 # Preconditions: App launched with clearState (fresh install simulation)
 # Test data: User name "EmptyTest", units kg
-# Assertions: All tabs (Library, History, Progress, Recovery, Profile) handle empty state gracefully
+# Assertions: All tabs (Home, Programs, History, Profile) handle empty state gracefully
 # Cleanup: App state cleared via stopApp
 # Dependencies: None
 tags:
@@ -56,12 +56,28 @@ onFlowComplete:
 - waitForAnimationToEnd:
     timeout: 3000
 
-# Now at Exercise Library (post-onboarding)
-- assertVisible: "Biblioteca de Ejercicios"
-# Screenshot 02: Exercise Library empty state (no workouts yet)
-- takeScreenshot: 02_empty_state_library
+# Now at Home/Programs (post-onboarding) — navigate to Home tab
+- tapOn:
+    id: "nav_home"
+    optional: true
+- waitForAnimationToEnd:
+    timeout: 2000
+- assertVisible: "Inicio|Home"
+# Screenshot 02: Home screen empty state (no workouts yet)
+- takeScreenshot: 02_empty_state_home
 
-# TEST 1: Check History tab (should show empty state)
+# TEST 1: Check Programs tab
+- tapOn:
+    id: "nav_programs"
+- waitForAnimationToEnd:
+    timeout: 2000
+
+# Verify Programs screen loaded
+- assertVisible: "Programas|Programs"
+# Screenshot 03: Programs tab state
+- takeScreenshot: 03_empty_state_programs
+
+# TEST 2: Check History tab (should show empty state)
 - tapOn:
     id: "nav_history"
 - waitForAnimationToEnd:
@@ -69,33 +85,11 @@ onFlowComplete:
 
 # Verify History screen loaded
 - assertVisible: "Historial|History"
-# Screenshot 03: History tab empty state (no workout history)
-- takeScreenshot: 03_empty_state_history
+# Screenshot 04: History tab empty state (no workout history)
+- takeScreenshot: 04_empty_state_history
 # Should show empty state message or empty list
 
-# TEST 2: Check Progress tab (should show empty state)
-- tapOn:
-    id: "nav_progress"
-- waitForAnimationToEnd:
-    timeout: 2000
-
-# Verify Progress screen loaded
-- assertVisible: "Progreso|Progress"
-# Screenshot 04: Progress tab empty state (no progress data)
-- takeScreenshot: 04_empty_state_progress
-# Should show empty state with no data
-
-# TEST 3: Check Recovery tab
-- tapOn:
-    id: "nav_recovery"
-- waitForAnimationToEnd:
-    timeout: 2000
-
-# Verify Recovery screen loaded
-# Screenshot 05: Recovery tab empty state
-- takeScreenshot: 05_empty_state_recovery
-
-# TEST 4: Check Profile tab
+# TEST 3: Check Profile tab
 - tapOn:
     id: "nav_profile"
 - waitForAnimationToEnd:
@@ -103,8 +97,8 @@ onFlowComplete:
 
 # Verify Profile screen loaded
 - assertVisible: "Perfil|Profile"
-# Screenshot 06: Profile tab with fresh user data
-- takeScreenshot: 06_empty_state_profile
+# Screenshot 05: Profile tab with fresh user data
+- takeScreenshot: 05_empty_state_profile
 
 # Verify app handles all empty states gracefully
 - assertVisible: "EmptyTest"

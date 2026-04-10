@@ -20,28 +20,27 @@ onFlowStart:
 
 - runFlow: flow/ensure-post-onboarding.yaml
 
-# Start from Exercise Library
-- assertVisible: "Biblioteca de Ejercicios"
+# Start from Home tab
+- tapOn:
+    id: "nav_home"
+- waitForAnimationToEnd:
+    timeout: 2000
+- assertVisible: "Inicio|Home"
 # Screenshot 01: Rapid navigation test starting point
 - takeScreenshot: 01_rapid_navigation_start
 
-# RAPID TAP SEQUENCE 1: Cycle through all nav tabs quickly
+# RAPID TAP SEQUENCE 1: Cycle through all 4 nav tabs quickly
+- tapOn:
+    id: "nav_programs"
+- waitForAnimationToEnd:
+    timeout: 1500
+- assertVisible: "Programas|Programs"
+
 - tapOn:
     id: "nav_history"
 - waitForAnimationToEnd:
     timeout: 1500
 - assertVisible: "Historial|History"
-
-- tapOn:
-    id: "nav_progress"
-- waitForAnimationToEnd:
-    timeout: 1500
-- assertVisible: "Progreso|Progress"
-
-- tapOn:
-    id: "nav_recovery"
-- waitForAnimationToEnd:
-    timeout: 1500
 
 - tapOn:
     id: "nav_profile"
@@ -50,10 +49,10 @@ onFlowStart:
 - assertVisible: "Perfil|Profile"
 
 - tapOn:
-    id: "nav_exercise_library"
+    id: "nav_home"
 - waitForAnimationToEnd:
     timeout: 1500
-- assertVisible: "Biblioteca de Ejercicios"
+- assertVisible: "Inicio|Home"
 
 # Screenshot 02: First navigation cycle completed
 - takeScreenshot: 02_rapid_navigation_cycle1
@@ -65,22 +64,17 @@ onFlowStart:
     timeout: 1500
 
 - tapOn:
-    id: "nav_recovery"
-- waitForAnimationToEnd:
-    timeout: 1500
-
-- tapOn:
-    id: "nav_progress"
-- waitForAnimationToEnd:
-    timeout: 1500
-
-- tapOn:
     id: "nav_history"
 - waitForAnimationToEnd:
     timeout: 1500
 
 - tapOn:
-    id: "nav_exercise_library"
+    id: "nav_programs"
+- waitForAnimationToEnd:
+    timeout: 1500
+
+- tapOn:
+    id: "nav_home"
 - waitForAnimationToEnd:
     timeout: 1500
 
@@ -89,17 +83,12 @@ onFlowStart:
 
 # RAPID TAP SEQUENCE 3: Random pattern
 - tapOn:
-    id: "nav_progress"
-- waitForAnimationToEnd:
-    timeout: 1500
-
-- tapOn:
-    id: "nav_exercise_library"
-- waitForAnimationToEnd:
-    timeout: 1500
-
-- tapOn:
     id: "nav_history"
+- waitForAnimationToEnd:
+    timeout: 1500
+
+- tapOn:
+    id: "nav_home"
 - waitForAnimationToEnd:
     timeout: 1500
 
@@ -109,12 +98,12 @@ onFlowStart:
     timeout: 1500
 
 - tapOn:
-    id: "nav_recovery"
+    id: "nav_programs"
 - waitForAnimationToEnd:
     timeout: 1500
 
 - tapOn:
-    id: "nav_exercise_library"
+    id: "nav_home"
 - waitForAnimationToEnd:
     timeout: 1500
 
@@ -133,35 +122,30 @@ onFlowStart:
 - assertVisible: "Historial|History"
 
 - tapOn:
-    id: "nav_exercise_library"
+    id: "nav_home"
 - tapOn:
-    id: "nav_exercise_library"
+    id: "nav_home"
 - tapOn:
-    id: "nav_exercise_library"
+    id: "nav_home"
 - waitForAnimationToEnd:
     timeout: 1500
-- assertVisible: "Biblioteca de Ejercicios"
+- assertVisible: "Inicio|Home"
 
 # Screenshot 05: Stress test (multiple rapid taps on same tab) completed
 - takeScreenshot: 05_rapid_navigation_stress
 
 # Final verification: All tabs still work correctly
 - tapOn:
+    id: "nav_programs"
+- waitForAnimationToEnd:
+    timeout: 1500
+- assertVisible: "Programas|Programs"
+
+- tapOn:
     id: "nav_history"
 - waitForAnimationToEnd:
     timeout: 1500
 - assertVisible: "Historial|History"
-
-- tapOn:
-    id: "nav_progress"
-- waitForAnimationToEnd:
-    timeout: 1500
-- assertVisible: "Progreso|Progress"
-
-- tapOn:
-    id: "nav_recovery"
-- waitForAnimationToEnd:
-    timeout: 1500
 
 - tapOn:
     id: "nav_profile"
@@ -170,10 +154,10 @@ onFlowStart:
 - assertVisible: "Perfil|Profile"
 
 - tapOn:
-    id: "nav_exercise_library"
+    id: "nav_home"
 - waitForAnimationToEnd:
     timeout: 1500
-- assertVisible: "Biblioteca de Ejercicios"
+- assertVisible: "Inicio|Home"
 
 # Screenshot 06: All tabs still functional after stress test
 - takeScreenshot: 06_rapid_navigation_complete

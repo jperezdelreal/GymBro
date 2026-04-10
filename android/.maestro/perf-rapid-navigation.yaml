@@ -6,21 +6,20 @@ tags:
 # Tests: Verify rapid tab switching without crashes or lag
 # Preconditions: Post-onboarding state, all tabs functional
 # Test data: None required
-# Assertions: All 5 tabs load correctly, no crashes after rapid switching
-# Cleanup: Return to Library tab
+# Assertions: All 4 tabs load correctly, no crashes after rapid switching
+# Cleanup: Return to Home tab
 # Dependencies: ensure-post-onboarding flow
 
 onFlowStart:
-  # Start at library
+  # Start at Home
   - launchApp
   - waitForAnimationToEnd:
       timeout: 3000
-  - assertVisible: "Biblioteca de Ejercicios"
 
 onFlowComplete:
-  # Return to Library tab
+  # Return to Home tab
   - tapOn:
-      id: "nav_exercise_library"
+      id: "nav_home"
       optional: true
   - waitForAnimationToEnd:
       timeout: 1000
@@ -29,28 +28,26 @@ onFlowComplete:
 
 - runFlow: flow/ensure-post-onboarding.yaml
 
-# Verify starting position
-- assertVisible: "Biblioteca de Ejercicios"
-- takeScreenshot: perf_rapid_nav_start_library
+# Verify starting position — navigate to Home
+- tapOn:
+    id: "nav_home"
+- waitForAnimationToEnd:
+    timeout: 2000
+- assertVisible: "Inicio|Home"
+- takeScreenshot: perf_rapid_nav_start_home
 
-# CYCLE 1: Rapid tab switching through all 5 tabs
+# CYCLE 1: Rapid tab switching through all 4 tabs
+- tapOn:
+    id: "nav_programs"
+- waitForAnimationToEnd:
+    timeout: 300
+- takeScreenshot: perf_rapid_nav_cycle1_programs
+
 - tapOn:
     id: "nav_history"
 - waitForAnimationToEnd:
     timeout: 300
 - takeScreenshot: perf_rapid_nav_cycle1_history
-
-- tapOn:
-    id: "nav_progress"
-- waitForAnimationToEnd:
-    timeout: 300
-- takeScreenshot: perf_rapid_nav_cycle1_progress
-
-- tapOn:
-    id: "nav_recovery"
-- waitForAnimationToEnd:
-    timeout: 300
-- takeScreenshot: perf_rapid_nav_cycle1_recovery
 
 - tapOn:
     id: "nav_profile"
@@ -59,7 +56,7 @@ onFlowComplete:
 - takeScreenshot: perf_rapid_nav_cycle1_profile
 
 - tapOn:
-    id: "nav_exercise_library"
+    id: "nav_home"
 - waitForAnimationToEnd:
     timeout: 300
 - takeScreenshot: perf_rapid_nav_cycle1_complete
@@ -71,29 +68,24 @@ onFlowComplete:
     timeout: 300
 
 - tapOn:
-    id: "nav_recovery"
-- waitForAnimationToEnd:
-    timeout: 300
-
-- tapOn:
-    id: "nav_progress"
-- waitForAnimationToEnd:
-    timeout: 300
-
-- tapOn:
     id: "nav_history"
 - waitForAnimationToEnd:
     timeout: 300
 
 - tapOn:
-    id: "nav_exercise_library"
+    id: "nav_programs"
+- waitForAnimationToEnd:
+    timeout: 300
+
+- tapOn:
+    id: "nav_home"
 - waitForAnimationToEnd:
     timeout: 300
 - takeScreenshot: perf_rapid_nav_cycle2_complete
 
 # CYCLE 3: Random pattern switching
 - tapOn:
-    id: "nav_progress"
+    id: "nav_history"
 - waitForAnimationToEnd:
     timeout: 300
 
@@ -103,31 +95,32 @@ onFlowComplete:
     timeout: 300
 
 - tapOn:
-    id: "nav_exercise_library"
+    id: "nav_home"
 - waitForAnimationToEnd:
     timeout: 300
 
 - tapOn:
-    id: "nav_recovery"
+    id: "nav_programs"
 - waitForAnimationToEnd:
     timeout: 300
 
 - tapOn:
-    id: "nav_history"
-- waitForAnimationToEnd:
-    timeout: 300
-
-- tapOn:
-    id: "nav_exercise_library"
+    id: "nav_home"
 - waitForAnimationToEnd:
     timeout: 300
 - takeScreenshot: perf_rapid_nav_cycle3_complete
 
 # Verify all tabs are still functional after rapid switching
-# Library tab
-- assertVisible: "Biblioteca de Ejercicios"
-- assertVisible:
-    id: "workout_fab"
+# Home tab
+- assertVisible: "Inicio|Home"
+
+# Programs tab
+- tapOn:
+    id: "nav_programs"
+- waitForAnimationToEnd:
+    timeout: 1000
+- assertVisible: "Programas|Programs"
+- takeScreenshot: perf_rapid_nav_verify_programs
 
 # History tab
 - tapOn:
@@ -137,22 +130,6 @@ onFlowComplete:
 - assertVisible: "Historial|History"
 - takeScreenshot: perf_rapid_nav_verify_history
 
-# Progress tab
-- tapOn:
-    id: "nav_progress"
-- waitForAnimationToEnd:
-    timeout: 1000
-- assertVisible: "Progreso|Progress"
-- takeScreenshot: perf_rapid_nav_verify_progress
-
-# Recovery tab
-- tapOn:
-    id: "nav_recovery"
-- waitForAnimationToEnd:
-    timeout: 1000
-- assertVisible: "Recuperación|Recovery"
-- takeScreenshot: perf_rapid_nav_verify_recovery
-
 # Profile tab
 - tapOn:
     id: "nav_profile"
@@ -161,10 +138,10 @@ onFlowComplete:
 - assertVisible: "Perfil|Profile"
 - takeScreenshot: perf_rapid_nav_verify_profile
 
-# Return to Library tab
+# Return to Home tab
 - tapOn:
-    id: "nav_exercise_library"
+    id: "nav_home"
 - waitForAnimationToEnd:
     timeout: 1000
-- assertVisible: "Biblioteca de Ejercicios"
+- assertVisible: "Inicio|Home"
 - takeScreenshot: perf_rapid_nav_complete

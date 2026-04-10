@@ -1,35 +1,53 @@
 appId: com.gymbro.app
-name: "Performance - Scroll Exercise Library"
+name: "Performance - Scroll Exercise Picker"
 tags:
   - performance
 
-# Tests: Verify smooth scrolling through exercise library without crashes
-# Preconditions: Post-onboarding state, exercise library populated
+# Tests: Verify smooth scrolling through exercise picker without crashes
+# Preconditions: Post-onboarding state, exercise picker populated
 # Test data: Default exercise database
-# Assertions: Scrolling completes without crash, library remains responsive
-# Cleanup: Return to top of library
+# Assertions: Scrolling completes without crash, picker remains responsive
+# Cleanup: Cancel active workout
 # Dependencies: ensure-post-onboarding flow
 
 onFlowStart:
-  # Start at library
+  # Start app
   - launchApp
   - waitForAnimationToEnd:
       timeout: 3000
-  - assertVisible: "Biblioteca de Ejercicios"
 
 onFlowComplete:
-  # Return to library top
+  # Cancel workout and return to Home
+  - back:
+      optional: true
+  - back:
+      optional: true
   - tapOn:
-      id: "nav_exercise_library"
-  - waitForAnimationToEnd:
-      timeout: 1000
+      text: "Cancelar Entrenamiento|Cancel Workout|Descartar"
+      optional: true
+  - tapOn:
+      id: "nav_home"
+      optional: true
 
 ---
 
 - runFlow: flow/ensure-post-onboarding.yaml
 
-# Verify we're on Library screen
-- assertVisible: "Biblioteca de Ejercicios"
+# Navigate to Home and open exercise picker via workout
+- tapOn:
+    id: "nav_home"
+- waitForAnimationToEnd:
+    timeout: 2000
+- tapOn:
+    id: "workout_fab"
+- waitForAnimationToEnd:
+    timeout: 2000
+- tapOn: "Añadir Ejercicio|Add Exercise"
+- waitForAnimationToEnd:
+    timeout: 2000
+
+# Verify we're on Exercise Picker screen
+- assertVisible: "Elegir Ejercicio|Choose Exercise"
 - takeScreenshot: perf_scroll_library_start
 
 # Scroll down rapidly multiple times to test performance
@@ -77,15 +95,13 @@ onFlowComplete:
     timeout: 500
 - takeScreenshot: perf_scroll_library_scroll_up_3
 
-# Verify library is still responsive after heavy scrolling
-- assertVisible: "Biblioteca de Ejercicios"
+# Verify picker is still responsive after heavy scrolling
+- assertVisible: "Elegir Ejercicio|Choose Exercise"
 - assertVisible:
     id: "search_bar"
-- assertVisible:
-    id: "workout_fab"
 - takeScreenshot: perf_scroll_library_complete
 
-# Try searching to verify library state is intact
+# Try searching to verify picker state is intact
 - tapOn:
     id: "search_bar"
 - waitForAnimationToEnd:
@@ -95,9 +111,8 @@ onFlowComplete:
     timeout: 1000
 - takeScreenshot: perf_scroll_library_search_after_scroll
 
-# Clear search and verify library is still functional
+# Go back to clean up
 - back
 - waitForAnimationToEnd:
     timeout: 1000
-- assertVisible: "Biblioteca de Ejercicios"
 - takeScreenshot: perf_scroll_library_final

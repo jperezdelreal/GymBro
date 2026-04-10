@@ -56,20 +56,25 @@ onFlowComplete:
     id: "onboarding_start"
 - waitForAnimationToEnd:
     timeout: 3000
-- assertVisible: "Biblioteca de Ejercicios"
-# Screenshot 02: Onboarding completed, landed on Exercise Library
+- assertVisible: "Programas|Programs"
+# Screenshot 02: Onboarding completed, landed on Programs
 - takeScreenshot: 02_full_e2e_onboarding_complete
 
-# === PHASE 2: QUICK LIBRARY BROWSE ===
+# === PHASE 2: NAVIGATE TO HOME ===
+
+# Navigate to Home tab
+- tapOn:
+    id: "nav_home"
+- waitForAnimationToEnd:
+    timeout: 2000
 
 # Dismiss tooltip if present
 - tapOn:
     text: "Entendido|Got it"
     optional: true
 
-# Verify library content is loaded
-# Screenshot 03: Exercise library loaded with exercises
-- takeScreenshot: 03_full_e2e_library_loaded
+# Screenshot 03: Home screen loaded
+- takeScreenshot: 03_full_e2e_home_loaded
 
 # === PHASE 3: START AND COMPLETE WORKOUT ===
 
@@ -130,7 +135,11 @@ onFlowComplete:
 - tapOn: "Listo"
 - waitForAnimationToEnd:
     timeout: 2000
-- assertVisible: "Biblioteca de Ejercicios"
+- tapOn:
+    id: "nav_home"
+- waitForAnimationToEnd:
+    timeout: 2000
+- assertVisible: "Inicio|Home"
 
 # === PHASE 4: VERIFY HISTORY ===
 
@@ -148,17 +157,7 @@ onFlowComplete:
     text: "Hoy"
     optional: true
 
-# === PHASE 5: CHECK PROGRESS ===
-
-# Navigate to Progress tab
-- tapOn:
-    id: "nav_progress"
-- waitForAnimationToEnd:
-    timeout: 2000
-# Screenshot 08: Progress tab after workout completion
-- takeScreenshot: 08_full_e2e_progress_after_workout
-
-# === PHASE 6: VERIFY PROFILE ===
+# === PHASE 5: VERIFY PROFILE ===
 
 # Navigate to Profile tab
 - tapOn:
@@ -169,9 +168,9 @@ onFlowComplete:
 # Screenshot 09: Profile tab with user account
 - takeScreenshot: 09_full_e2e_profile
 
-# Return to library
+# Return to Home
 - tapOn:
-    id: "nav_exercise_library"
-- assertVisible: "Biblioteca de Ejercicios"
-# Screenshot 10: E2E test completed, back at Exercise Library
+    id: "nav_home"
+- assertVisible: "Inicio|Home"
+# Screenshot 10: E2E test completed, back at Home
 - takeScreenshot: 10_full_e2e_complete
