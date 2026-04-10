@@ -576,3 +576,246 @@ The architecture is solid. We just need to close the stability gaps before shipp
 ### Next Action
 
 Tank picks up #327 (database migrations) as top priority. Switch prepares migration test cases. Morpheus reviews all Phase A PRs before merge.
+
+---
+
+## 2026-04-10: Android Architecture & Feature Completeness Audit
+
+**Lead:** Morpheus  
+**Date:** 2026-04-10  
+**Scope:** Comprehensive audit of GymBro Android app architecture, navigation, and feature completeness  
+
+### Executive Summary
+
+The Android app has a **solid architectural foundation** with clean separation of concerns (app/feature/core modules), proper MVVM architecture, comprehensive error handling, and offline-first data persistence. The codebase demonstrates mature engineering practices with 260+ unit tests, strong type safety, and production-ready sync infrastructure.
+
+**However**: The app suffers from **integration gaps** and **incomplete feature connections**. Multiple features exist in isolation but lack navigation wiring, and several high-value capabilities (AI coach, programs, analytics) are not accessible from primary user flows.
+
+**Critical Finding**: The app is approximately **60-70% complete** toward a shippable MVP. Most code is production-quality, but the **user experience is fragmented** due to missing integration points.
+
+### Feature Completeness by Domain
+
+| Domain | Completeness | Blockers | Notes |
+|--------|-------------|----------|-------|
+| **Workout Logging** | 95% | Voice button not wired | Core feature ready to ship |
+| **Exercise Library** | 85% | Missing detail screen | Browse/search works, detail is placeholder |
+| **History** | 90% | None | Fully functional |
+| **Progress** | 90% | None | Charts, PRs, plateaus all working |
+| **Programs** | 70% | Not in bottom nav | Backend complete, no primary access |
+| **AI Coach** | 60% | Hidden from main flow | Feature exists but undiscoverable |
+| **Recovery** | 40% | No data sync | UI exists, no Health Connect data |
+| **Settings/Profile** | 95% | None | Fully functional |
+| **Onboarding** | 100% | None | Production-ready |
+
+**Overall App Completeness:** 60-70% toward shippable MVP
+
+### Critical Integration Gaps
+
+1. **AI Coach Hidden** — Feature fully implemented but no main flow entry point
+   - Route exists: `coach`
+   - Accessible from: Profile, plateau alerts (minor pathways)
+   - Missing: Primary access (FAB, bottom nav)
+   - **Recommendation:** Add chat FAB to Active Workout or "Coach" tab
+
+2. **Programs Feature Orphaned** — Backend complete, no primary access
+   - Route exists: `programs`
+   - Missing: Bottom nav tab
+   - **Recommendation:** Replace Recovery tab with Programs
+
+3. **Voice Input Dead Code** — Button rendered but never called
+   - VoiceInputButton exists but not wired
+   - VoiceRecognitionService fully implemented
+   - Missing: Permission flow + button logic
+   - **Recommendation:** Wire button + add RECORD_AUDIO flow to onboarding
+
+4. **Exercise Detail Placeholder** — Breaks user expectation
+   - Currently shows "PlaceholderScreen(title = "Exercise Detail")"
+   - **Recommendation:** Implement basic detail view
+
+### MVP Readiness Assessment
+
+**Timeline to Shippable:** 1-2 weeks (2-3 PRs)
+
+**What's Needed:**
+- 10-15 hours of integration work (no new features required)
+- Focus: navigation + discoverability
+- Sequence: Voice input → Programs nav → AI Coach access → Exercise detail
+
+---
+
+## 2026-04-10: Android UX & Customer Experience Audit
+
+**Conducted by:** Trinity  
+**Date:** 2026-04-10  
+**Scope:** Comprehensive user journey analysis from gym-goer perspective
+
+### Executive Summary
+
+The GymBro Android app shows **strong foundations** (glassmorphic design, haptic feedback, smooth animations) but has **critical UX gaps** that would cause users to delete it or never finish their first workout. The app looks beautiful but doesn't fulfill its core promise: ultra-fast workout logging for serious lifters at the gym.
+
+**Shipping Readiness:** NOT shippable yet — 2-3 weeks to P0.
+
+### Critical Blockers (Deal-Breakers)
+
+#### 1. No Workout Templates
+**What users expect:** Tap "Chest Day" → 6 exercises pre-loaded → start logging  
+**What they get:** Empty Active Workout, must manually add every exercise every time  
+**Impact:** Users won't rebuild "5x5 Strength" from scratch 3x/week — app unusable  
+**Fix:** Ship 5-10 pre-built templates (Push/Pull/Legs, 5x5, Upper/Lower, Bro Split)
+
+#### 2. Active Workout State Not Persisted
+**What users expect:** Start workout → phone rings → resume from last set  
+**What they get:** App killed, all data lost  
+**Impact:** Users lose 30-45 min of data from accidental back press or OS kill  
+**Fix:** Auto-save state every 30s, detect incomplete workout on launch
+
+#### 3. Rest Timer Invisible
+**What users expect:** Complete set → timer countdown visible → notification at 0  
+**What they get:** Timer running in background (not visible)  
+**Impact:** Users rush sets, don't rest properly, increase injury risk  
+**Fix:** Inline timer card that slides in below current exercise after set completion
+
+#### 4. Empty States Have No CTAs
+**Examples:**
+- History empty: "No workouts yet" (no "Start First Workout" button)
+- Progress empty: "Not enough data" (no "Log 3 Workouts" guidance)
+- Programs empty: "Generate Plan" button fails silently  
+**Fix:** Every empty state needs primary CTA that kicks off the feature
+
+### Friction Points (Usable But Frustrating)
+
+- **7-page onboarding** exhausting before value shown (reduce to 3)
+- **Active Workout interface:** No FAB, warmup/working sets blend, no undo
+- **Progress screen:** e1RM trends lack context, no weekly comparison
+- **Bottom nav:** 5 tabs excessive, Recovery placeholder, Library rarely needed
+- **Coach Chat:** Firebase dependency shows error card on new users
+- **Programs:** "Generate" button fails silently, no error message
+
+### Priority Fix Roadmap
+
+**P0 (Blocking Launch):**
+1. Workout templates (Push/Pull/Legs minimum)
+2. Persist active workout state
+3. Show rest timer inline
+4. Fix empty states with CTAs
+
+**P1 (Launch Week):**
+5. Connect onboarding data to program generation
+6. Add undo on set completion
+7. Offline detection + graceful degradation
+8. Remove non-functional settings items
+
+**P2 (First Month):**
+9. Superset support (UI + timer logic)
+10. Plate calculator
+11. Workout notes field
+12. Export/share workout
+
+**P3 (Competitive Parity):**
+13. Body measurements tracking
+14. Exercise form videos
+15. Wear OS companion
+16. Advanced analytics screen
+
+### Conclusion
+
+Timeline estimate: 2-3 weeks to P0, 4-6 weeks to P1 (assuming 1 dev full-time).
+
+**Ship or hold?** Hold. Shipping now would generate negative reviews. Fix P0, then soft launch to beta testers.
+
+---
+
+## 2026-04-10: AI/ML Intelligence Audit — GymBro Android
+
+**Conducted by:** Neo  
+**Date:** 2026-04-10  
+**Scope:** Comprehensive evaluation of AI/ML and training intelligence capabilities
+
+### Executive Summary
+
+GymBro Android has **foundational AI/ML infrastructure** but is **incomplete as a competitive "smart training app"**. The app has:
+- ✅ **Working AI Coach** (Gemini 2.0 Flash, conversational, context-aware)
+- ✅ **Strong Analytics Layer** (volume tracking, muscle distribution, consistency, plateau detection)
+- ✅ **Basic Adaptive Training** (recovery-aware, muscle rotation)
+- ⚠️ **Limited Progressive Overload** (simple 2.5% weight bumps, no periodization)
+- ❌ **No Deload Intelligence** (no fatigue modeling, no auto-triggers)
+- ❌ **No Exercise Intelligence** (no substitutions, no difficulty progressions)
+
+**Competitive Position:** Behind FitBod, Hevy, JEFIT in adaptive training intelligence. Ahead in conversational AI accessibility.
+
+### AI/ML Completeness Assessment
+
+| Component | % Complete | Status |
+|-----------|-----------|--------|
+| AI Coach | 60% | Working, but missing goals/recovery context, no persistent history |
+| Workout Plan Generator | 70% | Functional, no periodization/autoregulation/weak point detection |
+| Progress Analytics | 80% | Strong, missing advanced metrics (Wilks, pull:push ratio) |
+| Adaptive Training | 50% | Recovery-aware but no deload automation |
+| Deload Intelligence | 0% | No fatigue modeling, no auto-triggers |
+| Exercise Progression | 0% | No substitutions, no form cues, no difficulty scaling |
+
+### AI Coach (60% Complete)
+
+**What Works:**
+- LLM integration via Firebase Vertex AI (Gemini 2.0 Flash)
+- Context awareness (last 5 workouts, PRs, total volume)
+- Full chat UI with Material 3 design
+- Accessible from Profile + plateau alerts
+
+**Gaps:**
+- No training plan knowledge (doesn't see current program)
+- No goals integration (doesn't know if strength/hypertrophy/powerlifting)
+- No recovery context (missing HRV, sleep integration)
+- No persistent chat history (session-only)
+- No on-device LLM fallback
+
+**Priority:** MEDIUM — Coach is functional but needs deeper integration
+
+### Workout Plan Generator (70% Complete)
+
+**What Works:**
+- Goal-based templates (Strength, Hypertrophy, Powerlifting, General)
+- Frequency adaptation (3/4/5+ days/week)
+- Recovery-aware volume (reduces sets on low readiness)
+- Muscle group rotation (48+ hour recovery)
+- Progressive overload suggestions (2.5% weight bumps)
+
+**Gaps:**
+- No periodization (static blocks, no mesocycle progression)
+- No autoregulation (doesn't adjust based on RPE/performance)
+- No weak point detection (doesn't flag muscle imbalances)
+- No exercise difficulty progression
+- Experience level ignored
+
+**Priority:** HIGH — This is the core differentiator
+
+### Progress Analytics (80% Complete)
+
+**What Works:**
+- Volume load trends (weekly, week-over-week %)
+- PRs (max weight/reps/e1RM via Brzycki formula)
+- Muscle group distribution
+- Consistency metrics (streak, avg workouts/week)
+- **Plateau Detection (Strong):**
+  - Stagnation: <2% e1RM over 4+ weeks
+  - Regression: 2+ consecutive weeks declining
+  - Severity levels: MILD, MODERATE, SEVERE
+  - Actionable suggestions
+
+**Gaps:**
+- No volume landmarks (celebrate milestones)
+- No Wilks score (key metric for serious lifters)
+- No strength curve analysis
+- No training load balance (pull:push ratio)
+
+**Priority:** MEDIUM — Analytics are strong, advanced metrics would differentiate
+
+### Path to Competitive Parity
+
+1. **Block periodization** (1 week) — accumulation → intensification → deload cycles
+2. **Autoregulation** (1 week) — adjust based on performance/RPE
+3. **Weak point detection** (4 days) — flag muscle imbalances
+4. **Exercise progression** (2 weeks) — difficulty scaling, substitutions
+5. **Deload automation** (3 days) — fatigue-based triggers
+
+**Total estimate:** 2-3 weeks focused AI/ML work
