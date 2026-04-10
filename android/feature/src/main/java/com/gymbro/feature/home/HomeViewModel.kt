@@ -37,8 +37,13 @@ class HomeViewModel @Inject constructor(
     fun onEvent(event: HomeEvent) {
         when (event) {
             is HomeEvent.QuickStartWorkout -> {
-                viewModelScope.launch {
-                    _effect.send(HomeEffect.NavigateToActiveWorkout)
+                val plan = activePlanStore.getPlan()
+                if (plan == null) {
+                    _state.update { it.copy(showNoPlanDialog = true) }
+                } else {
+                    viewModelScope.launch {
+                        _effect.send(HomeEffect.NavigateToActiveWorkout)
+                    }
                 }
             }
             is HomeEvent.CreateFirstProgram -> {
@@ -57,6 +62,15 @@ class HomeViewModel @Inject constructor(
                 }
             }
             is HomeEvent.ViewAllPrograms -> {
+                viewModelScope.launch {
+                    _effect.send(HomeEffect.NavigateToPrograms)
+                }
+            }
+            is HomeEvent.DismissNoPlanDialog -> {
+                _state.update { it.copy(showNoPlanDialog = false) }
+            }
+            is HomeEvent.NoPlanGoToPrograms -> {
+                _state.update { it.copy(showNoPlanDialog = false) }
                 viewModelScope.launch {
                     _effect.send(HomeEffect.NavigateToPrograms)
                 }

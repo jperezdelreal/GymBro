@@ -10,6 +10,7 @@ data class HomeState(
     val isLoading: Boolean = true,
     val isGeneratingPlan: Boolean = false,
     val daysSinceLastWorkout: Int? = null,
+    val showNoPlanDialog: Boolean = false,
 )
 
 data class RecentWorkoutItem(
@@ -27,6 +28,8 @@ sealed interface HomeEvent {
     data class StartTodayWorkout(val dayNumber: Int) : HomeEvent
     data class ViewWorkoutDetail(val workoutId: String) : HomeEvent
     data object ViewAllPrograms : HomeEvent
+    data object DismissNoPlanDialog : HomeEvent
+    data object NoPlanGoToPrograms : HomeEvent
 }
 
 sealed interface HomeEffect {

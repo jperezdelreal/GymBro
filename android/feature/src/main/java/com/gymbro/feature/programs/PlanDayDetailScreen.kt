@@ -35,6 +35,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
@@ -154,6 +156,7 @@ private fun PlanDayContent(
 ) {
     val exerciseCount = day.exercises.size
     val totalSets = day.exercises.sumOf { it.sets }
+    val haptic = LocalHapticFeedback.current
 
     LazyColumn(
         modifier = modifier
@@ -193,8 +196,14 @@ private fun PlanDayContent(
         }
 
         // Exercise cards
-        items(day.exercises) { exercise ->
-            ExerciseCard(exercise = exercise)
+        items(
+            items = day.exercises,
+            key = { it.id },
+        ) { exercise ->
+            ExerciseCard(
+                exercise = exercise,
+                modifier = Modifier.animateItem(),
+            )
             Spacer(modifier = Modifier.height(12.dp))
         }
 
@@ -203,7 +212,10 @@ private fun PlanDayContent(
             Spacer(modifier = Modifier.height(8.dp))
 
             Card(
-                onClick = onStartWorkout,
+                onClick = {
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    onStartWorkout()
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .semantics {
@@ -272,7 +284,11 @@ private fun SummaryItem(
 }
 
 @Composable
-private fun ExerciseCard(exercise: PlannedExercise) {
+private fun ExerciseCard(
+    exercise: PlannedExercise,
+    modifier: Modifier = Modifier,
+) {
+    val haptic = LocalHapticFeedback.current
     val exerciseDesc = stringResource(
         R.string.programs_exercise_accessibility,
         exercise.exerciseName,
@@ -282,7 +298,7 @@ private fun ExerciseCard(exercise: PlannedExercise) {
     )
 
     Card(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .semantics(mergeDescendants = true) {
                 contentDescription = exerciseDesc
@@ -291,6 +307,9 @@ private fun ExerciseCard(exercise: PlannedExercise) {
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant,
         ),
+        onClick = {
+            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+        },
     ) {
         Column(
             modifier = Modifier

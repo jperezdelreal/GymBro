@@ -563,6 +563,9 @@
     <string name="home_create_program_subtitle">Obtén un plan de entrenamiento personalizado basado en tus objetivos</string>
     <string name="home_recent_workouts">Entrenamientos Recientes</string>
     <string name="home_exercises_count">%d ejercicios</string>
+    <string name="home_no_plan_title">Sin Programa Activo</string>
+    <string name="home_no_plan_message">Crea un programa de entrenamiento primero para que tu sesión tenga estructura y progresión.</string>
+    <string name="home_no_plan_go_to_programs">Ir a Programas</string>
 
     <!-- Accessibility — Content Descriptions -->
     <string name="home_cd_start_workout">Iniciar entrenamiento</string>
