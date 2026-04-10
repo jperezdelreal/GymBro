@@ -166,7 +166,7 @@ onFlowComplete:
     timeout: 3000
 # App should handle emoji input
 
-# Verify we reached Exercise Library (no crash)
-- assertVisible: "Biblioteca de Ejercicios"
+# Verify we reached Programs screen (no crash, plan auto-generated)
+- assertVisible: "Programas|Programs"
 # Screenshot 06: Edge case tests completed, app stable
 - takeScreenshot: 06_onboarding_edge_complete

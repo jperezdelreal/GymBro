@@ -3,6 +3,8 @@ package com.gymbro.feature.onboarding.screenshots
 import app.cash.paparazzi.DeviceConfig
 import app.cash.paparazzi.Paparazzi
 import com.gymbro.app.ui.theme.GymBroTheme
+import com.gymbro.core.preferences.UserPreferences.ExperienceLevel
+import com.gymbro.core.preferences.UserPreferences.TrainingGoal
 import com.gymbro.core.preferences.UserPreferences.WeightUnit
 import com.gymbro.feature.onboarding.OnboardingScreen
 import com.gymbro.feature.onboarding.OnboardingState
@@ -27,7 +29,7 @@ class OnboardingScreenshotTest {
                         currentPage = 0,
                         selectedUnit = WeightUnit.KG,
                         userName = "",
-                        selectedGoal = "both"
+                        selectedGoal = TrainingGoal.HYPERTROPHY,
                     ),
                     onEvent = {}
                 )
@@ -44,7 +46,7 @@ class OnboardingScreenshotTest {
                         currentPage = 1,
                         selectedUnit = WeightUnit.KG,
                         userName = "Alex",
-                        selectedGoal = "both"
+                        selectedGoal = TrainingGoal.HYPERTROPHY,
                     ),
                     onEvent = {}
                 )
@@ -61,7 +63,7 @@ class OnboardingScreenshotTest {
                         currentPage = 2,
                         selectedUnit = WeightUnit.LBS,
                         userName = "Alex",
-                        selectedGoal = "strength"
+                        selectedGoal = TrainingGoal.STRENGTH,
                     ),
                     onEvent = {}
                 )

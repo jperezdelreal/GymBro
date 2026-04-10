@@ -11,6 +11,7 @@ data class OnboardingState(
     val selectedGoal: TrainingGoal = TrainingGoal.HYPERTROPHY,
     val selectedExperience: ExperienceLevel = ExperienceLevel.INTERMEDIATE,
     val trainingDaysPerWeek: Int = 4,
+    val isGeneratingPlan: Boolean = false,
 )
 
 sealed interface OnboardingEvent {

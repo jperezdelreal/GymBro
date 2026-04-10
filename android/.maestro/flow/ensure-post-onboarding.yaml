@@ -13,7 +13,7 @@ name: "Ensure Post-Onboarding State"
 - runFlow:
     when:
       visible: "GymBro"
-      notVisible: "Biblioteca de Ejercicios|Exercise Library"
+      notVisible: "Programas|Programs"
     commands:
       # We're on onboarding — complete it
       - swipe:
@@ -39,7 +39,7 @@ name: "Ensure Post-Onboarding State"
       - tapOn:
           point: "20%,69%"
       - waitForAnimationToEnd:
-          timeout: 3000
+          timeout: 5000
 
-# Verify we're now post-onboarding
-- assertVisible: "Biblioteca de Ejercicios|Exercise Library"
+# Verify we're now post-onboarding (lands on Programs after plan generation)
+- assertVisible: "Programas|Programs"

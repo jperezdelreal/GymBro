@@ -133,6 +133,7 @@ fun OnboardingScreen(
                     6 -> GetStartedPage(
                         selectedUnit = state.selectedUnit,
                         userName = state.userName,
+                        isGeneratingPlan = state.isGeneratingPlan,
                         onUnitSelected = { onEvent(OnboardingEvent.UnitSelected(it)) },
                         onNameChanged = { onEvent(OnboardingEvent.NameChanged(it)) },
                         onComplete = { onEvent(OnboardingEvent.CompleteOnboarding) },
@@ -258,6 +259,7 @@ private fun OnboardingFeaturePage(
 private fun GetStartedPage(
     selectedUnit: WeightUnit,
     userName: String,
+    isGeneratingPlan: Boolean,
     onUnitSelected: (WeightUnit) -> Unit,
     onNameChanged: (String) -> Unit,
     onComplete: () -> Unit,
@@ -331,8 +333,13 @@ private fun GetStartedPage(
         Spacer(modifier = Modifier.height(48.dp))
 
         GradientButton(
-            text = stringResource(R.string.onboarding_lets_go),
+            text = if (isGeneratingPlan) {
+                stringResource(R.string.onboarding_generating_plan)
+            } else {
+                stringResource(R.string.onboarding_lets_go)
+            },
             onClick = onComplete,
+            enabled = !isGeneratingPlan,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp)

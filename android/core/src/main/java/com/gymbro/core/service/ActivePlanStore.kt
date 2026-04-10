@@ -18,8 +18,20 @@ class ActivePlanStore @Inject constructor() {
     private val _activePlan = MutableStateFlow<WorkoutPlan?>(null)
     val activePlan: StateFlow<WorkoutPlan?> = _activePlan.asStateFlow()
 
+    private val _isFromOnboarding = MutableStateFlow(false)
+    val isFromOnboarding: StateFlow<Boolean> = _isFromOnboarding.asStateFlow()
+
     fun setPlan(plan: WorkoutPlan?) {
         _activePlan.value = plan
+    }
+
+    fun setPlanFromOnboarding(plan: WorkoutPlan) {
+        _activePlan.value = plan
+        _isFromOnboarding.value = true
+    }
+
+    fun clearOnboardingFlag() {
+        _isFromOnboarding.value = false
     }
 
     fun getPlan(): WorkoutPlan? = _activePlan.value

@@ -3,6 +3,8 @@ package com.gymbro.feature.onboarding
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gymbro.core.preferences.UserPreferences
+import com.gymbro.core.service.ActivePlanStore
+import com.gymbro.core.service.WorkoutPlanGenerator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,6 +16,8 @@ import javax.inject.Inject
 @HiltViewModel
 class OnboardingViewModel @Inject constructor(
     private val userPreferences: UserPreferences,
+    private val workoutPlanGenerator: WorkoutPlanGenerator,
+    private val activePlanStore: ActivePlanStore,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(OnboardingState())
@@ -50,6 +54,8 @@ class OnboardingViewModel @Inject constructor(
 
     private fun completeOnboarding() {
         viewModelScope.launch {
+            _state.value = _state.value.copy(isGeneratingPlan = true)
+
             userPreferences.setWeightUnit(_state.value.selectedUnit)
             val userName = _state.value.userName.takeIf { it.isNotBlank() } ?: ""
             userPreferences.setUserName(userName)
@@ -57,6 +63,22 @@ class OnboardingViewModel @Inject constructor(
             userPreferences.setExperienceLevel(_state.value.selectedExperience)
             userPreferences.setTrainingDaysPerWeek(_state.value.trainingDaysPerWeek)
             userPreferences.setOnboardingComplete(true)
+
+            try {
+                val plan = workoutPlanGenerator.generatePlan(
+                    goal = _state.value.selectedGoal,
+                    experienceLevel = _state.value.selectedExperience,
+                    daysPerWeek = _state.value.trainingDaysPerWeek,
+                )
+                val personalizedPlan = plan.copy(
+                    name = "Your First Program",
+                )
+                activePlanStore.setPlanFromOnboarding(personalizedPlan)
+            } catch (_: Exception) {
+                // Plan generation failure should not block onboarding completion
+            }
+
+            _state.value = _state.value.copy(isGeneratingPlan = false)
             _effects.send(OnboardingEffect.NavigateToMain)
         }
     }

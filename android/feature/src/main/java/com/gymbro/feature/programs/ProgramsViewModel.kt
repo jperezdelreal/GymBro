@@ -36,6 +36,7 @@ class ProgramsViewModel @Inject constructor(
 
     init {
         initializeTemplates()
+        loadActivePlanFromStore()
         loadTemplates()
     }
 
@@ -95,6 +96,22 @@ class ProgramsViewModel @Inject constructor(
                     activePlan = plan,
                     isGeneratingPlan = false,
                 )
+            }
+        }
+    }
+
+    private fun loadActivePlanFromStore() {
+        val plan = activePlanStore.getPlan()
+        if (plan != null) {
+            val isFromOnboarding = activePlanStore.isFromOnboarding.value
+            _state.update {
+                it.copy(
+                    activePlan = plan,
+                    showFirstProgramBanner = isFromOnboarding,
+                )
+            }
+            if (isFromOnboarding) {
+                activePlanStore.clearOnboardingFlag()
             }
         }
     }
