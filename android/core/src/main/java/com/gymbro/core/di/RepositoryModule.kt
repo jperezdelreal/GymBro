@@ -2,6 +2,8 @@ package com.gymbro.core.di
 
 import com.gymbro.core.repository.ExerciseRepository
 import com.gymbro.core.repository.ExerciseRepositoryImpl
+import com.gymbro.core.repository.ProgramTemplateRepository
+import com.gymbro.core.repository.ProgramTemplateRepositoryImpl
 import com.gymbro.core.repository.WorkoutRepository
 import com.gymbro.core.repository.WorkoutRepositoryImpl
 import com.gymbro.core.repository.WorkoutTemplateRepository
@@ -23,4 +25,7 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun bindWorkoutTemplateRepository(impl: WorkoutTemplateRepositoryImpl): WorkoutTemplateRepository
+
+    @Binds
+    abstract fun bindProgramTemplateRepository(impl: ProgramTemplateRepositoryImpl): ProgramTemplateRepository
 }
