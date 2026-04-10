@@ -744,3 +744,58 @@ Makes incremental progress on issue #334 (eliminate 32 total unsafe `!!` usages)
 - Training phase multiplier should eventually feed into AI coach recommendations and recovery suggestions
 - Post-v1.0 opportunity: Let AI coach personalize advice (e.g., "In a cut, prioritize compound movements") based on phase
 - Consider persistent plan storage (database) if users want to revert to old plans (current in-memory only)
+
+
+### 2026-04-11: Code Review & Merge — PR #409 (Trinity) & PR #410 (Tank)
+
+**Oversight:** Reviewed and approved both PRs; merged with full tech reconciliation.
+
+**PR #409 — Redesign Home Screen (Closes #335, Trinity)**
+- **Scope:** UX restructure—Home screen now primary landing (active program + today's workout + quick-start + recent workouts) instead of Exercise Library
+- **Navigation:** Bottom nav reordered to Home → Programs → History → Profile (4 tabs); Exercise Library moved to secondary access
+- **Architecture:** 
+  - New HomeRoute feature module (clean boundary)
+  - Null initial value pattern for DataStore prevents onboarding screen flash
+  - Bilingual strings (EN/ES) complete
+- **Quality:** Surgical changes, no god objects, proper module isolation
+- **Status:** ✅ Merged (squashed, branch deleted)
+
+**PR #410 — Startup Performance Audit (Closes #338, Tank)**
+- **Scope:** 7 cold start bottlenecks identified and fixed; expected 200–400ms improvement
+- **Optimizations Applied:**
+  1. **Deferred initialization:** dagger.Lazy<> for NotificationHelper, ReminderScheduler, UserPreferences
+  2. **Background threading:** Application.onCreate() work moved to applicationScope (non-blocking)
+  3. **SplashScreen API:** AndroidX compat library (1.0.1) + installSplashScreen() for API 26–36 consistency
+  4. **DataStore pattern:** Null initial value distinguishes 'loading' from 'false', prevents flashing (same as PR #409)
+  5. **TTFD reporting:** reportFullyDrawn() callback wired via NavGraph for proper metrics
+  6. **Firebase caching:** isFirebaseInitialized() result cached with 'by lazy'
+  7. **Hilt fix:** ExerciseSubstitutionEngine now has @Inject constructor
+- **Architecture:** Excellent pattern composition—each optimization is isolated and composable
+- **Changeset:** Included (startup-performance-audit.md)
+- **Status:** ✅ Merged (squashed, branch deleted)
+
+**Merge Resolution:**
+- Both PRs modified GymBroNavGraph.kt with non-conflicting startup optimization patterns
+- **Strategy:** Merged #410 first (lower-layer perf), then #409 (nav structure) with conflict resolution
+- **Conflict Resolution Details:**
+  - PR #410 expected start destination = 'exercise_library' (old UX)
+  - PR #409 expects start destination = 'home' (new UX)
+  - **Decision:** Accepted PR #409's 'home' as correct—redesign is the new product vision; startup perf optimizations remain intact
+  - Removed duplicate LaunchedEffect import during resolution
+- **Result:** Both PRs' functionality integrated; no loss of either feature
+
+**Technical Assessment:**
+- ✅ Both PRs follow module boundary principles (no god objects, clean composition)
+- ✅ Performance architecture is sound—lazy injection + background work prevent main thread blocking
+- ✅ DataStore pattern prevents UI flashing (common Android cold start pitfall)
+- ✅ Splash screen handling covers all API levels; TTFD measurement enables future benchmarking
+- ✅ No breaking changes; fully backward compatible
+- **Minor Observation:** Both agents independently identified the same DataStore null-initial-value pattern—suggests strong architectural alignment across team
+
+**Post-Merge Status:**
+- Local branches cleaned (335 and 338 deleted remote + local)
+- Master branch at commit caa44b2 (PR #409 squashed, includes all #410 changes)
+- Both history.md files documented in corresponding agent charters
+- Ready for next sprint
+
+**Decision for Team:** Startup perf + home screen redesign now live. Recommend immediate QA of cold start metrics (baseline vs 200–400ms claimed improvement) and UX validation of new Home tab as primary landing.
