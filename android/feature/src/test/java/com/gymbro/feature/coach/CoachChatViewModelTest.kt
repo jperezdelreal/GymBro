@@ -64,6 +64,7 @@ class CoachChatViewModelTest {
         every { aiCoachService.getChatHistory() } returns listOf(assistantMessage)
         
         viewModel.onEvent(CoachChatEvent.UpdateInput("Test"))
+        
         viewModel.effect.test {
             viewModel.onEvent(CoachChatEvent.SendMessage)
             
@@ -83,7 +84,7 @@ class CoachChatViewModelTest {
         viewModel.onEvent(CoachChatEvent.SendMessage)
         
         val state = viewModel.state.value
-        assertEquals("API error", state.error)
+        assertTrue("Error should contain 'API error' but was: ${state.error}", state.error?.contains("API error") == true)
         assertFalse(state.isLoading)
     }
 

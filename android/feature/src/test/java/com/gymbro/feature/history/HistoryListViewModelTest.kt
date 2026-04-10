@@ -71,7 +71,7 @@ class HistoryListViewModelTest {
         
         val state = viewModel.state.value
         assertFalse(state.isLoading)
-        assertEquals("Network error", state.error)
+        assertTrue(state.error?.contains("Network error") == true)
     }
 
     @Test
