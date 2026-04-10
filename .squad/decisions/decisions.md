@@ -1186,3 +1186,64 @@ After onboarding completes, the app now auto-generates a personalized workout pl
 **By:** Copilot (via user request)  
 **What:** Ralph NEVER stops. Context is at 18%, user will /compact if needed. Continue until the board is completely empty. No excuses. Emulator available for Android testing issues.  
 **Why:** User request — captured for team memory during Round 5 completion sprint.
+
+---
+
+## 2026-04-10T18:25:00Z: User Directive — Full Validation Cycle
+
+**By:** Copilot (via user request)  
+**What:** After Maestro flows pass: 1) Re-audit skills and charters, correct if needed. 2) Review all delivered features and create follow-up issues for gaps/improvements. 3) Do NOT stop under any circumstances — no context excuses. Use Ralph if needed.  
+**Why:** User request — ensure comprehensive validation and continuous improvement of team capabilities
+
+---
+
+## 2026-04-10T22:30Z: Session Audit Findings & Integration Gap Priority
+
+**Author:** Morpheus (Lead)  
+**Date:** 2026-04-10  
+**Context:** Comprehensive audit of 11 PRs merged in Ralph session; 24 Maestro flows re-validated against new navigation
+
+### Decision
+
+#### 1. Integration Gaps Are Priority Fixes (Not Features)
+
+**Decision:** The following integration gaps must be fixed before any new feature work:
+- ProgressionEngine ignoring TrainingPhase (#414)
+- WorkoutPlanGenerator volume multiplier dead code (#415)
+- HomeScreen not refreshing on plan change (#416)
+- Quick-start without plan validation (#417)
+- OnboardingData not persisted before plan generation (#418)
+
+**Rationale:** These are wiring bugs, not missing features. Users who set "Cut" mode expect the app to behave differently. Shipping features that don't actually work erodes trust. Label: `fix`, not `feat`.
+
+#### 2. Pre-Existing Build Failures Block All Testing
+
+**Decision:** Fix ActiveWorkoutViewModelTest compilation (#428) and Paparazzi baselines (#429) before ANY other test work. These are blocking issues — 14 screenshot tests are useless without baselines.
+
+**Rationale:** Test infrastructure ROI is zero until tests actually run. Priority order: fix compilation → record baselines → then add new tests.
+
+#### 3. Accessibility Is a Must-Fix for Gym Context
+
+**Decision:** Touch targets below 48dp (#422) and missing contentDescriptions (#421) are `fix` priority, not polish. The glassmorphic contrast audit (#423) requires measurement before action.
+
+**Rationale:** Our target users have sweaty hands and wear gloves. 32dp buttons are unusable. This is a functional bug for our user segment.
+
+#### 4. Skills Audit Result
+
+All three new skills (performance-benchmarking, accessibility-audit, behavioral-nudges) are accurate and useful. The accessibility-audit skill correctly predicted the gaps we found. No corrections needed.
+
+**New skill opportunity identified:** A "compose-maestro-compatibility" skill documenting known Compose modifier + Maestro selector incompatibilities would prevent future E2E authoring friction.
+
+### Team Routing & Implications
+
+**Neo:** 5 issues (#414, #415, #418, #419, #434)  
+- Priority: ProgressionEngine wiring, plan generation finalization, voice parsing
+
+**Tank:** 4 issues (#416, #420, #428, #431)  
+- Priority: HomeScreen refresh, test infrastructure unblocking, speech recognizer lifecycle
+
+**Trinity:** 8 issues (#417, #421, #422, #423, #424, #425, #432, #433)  
+- Priority: Accessibility fixes, validation, touch targets, UX clarity
+
+**Switch:** 6 issues (#426, #427, #428, #429, #430, #431)  
+- Priority: Test infrastructure, coverage expansion, naming conventions

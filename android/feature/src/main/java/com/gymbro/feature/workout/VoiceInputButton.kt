@@ -166,7 +166,7 @@ fun VoiceInputButton(
 
             Box(
                 modifier = Modifier
-                    .size(32.dp)
+                    .size(56.dp)
                     .scale(scale)
                     .alpha(pulseAlpha)
                     .background(AccentRed, CircleShape)
@@ -200,13 +200,13 @@ fun VoiceInputButton(
                     }
                 }
             },
-            modifier = Modifier.size(32.dp),
+            modifier = Modifier.size(56.dp),
         ) {
             Icon(
                 imageVector = Icons.Default.Mic,
                 contentDescription = stringResource(R.string.voice_input_button),
                 tint = if (isListening) AccentRed else Color.White.copy(alpha = 0.7f),
-                modifier = Modifier.size(18.dp),
+                modifier = Modifier.size(24.dp),
             )
         }
     }

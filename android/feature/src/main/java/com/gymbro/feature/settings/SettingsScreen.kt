@@ -59,6 +59,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
@@ -107,6 +110,8 @@ internal fun SettingsScreen(
     onNavigateBack: () -> Unit,
 ) {
     var showClearDataDialog by remember { mutableStateOf(false) }
+    val haptic = LocalHapticFeedback.current
+    val trainingPhaseSelectorDescription = stringResource(R.string.settings_cd_training_phase)
 
     Scaffold(
         topBar = {
@@ -231,25 +236,36 @@ internal fun SettingsScreen(
                         }
                         Spacer(modifier = Modifier.height(8.dp))
                         SingleChoiceSegmentedButtonRow(
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .semantics { contentDescription = trainingPhaseSelectorDescription },
                         ) {
                             SegmentedButton(
                                 selected = state.trainingPhase == TrainingPhase.BULK,
-                                onClick = { onEvent(SettingsEvent.SetTrainingPhase(TrainingPhase.BULK)) },
+                                onClick = {
+                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                    onEvent(SettingsEvent.SetTrainingPhase(TrainingPhase.BULK))
+                                },
                                 shape = SegmentedButtonDefaults.itemShape(0, 3),
                             ) {
                                 Text(stringResource(R.string.settings_training_phase_bulk), style = MaterialTheme.typography.labelMedium)
                             }
                             SegmentedButton(
                                 selected = state.trainingPhase == TrainingPhase.CUT,
-                                onClick = { onEvent(SettingsEvent.SetTrainingPhase(TrainingPhase.CUT)) },
+                                onClick = {
+                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                    onEvent(SettingsEvent.SetTrainingPhase(TrainingPhase.CUT))
+                                },
                                 shape = SegmentedButtonDefaults.itemShape(1, 3),
                             ) {
                                 Text(stringResource(R.string.settings_training_phase_cut), style = MaterialTheme.typography.labelMedium)
                             }
                             SegmentedButton(
                                 selected = state.trainingPhase == TrainingPhase.MAINTENANCE,
-                                onClick = { onEvent(SettingsEvent.SetTrainingPhase(TrainingPhase.MAINTENANCE)) },
+                                onClick = {
+                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                    onEvent(SettingsEvent.SetTrainingPhase(TrainingPhase.MAINTENANCE))
+                                },
                                 shape = SegmentedButtonDefaults.itemShape(2, 3),
                             ) {
                                 Text(stringResource(R.string.settings_training_phase_maintenance), style = MaterialTheme.typography.labelMedium)
