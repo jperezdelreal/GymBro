@@ -17,6 +17,7 @@ data class WorkoutPlan(
     val createdAt: Instant = Instant.now(),
     val isModified: Boolean = false,
     val originalPlanId: String? = null,
+    @Transient val originalPlan: WorkoutPlan? = null,
 ) {
     fun createOriginalCopy(): WorkoutPlan = copy(
         id = UUID.randomUUID().toString(),
@@ -42,5 +43,4 @@ data class PlannedExercise(
     val sets: Int,
     val repsRange: String,
     val restSeconds: Int = 90,
-    val targetWeightKg: Double? = null,
 )
