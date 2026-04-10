@@ -105,8 +105,6 @@ internal fun SettingsScreen(
     onNavigateBack: () -> Unit,
 ) {
     var showClearDataDialog by remember { mutableStateOf(false) }
-    var showSignInDialog by remember { mutableStateOf(false) }
-    var showVersionDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -147,14 +145,6 @@ internal fun SettingsScreen(
             SectionTitle(stringResource(R.string.settings_section_account))
             SettingsCard {
                 Column {
-                    SettingsRow(
-                        icon = Icons.Default.Person,
-                        title = stringResource(R.string.settings_sign_in_status),
-                        subtitle = stringResource(R.string.settings_sign_in_subtitle),
-                        iconTint = AccentGreen,
-                        onClick = { showSignInDialog = true },
-                    )
-                    SettingsDivider()
                     SettingsRow(
                         icon = Icons.Default.Delete,
                         title = stringResource(R.string.settings_clear_data),
@@ -313,7 +303,6 @@ internal fun SettingsScreen(
                         title = stringResource(R.string.settings_app_version),
                         subtitle = state.appVersion,
                         iconTint = AccentGreen,
-                        onClick = { showVersionDialog = true },
                     )
                     SettingsDivider()
                     SettingsRow(
@@ -368,58 +357,6 @@ internal fun SettingsScreen(
             },
         )
     }
-
-    // Sign In Dialog
-    if (showSignInDialog) {
-        AlertDialog(
-            onDismissRequest = { showSignInDialog = false },
-            containerColor = CardBackground,
-            title = {
-                Text(
-                    text = stringResource(R.string.settings_sign_in_dialog_title),
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                )
-            },
-            text = {
-                Text(
-                    text = stringResource(R.string.settings_sign_in_dialog_message),
-                    color = Color(0xFF9E9E9E),
-                )
-            },
-            confirmButton = {
-                TextButton(onClick = { showSignInDialog = false }) {
-                    Text(stringResource(R.string.action_ok), color = AccentGreen)
-                }
-            },
-        )
-    }
-
-    // App Version Dialog
-    if (showVersionDialog) {
-        AlertDialog(
-            onDismissRequest = { showVersionDialog = false },
-            containerColor = CardBackground,
-            title = {
-                Text(
-                    text = stringResource(R.string.settings_version_dialog_title),
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                )
-            },
-            text = {
-                Text(
-                    text = stringResource(R.string.settings_version_dialog_message, state.appVersion),
-                    color = Color(0xFF9E9E9E),
-                )
-            },
-            confirmButton = {
-                TextButton(onClick = { showVersionDialog = false }) {
-                    Text(stringResource(R.string.action_ok), color = AccentGreen)
-                }
-            },
-        )
-    }
 }
 
 @Composable
@@ -469,14 +406,18 @@ private fun SettingsRow(
     title: String,
     subtitle: String,
     iconTint: Color,
-    onClick: () -> Unit,
+    onClick: (() -> Unit)? = null,
     enabled: Boolean = true,
 ) {
+    val modifier = Modifier
+        .fillMaxWidth()
+        .then(
+            if (onClick != null) Modifier.clickable(enabled = enabled, onClick = onClick)
+            else Modifier
+        )
+        .padding(vertical = 8.dp)
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(enabled = enabled, onClick = onClick)
-            .padding(vertical = 8.dp),
+        modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
     ) {
         SettingsIcon(icon, iconTint)
