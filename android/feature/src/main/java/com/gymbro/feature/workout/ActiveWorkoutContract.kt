@@ -14,6 +14,7 @@ data class ActiveWorkoutState(
     val isRestTimerActive: Boolean = false,
     val isCompleting: Boolean = false,
     val isLoading: Boolean = true,
+    val errorMessage: String? = null,
 )
 
 data class WorkoutExerciseUi(
@@ -48,6 +49,8 @@ sealed interface ActiveWorkoutEvent {
     data class AdjustRestTimer(val deltaSeconds: Int) : ActiveWorkoutEvent
     data object CompleteWorkout : ActiveWorkoutEvent
     data object DiscardWorkout : ActiveWorkoutEvent
+    data object ClearError : ActiveWorkoutEvent
+    data object RetryStartWorkout : ActiveWorkoutEvent
 }
 
 sealed interface ActiveWorkoutEffect {

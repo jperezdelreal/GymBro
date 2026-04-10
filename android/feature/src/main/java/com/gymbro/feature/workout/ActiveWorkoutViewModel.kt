@@ -1,11 +1,12 @@
 package com.gymbro.feature.workout
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.gymbro.core.error.toUserMessage
 import com.gymbro.core.model.Exercise
 import com.gymbro.core.model.ExerciseSet
 import com.gymbro.core.repository.WorkoutRepository
 import com.gymbro.core.service.PersonalRecordService
+import com.gymbro.feature.common.BaseViewModel
 import com.gymbro.feature.common.TooltipManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -25,7 +26,7 @@ class ActiveWorkoutViewModel @Inject constructor(
     private val workoutRepository: WorkoutRepository,
     private val personalRecordService: PersonalRecordService,
     val tooltipManager: TooltipManager,
-) : ViewModel() {
+) : BaseViewModel() {
 
     private val _state = MutableStateFlow(ActiveWorkoutState())
     val state: StateFlow<ActiveWorkoutState> = _state.asStateFlow()
@@ -41,9 +42,18 @@ class ActiveWorkoutViewModel @Inject constructor(
     }
 
     private fun startWorkout() {
-        viewModelScope.launch {
+        safeLaunch(
+            onError = { error ->
+                _state.update { 
+                    it.copy(
+                        isLoading = false,
+                        errorMessage = "Failed to start workout: ${error.toUserMessage()}"
+                    )
+                }
+            }
+        ) {
             val workout = workoutRepository.startWorkout()
-            _state.update { it.copy(workoutId = workout.id.toString(), isLoading = false) }
+            _state.update { it.copy(workoutId = workout.id.toString(), isLoading = false, errorMessage = null) }
             startElapsedTimer()
         }
     }
@@ -92,6 +102,8 @@ class ActiveWorkoutViewModel @Inject constructor(
             is ActiveWorkoutEvent.AdjustRestTimer -> adjustRestTimer(event.deltaSeconds)
             is ActiveWorkoutEvent.CompleteWorkout -> completeWorkout()
             is ActiveWorkoutEvent.DiscardWorkout -> discardWorkout()
+            is ActiveWorkoutEvent.ClearError -> _state.update { it.copy(errorMessage = null) }
+            is ActiveWorkoutEvent.RetryStartWorkout -> startWorkout()
         }
     }
 
@@ -156,7 +168,13 @@ class ActiveWorkoutViewModel @Inject constructor(
         val weightKg = setUi.weight.toDoubleOrNull() ?: return
         val reps = setUi.reps.toIntOrNull() ?: return
 
-        viewModelScope.launch {
+        safeLaunch(
+            onError = { error ->
+                _state.update { 
+                    it.copy(errorMessage = "Failed to save set: ${error.toUserMessage()}")
+                }
+            }
+        ) {
             val exerciseSet = ExerciseSet(
                 id = UUID.fromString(setUi.id),
                 exerciseId = exerciseUi.exercise.id,
@@ -261,7 +279,16 @@ class ActiveWorkoutViewModel @Inject constructor(
 
         _state.update { it.copy(isCompleting = true) }
 
-        viewModelScope.launch {
+        safeLaunch(
+            onError = { error ->
+                _state.update { 
+                    it.copy(
+                        isCompleting = false,
+                        errorMessage = "Failed to complete workout: ${error.toUserMessage()}"
+                    )
+                }
+            }
+        ) {
             workoutRepository.completeWorkout(
                 workoutId = workoutId,
                 durationSeconds = currentState.elapsedSeconds,
@@ -310,5 +337,9 @@ class ActiveWorkoutViewModel @Inject constructor(
         super.onCleared()
         timerJob?.cancel()
         restTimerJob?.cancel()
+    }
+
+    override fun setLoading(loading: Boolean) {
+        _state.update { it.copy(isLoading = loading) }
     }
 }

@@ -1,9 +1,10 @@
 package com.gymbro.feature.coach
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gymbro.core.ai.AiCoachService
 import com.gymbro.core.ai.MessageRole
+import com.gymbro.core.error.toUserMessage
+import com.gymbro.feature.common.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,7 +18,7 @@ import javax.inject.Inject
 @HiltViewModel
 class CoachChatViewModel @Inject constructor(
     private val aiCoachService: AiCoachService,
-) : ViewModel() {
+) : BaseViewModel() {
 
     private val _state = MutableStateFlow(CoachChatState())
     val state: StateFlow<CoachChatState> = _state.asStateFlow()
@@ -61,34 +62,33 @@ class CoachChatViewModel @Inject constructor(
 
         _state.update { it.copy(currentInput = "", isLoading = true, error = null) }
 
-        viewModelScope.launch {
-            val currentMessages = _state.value.messages.toMutableList()
-            
-            val result = aiCoachService.sendMessage(message)
-            
-            result.fold(
-                onSuccess = { assistantMessage ->
-                    val updatedMessages = aiCoachService.getChatHistory()
-                    _state.update { 
-                        it.copy(
-                            messages = updatedMessages,
-                            isLoading = false,
-                        ) 
-                    }
-                    _effect.send(CoachChatEffect.ScrollToBottom)
-                },
-                onFailure = { exception ->
-                    val isConfigError = exception.message?.contains("not configured") == true
-                    _state.update { 
-                        it.copy(
-                            messages = currentMessages,
-                            isLoading = false,
-                            error = exception.message ?: "Failed to get response from AI Coach",
-                            isFirebaseConfigured = !isConfigError,
-                        ) 
-                    }
+        safeLaunch(
+            onError = { error ->
+                val isConfigError = error.message?.contains("not configured") == true
+                _state.update { 
+                    it.copy(
+                        isLoading = false,
+                        error = error.toUserMessage(),
+                        isFirebaseConfigured = !isConfigError,
+                    ) 
                 }
-            )
+            }
+        ) {
+            // getOrThrow() will automatically throw if Result is failure
+            aiCoachService.sendMessage(message).getOrThrow()
+            
+            val updatedMessages = aiCoachService.getChatHistory()
+            _state.update { 
+                it.copy(
+                    messages = updatedMessages,
+                    isLoading = false,
+                ) 
+            }
+            _effect.send(CoachChatEffect.ScrollToBottom)
         }
+    }
+
+    override fun setLoading(loading: Boolean) {
+        _state.update { it.copy(isLoading = loading) }
     }
 }
