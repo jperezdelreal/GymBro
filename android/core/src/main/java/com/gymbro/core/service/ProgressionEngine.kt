@@ -2,15 +2,18 @@ package com.gymbro.core.service
 
 import com.gymbro.core.database.dao.WorkoutDao
 import com.gymbro.core.database.entity.WorkoutSetEntity
+import com.gymbro.core.preferences.UserPreferences
 import javax.inject.Inject
 
 /**
  * Performance-based progression engine using RPE/RIR data.
  *
- * Rules:
- * - Auto-progression: all working sets completed at RPE ≤7 → suggest +2.5kg next session
- * - Auto-regression: last 2 working sets at RPE 10 or incomplete → suggest -5% weight
- * - No RPE data: fall back to last weight (no suggestion)
+ * Thresholds are phase-aware:
+ * - BULK: aggressive — RPE ≤8 → progress, last 2 sets RPE 10 → regress
+ * - CUT: conservative — RPE ≤6 → progress, last 2 sets RPE ≥9 → regress
+ * - MAINTENANCE: balanced — RPE ≤7 → progress, last 2 sets RPE 10 → regress
+ *
+ * No RPE data: fall back to last weight (no suggestion).
  */
 class ProgressionEngine @Inject constructor(
     private val workoutDao: WorkoutDao,
@@ -22,7 +25,7 @@ class ProgressionEngine @Inject constructor(
     )
 
     enum class ProgressionReason {
-        /** All sets were easy (RPE ≤ 7) — increase weight */
+        /** All sets were easy — increase weight */
         PROGRESS,
         /** Last sets were maximal effort or failed — reduce weight */
         REGRESS,
@@ -35,8 +38,13 @@ class ProgressionEngine @Inject constructor(
     /**
      * Calculate suggested weight for the next session of a given exercise.
      * Analyzes the most recent workout's working sets for that exercise.
+     *
+     * @param trainingPhase determines how aggressively thresholds are applied.
      */
-    suspend fun getSuggestion(exerciseId: String): ProgressionSuggestion? {
+    suspend fun getSuggestion(
+        exerciseId: String,
+        trainingPhase: UserPreferences.TrainingPhase = UserPreferences.TrainingPhase.MAINTENANCE,
+    ): ProgressionSuggestion? {
         val sets = workoutDao.getSetsByExercise(exerciseId)
         if (sets.isEmpty()) return null
 
@@ -57,8 +65,20 @@ class ProgressionEngine @Inject constructor(
             )
         }
 
-        // Check regression: last 2 sets at RPE 10
-        val shouldRegress = checkRegression(lastWorkoutSets)
+        // Phase-aware thresholds
+        val progressionCeiling = when (trainingPhase) {
+            UserPreferences.TrainingPhase.BULK -> 8.0
+            UserPreferences.TrainingPhase.CUT -> 6.0
+            UserPreferences.TrainingPhase.MAINTENANCE -> 7.0
+        }
+        val regressionFloor = when (trainingPhase) {
+            UserPreferences.TrainingPhase.BULK -> 10.0
+            UserPreferences.TrainingPhase.CUT -> 9.0
+            UserPreferences.TrainingPhase.MAINTENANCE -> 10.0
+        }
+
+        // Check regression: last 2 sets at or above regression floor
+        val shouldRegress = checkRegression(lastWorkoutSets, regressionFloor)
         if (shouldRegress) {
             val regressedWeight = roundToNearest2_5(lastWeight * 0.95)
             return ProgressionSuggestion(
@@ -67,8 +87,8 @@ class ProgressionEngine @Inject constructor(
             )
         }
 
-        // Check progression: all working sets RPE ≤ 7
-        val shouldProgress = setsWithRpe.all { (it.rpe ?: 10.0) <= 7.0 }
+        // Check progression: all working sets at or below progression ceiling
+        val shouldProgress = setsWithRpe.all { (it.rpe ?: 10.0) <= progressionCeiling }
         if (shouldProgress) {
             return ProgressionSuggestion(
                 suggestedWeightKg = lastWeight + 2.5,
@@ -76,19 +96,22 @@ class ProgressionEngine @Inject constructor(
             )
         }
 
-        // Moderate RPE (8-9) — maintain current weight
+        // Moderate RPE — maintain current weight
         return ProgressionSuggestion(
             suggestedWeightKg = lastWeight,
             reason = ProgressionReason.MAINTAIN,
         )
     }
 
-    private fun checkRegression(workingSets: List<WorkoutSetEntity>): Boolean {
+    private fun checkRegression(
+        workingSets: List<WorkoutSetEntity>,
+        regressionFloor: Double,
+    ): Boolean {
         if (workingSets.size < 2) return false
         val lastTwo = workingSets.takeLast(2)
         return lastTwo.all { set ->
             val rpe = set.rpe ?: return@all false
-            rpe >= 10.0
+            rpe >= regressionFloor
         }
     }
 
