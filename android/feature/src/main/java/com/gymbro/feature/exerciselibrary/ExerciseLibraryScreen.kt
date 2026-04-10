@@ -72,6 +72,7 @@ import com.gymbro.core.model.MuscleGroup
 import com.gymbro.feature.common.FullScreenLoading
 import com.gymbro.feature.common.GlassmorphicCard
 import com.gymbro.feature.common.ObserveErrors
+import com.gymbro.feature.common.EmptyState
 import com.gymbro.feature.common.icon
 import com.gymbro.core.R
 
@@ -235,7 +236,13 @@ fun ExerciseLibraryScreen(
                     FullScreenLoading(message = stringResource(R.string.exercise_library_loading))
                 }
                 state.exercises.isEmpty() -> {
-                    EmptyExercisesView()
+                    EmptyState(
+                        icon = Icons.Default.Search,
+                        title = stringResource(R.string.exercise_library_empty_title),
+                        subtitle = stringResource(R.string.exercise_library_empty_subtitle),
+                        actionText = stringResource(R.string.exercise_library_empty_cta),
+                        onActionClick = onNavigateToCreateExercise,
+                    )
                 }
                 else -> {
                     LazyColumn(
@@ -428,37 +435,4 @@ private fun CategoryBadge(category: ExerciseCategory) {
     }
 }
 
-@Composable
-private fun EmptyExercisesView() {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(32.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-    ) {
-        Icon(
-            Icons.Default.Search,
-            contentDescription = null,
-            modifier = Modifier.size(96.dp),
-            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
-        )
-        
-        Spacer(modifier = Modifier.height(24.dp))
-        
-        Text(
-            text = stringResource(R.string.exercise_library_empty_title),
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onBackground,
-        )
-        
-        Spacer(modifier = Modifier.height(8.dp))
-        
-        Text(
-            text = stringResource(R.string.tooltip_exercise_not_found),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-    }
-}
+

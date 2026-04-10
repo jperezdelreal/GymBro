@@ -329,6 +329,9 @@ fun GymBroNavGraph(
                 onNavigateToDetail = { workoutId ->
                     navController.navigate("history/$workoutId")
                 },
+                onNavigateToActiveWorkout = {
+                    navController.navigate("active_workout")
+                },
             )
         }
         composable("progress") {
@@ -339,6 +342,9 @@ fun GymBroNavGraph(
                         ?.savedStateHandle
                         ?.set("coach_initial_prompt", prompt)
                     navController.navigate("coach")
+                },
+                onNavigateToActiveWorkout = {
+                    navController.navigate("active_workout")
                 }
             )
         }

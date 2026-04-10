@@ -32,6 +32,7 @@
     <string name="exercise_library_search">Buscar ejercicios…</string>
     <string name="exercise_library_empty_title">No se encontraron ejercicios</string>
     <string name="exercise_library_empty_subtitle">Intenta ajustar tu búsqueda o filtros</string>
+    <string name="exercise_library_empty_cta">Crear Ejercicio Personalizado</string>
     <string name="exercise_library_loading">Cargando ejercicios...</string>
     <string name="exercise_library_view_details">Ver detalles del ejercicio</string>
 
@@ -73,6 +74,7 @@
     <string name="history_title">Historial de Entrenamientos</string>
     <string name="history_empty_title">Sin Entrenamientos Aún</string>
     <string name="history_empty_subtitle">¡Empieza a entrenar para construir tu historial!</string>
+    <string name="history_empty_cta">Inicia Tu Primer Entrenamiento</string>
     <string name="history_loading">Cargando historial...</string>
     <string name="history_error_title">Error</string>
     <string name="history_exercises_count">%d ejercicios</string>
@@ -82,7 +84,8 @@
     <!-- Progress -->
     <string name="progress_title">Progreso</string>
     <string name="progress_empty_title">Sin entrenamientos aún</string>
-    <string name="progress_empty_subtitle">¡Empieza a entrenar para rastrear tu progreso!</string>
+    <string name="progress_empty_subtitle">Registra 3 entrenamientos para ver tendencias y análisis</string>
+    <string name="progress_empty_cta">Iniciar Entrenamiento</string>
     <string name="progress_loading">Cargando progreso...</string>
     <string name="progress_total_workouts">Total de Entrenamientos</string>
     <string name="progress_total_volume">Volumen Total</string>
