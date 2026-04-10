@@ -2,6 +2,7 @@ package com.gymbro.core.service
 
 import com.gymbro.core.database.dao.WorkoutDao
 import com.gymbro.core.database.entity.WorkoutSetEntity
+import com.gymbro.core.preferences.UserPreferences.TrainingPhase
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
@@ -133,6 +134,143 @@ class ProgressionEngineTest {
         val result = engine.getSuggestion(exerciseId)
         assertNotNull(result)
         assertEquals(ProgressionEngine.ProgressionReason.PROGRESS, result!!.reason)
+    }
+
+    // ── Phase-aware progression tests (Issue #414) ──
+
+    @Test
+    fun `BULK phase - progresses at RPE 8 (more aggressive)`() = runTest {
+        val sets = listOf(
+            createSet(weight = 100.0, rpe = 8.0),
+            createSet(weight = 100.0, rpe = 7.5),
+            createSet(weight = 100.0, rpe = 8.0),
+        )
+        coEvery { workoutDao.getSetsByExercise(exerciseId) } returns sets
+
+        val result = engine.getSuggestion(exerciseId, TrainingPhase.BULK)
+        assertNotNull(result)
+        assertEquals(ProgressionEngine.ProgressionReason.PROGRESS, result!!.reason)
+        assertEquals(102.5, result.suggestedWeightKg, 0.01)
+    }
+
+    @Test
+    fun `BULK phase - maintains at RPE 9 (not easy enough to progress)`() = runTest {
+        val sets = listOf(
+            createSet(weight = 100.0, rpe = 9.0),
+            createSet(weight = 100.0, rpe = 9.0),
+            createSet(weight = 100.0, rpe = 9.0),
+        )
+        coEvery { workoutDao.getSetsByExercise(exerciseId) } returns sets
+
+        val result = engine.getSuggestion(exerciseId, TrainingPhase.BULK)
+        assertNotNull(result)
+        assertEquals(ProgressionEngine.ProgressionReason.MAINTAIN, result!!.reason)
+        assertEquals(100.0, result.suggestedWeightKg, 0.01)
+    }
+
+    @Test
+    fun `BULK phase - regresses at RPE 10 (last 2 sets)`() = runTest {
+        val sets = listOf(
+            createSet(weight = 100.0, rpe = 8.0),
+            createSet(weight = 100.0, rpe = 10.0),
+            createSet(weight = 100.0, rpe = 10.0),
+        )
+        coEvery { workoutDao.getSetsByExercise(exerciseId) } returns sets
+
+        val result = engine.getSuggestion(exerciseId, TrainingPhase.BULK)
+        assertNotNull(result)
+        assertEquals(ProgressionEngine.ProgressionReason.REGRESS, result!!.reason)
+        assertEquals(95.0, result.suggestedWeightKg, 0.01)
+    }
+
+    @Test
+    fun `CUT phase - progresses only at RPE 6 or below (conservative)`() = runTest {
+        val sets = listOf(
+            createSet(weight = 100.0, rpe = 5.0),
+            createSet(weight = 100.0, rpe = 6.0),
+            createSet(weight = 100.0, rpe = 6.0),
+        )
+        coEvery { workoutDao.getSetsByExercise(exerciseId) } returns sets
+
+        val result = engine.getSuggestion(exerciseId, TrainingPhase.CUT)
+        assertNotNull(result)
+        assertEquals(ProgressionEngine.ProgressionReason.PROGRESS, result!!.reason)
+        assertEquals(102.5, result.suggestedWeightKg, 0.01)
+    }
+
+    @Test
+    fun `CUT phase - maintains at RPE 7-8 (would progress in other phases)`() = runTest {
+        val sets = listOf(
+            createSet(weight = 100.0, rpe = 7.0),
+            createSet(weight = 100.0, rpe = 7.0),
+            createSet(weight = 100.0, rpe = 7.0),
+        )
+        coEvery { workoutDao.getSetsByExercise(exerciseId) } returns sets
+
+        val result = engine.getSuggestion(exerciseId, TrainingPhase.CUT)
+        assertNotNull(result)
+        assertEquals(ProgressionEngine.ProgressionReason.MAINTAIN, result!!.reason)
+        assertEquals(100.0, result.suggestedWeightKg, 0.01)
+    }
+
+    @Test
+    fun `CUT phase - regresses at RPE 9 (earlier than other phases)`() = runTest {
+        val sets = listOf(
+            createSet(weight = 100.0, rpe = 8.0),
+            createSet(weight = 100.0, rpe = 9.0),
+            createSet(weight = 100.0, rpe = 9.0),
+        )
+        coEvery { workoutDao.getSetsByExercise(exerciseId) } returns sets
+
+        val result = engine.getSuggestion(exerciseId, TrainingPhase.CUT)
+        assertNotNull(result)
+        assertEquals(ProgressionEngine.ProgressionReason.REGRESS, result!!.reason)
+        assertEquals(95.0, result.suggestedWeightKg, 0.01)
+    }
+
+    @Test
+    fun `MAINTENANCE phase - progresses at RPE 7 or below (default behavior)`() = runTest {
+        val sets = listOf(
+            createSet(weight = 100.0, rpe = 6.0),
+            createSet(weight = 100.0, rpe = 7.0),
+            createSet(weight = 100.0, rpe = 7.0),
+        )
+        coEvery { workoutDao.getSetsByExercise(exerciseId) } returns sets
+
+        val result = engine.getSuggestion(exerciseId, TrainingPhase.MAINTENANCE)
+        assertNotNull(result)
+        assertEquals(ProgressionEngine.ProgressionReason.PROGRESS, result!!.reason)
+        assertEquals(102.5, result.suggestedWeightKg, 0.01)
+    }
+
+    @Test
+    fun `MAINTENANCE phase - maintains at RPE 8-9`() = runTest {
+        val sets = listOf(
+            createSet(weight = 100.0, rpe = 8.0),
+            createSet(weight = 100.0, rpe = 8.5),
+            createSet(weight = 100.0, rpe = 9.0),
+        )
+        coEvery { workoutDao.getSetsByExercise(exerciseId) } returns sets
+
+        val result = engine.getSuggestion(exerciseId, TrainingPhase.MAINTENANCE)
+        assertNotNull(result)
+        assertEquals(ProgressionEngine.ProgressionReason.MAINTAIN, result!!.reason)
+        assertEquals(100.0, result.suggestedWeightKg, 0.01)
+    }
+
+    @Test
+    fun `MAINTENANCE phase - regresses at RPE 10 (last 2 sets)`() = runTest {
+        val sets = listOf(
+            createSet(weight = 100.0, rpe = 8.0),
+            createSet(weight = 100.0, rpe = 10.0),
+            createSet(weight = 100.0, rpe = 10.0),
+        )
+        coEvery { workoutDao.getSetsByExercise(exerciseId) } returns sets
+
+        val result = engine.getSuggestion(exerciseId, TrainingPhase.MAINTENANCE)
+        assertNotNull(result)
+        assertEquals(ProgressionEngine.ProgressionReason.REGRESS, result!!.reason)
+        assertEquals(95.0, result.suggestedWeightKg, 0.01)
     }
 
     private fun createSet(

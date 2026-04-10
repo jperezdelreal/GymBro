@@ -46,6 +46,9 @@ class OnboardingViewModel @Inject constructor(
             is OnboardingEvent.TrainingDaysSelected -> {
                 _state.value = _state.value.copy(trainingDaysPerWeek = event.days)
             }
+            is OnboardingEvent.TrainingPhaseSelected -> {
+                _state.value = _state.value.copy(selectedPhase = event.phase)
+            }
             is OnboardingEvent.CompleteOnboarding -> {
                 completeOnboarding()
             }
@@ -62,6 +65,7 @@ class OnboardingViewModel @Inject constructor(
             userPreferences.setTrainingGoal(_state.value.selectedGoal)
             userPreferences.setExperienceLevel(_state.value.selectedExperience)
             userPreferences.setTrainingDaysPerWeek(_state.value.trainingDaysPerWeek)
+            userPreferences.setTrainingPhase(_state.value.selectedPhase)
             userPreferences.setOnboardingComplete(true)
 
             try {
@@ -69,6 +73,7 @@ class OnboardingViewModel @Inject constructor(
                     goal = _state.value.selectedGoal,
                     experienceLevel = _state.value.selectedExperience,
                     daysPerWeek = _state.value.trainingDaysPerWeek,
+                    trainingPhase = _state.value.selectedPhase,
                 )
                 val personalizedPlan = plan.copy(
                     name = "Your First Program",

@@ -9,6 +9,7 @@ import com.gymbro.core.model.WorkoutDay
 import com.gymbro.core.model.WorkoutPlan
 import com.gymbro.core.preferences.UserPreferences
 import com.gymbro.core.repository.ExerciseRepository
+import kotlin.math.roundToInt
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
@@ -32,16 +33,16 @@ class WorkoutPlanGenerator @Inject constructor(
 
         return when (goal) {
             UserPreferences.TrainingGoal.STRENGTH -> generateStrengthPlan(
-                allExercises, experienceLevel, daysPerWeek, split
+                allExercises, experienceLevel, daysPerWeek, split, volumeMultiplier
             )
             UserPreferences.TrainingGoal.HYPERTROPHY -> generateHypertrophyPlan(
-                allExercises, experienceLevel, daysPerWeek, split
+                allExercises, experienceLevel, daysPerWeek, split, volumeMultiplier
             )
             UserPreferences.TrainingGoal.POWERLIFTING -> generatePowerliftingPlan(
-                allExercises, experienceLevel, daysPerWeek, split
+                allExercises, experienceLevel, daysPerWeek, split, volumeMultiplier
             )
             UserPreferences.TrainingGoal.GENERAL_FITNESS -> generateGeneralFitnessPlan(
-                allExercises, experienceLevel, daysPerWeek, split
+                allExercises, experienceLevel, daysPerWeek, split, volumeMultiplier
             )
         }
     }
@@ -51,12 +52,13 @@ class WorkoutPlanGenerator @Inject constructor(
         experienceLevel: UserPreferences.ExperienceLevel,
         daysPerWeek: Int,
         split: TrainingSplit,
+        volumeMultiplier: Float,
     ): WorkoutPlan {
+        val adjSets = applyVolumeMultiplier(5, volumeMultiplier)
         val workoutDays = when (split) {
-            TrainingSplit.FULL_BODY -> generateFullBodyDays(exercises, sets = 5, reps = "5", rest = 180)
-            TrainingSplit.UPPER_LOWER -> generateUpperLowerDays(exercises, sets = 5, reps = "5", rest = 180)
+            TrainingSplit.FULL_BODY -> generateFullBodyDays(exercises, sets = adjSets, reps = "5", rest = 180)
+            TrainingSplit.UPPER_LOWER -> generateUpperLowerDays(exercises, sets = adjSets, reps = "5", rest = 180)
             else -> {
-                // Fallback to 3-day split
                 listOf(
                     WorkoutDay(
                         dayNumber = 1,
@@ -64,9 +66,7 @@ class WorkoutPlanGenerator @Inject constructor(
                         exercises = buildExerciseList(
                             exercises,
                             listOf(MuscleGroup.CHEST, MuscleGroup.BACK, MuscleGroup.SHOULDERS),
-                            sets = 5,
-                            reps = "5",
-                            rest = 180,
+                            sets = adjSets, reps = "5", rest = 180,
                         ),
                     ),
                     WorkoutDay(
@@ -75,9 +75,7 @@ class WorkoutPlanGenerator @Inject constructor(
                         exercises = buildExerciseList(
                             exercises,
                             listOf(MuscleGroup.QUADRICEPS, MuscleGroup.HAMSTRINGS, MuscleGroup.GLUTES),
-                            sets = 5,
-                            reps = "5",
-                            rest = 180,
+                            sets = adjSets, reps = "5", rest = 180,
                         ),
                     ),
                     WorkoutDay(
@@ -86,9 +84,7 @@ class WorkoutPlanGenerator @Inject constructor(
                         exercises = buildExerciseList(
                             exercises,
                             listOf(MuscleGroup.CHEST, MuscleGroup.BACK, MuscleGroup.QUADRICEPS),
-                            sets = 5,
-                            reps = "5",
-                            rest = 180,
+                            sets = adjSets, reps = "5", rest = 180,
                         ),
                     ),
                 )
@@ -97,7 +93,7 @@ class WorkoutPlanGenerator @Inject constructor(
 
         return WorkoutPlan(
             name = "Strength Building Program",
-            description = "Focus on progressive overload with compound movements. 5x5 protocol for major lifts. Using ${split.displayName} split for $daysPerWeek days/week.",
+            description = "Focus on progressive overload with compound movements. 5x5 protocol for major lifts. Using ${'$'}{split.displayName} split for ${'$'}daysPerWeek days/week.",
             goal = UserPreferences.TrainingGoal.STRENGTH,
             experienceLevel = experienceLevel,
             daysPerWeek = daysPerWeek,
@@ -112,18 +108,20 @@ class WorkoutPlanGenerator @Inject constructor(
         experienceLevel: UserPreferences.ExperienceLevel,
         daysPerWeek: Int,
         split: TrainingSplit,
+        volumeMultiplier: Float,
     ): WorkoutPlan {
+        val adjSets = applyVolumeMultiplier(4, volumeMultiplier)
         val workoutDays = when (split) {
-            TrainingSplit.FULL_BODY -> generateFullBodyDays(exercises, sets = 4, reps = "8-12", rest = 90)
-            TrainingSplit.UPPER_LOWER -> generateUpperLowerDays(exercises, sets = 4, reps = "8-12", rest = 90)
-            TrainingSplit.PPL -> generatePPLDays(exercises, sets = 4, reps = "8-12", rest = 90)
-            TrainingSplit.PPLUL -> generatePPLULDays(exercises)
-            else -> generatePPLDays(exercises, sets = 4, reps = "8-12", rest = 90)
+            TrainingSplit.FULL_BODY -> generateFullBodyDays(exercises, sets = adjSets, reps = "8-12", rest = 90)
+            TrainingSplit.UPPER_LOWER -> generateUpperLowerDays(exercises, sets = adjSets, reps = "8-12", rest = 90)
+            TrainingSplit.PPL -> generatePPLDays(exercises, sets = adjSets, reps = "8-12", rest = 90)
+            TrainingSplit.PPLUL -> generatePPLULDays(exercises, volumeMultiplier)
+            else -> generatePPLDays(exercises, sets = adjSets, reps = "8-12", rest = 90)
         }
 
         return WorkoutPlan(
             name = "Hypertrophy Program",
-            description = "${split.displayName} split focused on muscle growth. Higher volume, moderate intensity for $daysPerWeek days/week.",
+            description = "${'$'}{split.displayName} split focused on muscle growth. Higher volume, moderate intensity for ${'$'}daysPerWeek days/week.",
             goal = UserPreferences.TrainingGoal.HYPERTROPHY,
             experienceLevel = experienceLevel,
             daysPerWeek = daysPerWeek,
@@ -138,7 +136,9 @@ class WorkoutPlanGenerator @Inject constructor(
         experienceLevel: UserPreferences.ExperienceLevel,
         daysPerWeek: Int,
         split: TrainingSplit,
+        volumeMultiplier: Float,
     ): WorkoutPlan {
+        val adjSets = applyVolumeMultiplier(5, volumeMultiplier)
         val workoutDays = when (split) {
             TrainingSplit.POWERLIFTING_3DAY -> {
                 listOf(
@@ -148,9 +148,7 @@ class WorkoutPlanGenerator @Inject constructor(
                         exercises = buildExerciseList(
                             exercises,
                             listOf(MuscleGroup.QUADRICEPS, MuscleGroup.HAMSTRINGS, MuscleGroup.GLUTES, MuscleGroup.CORE),
-                            sets = 5,
-                            reps = "3-5",
-                            rest = 240,
+                            sets = adjSets, reps = "3-5", rest = 240,
                         ),
                     ),
                     WorkoutDay(
@@ -159,9 +157,7 @@ class WorkoutPlanGenerator @Inject constructor(
                         exercises = buildExerciseList(
                             exercises,
                             listOf(MuscleGroup.CHEST, MuscleGroup.TRICEPS, MuscleGroup.SHOULDERS),
-                            sets = 5,
-                            reps = "3-5",
-                            rest = 240,
+                            sets = adjSets, reps = "3-5", rest = 240,
                         ),
                     ),
                     WorkoutDay(
@@ -170,14 +166,13 @@ class WorkoutPlanGenerator @Inject constructor(
                         exercises = buildExerciseList(
                             exercises,
                             listOf(MuscleGroup.BACK, MuscleGroup.HAMSTRINGS, MuscleGroup.GLUTES),
-                            sets = 5,
-                            reps = "3-5",
-                            rest = 240,
+                            sets = adjSets, reps = "3-5", rest = 240,
                         ),
                     ),
                 )
             }
             TrainingSplit.UPPER_LOWER -> {
+                val accessorySets = applyVolumeMultiplier(3, volumeMultiplier)
                 listOf(
                     WorkoutDay(
                         dayNumber = 1,
@@ -185,9 +180,7 @@ class WorkoutPlanGenerator @Inject constructor(
                         exercises = buildExerciseList(
                             exercises,
                             listOf(MuscleGroup.CHEST, MuscleGroup.BACK, MuscleGroup.SHOULDERS),
-                            sets = 5,
-                            reps = "3-5",
-                            rest = 240,
+                            sets = adjSets, reps = "3-5", rest = 240,
                         ),
                     ),
                     WorkoutDay(
@@ -196,9 +189,7 @@ class WorkoutPlanGenerator @Inject constructor(
                         exercises = buildExerciseList(
                             exercises,
                             listOf(MuscleGroup.QUADRICEPS, MuscleGroup.HAMSTRINGS, MuscleGroup.GLUTES),
-                            sets = 5,
-                            reps = "3-5",
-                            rest = 240,
+                            sets = adjSets, reps = "3-5", rest = 240,
                         ),
                     ),
                     WorkoutDay(
@@ -207,9 +198,7 @@ class WorkoutPlanGenerator @Inject constructor(
                         exercises = buildExerciseList(
                             exercises,
                             listOf(MuscleGroup.CHEST, MuscleGroup.BACK, MuscleGroup.SHOULDERS),
-                            sets = 3,
-                            reps = "6-8",
-                            rest = 120,
+                            sets = accessorySets, reps = "6-8", rest = 120,
                         ),
                     ),
                     WorkoutDay(
@@ -218,9 +207,7 @@ class WorkoutPlanGenerator @Inject constructor(
                         exercises = buildExerciseList(
                             exercises,
                             listOf(MuscleGroup.QUADRICEPS, MuscleGroup.HAMSTRINGS, MuscleGroup.CORE),
-                            sets = 3,
-                            reps = "6-8",
-                            rest = 120,
+                            sets = accessorySets, reps = "6-8", rest = 120,
                         ),
                     ),
                 )
@@ -233,9 +220,7 @@ class WorkoutPlanGenerator @Inject constructor(
                         exercises = buildExerciseList(
                             exercises,
                             listOf(MuscleGroup.QUADRICEPS, MuscleGroup.HAMSTRINGS, MuscleGroup.GLUTES, MuscleGroup.CORE),
-                            sets = 5,
-                            reps = "3-5",
-                            rest = 240,
+                            sets = adjSets, reps = "3-5", rest = 240,
                         ),
                     ),
                     WorkoutDay(
@@ -244,9 +229,7 @@ class WorkoutPlanGenerator @Inject constructor(
                         exercises = buildExerciseList(
                             exercises,
                             listOf(MuscleGroup.CHEST, MuscleGroup.TRICEPS, MuscleGroup.SHOULDERS),
-                            sets = 5,
-                            reps = "3-5",
-                            rest = 240,
+                            sets = adjSets, reps = "3-5", rest = 240,
                         ),
                     ),
                 )
@@ -255,7 +238,7 @@ class WorkoutPlanGenerator @Inject constructor(
 
         return WorkoutPlan(
             name = "Powerlifting Program",
-            description = "Focus on the big three: squat, bench press, and deadlift. Low reps, high intensity using ${split.displayName} split.",
+            description = "Focus on the big three: squat, bench press, and deadlift. Low reps, high intensity using ${'$'}{split.displayName} split.",
             goal = UserPreferences.TrainingGoal.POWERLIFTING,
             experienceLevel = experienceLevel,
             daysPerWeek = daysPerWeek,
@@ -270,12 +253,14 @@ class WorkoutPlanGenerator @Inject constructor(
         experienceLevel: UserPreferences.ExperienceLevel,
         daysPerWeek: Int,
         split: TrainingSplit,
+        volumeMultiplier: Float,
     ): WorkoutPlan {
-        val workoutDays = generateFullBodyDays(exercises, sets = 3, reps = "10-12", rest = 90)
+        val adjSets = applyVolumeMultiplier(3, volumeMultiplier)
+        val workoutDays = generateFullBodyDays(exercises, sets = adjSets, reps = "10-12", rest = 90)
 
         return WorkoutPlan(
             name = "General Fitness Program",
-            description = "Balanced full-body workouts for overall fitness and health. ${split.displayName} approach for $daysPerWeek days/week.",
+            description = "Balanced full-body workouts for overall fitness and health. ${'$'}{split.displayName} approach for ${'$'}daysPerWeek days/week.",
             goal = UserPreferences.TrainingGoal.GENERAL_FITNESS,
             experienceLevel = experienceLevel,
             daysPerWeek = daysPerWeek,
@@ -472,7 +457,9 @@ class WorkoutPlanGenerator @Inject constructor(
         )
     }
 
-    private fun generatePPLULDays(exercises: List<Exercise>): List<WorkoutDay> {
+    private fun generatePPLULDays(exercises: List<Exercise>, volumeMultiplier: Float): List<WorkoutDay> {
+        val mainSets = applyVolumeMultiplier(4, volumeMultiplier)
+        val secondarySets = applyVolumeMultiplier(3, volumeMultiplier)
         return listOf(
             WorkoutDay(
                 dayNumber = 1,
@@ -480,7 +467,7 @@ class WorkoutPlanGenerator @Inject constructor(
                 exercises = buildExerciseList(
                     exercises,
                     listOf(MuscleGroup.CHEST, MuscleGroup.SHOULDERS, MuscleGroup.TRICEPS),
-                    sets = 4, reps = "8-12", rest = 90,
+                    sets = mainSets, reps = "8-12", rest = 90,
                 ),
             ),
             WorkoutDay(
@@ -489,7 +476,7 @@ class WorkoutPlanGenerator @Inject constructor(
                 exercises = buildExerciseList(
                     exercises,
                     listOf(MuscleGroup.BACK, MuscleGroup.BICEPS, MuscleGroup.FOREARMS),
-                    sets = 4, reps = "8-12", rest = 90,
+                    sets = mainSets, reps = "8-12", rest = 90,
                 ),
             ),
             WorkoutDay(
@@ -498,7 +485,7 @@ class WorkoutPlanGenerator @Inject constructor(
                 exercises = buildExerciseList(
                     exercises,
                     listOf(MuscleGroup.QUADRICEPS, MuscleGroup.HAMSTRINGS, MuscleGroup.GLUTES),
-                    sets = 4, reps = "8-12", rest = 90,
+                    sets = mainSets, reps = "8-12", rest = 90,
                 ),
             ),
             WorkoutDay(
@@ -507,7 +494,7 @@ class WorkoutPlanGenerator @Inject constructor(
                 exercises = buildExerciseList(
                     exercises,
                     listOf(MuscleGroup.CHEST, MuscleGroup.BACK, MuscleGroup.SHOULDERS),
-                    sets = 3, reps = "12-15", rest = 60,
+                    sets = secondarySets, reps = "12-15", rest = 60,
                 ),
             ),
             WorkoutDay(
@@ -516,9 +503,13 @@ class WorkoutPlanGenerator @Inject constructor(
                 exercises = buildExerciseList(
                     exercises,
                     listOf(MuscleGroup.QUADRICEPS, MuscleGroup.HAMSTRINGS, MuscleGroup.CALVES),
-                    sets = 3, reps = "12-15", rest = 60,
+                    sets = secondarySets, reps = "12-15", rest = 60,
                 ),
             ),
         )
+    }
+
+    private fun applyVolumeMultiplier(baseSets: Int, multiplier: Float): Int {
+        return maxOf(1, (baseSets * multiplier).roundToInt())
     }
 }

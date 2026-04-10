@@ -100,7 +100,7 @@ class OnboardingViewModelTest {
             workoutDays = emptyList(),
         )
         coEvery {
-            workoutPlanGenerator.generatePlan(any(), any(), any())
+            workoutPlanGenerator.generatePlan(any(), any(), any(), any())
         } returns mockPlan
 
         viewModel.onEvent(OnboardingEvent.GoalSelected(TrainingGoal.HYPERTROPHY))
@@ -116,6 +116,7 @@ class OnboardingViewModelTest {
                     TrainingGoal.HYPERTROPHY,
                     ExperienceLevel.INTERMEDIATE,
                     4,
+                    UserPreferences.TrainingPhase.MAINTENANCE,
                 )
             }
 
@@ -128,7 +129,7 @@ class OnboardingViewModelTest {
     @Test
     fun `complete onboarding still navigates if plan generation fails`() = runTest {
         coEvery {
-            workoutPlanGenerator.generatePlan(any(), any(), any())
+            workoutPlanGenerator.generatePlan(any(), any(), any(), any())
         } throws RuntimeException("Failed to generate plan")
 
         viewModel.effects.test {

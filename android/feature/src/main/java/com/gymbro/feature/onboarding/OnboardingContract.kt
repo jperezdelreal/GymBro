@@ -3,6 +3,7 @@ package com.gymbro.feature.onboarding
 import com.gymbro.core.preferences.UserPreferences.WeightUnit
 import com.gymbro.core.preferences.UserPreferences.TrainingGoal
 import com.gymbro.core.preferences.UserPreferences.ExperienceLevel
+import com.gymbro.core.preferences.UserPreferences.TrainingPhase
 
 data class OnboardingState(
     val currentPage: Int = 0,
@@ -11,6 +12,7 @@ data class OnboardingState(
     val selectedGoal: TrainingGoal = TrainingGoal.HYPERTROPHY,
     val selectedExperience: ExperienceLevel = ExperienceLevel.INTERMEDIATE,
     val trainingDaysPerWeek: Int = 4,
+    val selectedPhase: TrainingPhase = TrainingPhase.MAINTENANCE,
     val isGeneratingPlan: Boolean = false,
 )
 
@@ -21,6 +23,7 @@ sealed interface OnboardingEvent {
     data class GoalSelected(val goal: TrainingGoal) : OnboardingEvent
     data class ExperienceSelected(val experience: ExperienceLevel) : OnboardingEvent
     data class TrainingDaysSelected(val days: Int) : OnboardingEvent
+    data class TrainingPhaseSelected(val phase: TrainingPhase) : OnboardingEvent
     data object CompleteOnboarding : OnboardingEvent
 }
 

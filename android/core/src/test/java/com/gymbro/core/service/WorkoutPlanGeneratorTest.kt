@@ -132,4 +132,64 @@ class WorkoutPlanGeneratorTest {
             assertTrue("Day ${day.dayNumber} should have <= 6 exercises", day.exercises.size <= 6)
         }
     }
+
+    @Test
+    fun `BULK phase generates more sets than MAINTENANCE`() = runTest {
+        val maintenancePlan = generator.generatePlan(
+            goal = UserPreferences.TrainingGoal.HYPERTROPHY,
+            experienceLevel = UserPreferences.ExperienceLevel.INTERMEDIATE,
+            daysPerWeek = 4,
+            trainingPhase = UserPreferences.TrainingPhase.MAINTENANCE,
+        )
+        val bulkPlan = generator.generatePlan(
+            goal = UserPreferences.TrainingGoal.HYPERTROPHY,
+            experienceLevel = UserPreferences.ExperienceLevel.INTERMEDIATE,
+            daysPerWeek = 4,
+            trainingPhase = UserPreferences.TrainingPhase.BULK,
+        )
+
+        val maintenanceSets = maintenancePlan.workoutDays.flatMap { it.exercises }.sumOf { it.sets }
+        val bulkSets = bulkPlan.workoutDays.flatMap { it.exercises }.sumOf { it.sets }
+        assertTrue(
+            "Bulk ($bulkSets sets) should have more total sets than maintenance ($maintenanceSets sets)",
+            bulkSets > maintenanceSets,
+        )
+    }
+
+    @Test
+    fun `CUT phase generates fewer sets than MAINTENANCE`() = runTest {
+        val maintenancePlan = generator.generatePlan(
+            goal = UserPreferences.TrainingGoal.HYPERTROPHY,
+            experienceLevel = UserPreferences.ExperienceLevel.INTERMEDIATE,
+            daysPerWeek = 4,
+            trainingPhase = UserPreferences.TrainingPhase.MAINTENANCE,
+        )
+        val cutPlan = generator.generatePlan(
+            goal = UserPreferences.TrainingGoal.HYPERTROPHY,
+            experienceLevel = UserPreferences.ExperienceLevel.INTERMEDIATE,
+            daysPerWeek = 4,
+            trainingPhase = UserPreferences.TrainingPhase.CUT,
+        )
+
+        val maintenanceSets = maintenancePlan.workoutDays.flatMap { it.exercises }.sumOf { it.sets }
+        val cutSets = cutPlan.workoutDays.flatMap { it.exercises }.sumOf { it.sets }
+        assertTrue(
+            "Cut ($cutSets sets) should have fewer total sets than maintenance ($maintenanceSets sets)",
+            cutSets < maintenanceSets,
+        )
+    }
+
+    @Test
+    fun `MAINTENANCE phase uses default set counts (no multiplier effect)`() = runTest {
+        val plan = generator.generatePlan(
+            goal = UserPreferences.TrainingGoal.STRENGTH,
+            experienceLevel = UserPreferences.ExperienceLevel.INTERMEDIATE,
+            daysPerWeek = 2,
+            trainingPhase = UserPreferences.TrainingPhase.MAINTENANCE,
+        )
+
+        // Strength Full Body base sets = 5, multiplier 1.0 → 5
+        val compoundSets = plan.workoutDays.first().exercises.first().sets
+        assertEquals(5, compoundSets)
+    }
 }
