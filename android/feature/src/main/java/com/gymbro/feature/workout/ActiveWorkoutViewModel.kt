@@ -92,6 +92,7 @@ class ActiveWorkoutViewModel @Inject constructor(
                 it.copy(isWarmup = !it.isWarmup)
             }
             is ActiveWorkoutEvent.CompleteSet -> completeSet(event.exerciseIndex, event.setIndex)
+            is ActiveWorkoutEvent.QuickCompleteSet -> completeSet(event.exerciseIndex, event.setIndex)
             is ActiveWorkoutEvent.RemoveSet -> removeSet(event.exerciseIndex, event.setIndex)
             is ActiveWorkoutEvent.RemoveExercise -> removeExercise(event.exerciseIndex)
             is ActiveWorkoutEvent.VoiceInput -> {
