@@ -189,6 +189,27 @@
     <string name="onboarding_your_name">Your Name (Optional)</string>
     <string name="onboarding_name_placeholder">Enter your name</string>
     <string name="onboarding_lets_go">Let\'s Go</string>
+    <string name="onboarding_training_goal_title">What\'s Your Goal?</string>
+    <string name="onboarding_training_goal_subtitle">Choose your primary training focus</string>
+    <string name="onboarding_goal_strength">Strength</string>
+    <string name="onboarding_goal_strength_desc">Build maximum strength</string>
+    <string name="onboarding_goal_powerlifting">Powerlifting</string>
+    <string name="onboarding_goal_powerlifting_desc">Focus on the big three lifts</string>
+    <string name="onboarding_goal_hypertrophy">Hypertrophy</string>
+    <string name="onboarding_goal_hypertrophy_desc">Build muscle and size</string>
+    <string name="onboarding_goal_general_fitness">General Fitness</string>
+    <string name="onboarding_goal_general_fitness_desc">Stay healthy and active</string>
+    <string name="onboarding_experience_title">Experience Level</string>
+    <string name="onboarding_experience_subtitle">How long have you been training?</string>
+    <string name="onboarding_experience_beginner">Beginner</string>
+    <string name="onboarding_experience_beginner_desc">Less than 1 year</string>
+    <string name="onboarding_experience_intermediate">Intermediate</string>
+    <string name="onboarding_experience_intermediate_desc">1-3 years</string>
+    <string name="onboarding_experience_advanced">Advanced</string>
+    <string name="onboarding_experience_advanced_desc">3+ years</string>
+    <string name="onboarding_frequency_title">Training Frequency</string>
+    <string name="onboarding_frequency_subtitle">How many days per week do you train?</string>
+    <string name="onboarding_frequency_days">%d days/week</string>
 
     <!-- Common -->
     <string name="common_loading">Loading...</string>

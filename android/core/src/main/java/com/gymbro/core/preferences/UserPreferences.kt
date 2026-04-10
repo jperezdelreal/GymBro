@@ -29,10 +29,21 @@ class UserPreferences @Inject constructor(
         val NOTIFICATIONS_ENABLED = booleanPreferencesKey("notifications_enabled")
         val ONBOARDING_COMPLETE = booleanPreferencesKey("onboarding_complete")
         val USER_NAME = stringPreferencesKey("user_name")
+        val TRAINING_GOAL = stringPreferencesKey("training_goal")
+        val EXPERIENCE_LEVEL = stringPreferencesKey("experience_level")
+        val TRAINING_DAYS_PER_WEEK = intPreferencesKey("training_days_per_week")
     }
 
     enum class WeightUnit {
         KG, LBS
+    }
+
+    enum class TrainingGoal {
+        STRENGTH, POWERLIFTING, HYPERTROPHY, GENERAL_FITNESS
+    }
+
+    enum class ExperienceLevel {
+        BEGINNER, INTERMEDIATE, ADVANCED
     }
 
     val weightUnit: Flow<WeightUnit> = dataStore.data.map { preferences ->
@@ -56,6 +67,29 @@ class UserPreferences @Inject constructor(
 
     val hasCompletedOnboarding: Flow<Boolean> = dataStore.data.map { preferences ->
         preferences[ONBOARDING_COMPLETE] ?: false
+    }
+
+    val trainingGoal: Flow<TrainingGoal> = dataStore.data.map { preferences ->
+        when (preferences[TRAINING_GOAL]) {
+            "STRENGTH" -> TrainingGoal.STRENGTH
+            "POWERLIFTING" -> TrainingGoal.POWERLIFTING
+            "HYPERTROPHY" -> TrainingGoal.HYPERTROPHY
+            "GENERAL_FITNESS" -> TrainingGoal.GENERAL_FITNESS
+            else -> TrainingGoal.HYPERTROPHY
+        }
+    }
+
+    val experienceLevel: Flow<ExperienceLevel> = dataStore.data.map { preferences ->
+        when (preferences[EXPERIENCE_LEVEL]) {
+            "BEGINNER" -> ExperienceLevel.BEGINNER
+            "INTERMEDIATE" -> ExperienceLevel.INTERMEDIATE
+            "ADVANCED" -> ExperienceLevel.ADVANCED
+            else -> ExperienceLevel.INTERMEDIATE
+        }
+    }
+
+    val trainingDaysPerWeek: Flow<Int> = dataStore.data.map { preferences ->
+        preferences[TRAINING_DAYS_PER_WEEK] ?: 4
     }
 
     suspend fun setWeightUnit(unit: WeightUnit) {
@@ -91,6 +125,24 @@ class UserPreferences @Inject constructor(
     suspend fun setUserName(name: String) {
         dataStore.edit { preferences ->
             preferences[USER_NAME] = name
+        }
+    }
+
+    suspend fun setTrainingGoal(goal: TrainingGoal) {
+        dataStore.edit { preferences ->
+            preferences[TRAINING_GOAL] = goal.name
+        }
+    }
+
+    suspend fun setExperienceLevel(level: ExperienceLevel) {
+        dataStore.edit { preferences ->
+            preferences[EXPERIENCE_LEVEL] = level.name
+        }
+    }
+
+    suspend fun setTrainingDaysPerWeek(days: Int) {
+        dataStore.edit { preferences ->
+            preferences[TRAINING_DAYS_PER_WEEK] = days
         }
     }
 
