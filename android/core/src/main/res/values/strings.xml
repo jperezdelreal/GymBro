@@ -287,6 +287,14 @@
     <string name="programs_start_this_workout">Start This Workout</string>
     <string name="programs_exercise_sets_reps" formatted="false">%d × %s</string>
     <string name="programs_rest_time">Rest: %ds</string>
+    <string name="programs_loading_day">Loading workout day…</string>
+    <string name="programs_day_error_title">Could Not Load Day</string>
+    <string name="programs_exercises_label">Exercises</string>
+    <string name="programs_total_sets_label">Total Sets</string>
+    <string name="programs_exercises_count_desc" formatted="false">%d exercises in this workout</string>
+    <string name="programs_total_sets_desc" formatted="false">%d total sets</string>
+    <string name="programs_exercise_accessibility" formatted="false">%s: %d sets of %s reps, %d seconds rest</string>
+    <string name="common_retry">Retry</string>
     <string name="programs_edit_plan">Edit Plan</string>
     <string name="programs_save_edits">Save Changes</string>
     <string name="programs_cancel_edits">Cancel</string>

@@ -287,6 +287,14 @@
     <string name="programs_start_this_workout">Iniciar Este Entrenamiento</string>
     <string name="programs_exercise_sets_reps" formatted="false">%d × %s</string>
     <string name="programs_rest_time">Descanso: %ds</string>
+    <string name="programs_loading_day">Cargando día de entrenamiento…</string>
+    <string name="programs_day_error_title">No Se Pudo Cargar el Día</string>
+    <string name="programs_exercises_label">Ejercicios</string>
+    <string name="programs_total_sets_label">Series Totales</string>
+    <string name="programs_exercises_count_desc" formatted="false">%d ejercicios en este entrenamiento</string>
+    <string name="programs_total_sets_desc" formatted="false">%d series totales</string>
+    <string name="programs_exercise_accessibility" formatted="false">%s: %d series de %s repeticiones, %d segundos de descanso</string>
+    <string name="common_retry">Reintentar</string>
     <string name="programs_edit_plan">Editar Plan</string>
     <string name="programs_save_edits">Guardar Cambios</string>
     <string name="programs_cancel_edits">Cancelar</string>
