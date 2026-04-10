@@ -1,9 +1,11 @@
 package com.gymbro.feature.settings
 
+import com.gymbro.core.preferences.UserPreferences.TrainingPhase
 import com.gymbro.core.preferences.UserPreferences.WeightUnit
 
 data class SettingsState(
     val weightUnit: WeightUnit = WeightUnit.KG,
+    val trainingPhase: TrainingPhase = TrainingPhase.MAINTENANCE,
     val defaultRestTimer: Int = 90,
     val autoStartRestTimer: Boolean = true,
     val notificationsEnabled: Boolean = false,
@@ -15,6 +17,7 @@ data class SettingsState(
 
 sealed interface SettingsEvent {
     data class SetWeightUnit(val unit: WeightUnit) : SettingsEvent
+    data class SetTrainingPhase(val phase: TrainingPhase) : SettingsEvent
     data class SetDefaultRestTimer(val seconds: Int) : SettingsEvent
     data class SetAutoStartRestTimer(val enabled: Boolean) : SettingsEvent
     data class SetNotifications(val enabled: Boolean) : SettingsEvent

@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Feedback
 import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.LocalFireDepartment
 import androidx.compose.material.icons.filled.MonitorHeart
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
@@ -65,6 +66,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gymbro.core.R
+import com.gymbro.core.preferences.UserPreferences.TrainingPhase
 import com.gymbro.core.preferences.UserPreferences.WeightUnit
 
 private val AccentGreen = Color(0xFF00FF87)
@@ -198,6 +200,59 @@ internal fun SettingsScreen(
                                 shape = SegmentedButtonDefaults.itemShape(1, 2),
                             ) {
                                 Text(stringResource(R.string.settings_weight_unit_lbs), style = MaterialTheme.typography.labelMedium)
+                            }
+                        }
+                    }
+
+                    SettingsDivider()
+
+                    // Training Phase
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            SettingsIcon(Icons.Default.LocalFireDepartment, AccentGreen)
+                            Spacer(modifier = Modifier.width(12.dp))
+                            Column {
+                                Text(
+                                    text = stringResource(R.string.settings_training_phase),
+                                    style = MaterialTheme.typography.titleSmall,
+                                    color = Color.White,
+                                    fontWeight = FontWeight.Medium,
+                                )
+                                Text(
+                                    text = stringResource(R.string.settings_training_phase_subtitle),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = Color(0xFF9E9E9E),
+                                )
+                            }
+                        }
+                        Spacer(modifier = Modifier.height(8.dp))
+                        SingleChoiceSegmentedButtonRow(
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            SegmentedButton(
+                                selected = state.trainingPhase == TrainingPhase.BULK,
+                                onClick = { onEvent(SettingsEvent.SetTrainingPhase(TrainingPhase.BULK)) },
+                                shape = SegmentedButtonDefaults.itemShape(0, 3),
+                            ) {
+                                Text(stringResource(R.string.settings_training_phase_bulk), style = MaterialTheme.typography.labelMedium)
+                            }
+                            SegmentedButton(
+                                selected = state.trainingPhase == TrainingPhase.CUT,
+                                onClick = { onEvent(SettingsEvent.SetTrainingPhase(TrainingPhase.CUT)) },
+                                shape = SegmentedButtonDefaults.itemShape(1, 3),
+                            ) {
+                                Text(stringResource(R.string.settings_training_phase_cut), style = MaterialTheme.typography.labelMedium)
+                            }
+                            SegmentedButton(
+                                selected = state.trainingPhase == TrainingPhase.MAINTENANCE,
+                                onClick = { onEvent(SettingsEvent.SetTrainingPhase(TrainingPhase.MAINTENANCE)) },
+                                shape = SegmentedButtonDefaults.itemShape(2, 3),
+                            ) {
+                                Text(stringResource(R.string.settings_training_phase_maintenance), style = MaterialTheme.typography.labelMedium)
                             }
                         }
                     }

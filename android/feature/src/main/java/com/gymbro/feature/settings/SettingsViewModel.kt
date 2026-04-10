@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gymbro.core.notification.ReminderScheduler
 import com.gymbro.core.preferences.UserPreferences
+import com.gymbro.core.preferences.UserPreferences.TrainingPhase
 import com.gymbro.core.preferences.UserPreferences.WeightUnit
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -44,9 +45,11 @@ class SettingsViewModel @Inject constructor(
                 userPreferences.defaultRestTimer,
                 userPreferences.autoStartRestTimer,
                 userPreferences.notificationsEnabled,
-            ) { weightUnit, restTimer, autoStart, notifications ->
+                userPreferences.trainingPhase,
+            ) { weightUnit, restTimer, autoStart, notifications, phase ->
                 SettingsState(
                     weightUnit = weightUnit,
+                    trainingPhase = phase,
                     defaultRestTimer = restTimer,
                     autoStartRestTimer = autoStart,
                     notificationsEnabled = notifications,
@@ -90,6 +93,7 @@ class SettingsViewModel @Inject constructor(
     fun onEvent(event: SettingsEvent) {
         when (event) {
             is SettingsEvent.SetWeightUnit -> setWeightUnit(event.unit)
+            is SettingsEvent.SetTrainingPhase -> setTrainingPhase(event.phase)
             is SettingsEvent.SetDefaultRestTimer -> setDefaultRestTimer(event.seconds)
             is SettingsEvent.SetAutoStartRestTimer -> setAutoStartRestTimer(event.enabled)
             is SettingsEvent.SetNotifications -> setNotifications(event.enabled)
@@ -104,6 +108,12 @@ class SettingsViewModel @Inject constructor(
     private fun setWeightUnit(unit: WeightUnit) {
         viewModelScope.launch {
             userPreferences.setWeightUnit(unit)
+        }
+    }
+
+    private fun setTrainingPhase(phase: TrainingPhase) {
+        viewModelScope.launch {
+            userPreferences.setTrainingPhase(phase)
         }
     }
 

@@ -178,6 +178,11 @@
     <string name="settings_rest_timer_value">%ds</string>
     <string name="settings_auto_start_rest_timer">Auto-Start Rest Timer</string>
     <string name="settings_auto_start_rest_timer_subtitle">Start timer after completing a set</string>
+    <string name="settings_training_phase">Training Phase</string>
+    <string name="settings_training_phase_subtitle">Affects volume, intensity, and AI coach recommendations</string>
+    <string name="settings_training_phase_bulk">Bulk</string>
+    <string name="settings_training_phase_cut">Cut</string>
+    <string name="settings_training_phase_maintenance">Maintain</string>
     <string name="settings_workout_reminders">Workout Reminders</string>
     <string name="settings_workout_reminders_subtitle">Get reminded to train</string>
     <string name="settings_health_connect_connected">Connected</string>
@@ -228,6 +233,7 @@
     <string name="onboarding_frequency_title">Training Frequency</string>
     <string name="onboarding_frequency_subtitle">How many days per week do you train?</string>
     <string name="onboarding_frequency_days">%d days/week</string>
+    <string name="onboarding_generating_plan">Building your plan…</string>
 
     <!-- Common -->
     <string name="common_loading">Loading...</string>
@@ -273,6 +279,9 @@
     <string name="programs_built_in">Built-in</string>
     <string name="programs_last_used">Last used: %s</string>
     <string name="programs_active_plan_title">Active Plan</string>
+    <string name="programs_your_first_program">Your First Program</string>
+    <string name="programs_first_program_title">Based on your goals, here\'s your personalized plan</string>
+    <string name="programs_first_program_subtitle">We built this program from your onboarding answers. Tap any day to see the full workout.</string>
     <string name="programs_templates_title">Saved Templates</string>
     <string name="programs_generate_new_plan">Generate New Workout Plan</string>
     <string name="programs_generating_plan">Generating plan...</string>
@@ -399,6 +408,7 @@
     <string name="profile_weight_unit_label">Weight unit</string>
     <string name="profile_weight_unit_lbs">lbs</string>
     <string name="profile_notifications">Notifications</string>
+    <string name="profile_training_phase">Training phase</string>
     <string name="profile_data_section">Data</string>
     <string name="profile_export_data">Export data</string>
     <string name="profile_clear_all_data">Clear all data</string>
