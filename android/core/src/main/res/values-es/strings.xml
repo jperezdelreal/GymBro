@@ -17,6 +17,7 @@
     <!-- Common Actions -->
     <string name="action_back">Atrás</string>
     <string name="action_cancel">Cancelar</string>
+    <string name="action_ok">Aceptar</string>
     <string name="action_save">Guardar</string>
     <string name="action_delete">Eliminar</string>
     <string name="action_retry">Reintentar</string>
@@ -170,6 +171,10 @@
     <string name="settings_app_version">Versión de la App</string>
     <string name="settings_send_feedback">Enviar Comentarios</string>
     <string name="settings_send_feedback_subtitle">Reporta problemas o sugiere características</string>
+    <string name="settings_sign_in_dialog_title">Inicio de Sesión Próximamente</string>
+    <string name="settings_sign_in_dialog_message">La funcionalidad de inicio de sesión llegará en una actualización futura. Tus datos de entrenamiento se guardan localmente en tu dispositivo.</string>
+    <string name="settings_version_dialog_title">Versión de la App</string>
+    <string name="settings_version_dialog_message">GymBro v%1$s</string>
 
     <!-- Onboarding -->
     <string name="onboarding_app_title">GymBro</string>
