@@ -2325,3 +2325,73 @@ All added in both `strings.xml` (en-US) and `strings-es.xml` (es-ES).
 - **Historical entry support (deferred):** Let users log past days' recovery (currently only today)
 
 **PR:** #374 (opened 2026-04-10T06:30Z)
+
+---
+
+## Audit Sprint Directives (2026-04-10T11:40Z)
+
+### 1. Deferred Work Directive (#392–#394)
+
+**Date:** 2026-04-10T11:40:00Z  
+**By:** Copilot (via user request)  
+**Reference:** Issues #392 (Voice Input), #393 (RPE Progression), #394 (Onboarding Program)
+
+**Decision:** Move to backlog. Do not execute in this sprint.
+
+**Rationale:**  
+User directive for scope control. Audit sprint focused on closing MVP readiness gaps (persistence, templates, deload). Voice input, RPE progression, and onboarding are advanced features appropriate for v1.1 after initial launch feedback.
+
+**Status:** Implemented. All three issues closed (not abandoned) with 'backlog' label.
+
+---
+
+### 2. Workout State Persistence Architecture (#390 → #399)
+
+**Date:** 2026-04-10T10:30:00Z  
+**Architect:** Tank  
+**Reference:** Issue #390, PR #399
+
+**Problem:** ActiveWorkoutViewModel held all workout state in memory. App kill (incoming call, accidental swipe, system OOM) destroyed 30–45 min of logged data. Unacceptable for powerlifting where users invest significant effort.
+
+**Decision:** Room + Gson JSON serialization.
+
+**Design:**
+- Single table: `in_progress_workouts` (workoutId PK)
+- Serialization: Gson JSON for `List<InProgressExercise>` → `exercisesJson TEXT`
+- Auto-save triggers: `completeSet()`, `addExercise()`, `startRestTimer()`
+- Recovery flow: ViewModel init → check for in-progress → show resume prompt → user selects resume/new
+- Corruption handling: Deserialization failure → silent clear + log (no crash)
+
+**Alternatives Rejected:**
+- SavedStateHandle: Only survives process death, not force stop
+- DataStore: Poor fit for nested structures, async overhead
+- Full WorkoutEntity: Pollutes workout history with drafts
+- ViewModel onSaveInstanceState: Doesn't survive force-stop
+
+**Migration:** Database v4 → v5
+
+**Rationale:**
+- Room already in use (zero dependency cost)
+- Gson already in project (wger.de API deserialization)
+- JSON simpler than relational approach for unbounded exercise list (~50 max)
+- Auto-save on mutations (write-through cache) prevents data loss
+- ~10ms latency per save acceptable (user already waiting for DB write)
+
+**Trade-offs:**
+- Pros: Zero data loss, fast recovery (<50ms), simple migration, testable
+- Cons: Cannot query individual sets in SQL (acceptable—always load full), write amplification (50KB per save on older storage), timer drift on restore (v2.0 fix)
+
+**Enhancements (v2.0):**
+- Store `restTimerStartedAt` timestamp, recalculate on resume
+- Incremental save (only serialize changed exercises)
+- gzip compression (60–70% storage reduction)
+
+**Testing:**
+- Unit tests: `WorkoutPersistenceTest.kt` (4 tests: save, load, clear, null)
+- Manual QA: Force-stop mid-workout → relaunch → verify state restored
+
+**Owners:**
+- Tank: Data layer (Room, DAO, Repository)
+- Trinity: UI layer (resume prompt, event handling)
+
+**Status:** Implemented. PR #399 merged 2026-04-10. Feature live.
