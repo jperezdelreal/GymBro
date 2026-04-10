@@ -36,6 +36,7 @@ data class WorkoutSetEntity(
     val weight: Double,
     val reps: Int,
     val rpe: Double? = null,
+    val rir: Int? = null,
     val isWarmup: Boolean = false,
     val completedAt: Long = System.currentTimeMillis(),
 )

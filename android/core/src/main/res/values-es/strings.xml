@@ -473,7 +473,11 @@
     <string name="active_workout_header_set">SERIE</string>
     <string name="active_workout_header_kg">KG</string>
     <string name="active_workout_header_reps">REPS</string>
+    <string name="active_workout_header_rpe">RPE</string>
     <string name="active_workout_set_completed">Serie %d completada</string>
+    <string name="active_workout_rpe_label">RPE</string>
+    <string name="active_workout_progression_up">↑ +2.5kg sugerido (RPE bajo)</string>
+    <string name="active_workout_progression_down">↓ −5%% sugerido (RPE alto)</string>
 
     <!-- Progress (additional new) -->
     <string name="progress_e1rm_trend">Tendencia Est. 1RM</string>

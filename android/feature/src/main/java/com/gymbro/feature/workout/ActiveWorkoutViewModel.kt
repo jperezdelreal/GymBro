@@ -213,12 +213,15 @@ class ActiveWorkoutViewModel @Inject constructor(
                 }
             }
         ) {
+            val rpeValue = setUi.rpe.toDoubleOrNull()
+            val rirValue = rpeValue?.let { ExerciseSet.rpeToRir(it) }
             val exerciseSet = ExerciseSet(
                 id = UUID.fromString(setUi.id),
                 exerciseId = exerciseUi.exercise.id,
                 weightKg = weightKg,
                 reps = reps,
-                rpe = setUi.rpe.toDoubleOrNull(),
+                rpe = rpeValue,
+                rir = rirValue,
                 isWarmup = setUi.isWarmup,
             )
             workoutRepository.addSet(workoutId, exerciseSet)

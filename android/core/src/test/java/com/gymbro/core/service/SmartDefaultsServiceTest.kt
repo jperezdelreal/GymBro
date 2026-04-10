@@ -13,6 +13,7 @@ import java.util.UUID
 class SmartDefaultsServiceTest {
 
     private lateinit var workoutDao: WorkoutDao
+    private lateinit var progressionEngine: ProgressionEngine
     private lateinit var service: SmartDefaultsService
 
     private val exerciseId = "bench-press-id"
@@ -20,7 +21,8 @@ class SmartDefaultsServiceTest {
     @Before
     fun setup() {
         workoutDao = mockk()
-        service = SmartDefaultsService(workoutDao)
+        progressionEngine = ProgressionEngine(workoutDao)
+        service = SmartDefaultsService(workoutDao, progressionEngine)
     }
 
     @Test
