@@ -36,6 +36,12 @@ class OnboardingViewModel @Inject constructor(
             is OnboardingEvent.GoalSelected -> {
                 _state.value = _state.value.copy(selectedGoal = event.goal)
             }
+            is OnboardingEvent.ExperienceSelected -> {
+                _state.value = _state.value.copy(selectedExperience = event.experience)
+            }
+            is OnboardingEvent.TrainingDaysSelected -> {
+                _state.value = _state.value.copy(trainingDaysPerWeek = event.days)
+            }
             is OnboardingEvent.CompleteOnboarding -> {
                 completeOnboarding()
             }
@@ -47,6 +53,9 @@ class OnboardingViewModel @Inject constructor(
             userPreferences.setWeightUnit(_state.value.selectedUnit)
             val userName = _state.value.userName.takeIf { it.isNotBlank() } ?: ""
             userPreferences.setUserName(userName)
+            userPreferences.setTrainingGoal(_state.value.selectedGoal)
+            userPreferences.setExperienceLevel(_state.value.selectedExperience)
+            userPreferences.setTrainingDaysPerWeek(_state.value.trainingDaysPerWeek)
             userPreferences.setOnboardingComplete(true)
             _effects.send(OnboardingEffect.NavigateToMain)
         }

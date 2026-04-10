@@ -186,6 +186,27 @@
     <string name="onboarding_your_name">Tu Nombre (Opcional)</string>
     <string name="onboarding_name_placeholder">Ingresa tu nombre</string>
     <string name="onboarding_lets_go">¡Vamos!</string>
+    <string name="onboarding_training_goal_title">¿Cuál es tu Objetivo?</string>
+    <string name="onboarding_training_goal_subtitle">Elige tu enfoque principal de entrenamiento</string>
+    <string name="onboarding_goal_strength">Fuerza</string>
+    <string name="onboarding_goal_strength_desc">Desarrolla fuerza máxima</string>
+    <string name="onboarding_goal_powerlifting">Powerlifting</string>
+    <string name="onboarding_goal_powerlifting_desc">Enfócate en los tres grandes levantamientos</string>
+    <string name="onboarding_goal_hypertrophy">Hipertrofia</string>
+    <string name="onboarding_goal_hypertrophy_desc">Construye músculo y tamaño</string>
+    <string name="onboarding_goal_general_fitness">Fitness General</string>
+    <string name="onboarding_goal_general_fitness_desc">Mantente saludable y activo</string>
+    <string name="onboarding_experience_title">Nivel de Experiencia</string>
+    <string name="onboarding_experience_subtitle">¿Cuánto tiempo llevas entrenando?</string>
+    <string name="onboarding_experience_beginner">Principiante</string>
+    <string name="onboarding_experience_beginner_desc">Menos de 1 año</string>
+    <string name="onboarding_experience_intermediate">Intermedio</string>
+    <string name="onboarding_experience_intermediate_desc">1-3 años</string>
+    <string name="onboarding_experience_advanced">Avanzado</string>
+    <string name="onboarding_experience_advanced_desc">Más de 3 años</string>
+    <string name="onboarding_frequency_title">Frecuencia de Entrenamiento</string>
+    <string name="onboarding_frequency_subtitle">¿Cuántos días por semana entrenas?</string>
+    <string name="onboarding_frequency_days">%d días/semana</string>
 
     <!-- Common -->
     <string name="common_loading">Cargando...</string>

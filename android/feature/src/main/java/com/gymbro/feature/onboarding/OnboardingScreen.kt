@@ -51,6 +51,7 @@ import androidx.compose.ui.unit.sp
 import com.gymbro.core.R
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.gymbro.core.preferences.UserPreferences
 import com.gymbro.core.preferences.UserPreferences.WeightUnit
 import com.gymbro.core.ui.theme.AccentGreenStart
 import com.gymbro.core.ui.theme.AccentGreenEnd
@@ -91,7 +92,7 @@ fun OnboardingScreen(
     onEvent: (OnboardingEvent) -> Unit,
 ) {
     val haptic = LocalHapticFeedback.current
-    val pagerState = rememberPagerState(pageCount = { 4 })
+    val pagerState = rememberPagerState(pageCount = { 7 })
 
     LaunchedEffect(pagerState) {
         snapshotFlow { pagerState.currentPage }.collect { page ->
@@ -115,9 +116,21 @@ fun OnboardingScreen(
             ) { page ->
                 when (page) {
                     0 -> WelcomePage()
-                    1 -> TrackPage()
-                    2 -> ProgressPage()
-                    3 -> GetStartedPage(
+                    1 -> TrainingGoalPage(
+                        selectedGoal = state.selectedGoal,
+                        onGoalSelected = { onEvent(OnboardingEvent.GoalSelected(it)) },
+                    )
+                    2 -> ExperienceLevelPage(
+                        selectedExperience = state.selectedExperience,
+                        onExperienceSelected = { onEvent(OnboardingEvent.ExperienceSelected(it)) },
+                    )
+                    3 -> TrainingFrequencyPage(
+                        trainingDays = state.trainingDaysPerWeek,
+                        onDaysSelected = { onEvent(OnboardingEvent.TrainingDaysSelected(it)) },
+                    )
+                    4 -> TrackPage()
+                    5 -> ProgressPage()
+                    6 -> GetStartedPage(
                         selectedUnit = state.selectedUnit,
                         userName = state.userName,
                         onUnitSelected = { onEvent(OnboardingEvent.UnitSelected(it)) },
@@ -128,7 +141,7 @@ fun OnboardingScreen(
             }
 
             PageIndicators(
-                pageCount = 4,
+                pageCount = 7,
                 currentPage = pagerState.currentPage,
                 modifier = Modifier.padding(bottom = 32.dp),
             )
@@ -368,6 +381,282 @@ private fun UnitCard(
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
                 color = if (isSelected) Color.Black else Color.White,
+            )
+        }
+    }
+}
+
+@Composable
+private fun TrainingGoalPage(
+    selectedGoal: UserPreferences.TrainingGoal,
+    onGoalSelected: (UserPreferences.TrainingGoal) -> Unit,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+    ) {
+        Text(
+            text = stringResource(R.string.onboarding_training_goal_title),
+            style = MaterialTheme.typography.headlineLarge,
+            fontWeight = FontWeight.Bold,
+            color = Color.White,
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = stringResource(R.string.onboarding_training_goal_subtitle),
+            style = MaterialTheme.typography.bodyLarge,
+            color = OnSurfaceVariant,
+            textAlign = TextAlign.Center,
+        )
+        Spacer(modifier = Modifier.height(48.dp))
+
+        GoalCard(
+            title = stringResource(R.string.onboarding_goal_strength),
+            description = stringResource(R.string.onboarding_goal_strength_desc),
+            isSelected = selectedGoal == UserPreferences.TrainingGoal.STRENGTH,
+            onClick = { onGoalSelected(UserPreferences.TrainingGoal.STRENGTH) },
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+        GoalCard(
+            title = stringResource(R.string.onboarding_goal_powerlifting),
+            description = stringResource(R.string.onboarding_goal_powerlifting_desc),
+            isSelected = selectedGoal == UserPreferences.TrainingGoal.POWERLIFTING,
+            onClick = { onGoalSelected(UserPreferences.TrainingGoal.POWERLIFTING) },
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+        GoalCard(
+            title = stringResource(R.string.onboarding_goal_hypertrophy),
+            description = stringResource(R.string.onboarding_goal_hypertrophy_desc),
+            isSelected = selectedGoal == UserPreferences.TrainingGoal.HYPERTROPHY,
+            onClick = { onGoalSelected(UserPreferences.TrainingGoal.HYPERTROPHY) },
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+        GoalCard(
+            title = stringResource(R.string.onboarding_goal_general_fitness),
+            description = stringResource(R.string.onboarding_goal_general_fitness_desc),
+            isSelected = selectedGoal == UserPreferences.TrainingGoal.GENERAL_FITNESS,
+            onClick = { onGoalSelected(UserPreferences.TrainingGoal.GENERAL_FITNESS) },
+        )
+    }
+}
+
+@Composable
+private fun ExperienceLevelPage(
+    selectedExperience: UserPreferences.ExperienceLevel,
+    onExperienceSelected: (UserPreferences.ExperienceLevel) -> Unit,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+    ) {
+        Text(
+            text = stringResource(R.string.onboarding_experience_title),
+            style = MaterialTheme.typography.headlineLarge,
+            fontWeight = FontWeight.Bold,
+            color = Color.White,
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = stringResource(R.string.onboarding_experience_subtitle),
+            style = MaterialTheme.typography.bodyLarge,
+            color = OnSurfaceVariant,
+            textAlign = TextAlign.Center,
+        )
+        Spacer(modifier = Modifier.height(48.dp))
+
+        GoalCard(
+            title = stringResource(R.string.onboarding_experience_beginner),
+            description = stringResource(R.string.onboarding_experience_beginner_desc),
+            isSelected = selectedExperience == UserPreferences.ExperienceLevel.BEGINNER,
+            onClick = { onExperienceSelected(UserPreferences.ExperienceLevel.BEGINNER) },
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+        GoalCard(
+            title = stringResource(R.string.onboarding_experience_intermediate),
+            description = stringResource(R.string.onboarding_experience_intermediate_desc),
+            isSelected = selectedExperience == UserPreferences.ExperienceLevel.INTERMEDIATE,
+            onClick = { onExperienceSelected(UserPreferences.ExperienceLevel.INTERMEDIATE) },
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+        GoalCard(
+            title = stringResource(R.string.onboarding_experience_advanced),
+            description = stringResource(R.string.onboarding_experience_advanced_desc),
+            isSelected = selectedExperience == UserPreferences.ExperienceLevel.ADVANCED,
+            onClick = { onExperienceSelected(UserPreferences.ExperienceLevel.ADVANCED) },
+        )
+    }
+}
+
+@Composable
+private fun TrainingFrequencyPage(
+    trainingDays: Int,
+    onDaysSelected: (Int) -> Unit,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+    ) {
+        Text(
+            text = stringResource(R.string.onboarding_frequency_title),
+            style = MaterialTheme.typography.headlineLarge,
+            fontWeight = FontWeight.Bold,
+            color = Color.White,
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = stringResource(R.string.onboarding_frequency_subtitle),
+            style = MaterialTheme.typography.bodyLarge,
+            color = OnSurfaceVariant,
+            textAlign = TextAlign.Center,
+        )
+        Spacer(modifier = Modifier.height(48.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            FrequencyCard(
+                days = 2,
+                isSelected = trainingDays == 2,
+                onClick = { onDaysSelected(2) },
+                modifier = Modifier.weight(1f),
+            )
+            FrequencyCard(
+                days = 3,
+                isSelected = trainingDays == 3,
+                onClick = { onDaysSelected(3) },
+                modifier = Modifier.weight(1f),
+            )
+        }
+        Spacer(modifier = Modifier.height(12.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            FrequencyCard(
+                days = 4,
+                isSelected = trainingDays == 4,
+                onClick = { onDaysSelected(4) },
+                modifier = Modifier.weight(1f),
+            )
+            FrequencyCard(
+                days = 5,
+                isSelected = trainingDays == 5,
+                onClick = { onDaysSelected(5) },
+                modifier = Modifier.weight(1f),
+            )
+        }
+        Spacer(modifier = Modifier.height(12.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            FrequencyCard(
+                days = 6,
+                isSelected = trainingDays == 6,
+                onClick = { onDaysSelected(6) },
+                modifier = Modifier.weight(1f),
+            )
+            Box(modifier = Modifier.weight(1f))
+        }
+    }
+}
+
+@Composable
+private fun GoalCard(
+    title: String,
+    description: String,
+    isSelected: Boolean,
+    onClick: () -> Unit,
+) {
+    val haptic = LocalHapticFeedback.current
+    GlassmorphicCard(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .background(
+                if (isSelected) {
+                    Brush.linearGradient(
+                        colors = listOf(AccentGreenStart, AccentGreenEnd)
+                    )
+                } else {
+                    Brush.linearGradient(
+                        colors = listOf(GlassOverlay, GlassOverlay)
+                    )
+                }
+            )
+            .clip(RoundedCornerShape(16.dp))
+            .clickable {
+                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                onClick()
+            }
+            .padding(20.dp),
+    ) {
+        Column {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                color = if (isSelected) Color.Black else Color.White,
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = description,
+                style = MaterialTheme.typography.bodyMedium,
+                color = if (isSelected) Color.Black.copy(alpha = 0.8f) else OnSurfaceVariant,
+            )
+        }
+    }
+}
+
+@Composable
+private fun FrequencyCard(
+    days: Int,
+    isSelected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val haptic = LocalHapticFeedback.current
+    GlassmorphicCard(
+        modifier = modifier
+            .height(100.dp)
+            .clip(RoundedCornerShape(16.dp))
+            .background(
+                if (isSelected) {
+                    Brush.linearGradient(
+                        colors = listOf(AccentGreenStart, AccentGreenEnd)
+                    )
+                } else {
+                    Brush.linearGradient(
+                        colors = listOf(GlassOverlay, GlassOverlay)
+                    )
+                }
+            )
+            .clip(RoundedCornerShape(16.dp))
+            .clickable {
+                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                onClick()
+            },
+    ) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(
+                text = stringResource(R.string.onboarding_frequency_days, days),
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                color = if (isSelected) Color.Black else Color.White,
+                textAlign = TextAlign.Center,
             )
         }
     }
