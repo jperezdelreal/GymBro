@@ -131,214 +131,422 @@ class WorkoutTemplateRepositoryImpl @Inject constructor(
                 return // Already initialized
             }
 
-            // Get exercises from the database to build templates
             exerciseRepository.getAllExercises().collect { allExercises ->
-            // Push Day Template
-            val pushExercises = listOf(
-                allExercises.find { it.name.contains("Bench Press", ignoreCase = true) }?.let {
-                    TemplateExercise(
-                        exerciseId = it.id,
-                        exerciseName = it.name,
-                        muscleGroup = it.muscleGroup,
-                        targetSets = 4,
-                        targetReps = 8,
-                        order = 0,
-                    )
-                },
-                allExercises.find { it.name.contains("Overhead Press", ignoreCase = true) || it.name.contains("Military Press", ignoreCase = true) }?.let {
-                    TemplateExercise(
-                        exerciseId = it.id,
-                        exerciseName = it.name,
-                        muscleGroup = it.muscleGroup,
-                        targetSets = 3,
-                        targetReps = 10,
-                        order = 1,
-                    )
-                },
-                allExercises.find { it.name.contains("Incline", ignoreCase = true) && it.name.contains("Press", ignoreCase = true) }?.let {
-                    TemplateExercise(
-                        exerciseId = it.id,
-                        exerciseName = it.name,
-                        muscleGroup = it.muscleGroup,
-                        targetSets = 3,
-                        targetReps = 10,
-                        order = 2,
-                    )
-                },
-                allExercises.find { it.name.contains("Tricep", ignoreCase = true) }?.let {
-                    TemplateExercise(
-                        exerciseId = it.id,
-                        exerciseName = it.name,
-                        muscleGroup = it.muscleGroup,
-                        targetSets = 3,
-                        targetReps = 12,
-                        order = 3,
-                    )
-                },
-            ).filterNotNull()
+                // Helper function to find exercise by name
+                fun findExercise(name: String) = allExercises.find { it.name == name }
 
-            if (pushExercises.isNotEmpty()) {
-                val pushTemplate = WorkoutTemplate(
-                    name = "Push Day",
-                    description = "Chest, shoulders, and triceps workout",
-                    exercises = pushExercises,
-                    isBuiltIn = true,
-                )
-                saveTemplate(pushTemplate)
+                // 1. Starting Strength 5x5 - Day A
+                val ss5x5DayA = listOf(
+                    findExercise("Barbell Back Squat")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 5, targetReps = 5, order = 0)
+                    },
+                    findExercise("Barbell Bench Press")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 5, targetReps = 5, order = 1)
+                    },
+                    findExercise("Barbell Row")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 5, targetReps = 5, order = 2)
+                    },
+                ).filterNotNull()
+
+                if (ss5x5DayA.isNotEmpty()) {
+                    saveTemplate(WorkoutTemplate(
+                        name = "Starting Strength 5×5 - Day A",
+                        description = "Classic beginner strength program: Squat, Bench, Row. Linear progression, 3 days/week.",
+                        exercises = ss5x5DayA,
+                        isBuiltIn = true,
+                    ))
+                }
+
+                // 2. Starting Strength 5x5 - Day B
+                val ss5x5DayB = listOf(
+                    findExercise("Barbell Back Squat")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 5, targetReps = 5, order = 0)
+                    },
+                    findExercise("Barbell Overhead Press")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 5, targetReps = 5, order = 1)
+                    },
+                    findExercise("Conventional Deadlift")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 1, targetReps = 5, order = 2)
+                    },
+                ).filterNotNull()
+
+                if (ss5x5DayB.isNotEmpty()) {
+                    saveTemplate(WorkoutTemplate(
+                        name = "Starting Strength 5×5 - Day B",
+                        description = "Alternate day: Squat, Overhead Press, Deadlift. Alternate with Day A.",
+                        exercises = ss5x5DayB,
+                        isBuiltIn = true,
+                    ))
+                }
+
+                // 3. PPL - Push Day
+                val pplPush = listOf(
+                    findExercise("Barbell Bench Press")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 4, targetReps = 8, order = 0)
+                    },
+                    findExercise("Barbell Overhead Press")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 3, targetReps = 10, order = 1)
+                    },
+                    findExercise("Incline Barbell Bench Press")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 3, targetReps = 10, order = 2)
+                    },
+                    findExercise("Cable Tricep Extension (Rope)")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 3, targetReps = 12, order = 3)
+                    },
+                    findExercise("Lateral Raise")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 3, targetReps = 12, order = 4)
+                    },
+                    findExercise("Cable Crossover")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 3, targetReps = 12, order = 5)
+                    },
+                ).filterNotNull()
+
+                if (pplPush.isNotEmpty()) {
+                    saveTemplate(WorkoutTemplate(
+                        name = "PPL - Push Day",
+                        description = "Chest, shoulders, triceps. Hypertrophy-focused with 8-12 reps.",
+                        exercises = pplPush,
+                        isBuiltIn = true,
+                    ))
+                }
+
+                // 4. PPL - Pull Day
+                val pplPull = listOf(
+                    findExercise("Conventional Deadlift")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 3, targetReps = 6, order = 0)
+                    },
+                    findExercise("Pull-Up")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 4, targetReps = 8, order = 1)
+                    },
+                    findExercise("Barbell Row")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 4, targetReps = 10, order = 2)
+                    },
+                    findExercise("Cable Lat Pulldown (Wide Grip)")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 3, targetReps = 12, order = 3)
+                    },
+                    findExercise("Cable Bicep Curl")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 3, targetReps = 12, order = 4)
+                    },
+                    findExercise("Face Pull")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 3, targetReps = 15, order = 5)
+                    },
+                ).filterNotNull()
+
+                if (pplPull.isNotEmpty()) {
+                    saveTemplate(WorkoutTemplate(
+                        name = "PPL - Pull Day",
+                        description = "Back, biceps, rear delts. Compound pulling movements + accessory work.",
+                        exercises = pplPull,
+                        isBuiltIn = true,
+                    ))
+                }
+
+                // 5. PPL - Leg Day
+                val pplLegs = listOf(
+                    findExercise("Barbell Back Squat")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 4, targetReps = 8, order = 0)
+                    },
+                    findExercise("Romanian Deadlift")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 3, targetReps = 10, order = 1)
+                    },
+                    findExercise("Leg Press")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 3, targetReps = 12, order = 2)
+                    },
+                    findExercise("Leg Curl")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 3, targetReps = 12, order = 3)
+                    },
+                    findExercise("Leg Extension")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 3, targetReps = 12, order = 4)
+                    },
+                    findExercise("Standing Calf Raise")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 4, targetReps = 15, order = 5)
+                    },
+                ).filterNotNull()
+
+                if (pplLegs.isNotEmpty()) {
+                    saveTemplate(WorkoutTemplate(
+                        name = "PPL - Leg Day",
+                        description = "Complete lower body: quads, hamstrings, glutes, calves.",
+                        exercises = pplLegs,
+                        isBuiltIn = true,
+                    ))
+                }
+
+                // 6. Upper/Lower - Upper A
+                val upperLowerUpperA = listOf(
+                    findExercise("Barbell Bench Press")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 4, targetReps = 6, order = 0)
+                    },
+                    findExercise("Barbell Row")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 4, targetReps = 6, order = 1)
+                    },
+                    findExercise("Barbell Overhead Press")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 3, targetReps = 8, order = 2)
+                    },
+                    findExercise("Lat Pulldown")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 3, targetReps = 10, order = 3)
+                    },
+                    findExercise("Cable Bicep Curl")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 3, targetReps = 12, order = 4)
+                    },
+                    findExercise("Cable Tricep Extension (Rope)")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 3, targetReps = 12, order = 5)
+                    },
+                ).filterNotNull()
+
+                if (upperLowerUpperA.isNotEmpty()) {
+                    saveTemplate(WorkoutTemplate(
+                        name = "Upper/Lower - Upper A",
+                        description = "Upper body strength day. Horizontal push/pull focus.",
+                        exercises = upperLowerUpperA,
+                        isBuiltIn = true,
+                    ))
+                }
+
+                // 7. Upper/Lower - Lower A
+                val upperLowerLowerA = listOf(
+                    findExercise("Barbell Back Squat")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 4, targetReps = 6, order = 0)
+                    },
+                    findExercise("Romanian Deadlift")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 3, targetReps = 8, order = 1)
+                    },
+                    findExercise("Bulgarian Split Squat")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 3, targetReps = 10, order = 2)
+                    },
+                    findExercise("Leg Curl")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 3, targetReps = 12, order = 3)
+                    },
+                    findExercise("Standing Calf Raise")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 4, targetReps = 15, order = 4)
+                    },
+                ).filterNotNull()
+
+                if (upperLowerLowerA.isNotEmpty()) {
+                    saveTemplate(WorkoutTemplate(
+                        name = "Upper/Lower - Lower A",
+                        description = "Lower body strength: squat variation + hip hinge.",
+                        exercises = upperLowerLowerA,
+                        isBuiltIn = true,
+                    ))
+                }
+
+                // 8. Upper/Lower - Upper B
+                val upperLowerUpperB = listOf(
+                    findExercise("Incline Barbell Bench Press")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 4, targetReps = 8, order = 0)
+                    },
+                    findExercise("Pull-Up")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 4, targetReps = 8, order = 1)
+                    },
+                    findExercise("Dumbbell Shoulder Press")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 3, targetReps = 10, order = 2)
+                    },
+                    findExercise("Cable Row")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 3, targetReps = 10, order = 3)
+                    },
+                    findExercise("Lateral Raise")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 3, targetReps = 15, order = 4)
+                    },
+                    findExercise("Face Pull")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 3, targetReps = 15, order = 5)
+                    },
+                ).filterNotNull()
+
+                if (upperLowerUpperB.isNotEmpty()) {
+                    saveTemplate(WorkoutTemplate(
+                        name = "Upper/Lower - Upper B",
+                        description = "Upper body hypertrophy. Incline press + vertical pull focus.",
+                        exercises = upperLowerUpperB,
+                        isBuiltIn = true,
+                    ))
+                }
+
+                // 9. Upper/Lower - Lower B
+                val upperLowerLowerB = listOf(
+                    findExercise("Conventional Deadlift")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 4, targetReps = 5, order = 0)
+                    },
+                    findExercise("Front Squat")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 3, targetReps = 8, order = 1)
+                    },
+                    findExercise("Leg Press")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 3, targetReps = 12, order = 2)
+                    },
+                    findExercise("Leg Extension")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 3, targetReps = 12, order = 3)
+                    },
+                    findExercise("Seated Calf Raise")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 4, targetReps = 15, order = 4)
+                    },
+                ).filterNotNull()
+
+                if (upperLowerLowerB.isNotEmpty()) {
+                    saveTemplate(WorkoutTemplate(
+                        name = "Upper/Lower - Lower B",
+                        description = "Lower body: deadlift + front squat focus with accessory volume.",
+                        exercises = upperLowerLowerB,
+                        isBuiltIn = true,
+                    ))
+                }
+
+                // 10. Full Body - Day 1
+                val fullBodyDay1 = listOf(
+                    findExercise("Barbell Back Squat")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 4, targetReps = 6, order = 0)
+                    },
+                    findExercise("Barbell Bench Press")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 4, targetReps = 6, order = 1)
+                    },
+                    findExercise("Barbell Row")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 3, targetReps = 8, order = 2)
+                    },
+                    findExercise("Barbell Overhead Press")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 3, targetReps = 8, order = 3)
+                    },
+                    findExercise("Romanian Deadlift")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 3, targetReps = 10, order = 4)
+                    },
+                    findExercise("Plank")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 3, targetReps = 1, order = 5)
+                    },
+                ).filterNotNull()
+
+                if (fullBodyDay1.isNotEmpty()) {
+                    saveTemplate(WorkoutTemplate(
+                        name = "Full Body - Day 1",
+                        description = "Complete body workout hitting all major movement patterns. Squat + horizontal press focus.",
+                        exercises = fullBodyDay1,
+                        isBuiltIn = true,
+                    ))
+                }
+
+                // 11. Full Body - Day 2
+                val fullBodyDay2 = listOf(
+                    findExercise("Conventional Deadlift")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 4, targetReps = 5, order = 0)
+                    },
+                    findExercise("Barbell Overhead Press")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 4, targetReps = 6, order = 1)
+                    },
+                    findExercise("Pull-Up")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 3, targetReps = 8, order = 2)
+                    },
+                    findExercise("Incline Barbell Bench Press")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 3, targetReps = 8, order = 3)
+                    },
+                    findExercise("Bulgarian Split Squat")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 3, targetReps = 10, order = 4)
+                    },
+                    findExercise("Ab Wheel Rollout")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 3, targetReps = 10, order = 5)
+                    },
+                ).filterNotNull()
+
+                if (fullBodyDay2.isNotEmpty()) {
+                    saveTemplate(WorkoutTemplate(
+                        name = "Full Body - Day 2",
+                        description = "Full body with deadlift + vertical press/pull emphasis. Alternate with Day 1.",
+                        exercises = fullBodyDay2,
+                        isBuiltIn = true,
+                    ))
+                }
+
+                // 12. Full Body - Day 3
+                val fullBodyDay3 = listOf(
+                    findExercise("Front Squat")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 4, targetReps = 6, order = 0)
+                    },
+                    findExercise("Dumbbell Bench Press")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 4, targetReps = 8, order = 1)
+                    },
+                    findExercise("Cable Row")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 3, targetReps = 10, order = 2)
+                    },
+                    findExercise("Dumbbell Shoulder Press")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 3, targetReps = 10, order = 3)
+                    },
+                    findExercise("Leg Curl")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 3, targetReps = 12, order = 4)
+                    },
+                    findExercise("Hanging Leg Raise")?.let {
+                        TemplateExercise(exerciseId = it.id, exerciseName = it.name, muscleGroup = it.muscleGroup,
+                            targetSets = 3, targetReps = 12, order = 5)
+                    },
+                ).filterNotNull()
+
+                if (fullBodyDay3.isNotEmpty()) {
+                    saveTemplate(WorkoutTemplate(
+                        name = "Full Body - Day 3",
+                        description = "Full body variation workout with dumbbell emphasis and unilateral work.",
+                        exercises = fullBodyDay3,
+                        isBuiltIn = true,
+                    ))
+                }
             }
-
-            // Pull Day Template
-            val pullExercises = listOf(
-                allExercises.find { it.name.contains("Pull", ignoreCase = true) && it.name.contains("Up", ignoreCase = true) }?.let {
-                    TemplateExercise(
-                        exerciseId = it.id,
-                        exerciseName = it.name,
-                        muscleGroup = it.muscleGroup,
-                        targetSets = 4,
-                        targetReps = 8,
-                        order = 0,
-                    )
-                },
-                allExercises.find { it.name.contains("Row", ignoreCase = true) }?.let {
-                    TemplateExercise(
-                        exerciseId = it.id,
-                        exerciseName = it.name,
-                        muscleGroup = it.muscleGroup,
-                        targetSets = 4,
-                        targetReps = 10,
-                        order = 1,
-                    )
-                },
-                allExercises.find { it.name.contains("Curl", ignoreCase = true) }?.let {
-                    TemplateExercise(
-                        exerciseId = it.id,
-                        exerciseName = it.name,
-                        muscleGroup = it.muscleGroup,
-                        targetSets = 3,
-                        targetReps = 12,
-                        order = 2,
-                    )
-                },
-            ).filterNotNull()
-
-            if (pullExercises.isNotEmpty()) {
-                val pullTemplate = WorkoutTemplate(
-                    name = "Pull Day",
-                    description = "Back and biceps workout",
-                    exercises = pullExercises,
-                    isBuiltIn = true,
-                )
-                saveTemplate(pullTemplate)
-            }
-
-            // Leg Day Template
-            val legExercises = listOf(
-                allExercises.find { it.name.contains("Squat", ignoreCase = true) }?.let {
-                    TemplateExercise(
-                        exerciseId = it.id,
-                        exerciseName = it.name,
-                        muscleGroup = it.muscleGroup,
-                        targetSets = 4,
-                        targetReps = 8,
-                        order = 0,
-                    )
-                },
-                allExercises.find { it.name.contains("Deadlift", ignoreCase = true) }?.let {
-                    TemplateExercise(
-                        exerciseId = it.id,
-                        exerciseName = it.name,
-                        muscleGroup = it.muscleGroup,
-                        targetSets = 3,
-                        targetReps = 6,
-                        order = 1,
-                    )
-                },
-                allExercises.find { it.name.contains("Leg Press", ignoreCase = true) }?.let {
-                    TemplateExercise(
-                        exerciseId = it.id,
-                        exerciseName = it.name,
-                        muscleGroup = it.muscleGroup,
-                        targetSets = 3,
-                        targetReps = 12,
-                        order = 2,
-                    )
-                },
-                allExercises.find { it.name.contains("Calf", ignoreCase = true) }?.let {
-                    TemplateExercise(
-                        exerciseId = it.id,
-                        exerciseName = it.name,
-                        muscleGroup = it.muscleGroup,
-                        targetSets = 4,
-                        targetReps = 15,
-                        order = 3,
-                    )
-                },
-            ).filterNotNull()
-
-            if (legExercises.isNotEmpty()) {
-                val legTemplate = WorkoutTemplate(
-                    name = "Leg Day",
-                    description = "Lower body workout",
-                    exercises = legExercises,
-                    isBuiltIn = true,
-                )
-                saveTemplate(legTemplate)
-            }
-
-            // Upper Body Template
-            val upperExercises = listOf(
-                allExercises.find { it.name.contains("Bench Press", ignoreCase = true) }?.let {
-                    TemplateExercise(
-                        exerciseId = it.id,
-                        exerciseName = it.name,
-                        muscleGroup = it.muscleGroup,
-                        targetSets = 4,
-                        targetReps = 8,
-                        order = 0,
-                    )
-                },
-                allExercises.find { it.name.contains("Row", ignoreCase = true) }?.let {
-                    TemplateExercise(
-                        exerciseId = it.id,
-                        exerciseName = it.name,
-                        muscleGroup = it.muscleGroup,
-                        targetSets = 4,
-                        targetReps = 8,
-                        order = 1,
-                    )
-                },
-                allExercises.find { it.name.contains("Overhead Press", ignoreCase = true) }?.let {
-                    TemplateExercise(
-                        exerciseId = it.id,
-                        exerciseName = it.name,
-                        muscleGroup = it.muscleGroup,
-                        targetSets = 3,
-                        targetReps = 10,
-                        order = 2,
-                    )
-                },
-                allExercises.find { it.name.contains("Curl", ignoreCase = true) }?.let {
-                    TemplateExercise(
-                        exerciseId = it.id,
-                        exerciseName = it.name,
-                        muscleGroup = it.muscleGroup,
-                        targetSets = 3,
-                        targetReps = 12,
-                        order = 3,
-                    )
-                },
-            ).filterNotNull()
-
-            if (upperExercises.isNotEmpty()) {
-                val upperTemplate = WorkoutTemplate(
-                    name = "Upper Body",
-                    description = "Full upper body workout",
-                    exercises = upperExercises,
-                    isBuiltIn = true,
-                )
-                saveTemplate(upperTemplate)
-            }
-        }
         } catch (e: Exception) {
             Log.e(TAG, "Failed to initialize built-in templates: ${e.message}", e)
             throw e
