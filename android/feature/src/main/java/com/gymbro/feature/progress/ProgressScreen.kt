@@ -102,6 +102,7 @@ private val fullDateFormatter = DateTimeFormatter.ofPattern("MMM d, yyyy")
 fun ProgressRoute(
     onNavigateToWorkoutDetail: (String) -> Unit = {},
     onNavigateToAnalytics: () -> Unit = {},
+    onNavigateToCoach: (String) -> Unit = {},
 ) {
     val viewModel: ProgressViewModel = hiltViewModel()
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -116,6 +117,8 @@ fun ProgressRoute(
             when (effect) {
                 is ProgressEffect.NavigateToWorkoutDetail ->
                     onNavigateToWorkoutDetail(effect.workoutId)
+                is ProgressEffect.NavigateToCoach ->
+                    onNavigateToCoach(effect.prompt)
             }
         }
     }
@@ -180,15 +183,20 @@ private fun ProgressScreen(
         }
 
         // Plateau Alerts Section
+        item {
+            SectionHeader(title = stringResource(R.string.progress_plateau_alerts), icon = "⚠️")
+        }
         if (state.plateauAlerts.isNotEmpty()) {
-            item {
-                SectionHeader(title = stringResource(R.string.progress_plateau_alerts), icon = "⚠️")
-            }
             items(state.plateauAlerts) { alert ->
                 PlateauAlertCard(
                     alert = alert,
-                    onDismiss = { onEvent(ProgressEvent.DismissPlateauAlert(alert.exerciseId)) }
+                    onDismiss = { onEvent(ProgressEvent.DismissPlateauAlert(alert.exerciseId)) },
+                    onGetCoachingAdvice = { onEvent(ProgressEvent.GetCoachingAdvice(alert.exerciseName, alert.weeksDuration)) }
                 )
+            }
+        } else {
+            item {
+                PlateauEmptyState()
             }
         }
 
@@ -870,11 +878,13 @@ private fun WeeklyVolumeChart(data: List<WeeklyVolume>) {
 private fun PlateauAlertCard(
     alert: PlateauAlert,
     onDismiss: () -> Unit,
+    onGetCoachingAdvice: () -> Unit,
 ) {
     val haptic = LocalHapticFeedback.current
-    val alertColor = when (alert.type) {
-        PlateauType.STAGNATION -> Color(AccentAmberStart.value)
-        PlateauType.REGRESSION -> AccentRed
+    val alertColor = when (alert.severity) {
+        com.gymbro.core.model.PlateauSeverity.MILD -> Color(AccentAmberStart.value)
+        com.gymbro.core.model.PlateauSeverity.MODERATE -> Color(0xFFFF9800)
+        com.gymbro.core.model.PlateauSeverity.SEVERE -> AccentRed
     }
 
     Card(
@@ -884,64 +894,121 @@ private fun PlateauAlertCard(
         shape = RoundedCornerShape(12.dp),
         modifier = Modifier.fillMaxWidth()
     ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.Top,
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Warning,
+                    contentDescription = null,
+                    tint = alertColor,
+                    modifier = Modifier.size(28.dp)
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = when (alert.type) {
+                            PlateauType.STAGNATION -> stringResource(
+                                R.string.progress_plateau_detected_stagnation,
+                                alert.exerciseName
+                            )
+                            PlateauType.REGRESSION -> stringResource(
+                                R.string.progress_plateau_detected_regression,
+                                alert.exerciseName
+                            )
+                        },
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.Bold,
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = stringResource(
+                            R.string.progress_plateau_duration_days,
+                            alert.weeksDuration,
+                            alert.daysSinceLastPR
+                        ),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = stringResource(R.string.progress_plateau_consider) + " " + alert.suggestion,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+                }
+                IconButton(
+                    onClick = {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        onDismiss()
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = stringResource(R.string.action_dismiss),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+            }
+            
+            Spacer(modifier = Modifier.height(12.dp))
+            
+            androidx.compose.material3.Button(
+                onClick = {
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    onGetCoachingAdvice()
+                },
+                colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                    containerColor = alertColor,
+                    contentColor = Color.White
+                ),
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(8.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.progress_plateau_get_coaching),
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun PlateauEmptyState() {
+    Card(
+        colors = CardDefaults.cardColors(
+            containerColor = Color(AccentGreenStart.value).copy(alpha = 0.1f)
+        ),
+        shape = RoundedCornerShape(12.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            verticalAlignment = Alignment.Top,
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Icon(
-                imageVector = Icons.Default.Warning,
-                contentDescription = null,
-                tint = alertColor,
-                modifier = Modifier.size(28.dp)
+            Text(
+                text = "✓",
+                style = MaterialTheme.typography.headlineMedium,
+                color = Color(AccentGreenStart.value),
+                modifier = Modifier.padding(end = 12.dp)
             )
-            Spacer(modifier = Modifier.width(12.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = when (alert.type) {
-                        PlateauType.STAGNATION -> stringResource(
-                            R.string.progress_plateau_detected_stagnation,
-                            alert.exerciseName
-                        )
-                        PlateauType.REGRESSION -> stringResource(
-                            R.string.progress_plateau_detected_regression,
-                            alert.exerciseName
-                        )
-                    },
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    fontWeight = FontWeight.Bold,
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = stringResource(
-                        R.string.progress_plateau_duration,
-                        alert.weeksDuration
-                    ),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = stringResource(R.string.progress_plateau_consider) + " " + alert.suggestion,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface,
-                )
-            }
-            IconButton(
-                onClick = {
-                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                    onDismiss()
-                }
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Close,
-                    contentDescription = stringResource(R.string.action_dismiss),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(20.dp)
-                )
-            }
+            Text(
+                text = stringResource(R.string.progress_plateau_empty_state),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+                fontWeight = FontWeight.Medium,
+            )
         }
     }
 }

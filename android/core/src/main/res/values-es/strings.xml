@@ -346,6 +346,9 @@
     <string name="progress_plateau_detected_regression">Regresión detectada en %1$s</string>
     <string name="progress_plateau_duration">Sin progreso en %1$d semanas.</string>
     <string name="progress_plateau_consider">Considera:</string>
+    <string name="progress_plateau_duration_days">Sin progreso en %1$d semanas (%2$d días desde último RP).</string>
+    <string name="progress_plateau_get_coaching">Obtener Consejo del Coach</string>
+    <string name="progress_plateau_empty_state">No se detectaron estancamientos — ¡sigue así!</string>
 
     <!-- History (additional) -->
     <string name="history_workout_details">Detalles del Entrenamiento</string>
