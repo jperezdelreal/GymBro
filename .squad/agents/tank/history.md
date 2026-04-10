@@ -958,3 +958,37 @@ ProGuard rules follow official library documentation and Android best practices.
 **Branch:** squad/380-conditioning-exercises
 **PR:** #384 (draft, targeting master, label: feat)
 **Status:** Ready for review
+### 2026-01-10: Editable AI-Generated Workout Plans — Data Model Foundation (Issue #365, PR #375)
+
+**Problem:** AI-generated plans from WorkoutPlanGenerator were immutable — users couldn't modify exercises, sets, reps, or rest days after generation.
+
+**Solution — Plan Versioning + Edit Tracking:**
+- **WorkoutPlan Model Extensions:**
+  - Added `isModified: Boolean` flag to track if plan has been edited by user
+  - Added `originalPlanId: String?` to store reference to original AI-generated plan
+  - Added `createOriginalCopy()` helper — creates immutable snapshot before first edit
+  - Added `markAsModified()` helper — marks plan as modified and sets originalPlanId if not already set
+- **PlannedExercise Model Extensions:**
+  - Added unique `id: String` field (UUID) for tracking individual exercises in edit operations
+  - Added optional `targetWeightKg: Double?` for progressive overload tracking
+  
+**Architecture Decisions:**
+- **Immutable Original Copy Strategy:** When user enters edit mode for the first time, `createOriginalCopy()` creates a separate WorkoutPlan instance with a new ID. This copy is stored in `ProgramsState.originalPlan` and never modified. The user edits the active plan; they can revert by restoring `originalPlan`.
+- **Lazy originalPlanId Assignment:** `originalPlanId` is only set when `markAsModified()` is called (on save). Fresh AI plans have `originalPlanId = null` until edited.
+- **Exercise IDs Required for Mutations:** SwapExercises, RemoveExercise, and UpdateExercise* events all operate on exercise IDs, not indices. This prevents race conditions when exercises are reordered.
+
+**Files Changed (PR #375):**
+- Modified: `android/core/src/main/java/com/gymbro/core/model/WorkoutPlan.kt` (+16 lines)
+  - Data class extensions with `isModified`, `originalPlanId`
+  - Helper methods for copy/modify workflows
+
+**Status:** Data model foundation complete. ViewModel and UI implementation deferred to follow-up work. This unblocks:
+- Edit operations in ProgramsViewModel (swap, add, remove, update exercises)
+- Save/revert UI in ProgramsScreen
+- Plan modification persistence (future: save edited plans to WorkoutTemplateRepository)
+
+**Open Questions:**
+- Should edited plans be auto-saved to WorkoutTemplateRepository as custom templates?
+- Conflict resolution if user generates a new AI plan while an edited plan is active — replace or keep both?
+- UI for adding exercises: inline picker vs. modal exercise library?
+
