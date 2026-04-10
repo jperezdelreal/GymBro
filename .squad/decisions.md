@@ -1958,3 +1958,169 @@ Approved and merged PR #321, establishing bilingual regex as the standard patter
 - All Maestro E2E flows now work on both es-ES and en-US locales without modification
 - Zero test maintenance required if app UI switches default language
 - Pattern documented for future test authors (Switch, Trinity, Tank)
+
+---
+
+## UX/Feature Decisions (Continued)
+
+### Gesture-Based Set Input Pattern (Trinity, 2026-04-10)
+
+**Decision:** Implement gesture-based adjustments + tap-to-confirm for ultra-fast set logging in issue #364.
+
+**Pattern:**
+1. **Swipe-to-adjust**: Vertical swipe on weight/reps fields increments/decrements values
+   - Weight: ±2.5kg per swipe (gym plate convention)
+   - Reps: ±1 rep per swipe
+   - 40px drag threshold prevents accidental triggers
+   - Haptic feedback on each adjustment
+
+2. **Tap-to-confirm**: Single tap on set row (outside input fields) completes set
+   - Only enabled when weight AND reps populated
+   - Haptic feedback on completion
+   - Explicit check button remains as fallback
+
+3. **Smart defaults**: Pre-fill new sets from previous set (existing pattern)
+
+**Implementation:**
+- \Modifier.pointerInput(enabled)\ for gesture detection
+- \detectVerticalDragGestures\ with cumulative offset tracking
+- Gestures coexist with TextField keyboard input (no conflict)
+- \LocalHapticFeedback.current\ for tactile feedback
+
+**Alternatives Considered:**
+- ❌ Voice input (deferred — requires speech recognition setup)
+- ❌ Auto-complete after timeout (too aggressive, error-prone)
+- ❌ Swipe-to-complete (conflicts with scroll gesture in LazyColumn)
+
+**Impact:**
+- ✅ Reduces tap count to ~1.5 average (target achieved)
+- ✅ Matches Strong UX for gesture-based input
+- ⚠️ Gesture discovery relies on affordance + tooltip (no tutorial)
+- ⚠️ Risk of accidental gestures during typing (mitigated by 40px threshold)
+
+**Pattern Reusability:**
+Use this gesture pattern for future features:
+- Rest timer adjustment (currently uses +/- buttons, could add gesture)
+- RPE selection (swipe to change RPE 6→7→8)
+- Weight plate calculator (swipe to add/remove plates)
+
+**Files Modified:**
+- \ActiveWorkoutScreen.kt\ — GestureNumberField composable, SetRow tap-to-confirm
+- \ActiveWorkoutContract.kt\ — QuickCompleteSet event
+- \ActiveWorkoutViewModel.kt\ — QuickCompleteSet handler
+
+**PR:** #372 (opened 2026-04-10T06:25Z)
+
+---
+
+## Data Architecture Decisions (Tank)
+
+### Program Templates Library Data Architecture (Tank, 2026-04-10)
+
+**Decision:** Implement curated program templates as **JSON-backed in-memory repository** with lazy loading from assets (issue #366). NO Room persistence initially.
+
+**Problem Solved:**
+GymBro only offers AI-generated workout plans. Users want access to proven, battle-tested strength programs (5/3/1, PPL, PHAT, GZCL, etc.) with structured progression schemes and week-by-week variations.
+
+**Architecture Choices:**
+
+### 1. ProgramTemplate vs WorkoutTemplate Separation
+- **WorkoutTemplate:** Single-day workout (existing model)
+- **ProgramTemplate:** Multi-week program with day-by-week structure
+- Kept separate models because they serve different use cases and have different data structures
+- ProgramTemplate contains ProgramDay which contains WeekVariation — hierarchical nesting not appropriate for WorkoutTemplate
+
+### 2. JSON Seed Data in Assets (Not Room)
+**Chose:** Load from \ndroid/core/src/main/assets/programs-seed.json\  
+**Not:** Room database with ProgramTemplateEntity
+
+**Rationale:**
+- Program templates are **read-only curated content**, not user-generated data
+- Asset loading is simpler — no migrations, no DAO boilerplate, no entity mapping
+- 12 programs × ~50 exercises each = ~600 exercise prescriptions = 2066 lines JSON (~60KB compressed) — fits easily in memory
+- In-memory StateFlow cache after first load is fast enough for UI
+- If we need Room later (e.g., for user-created program templates), we can add it incrementally
+
+### 3. Flexible Target Reps (String, Not Int)
+**Chose:** \	argetReps: String\ (e.g., "5/5/5+", "8-12", "AMRAP")  
+**Not:** \	argetReps: Int\
+
+**Rationale:**
+- Programs like 5/3/1 use notation like "5/5/5+" (2 sets of 5, then AMRAP)
+- Hypertrophy programs use ranges like "8-12" or "10-15"
+- Some programs specify "AMRAP" or "max reps"
+- String field is more flexible and matches how coaches write programs
+- UI can parse/display appropriately (e.g., show "5+" with tooltip "as many reps as possible")
+
+### 4. kotlinx.serialization (Not Gson)
+**Chose:** \kotlinx.serialization.json.Json\ with \@Serializable\ DTOs  
+**Not:** Gson with \@SerializedName\ annotations
+
+**Rationale:**
+- Matches existing codebase pattern (DatabaseModule uses kotlinx.serialization for exercise seed data)
+- Type-safe at compile time (Gson uses runtime reflection)
+- Better Kotlin multiplatform support (if GymBro adds shared module later)
+- Native integration with Kotlin sealed classes and enums
+
+### 5. Lazy Loading with Singleton StateFlow
+**Pattern:**
+\\\kotlin
+private val _templates = MutableStateFlow<List<ProgramTemplate>>(emptyList())
+private var isInitialized = false
+
+override suspend fun getAllTemplates(): List<ProgramTemplate> {
+    if (!isInitialized) {
+        loadTemplatesFromAssets() // only called once
+    }
+    return _templates.value
+}
+\\\
+
+**Rationale:**
+- Asset loading happens once on first access, not on app startup (faster cold launch)
+- StateFlow enables reactive UI updates if we add "favorite" or "filter" features later
+- Singleton scope (@Singleton annotation on repository) ensures single source of truth
+
+### Scope: Data Layer Only
+This implementation covers **backend only** — model + JSON + repository. Browse UI and "Start from Template" flow deferred to Trinity (separate PR).
+
+**Why split the work?**
+- Tank focuses on data integrity (JSON schema, enum mapping, error handling)
+- Trinity focuses on UX (filtering, search, conversion to active plan)
+- Parallel work — no blocking dependencies
+- Smaller PRs = faster review + easier rollback if issues found
+
+### Implementation Files
+- **Model:** \ProgramTemplate.kt\ (data classes + 3 enums)
+- **Repository:** \ProgramTemplateRepository.kt\ (interface), \ProgramTemplateRepositoryImpl.kt\ (asset loader)
+- **DTOs:** \ProgramTemplateDto.kt\ (JSON schema mapping)
+- **Data:** \ndroid/core/src/main/assets/programs-seed.json\ (12 programs, 2066 lines)
+- **DI:** Modified \RepositoryModule.kt\ (Hilt binding)
+
+### Programs Included (12 Total)
+1. **Wendler 5/3/1** — 4-week block periodization, 4 days/week
+2. **nSuns 531LP** — 9-week linear progression, 5-6 days/week
+3. **GZCL Method** — 4-week linear periodization, 4 days/week
+4. **PPL** — Ongoing push/pull/legs, 6 days/week
+5. **PHAT** — Ongoing power/hypertrophy, 5 days/week
+6. **PHUL** — Ongoing power/hypertrophy upper/lower, 4 days/week
+7. **Starting Strength** — 12-week beginner linear progression, 3 days/week
+8. **Greyskull LP** — Ongoing beginner AMRAP progression, 3 days/week
+9. **Texas Method** — Ongoing intermediate volume/intensity, 3 days/week
+10. **Upper/Lower 4-Day** — Ongoing power/hypertrophy split, 4 days/week
+11. **Full Body 3x** — Ongoing strength/size, 3 days/week
+12. **Smolov Jr** — 3-week bench specialization, 4 days/week
+
+Coverage: All major training goals (strength, hypertrophy, powerlifting, beginner, intermediate, advanced).
+
+### Open Questions
+1. **Room persistence needed?** Not for MVP. If users want to "customize" a program template (e.g., swap exercises), we'll need to clone to WorkoutPlan or add a ProgramTemplateEntity layer.
+2. **Versioning?** If we update programs-seed.json (e.g., fix a typo in 5/3/1 percentages), how do we handle users who already loaded the old version? Current answer: app update replaces assets, in-memory cache refreshes on next launch. If we move to Room, we'd need migration strategy.
+3. **User-created programs?** Deferred. If users want to create/share custom programs, we'd add a \isBuiltIn: Boolean\ flag and Room persistence.
+
+### Next Steps
+- **Trinity:** Build ProgramsScreen with filtering by goal/level/frequency
+- **Trinity:** Implement "Start from Template" flow (convert ProgramTemplate → WorkoutPlan)
+- **Tank:** Add Room persistence if custom programs become a feature request
+
+**PR:** #373 (opened 2026-04-10T06:25Z)

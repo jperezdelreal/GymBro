@@ -39,19 +39,19 @@ class RecoveryViewModel @Inject constructor(
                 }
             }
             is RecoveryEvent.RefreshData -> loadData()
-            is RecoveryEvent.UpdateSleepQuality -> {
+            is RecoveryEvent.UpdateSleepHours -> {
                 _state.update { 
-                    it.copy(manualEntry = it.manualEntry.copy(sleepQuality = event.value))
+                    it.copy(manualEntry = it.manualEntry.copy(sleepHours = event.value))
                 }
             }
-            is RecoveryEvent.UpdateMuscleSoreness -> {
+            is RecoveryEvent.UpdateReadinessScore -> {
                 _state.update { 
-                    it.copy(manualEntry = it.manualEntry.copy(muscleSoreness = event.value))
+                    it.copy(manualEntry = it.manualEntry.copy(readinessScore = event.value))
                 }
             }
-            is RecoveryEvent.UpdateEnergyLevel -> {
+            is RecoveryEvent.UpdateEntryDate -> {
                 _state.update { 
-                    it.copy(manualEntry = it.manualEntry.copy(energyLevel = event.value))
+                    it.copy(manualEntry = it.manualEntry.copy(entryDate = event.date))
                 }
             }
             is RecoveryEvent.SaveManualEntry -> {
@@ -116,18 +116,15 @@ class RecoveryViewModel @Inject constructor(
 
     private fun loadManualEntryData() {
         viewModelScope.launch {
-            userPreferences.manualSleepQuality.collect { sleepQuality ->
-                userPreferences.manualMuscleSoreness.collect { soreness ->
-                    userPreferences.manualEnergyLevel.collect { energy ->
-                        _state.update { 
-                            it.copy(
-                                manualEntry = ManualRecoveryEntry(
-                                    sleepQuality = sleepQuality.toFloat(),
-                                    muscleSoreness = soreness.toFloat(),
-                                    energyLevel = energy.toFloat(),
-                                )
+            userPreferences.manualSleepHours.collect { sleepHours ->
+                userPreferences.manualReadinessScore.collect { readiness ->
+                    _state.update { 
+                        it.copy(
+                            manualEntry = ManualRecoveryEntry(
+                                sleepHours = sleepHours.toFloat(),
+                                readinessScore = readiness.toFloat(),
                             )
-                        }
+                        )
                     }
                 }
             }
@@ -138,9 +135,8 @@ class RecoveryViewModel @Inject constructor(
         viewModelScope.launch {
             val entry = _state.value.manualEntry
             userPreferences.setManualRecoveryMetrics(
-                sleepQuality = entry.sleepQuality.toInt(),
-                muscleSoreness = entry.muscleSoreness.toInt(),
-                energyLevel = entry.energyLevel.toInt(),
+                sleepHours = entry.sleepHours.toInt(),
+                readinessScore = entry.readinessScore.toInt(),
             )
         }
     }

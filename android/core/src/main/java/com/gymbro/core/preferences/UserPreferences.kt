@@ -32,6 +32,8 @@ class UserPreferences @Inject constructor(
         val TRAINING_GOAL = stringPreferencesKey("training_goal")
         val EXPERIENCE_LEVEL = stringPreferencesKey("experience_level")
         val TRAINING_DAYS_PER_WEEK = intPreferencesKey("training_days_per_week")
+        val MANUAL_SLEEP_HOURS = intPreferencesKey("manual_sleep_hours")
+        val MANUAL_READINESS_SCORE = intPreferencesKey("manual_readiness_score")
         val MANUAL_SLEEP_QUALITY = intPreferencesKey("manual_sleep_quality")
         val MANUAL_MUSCLE_SORENESS = intPreferencesKey("manual_muscle_soreness")
         val MANUAL_ENERGY_LEVEL = intPreferencesKey("manual_energy_level")
@@ -165,6 +167,14 @@ class UserPreferences @Inject constructor(
         }
     }
 
+    val manualSleepHours: Flow<Int> = dataStore.data.map { preferences ->
+        preferences[MANUAL_SLEEP_HOURS] ?: 7
+    }
+
+    val manualReadinessScore: Flow<Int> = dataStore.data.map { preferences ->
+        preferences[MANUAL_READINESS_SCORE] ?: 5
+    }
+
     val manualSleepQuality: Flow<Int> = dataStore.data.map { preferences ->
         preferences[MANUAL_SLEEP_QUALITY] ?: 5
     }
@@ -177,6 +187,14 @@ class UserPreferences @Inject constructor(
         preferences[MANUAL_ENERGY_LEVEL] ?: 5
     }
 
+    suspend fun setManualRecoveryMetrics(sleepHours: Int, readinessScore: Int) {
+        dataStore.edit { preferences ->
+            preferences[MANUAL_SLEEP_HOURS] = sleepHours
+            preferences[MANUAL_READINESS_SCORE] = readinessScore
+        }
+    }
+
+    @Deprecated("Use setManualRecoveryMetrics with sleepHours and readinessScore")
     suspend fun setManualRecoveryMetrics(sleepQuality: Int, muscleSoreness: Int, energyLevel: Int) {
         dataStore.edit { preferences ->
             preferences[MANUAL_SLEEP_QUALITY] = sleepQuality

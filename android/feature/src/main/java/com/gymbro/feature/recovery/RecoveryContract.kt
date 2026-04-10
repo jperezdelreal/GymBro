@@ -15,20 +15,29 @@ data class RecoveryState(
 )
 
 data class ManualRecoveryEntry(
-    val sleepQuality: Float = 5f, // 1-10
-    val muscleSoreness: Float = 5f, // 1-10
-    val energyLevel: Float = 5f, // 1-10
+    val sleepHours: Float = 7.0f, // 0-12
+    val readinessScore: Float = 5f, // 1-10
+    val entryDate: Long = System.currentTimeMillis(),
 ) {
     val recoveryScore: Int
-        get() = ((sleepQuality + (11f - muscleSoreness) + energyLevel) / 3f * 10f).toInt().coerceIn(0, 100)
+        get() = ((sleepHours / 8f) * 0.5f + (readinessScore / 10f) * 0.5f * 100f).toInt().coerceIn(0, 100)
+    
+    val readinessLabel: String
+        get() = when {
+            readinessScore >= 9f -> "Crushed"
+            readinessScore >= 7f -> "Good"
+            readinessScore >= 5f -> "OK"
+            readinessScore >= 3f -> "Tired"
+            else -> "Wrecked"
+        }
 }
 
 sealed interface RecoveryEvent {
     data object RequestPermissions : RecoveryEvent
     data object RefreshData : RecoveryEvent
-    data class UpdateSleepQuality(val value: Float) : RecoveryEvent
-    data class UpdateMuscleSoreness(val value: Float) : RecoveryEvent
-    data class UpdateEnergyLevel(val value: Float) : RecoveryEvent
+    data class UpdateSleepHours(val value: Float) : RecoveryEvent
+    data class UpdateReadinessScore(val value: Float) : RecoveryEvent
+    data class UpdateEntryDate(val date: Long) : RecoveryEvent
     data object SaveManualEntry : RecoveryEvent
 }
 
