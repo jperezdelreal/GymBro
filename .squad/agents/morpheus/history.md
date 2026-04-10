@@ -495,3 +495,88 @@
 
 **Impact:**
 Makes incremental progress on issue #334 (eliminate 32 total unsafe `!!` usages). Reduces crash risk from null pointer exceptions in 5 production code paths: E1RM calculations, plateau detection, history detail UI, progress screen improvements, and PR detection logic.
+
+### 2026-04-09: AI-Powered Competitive Analysis (#317)
+
+**Scope:** Deep competitive analysis of GymBro vs FitBod/Strong/Hevy with actionable improvement roadmap  
+**Branch:** `squad/317-competitive-analysis`  
+**Status:** ✅ COMPLETED — Analysis document created + 5 GitHub issues generated
+
+**Context:**
+- User requested competitive analysis as capstone of overnight session (via Ralph)
+- Goal: "hacer una comparacion contra la competencia y sobre eso iterar para generar nuevos cambios"
+- Analysis informed by feature audit findings (docs/feature-audit-2026-04-09.md) and product decisions
+
+**Deliverables:**
+
+**1. Competitive Analysis Report (`docs/competitive-analysis-2026-04-09.md`):**
+- **Competitor Profiles:**
+  - FitBod: AI-powered auto-generation ($13/mo) — shallow AI, slow logging (4-5 taps/set), large exercise library
+  - Strong: Simple manual logging ($5/mo) — speed king (1-2 taps/set), zero intelligence, no coaching
+  - Hevy: Social-first community ($10/mo) — viral growth via Gen Z, no AI, privacy concerns
+- **Feature Comparison Matrix:** 18 features across 4 competitors (logging speed, AI coaching, periodization, recovery, social, etc.)
+- **GymBro's Competitive Advantages (6 unique strengths):**
+  1. Conversational AI coach (LLM-powered chat) — UNIQUE
+  2. Proactive plateau detection — UNIQUE
+  3. Adaptive periodization (better than FitBod's shallow auto-generation)
+  4. Voice logging (hands-free set entry) — UNIQUE
+  5. RIR/RPE native support (better than Strong's notes-only)
+  6. Privacy-first (no social features, anti-Hevy positioning)
+- **GymBro's Competitive Gaps (8 weaknesses):**
+  1. Logging speed (2-3 taps/set vs Strong's 1.5 taps/set) — CREDIBILITY ISSUE on our "Speed" pillar
+  2. Program templates library (Hevy has 1000s, FitBod has 50+, GymBro has zero)
+  3. Exercise library depth (FitBod has 1000+ with videos, GymBro basic)
+  4. Wearable integration (all competitors have Apple Watch apps)
+  5. Cross-platform support (Android-only vs competitors' iOS+Android)
+  6. Social features (intentional gap, but limits viral growth)
+  7. Workout plan editing (FitBod allows customization, GymBro's AI plans are rigid)
+  8. Form analysis (neutral gap — no competitor has AI analysis)
+
+**2. Top 10 Improvement Recommendations (ranked by Impact × Effort):**
+1. Ultra-fast 1-tap set logging (Impact: 5, Effort: 2, Priority: 20)
+2. Curated program templates library (Impact: 5, Effort: 2, Priority: 20)
+3. Plan editing for AI-generated workouts (Impact: 4, Effort: 2, Priority: 16)
+4. Exercise library instructional videos (Impact: 4, Effort: 3, Priority: 12)
+5. iOS app parity (Impact: 5, Effort: 5, Priority: 5)
+6. Plateau alert UI banner (Impact: 4, Effort: 1, Priority: 20)
+7. Apple Watch app (Impact: 3, Effort: 4, Priority: 6)
+8. Recovery fallback UI (Impact: 3, Effort: 2, Priority: 12)
+9. Workout summary stats polish (Impact: 3, Effort: 1, Priority: 15)
+10. Export data (CSV/PDF) (Impact: 2, Effort: 2, Priority: 8)
+
+**3. GitHub Issues Created (Top 5 Improvements):**
+- **#364:** Ultra-fast 1-tap set logging to match Strong (squad:trinity)
+- **#366:** Curated program templates library — 5/3/1, PPL, PHAT, etc. (squad:tank)
+- **#365:** Allow editing AI-generated workout plans (squad:tank)
+- **#363:** Prominent plateau alert banner on Progress screen (squad:neo)
+- **#367:** Recovery fallback — manual sleep and readiness logging (squad:trinity)
+
+**Strategic Insights:**
+- **Positioning Validated:** GymBro owns "Speed + Intelligence + Conversation" niche — no competitor combines all three
+- **Immediate Priority:** Fix logging speed (closes credibility gap on Speed pillar) + add program templates (closes trust gap vs FitBod/Hevy)
+- **Moat:** Conversational AI coach + proactive plateau detection are defensible — competitors 12-18 months behind on LLM integration
+- **Anti-Social Strategy:** Intentionally avoid Hevy's social features — market GymBro as "anti-social, for serious lifters who train, not post"
+- **Threat Analysis:** FitBod most likely to add conversational AI (12-18mo timeline); Hevy may add AI but social/privacy conflict
+- **iOS is Table Stakes:** Android-only limits TAM to 50% of market — must start iOS port to compete at scale
+
+**Key Learnings:**
+- Competitive analysis timing was perfect — feature audit identified gaps, competitive research quantified them against market leaders
+- Strong beats us on logging speed despite Speed being our pillar — this is a brand credibility issue requiring immediate fix
+- "AI-generated workout" sounds experimental; "Run Wendler 5/3/1 with AI coaching" sounds legit — need proven program templates for user trust
+- Plateau detection is a unique moat but invisible to users (UI missing) — feature exists, needs amplification
+- Social features are intentional gap (Hevy's territory) — doubles down on privacy positioning for serious lifters
+
+**Impact:**
+- 5 high-priority issues added to backlog (all labeled `squad` + appropriate member)
+- Clear 30-day roadmap: Fix logging speed → Add templates → Make plateau alerts visible → Enable plan editing → Add recovery fallback
+- 90-day strategic roadmap: Start iOS port → Add exercise videos → Polish workout summaries
+- Product positioning sharpened: "Anti-social AI coaching app for serious lifters" (not general fitness tracker)
+
+**Files:**
+- Analysis: `docs/competitive-analysis-2026-04-09.md` (19,884 chars, 10 sections)
+- Issues: #364, #363, #365, #366, #367 (all created with detailed user stories, acceptance criteria, effort estimates)
+
+**Next Steps:**
+- Ralph will pick up new issues in next orchestration cycle
+- Squad members (Trinity, Tank, Neo) assigned via labels
+- Feature audit + competitive analysis now form comprehensive product intelligence baseline
