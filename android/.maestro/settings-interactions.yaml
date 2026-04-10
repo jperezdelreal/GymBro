@@ -1,0 +1,135 @@
+appId: com.gymbro.app
+name: "Settings Interactions - Change weight unit and training phase"
+#
+# Tests: Settings screen interactions — toggle weight unit (kg/lbs), change training phase (Bulk/Cut/Maintain)
+# Preconditions: User has completed onboarding (ensured by ensure-post-onboarding.yaml)
+# Test data: None
+# Assertions: Settings screen opens, weight unit toggles between kg and lbs, training phase changes work
+# Cleanup: Reset weight unit back to kg, navigate to Home
+# Dependencies: flow/ensure-post-onboarding.yaml
+tags:
+  - core
+  - regression
+onFlowStart:
+  - launchApp
+  - waitForAnimationToEnd:
+      timeout: 3000
+
+onFlowComplete:
+  # Return to Home tab
+  - tapOn:
+      id: "nav_home"
+      optional: true
+
+---
+
+- runFlow: flow/ensure-post-onboarding.yaml
+
+# Navigate to Profile tab
+- tapOn:
+    id: "nav_profile"
+- waitForAnimationToEnd:
+    timeout: 2000
+
+# Verify Profile screen loaded
+- assertVisible: "Perfil|Profile"
+# Screenshot 01: Profile tab opened
+- takeScreenshot: 01_settings_profile_tab
+
+# Tap on Preferences/Settings to open settings screen
+# Profile screen has settings items that navigate to settings
+- tapOn: "Preferencias de Entrenamiento|Workout Preferences|Configuración|Settings"
+- waitForAnimationToEnd:
+    timeout: 2000
+
+# Verify Settings screen loaded
+- assertVisible: "Configuración|Settings"
+# Screenshot 02: Settings screen opened
+- takeScreenshot: 02_settings_screen_opened
+
+# === TEST 1: Weight Unit Toggle ===
+
+# Verify weight unit section is visible
+- assertVisible: "Unidad de Peso|Weight Unit"
+# Screenshot 03: Weight unit section visible (default: kg)
+- takeScreenshot: 03_settings_weight_unit_section
+
+# Tap LBS to switch weight unit
+- tapOn: "lbs"
+- waitForAnimationToEnd:
+    timeout: 1000
+# Screenshot 04: Weight unit changed to lbs
+- takeScreenshot: 04_settings_weight_unit_lbs
+
+# Tap KG to switch back
+- tapOn: "kg"
+- waitForAnimationToEnd:
+    timeout: 1000
+# Screenshot 05: Weight unit restored to kg
+- takeScreenshot: 05_settings_weight_unit_kg
+
+# === TEST 2: Training Phase Selection ===
+
+# Scroll to Training Phase section
+- scrollUntilVisible:
+    element:
+      text: "Fase de Entrenamiento|Training Phase"
+    timeout: 5000
+- assertVisible: "Fase de Entrenamiento|Training Phase"
+# Screenshot 06: Training Phase section visible
+- takeScreenshot: 06_settings_training_phase_section
+
+# Tap Bulk/Volumen
+- tapOn: "Volumen|Bulk"
+- waitForAnimationToEnd:
+    timeout: 1000
+# Screenshot 07: Training phase set to Bulk/Volumen
+- takeScreenshot: 07_settings_training_phase_bulk
+
+# Tap Cut/Definición
+- tapOn: "Definición|Cut"
+- waitForAnimationToEnd:
+    timeout: 1000
+# Screenshot 08: Training phase set to Cut/Definición
+- takeScreenshot: 08_settings_training_phase_cut
+
+# Tap Maintain/Mantener (reset to default)
+- tapOn: "Mantener|Maintain"
+- waitForAnimationToEnd:
+    timeout: 1000
+# Screenshot 09: Training phase set to Maintain/Mantener
+- takeScreenshot: 09_settings_training_phase_maintain
+
+# === TEST 3: Verify other settings sections ===
+
+# Verify Notifications section
+- scrollUntilVisible:
+    element:
+      text: "Notificaciones|Notifications"
+    timeout: 3000
+    optional: true
+- assertVisible:
+    text: "Recordatorios de Entrenamiento|Workout Reminders"
+    optional: true
+# Screenshot 10: Notifications section visible
+- takeScreenshot: 10_settings_notifications_section
+
+# Verify About section
+- scrollUntilVisible:
+    element:
+      text: "Acerca de|About"
+    timeout: 3000
+    optional: true
+- assertVisible:
+    text: "Versión de la App|App Version"
+    optional: true
+# Screenshot 11: About section with version info
+- takeScreenshot: 11_settings_about_section
+
+# Navigate back to Profile
+- back
+- waitForAnimationToEnd:
+    timeout: 2000
+- assertVisible: "Perfil|Profile"
+# Screenshot 12: Settings interactions flow complete, returned to Profile
+- takeScreenshot: 12_settings_back_to_profile

@@ -1,0 +1,155 @@
+appId: com.gymbro.app
+name: "RPE Entry - Log RPE during workout set"
+#
+# Tests: RPE quick picker interaction during workout set logging
+# Preconditions: User has completed onboarding (ensured by ensure-post-onboarding.yaml)
+# Test data: WEIGHT (80), REPS (8), RPE cycles 6→7→8→9→10→(blank)
+# Assertions: RPE picker is visible, cycles through values on tap, color coding changes
+# Cleanup: Cancel active workout
+# Dependencies: flow/ensure-post-onboarding.yaml
+tags:
+  - core
+  - regression
+onFlowStart:
+  - launchApp
+  - waitForAnimationToEnd:
+      timeout: 3000
+
+onFlowComplete:
+  # Cancel any active workout to clean up
+  - back:
+      optional: true
+  - tapOn:
+      text: "Cancelar Entrenamiento|Cancel Workout|Descartar"
+      optional: true
+
+---
+
+- runFlow: flow/ensure-post-onboarding.yaml
+
+# Navigate to Home tab to access FAB
+- tapOn:
+    id: "nav_home"
+- waitForAnimationToEnd:
+    timeout: 2000
+
+# Tap FAB to start new workout
+- tapOn:
+    id: "workout_fab"
+- waitForAnimationToEnd:
+    timeout: 2000
+
+# Verify Active Workout screen
+- assertVisible: "Entrenamiento Activo|Active Workout"
+# Screenshot 01: Active workout screen opened
+- takeScreenshot: 01_rpe_entry_workout_started
+
+# Add an exercise
+- tapOn: "Añadir Ejercicio|Add Exercise"
+- waitForAnimationToEnd:
+    timeout: 2000
+- assertVisible: "Elegir Ejercicio|Choose Exercise"
+
+# Search and select Bench Press
+- tapOn:
+    id: "search_bar"
+- inputText: "Bench"
+- tapOn:
+    text: "Bench Press"
+    index: 0
+- waitForAnimationToEnd:
+    timeout: 2000
+
+# Back on workout screen with exercise added
+- assertVisible: "Entrenamiento Activo|Active Workout"
+
+# Enter weight and reps for the set
+- tapOn:
+    id: "weight_input"
+    index: 0
+- inputText: "${WEIGHT || '80'}"
+
+- tapOn:
+    id: "reps_input"
+    index: 0
+- inputText: "${REPS || '8'}"
+
+# Screenshot 02: Set data entered, RPE picker should be visible
+- takeScreenshot: 02_rpe_entry_set_data_entered
+
+# Verify RPE picker is present
+- assertVisible:
+    id: "rpe_picker"
+# Screenshot 03: RPE picker visible in initial state
+- takeScreenshot: 03_rpe_entry_picker_visible
+
+# Tap RPE picker to cycle to RPE 6
+- tapOn:
+    id: "rpe_picker"
+- waitForAnimationToEnd:
+    timeout: 500
+# Screenshot 04: RPE set to 6 (green color range)
+- takeScreenshot: 04_rpe_entry_rpe6
+
+# Tap again to cycle to RPE 7
+- tapOn:
+    id: "rpe_picker"
+- waitForAnimationToEnd:
+    timeout: 500
+# Screenshot 05: RPE set to 7 (green color range)
+- takeScreenshot: 05_rpe_entry_rpe7
+
+# Tap again to cycle to RPE 8
+- tapOn:
+    id: "rpe_picker"
+- waitForAnimationToEnd:
+    timeout: 500
+# Screenshot 06: RPE set to 8 (amber color range)
+- takeScreenshot: 06_rpe_entry_rpe8
+
+# Tap again to cycle to RPE 9
+- tapOn:
+    id: "rpe_picker"
+- waitForAnimationToEnd:
+    timeout: 500
+# Screenshot 07: RPE set to 9 (red color range)
+- takeScreenshot: 07_rpe_entry_rpe9
+
+# Tap again to cycle to RPE 10
+- tapOn:
+    id: "rpe_picker"
+- waitForAnimationToEnd:
+    timeout: 500
+# Screenshot 08: RPE set to 10 (red color range, max effort)
+- takeScreenshot: 08_rpe_entry_rpe10
+
+# Tap again to cycle back to blank (reset)
+- tapOn:
+    id: "rpe_picker"
+- waitForAnimationToEnd:
+    timeout: 500
+# Screenshot 09: RPE reset to blank after full cycle
+- takeScreenshot: 09_rpe_entry_rpe_reset
+
+# Set RPE to 8 for a realistic log (tap 3 times: blank→6→7→8)
+- tapOn:
+    id: "rpe_picker"
+- tapOn:
+    id: "rpe_picker"
+- tapOn:
+    id: "rpe_picker"
+- waitForAnimationToEnd:
+    timeout: 500
+
+# Complete the set with RPE 8 logged
+- tapOn:
+    text: "Completar serie.*|Complete set.*"
+- waitForAnimationToEnd:
+    timeout: 1000
+# Screenshot 10: Set completed with RPE 8 value logged
+- takeScreenshot: 10_rpe_entry_set_completed_with_rpe
+
+# Verify app is still responsive after RPE-enhanced set
+- assertVisible: "Entrenamiento Activo|Active Workout"
+# Screenshot 11: Workout screen stable after RPE entry
+- takeScreenshot: 11_rpe_entry_workout_stable

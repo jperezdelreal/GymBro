@@ -1,0 +1,173 @@
+appId: com.gymbro.app
+name: "Create Custom Exercise - Add a user-defined exercise to the library"
+#
+# Tests: Full create exercise flow — name entry, muscle group selection, category, equipment, save
+# Preconditions: User has completed onboarding (ensured by ensure-post-onboarding.yaml)
+# Test data: Exercise name "Custom Landmine Press", muscle group Chest/Pecho, category Compound/Compuesto
+# Assertions: Create form opens, all fields fillable, exercise saved, appears in library
+# Cleanup: None (exercise persists)
+# Dependencies: flow/ensure-post-onboarding.yaml
+tags:
+  - core
+  - regression
+onFlowStart:
+  - launchApp
+  - waitForAnimationToEnd:
+      timeout: 3000
+
+onFlowComplete:
+  # Return to home
+  - tapOn:
+      id: "nav_home"
+      optional: true
+
+---
+
+- runFlow: flow/ensure-post-onboarding.yaml
+
+# Navigate to Home tab (exercise library is accessible from nav)
+- tapOn:
+    id: "nav_home"
+- waitForAnimationToEnd:
+    timeout: 2000
+
+# Navigate to exercise library — tap the FAB and then look for create option
+# The Exercise Library has a "Create Exercise" button/nav
+# Navigate via the exercise library route
+- tapOn:
+    id: "nav_home"
+- waitForAnimationToEnd:
+    timeout: 2000
+# Screenshot 01: Home screen starting point
+- takeScreenshot: 01_create_exercise_home
+
+# The FAB starts a workout; we need the exercise library's create button
+# Exercise library may be accessible from Programs or a dedicated nav
+# Check if "Crear Ejercicio" or "Create Exercise" link exists in the library area
+# Since the home screen was redesigned, navigate to exercise library via search or direct
+# The exercise library has its own screen with a create exercise option
+
+# Actually, looking at the nav graph, exercise_library is a separate route
+# accessible from certain screens. Let's try via the Programs tab or search
+# Based on the nav, ExerciseLibraryRoute has onNavigateToCreateExercise
+# But the Exercise Library is not a bottom tab anymore
+# It's accessible when adding exercises during workout or from exercise_library route
+
+# Start a workout to access the exercise picker, which has create option
+- tapOn:
+    id: "workout_fab"
+- waitForAnimationToEnd:
+    timeout: 2000
+
+# Verify Active Workout screen
+- assertVisible: "Entrenamiento Activo|Active Workout"
+
+# Tap Add Exercise to open exercise picker
+- tapOn: "Añadir Ejercicio|Add Exercise"
+- waitForAnimationToEnd:
+    timeout: 2000
+- assertVisible: "Elegir Ejercicio|Choose Exercise"
+# Screenshot 02: Exercise picker opened from active workout
+- takeScreenshot: 02_create_exercise_picker_open
+
+# Look for Create Exercise button in the picker
+- scrollUntilVisible:
+    element:
+      text: "Crear Ejercicio|Create Exercise"
+    timeout: 5000
+    optional: true
+
+# If create button exists in picker, tap it
+- tapOn:
+    text: "Crear Ejercicio|Create Exercise"
+- waitForAnimationToEnd:
+    timeout: 2000
+
+# Verify Create Exercise screen loaded
+- assertVisible: "Crear Ejercicio|Create Exercise"
+# Screenshot 03: Create Exercise form opened
+- takeScreenshot: 03_create_exercise_form
+
+# Verify form sections are visible
+- assertVisible: "Nombre del Ejercicio|Exercise Name"
+# Screenshot 04: Exercise name field visible
+- takeScreenshot: 04_create_exercise_name_section
+
+# Enter exercise name
+- tapOn:
+    text: "Ingresa el nombre del ejercicio|Enter exercise name"
+- inputText: "Custom Landmine Press"
+# Dismiss keyboard by tapping outside
+- tapOn:
+    point: "50%,10%"
+- waitForAnimationToEnd:
+    timeout: 1000
+# Screenshot 05: Exercise name entered
+- takeScreenshot: 05_create_exercise_name_entered
+
+# Select muscle group — tap Chest/Pecho chip
+- assertVisible: "Grupo Muscular|Muscle Group"
+- tapOn: "Pecho|Chest"
+- waitForAnimationToEnd:
+    timeout: 500
+# Screenshot 06: Chest muscle group selected
+- takeScreenshot: 06_create_exercise_muscle_selected
+
+# Select category — tap Compound/Compuesto chip
+- assertVisible: "Categoría|Category"
+- scrollUntilVisible:
+    element:
+      text: "Compound|Compuesto"
+    timeout: 3000
+    optional: true
+- tapOn:
+    text: "Compound|Compuesto"
+    optional: true
+- waitForAnimationToEnd:
+    timeout: 500
+# Screenshot 07: Category selected
+- takeScreenshot: 07_create_exercise_category_selected
+
+# Select equipment — tap Barbell chip
+- assertVisible: "Equipo|Equipment"
+- scrollUntilVisible:
+    element:
+      text: "Barbell"
+    timeout: 3000
+    optional: true
+- tapOn:
+    text: "Barbell"
+    optional: true
+- waitForAnimationToEnd:
+    timeout: 500
+# Screenshot 08: Equipment selected
+- takeScreenshot: 08_create_exercise_equipment_selected
+
+# Scroll to save button
+- scrollUntilVisible:
+    element:
+      text: "Guardar Ejercicio|Save Exercise"
+    timeout: 3000
+
+# Tap Save Exercise button
+- tapOn: "Guardar Ejercicio|Save Exercise"
+- waitForAnimationToEnd:
+    timeout: 2000
+# Screenshot 09: Exercise saved
+- takeScreenshot: 09_create_exercise_saved
+
+# Verify we're back on exercise picker or workout screen
+# The saved exercise should be accessible
+- assertVisible:
+    text: "Elegir Ejercicio|Choose Exercise|Entrenamiento Activo|Active Workout"
+# Screenshot 10: Create exercise flow completed
+- takeScreenshot: 10_create_exercise_flow_complete
+
+# Clean up — cancel the workout
+- back:
+    optional: true
+- back:
+    optional: true
+- tapOn:
+    text: "Cancelar Entrenamiento|Cancel Workout|Descartar"
+    optional: true

@@ -1,0 +1,103 @@
+appId: com.gymbro.app
+name: "Plan Day Detail - Browse programs and drill into a plan day"
+#
+# Tests: Programs tab navigation, plan day drill-down, exercise list, and start workout button
+# Preconditions: User has completed onboarding with auto-generated plan (ensured by ensure-post-onboarding.yaml)
+# Test data: None (uses auto-generated plan from onboarding)
+# Assertions: Programs tab loads, active plan visible, day card tappable, detail shows exercises and start button
+# Cleanup: Navigate back to Programs tab
+# Dependencies: flow/ensure-post-onboarding.yaml
+tags:
+  - core
+  - regression
+onFlowStart:
+  - launchApp
+  - waitForAnimationToEnd:
+      timeout: 3000
+
+onFlowComplete:
+  # Return to Programs tab
+  - tapOn:
+      id: "nav_programs"
+      optional: true
+
+---
+
+- runFlow: flow/ensure-post-onboarding.yaml
+
+# Navigate to Programs tab
+- tapOn:
+    id: "nav_programs"
+- waitForAnimationToEnd:
+    timeout: 2000
+
+# Verify Programs screen loaded
+- assertVisible: "Programas|Programs"
+# Screenshot 01: Programs tab opened
+- takeScreenshot: 01_plan_day_detail_programs_tab
+
+# Verify active plan is visible (auto-generated from onboarding)
+- assertVisible:
+    text: "Plan Activo|Active Plan|Tu Primer Programa|Your First Program"
+# Screenshot 02: Active plan section visible
+- takeScreenshot: 02_plan_day_detail_active_plan
+
+# Verify workout days section exists
+- assertVisible:
+    text: "Días de Entrenamiento|Workout Days"
+    optional: true
+
+# Scroll down to find day cards if needed
+- scrollUntilVisible:
+    element:
+      text: "Día 1|Day 1"
+    timeout: 5000
+# Screenshot 03: Day 1 card found in plan
+- takeScreenshot: 03_plan_day_detail_day1_visible
+
+# Tap on Day 1 to navigate to detail
+- tapOn:
+    text: "Día 1|Day 1"
+    index: 0
+- waitForAnimationToEnd:
+    timeout: 2000
+
+# Verify Plan Day Detail screen loaded
+- assertVisible:
+    text: "Día 1.*|Day 1.*"
+# Screenshot 04: Plan Day Detail screen for Day 1
+- takeScreenshot: 04_plan_day_detail_screen
+
+# Verify summary header with exercise count and total sets
+- assertVisible:
+    text: "Ejercicios|Exercises"
+- assertVisible:
+    text: "Series Totales|Total Sets"
+    optional: true
+# Screenshot 05: Summary header with exercise count and sets
+- takeScreenshot: 05_plan_day_detail_summary_header
+
+# Verify at least one exercise card is displayed
+- assertVisible:
+    text: "\\d+ × \\d+.*|\\d+ sets|\\d+ series"
+    optional: true
+# Screenshot 06: Exercise cards with sets/reps info
+- takeScreenshot: 06_plan_day_detail_exercise_cards
+
+# Scroll to find the Start This Workout button
+- scrollUntilVisible:
+    element:
+      text: "Iniciar Este Entrenamiento|Start This Workout"
+    timeout: 5000
+# Screenshot 07: Start This Workout button visible
+- takeScreenshot: 07_plan_day_detail_start_button
+
+# Navigate back without starting workout
+- back
+- waitForAnimationToEnd:
+    timeout: 2000
+
+# Verify we're back on Programs
+- assertVisible: "Programas|Programs"
+# Screenshot 08: Returned to Programs tab after viewing day detail
+- takeScreenshot: 08_plan_day_detail_back_to_programs

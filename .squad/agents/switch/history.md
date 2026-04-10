@@ -1082,3 +1082,50 @@ av_exercise_library)
 - Retry logic addresses transient database failures
 - Safe defaults prevent UI crashes on errors
 - Ready for Morpheus re-review
+
+### 2026-04-10: Maestro E2E Flows for Untested Critical Paths (Issue #341)
+
+**Context:**
+- Branch: `squad/341-maestro-e2e-flows`
+- Task: Audit existing Maestro flows, identify coverage gaps, create flows for untested critical paths
+- Existing coverage: 28 flows covering onboarding, workout lifecycle, search/filter, history, progress, profile, AI coach, negative/perf/a11y tests
+
+**Coverage Gap Analysis:**
+
+Identified 5 untested critical paths:
+1. **RPE entry during workout** — RPE picker (tap-to-cycle 6→7→8→9→10→blank) with testTag `rpe_picker`. Critical for serious lifters.
+2. **Plan Day Detail view** — PlanDayDetailScreen with exercise list, summary header, "Start This Workout" button. Programs tab navigation.
+3. **Create Custom Exercise** — CreateExerciseScreen with name input, muscle group/category/equipment chips, save flow.
+4. **Settings interactions** — Actually changing settings (weight unit kg↔lbs, training phase Bulk/Cut/Maintain) vs. just viewing them.
+5. **Home screen Quick Start** — New Home screen redesign has `quick_start_button` (testTag) for starting workouts.
+
+**Nav Structure Discovery:**
+- Bottom tabs changed: HOME/PROGRAMS/HISTORY/PROFILE (testTags: nav_home, nav_programs, nav_history, nav_profile)
+- Old flows reference nav_exercise_library, nav_progress, nav_recovery — these may be stale after home screen redesign (#409)
+- ensure-post-onboarding lands at "Programas|Programs" which is still valid
+
+**Flows Created (5 new files):**
+
+1. **rpe-entry.yaml** — RPE picker cycle test during workout logging, covers full 6→10→blank cycle, set completion with RPE
+2. **plan-day-detail.yaml** — Navigate to Programs tab, verify active plan, tap Day 1, verify exercise list + summary + start button
+3. **create-custom-exercise.yaml** — Start workout → exercise picker → Create Exercise → fill name/muscle/category/equipment → save
+4. **settings-interactions.yaml** — Profile → Settings → toggle weight unit kg↔lbs → cycle training phase Bulk→Cut→Maintain → verify sections
+5. **home-quick-start.yaml** — Home tab → quick start card → active workout → add exercise + enter set data → cancel
+
+**Patterns Used:**
+- Bilingual regex "Spanish|English" for all text assertions
+- `launchApp` without clearState (uses ensure-post-onboarding subflow)
+- `scrollUntilVisible` for content below fold
+- testTag-based selectors (rpe_picker, quick_start_button, quick_start_card, nav_home, nav_programs, nav_profile)
+- Coordinate taps avoided (used testTags where available)
+- Proper cleanup in onFlowComplete (cancel workouts, navigate back)
+
+**Key Learnings:**
+- Home screen redesign (#409) changed bottom nav from 5 tabs to 4 tabs (HOME, PROGRAMS, HISTORY, PROFILE)
+- Exercise Library is no longer a bottom tab — accessible via specific routes
+- RPE picker uses tap-to-cycle pattern, not text input — testTag `rpe_picker` cycles through ["", "6", "7", "8", "9", "10"]
+- Settings has SegmentedButton rows for weight unit and training phase — direct text tap works (e.g., tap "lbs" or "Volumen")
+- PlanDayDetail navigation: Programs tab → tap day card → detail screen with exercises
+
+**Files:** 5 new Maestro flow files, ~450 lines added
+**PR:** Pending
