@@ -3,7 +3,6 @@ package com.gymbro.feature.exerciselibrary
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -351,13 +350,13 @@ private fun ExerciseCard(
     GlassmorphicCard(
         modifier = Modifier
             .scale(scale)
-            .clickable {
-                isPressed = true
-                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                onClick()
-            }
-            .testTag("exercise_card"),
+            .testTag("exercise_card_${exercise.id}"),
         accentColor = accentColor,
+        onClick = {
+            isPressed = true
+            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+            onClick()
+        },
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
