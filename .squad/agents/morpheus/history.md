@@ -621,3 +621,126 @@ Makes incremental progress on issue #334 (eliminate 32 total unsafe `!!` usages)
 1. In-memory singleton for cross-destination state sharing (vs SavedStateHandle or remotes) — correct for generated, non-persistent UI state
 2. Lazy loading via MVI intents — supports future incremental loading if plan size grows
 3. Read-only pattern in SettingsRow (optional onClick) — enables flexibility for future settings rows without refactoring
+
+---
+
+### PR #407 — Training Phase Selector (Bulk/Cut/Maintenance) (#379)
+**Author:** Trinity (Mobile Dev)  
+**Date:** 2026-04-10  
+**Scope:** 8 files, 121 insertions
+**Architecture Review:**
+
+**✅ Design Excellence:**
+- **Enum Pattern:** TrainingPhase (BULK/CUT/MAINTENANCE) added to UserPreferences, following existing ExperienceLevel/TrainingGoal patterns
+- **Persistence:** DataStore-backed, Flow-reactive, serialized as string → proper idiomatic Kotlin
+- **Volume Multipliers:** WorkoutPlanGenerator gains optional `trainingPhase` parameter with sensible physics:
+  - BULK: 1.2x volume (more sets/reps for hypertrophy stimulus)
+  - CUT: 0.8x volume (preserve strength, reduce volume for caloric deficit)
+  - MAINTENANCE: 1.0x baseline
+- **UI/UX:** Material3 segmented buttons in Settings > Workout Preferences — clean, discoverable, tactile
+- **Localization:** Complete EN (Bulk/Cut/Maintain) and ES (Volumen/Definición/Mantener) strings
+- **Integration Points:**
+  - UserPreferences.trainingPhase: Flow<TrainingPhase> with getter/setter
+  - SettingsViewModel collects trainingPhase into state
+  - SettingsScreen renders 3-way segmented button, handles SetTrainingPhase event
+  - ProfileScreen adds Training Phase item linking to Settings (via onNavigateToSettings)
+
+**✅ Code Quality:**
+- No boundary violations; all changes are internal to preferences/settings subsystem
+- SettingsViewModel.combine() properly threads new Flow into state
+- UI follows existing pattern (Icon + Text header, Material3 button styling)
+- No hardcoded strings; all externalized with bilingual support
+
+**Decision:** APPROVED & MERGED (squash → 5c5b36d)
+
+---
+
+### PR #408 — Connect Onboarding Data to Auto-Generate First Program (#394)
+**Author:** Neo (AI/ML Engineer)  
+**Date:** 2026-04-10  
+**Scope:** 18 files, 16 changed, includes tests + E2E updates
+
+**Architecture Review:**
+
+**✅ Problem Framing:**
+- Onboarding collected 3 critical data points (goal, experience, frequency) but discarded them → user landed on empty Exercise Library with zero guidance
+- WorkoutPlanGenerator already existed and accepted exactly this data → zero new ML logic needed
+- This was a wiring problem, not a capability gap
+
+**✅ Solution Design — Clean Decoupling Pattern:**
+1. **OnboardingViewModel** injects WorkoutPlanGenerator + ActivePlanStore (both Hilt singletons)
+   - After saving preferences, calls `generatePlan(goal, experience, daysPerWeek)`
+   - Wraps in try/catch → plan generation failure does NOT block onboarding completion (graceful degradation)
+   - Calls `activePlanStore.setPlanFromOnboarding(plan)` with renamed plan as "Your First Program"
+   - UI shows "Building your plan…" state, disables button during generation
+
+2. **ActivePlanStore** gains `isFromOnboarding` flag
+   - `setPlanFromOnboarding()` sets both plan AND flag
+   - `clearOnboardingFlag()` called by ProgramsViewModel after displaying banner once
+   - Clean lifecycle: flag is transient, not persistent (correct for first-time UX)
+
+3. **ProgramsViewModel** loads plan on init
+   - `loadActivePlanFromStore()` retrieves plan + checks flag
+   - If from onboarding: sets `showFirstProgramBanner` state and clears flag immediately
+   - Prevents banner from reappearing after app restart
+
+4. **Navigation Change:** Post-onboarding route: Exercise Library → Programs
+   - Correct decision: user now has an actual plan to view, not empty library
+
+5. **UI Affordances:**
+   - FirstProgramBanner composable: "🎯 Based on your goals, here's your personalized plan"
+   - Section title toggles: "Your First Program" (onboarding) vs "Active Plan" (subsequent)
+   - Encourages immediate engagement with generated content
+
+**✅ Testing — Comprehensive Coverage:**
+- **OnboardingViewModelTest:** 
+  - ✅ Plan generation + storage on completion
+  - ✅ Failure path: plan generation throws → onboarding still completes, activePlanStore.getPlan() returns null
+  - ✅ Preferences saved (unit, name, goal, experience, frequency, onboarding_complete)
+- **ProgramsViewModelTest:**
+  - ✅ `loads active plan from store on init` test verifies banner display
+  - ✅ Fixed pre-existing constructor param issues (workoutPlanGenerator, userPreferences were missing)
+- **OnboardingScreenshotTest:**
+  - ✅ Fixed string refs → enum refs (TrainingGoal enum instead of "strength"/"both")
+
+**✅ E2E Updates — Maestro:**
+- `onboarding-flow.yaml`: Timeout 3s → 5s (accounts for plan generation latency)
+- `ensure-post-onboarding.yaml`: Asserts "Programs" screen instead of "Exercise Library"
+- `onboarding-edge-cases.yaml`: Same assertion update
+- All flows correctly verify graceful degradation (app doesn't crash if plan generation fails)
+
+**✅ Documentation:**
+- Neo documented decision in `.squad/decisions/inbox/neo-onboarding-program.md`
+- Key implications for Trinity (routing), Tank (persistence hook), Switch (E2E timing)
+- Updated Neo's history with architecture notes + key learnings
+
+**✅ Code Quality:**
+- Fire-and-forget pattern is correct for non-critical background work
+- Exception handling preserves UX (no toast, no error state — silent failure with fallback)
+- Flag cleanup timing is precise (happens in loadActivePlanFromStore, not deferred)
+- No premature persistence (plan lives in ActivePlanStore in-memory only, per Tank's architecture)
+
+**Decision:** APPROVED & MERGED (squash → e682985)
+
+---
+
+### Review Summary — Coherent Feature Bundle
+**PR #407 + #408 form a coherent story:**
+- PR #407: Enables user to select training phase (goal-specific intensity/volume tuning)
+- PR #408: First program auto-generated using onboarding data, respects training phase multiplier
+
+**Cross-PR Compatibility:**
+- PR #408 merged first, already included TrainingPhase enum in UserPreferences ✓
+- PR #407 applied cleanly on top, added trainingPhase column and SettingsScreen UI ✓
+- No conflicts; both follow squad conventions for scope, testing, documentation
+
+**Architecture Validation:**
+- Preferences system: Supports new enum cleanly (DataStore + Flow pattern proven)
+- Plan generation: Fire-and-forget with graceful failure (proved pattern in onboarding)
+- Cross-screen state: ActivePlanStore singleton works correctly (verified by tests + lifecycle management)
+- Navigation: Programs screen is now the primary "view your training" destination post-onboarding
+
+**Next Steps:**
+- Training phase multiplier should eventually feed into AI coach recommendations and recovery suggestions
+- Post-v1.0 opportunity: Let AI coach personalize advice (e.g., "In a cut, prioritize compound movements") based on phase
+- Consider persistent plan storage (database) if users want to revert to old plans (current in-memory only)
