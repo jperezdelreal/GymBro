@@ -563,6 +563,9 @@
     <string name="home_create_program_subtitle">Get a personalized training plan based on your goals</string>
     <string name="home_recent_workouts">Recent Workouts</string>
     <string name="home_exercises_count">%d exercises</string>
+    <string name="home_no_plan_title">No Active Program</string>
+    <string name="home_no_plan_message">Create a training program first so your workout has structure and progression.</string>
+    <string name="home_no_plan_go_to_programs">Go to Programs</string>
 
     <!-- Accessibility — Content Descriptions -->
     <string name="home_cd_start_workout">Start workout</string>

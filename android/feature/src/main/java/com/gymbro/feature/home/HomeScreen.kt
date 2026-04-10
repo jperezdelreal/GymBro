@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Timer
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -30,6 +31,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -187,6 +189,40 @@ fun HomeScreen(
                 }
             }
         }
+    }
+
+    if (state.showNoPlanDialog) {
+        AlertDialog(
+            onDismissRequest = { onEvent(HomeEvent.DismissNoPlanDialog) },
+            title = {
+                Text(
+                    text = stringResource(R.string.home_no_plan_title),
+                    fontWeight = FontWeight.Bold,
+                )
+            },
+            text = {
+                Text(text = stringResource(R.string.home_no_plan_message))
+            },
+            confirmButton = {
+                Button(
+                    onClick = { onEvent(HomeEvent.NoPlanGoToPrograms) },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = AccentGreen,
+                        contentColor = Color.Black,
+                    ),
+                ) {
+                    Text(
+                        text = stringResource(R.string.home_no_plan_go_to_programs),
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
+            },
+            dismissButton = {
+                OutlinedButton(onClick = { onEvent(HomeEvent.DismissNoPlanDialog) }) {
+                    Text(text = stringResource(R.string.action_cancel))
+                }
+            },
+        )
     }
 }
 
