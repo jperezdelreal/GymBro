@@ -441,3 +441,251 @@ Analyzes training balance and volume distribution:
 - Empowers users with actionable guidance ("reduce chest volume by 8 sets" vs "you're overtrained")
 - Differentiates GymBro from competitors (no other app has evidence-based volume landmark alerts)
 - Foundation for true adaptive training — app now knows when to push, hold, and back off
+
+
+---
+
+## 2024-12-XX — Training Domain Skill Creation + Exercise Library Re-Audit
+
+**Context:**
+Created comprehensive training domain skill (.squad/skills/training-domain/SKILL.md) to serve as a universal reference for exercise-related work across all agents. Then re-audited the 200-exercise library against this domain knowledge to identify critical gaps.
+
+**Training Domain Skill Coverage:**
+- 5 training modalities (Strength, Hypertrophy, Toning, Calisthenics, Olympic Lifting)
+- 12 movement patterns (horizontal/vertical push/pull, hip hinge, knee dominant, carry, rotation, anti-movement)
+- Equipment knowledge (8 equipment types with alternatives)
+- Calisthenics progressions (6 skill families: push, pull, squat, dip, core, handstand)
+- Goal-based exercise priorities (what to recommend when user says "I want X")
+- Coaching cues by pattern (universal form guidance)
+- Exercise data quality rules (for library expansion)
+
+**Library Audit Results (200 exercises analyzed):**
+
+*Equipment Distribution:*
+- Barbell: 68 | Dumbbell: 36 | Bodyweight: 25 | Machine: 24 | Cable: 23 | Kettlebell: 10 | Band: 7
+
+*Goal-Based Coverage:*
+- ✅ Strength/Powerlifting: COMPLETE (all big lifts + accessories present)
+- ✅ Hypertrophy/Bodybuilding: MOSTLY COMPLETE (excellent isolation variety, minor gaps)
+- ⚠️ General Fitness/Toning: GAPS (missing glute bridge, basic bodyweight movements)
+- ⚠️ Calisthenics: MAJOR GAPS (missing beginner progressions)
+
+*Movement Pattern Coverage:*
+- ✅ Horizontal push: 24 exercises (excellent)
+- ✅ Knee dominant: 28 exercises (excellent)
+- ✅ Hip hinge: 16 exercises (excellent)
+- ✅ Horizontal pull: 18 exercises (excellent)
+- ✅ Vertical push: 7 exercises (good)
+- ✅ Vertical pull: 7 exercises (good)
+- ⚠️ Anti-rotation: 1 exercise (WEAK)
+- ⚠️ Rotation: 2 exercises (WEAK)
+
+**Critical Finding: Calisthenics Progression Gaps**
+
+The library has ADVANCED bodyweight exercises (muscle-ups, front levers, one-arm push-ups) but is MISSING the beginner/intermediate stepping stones. This breaks the progression ladder:
+
+- Push: Has archer push-up and handstand push-up, but MISSING wall/incline/knee/diamond variants
+- Pull: Has muscle-ups and weighted pull-ups, but MISSING dead hang, scapular pulls, negatives, band-assisted
+- Squat: Has pistol squats, but MISSING assisted pistol, box pistol progressions
+- Dip: Has advanced dips, but MISSING bench dip, chair dip entry points
+- Core: Has dragon flags and levers, but MISSING hollow body hold
+- Handstand: Has handstand push-up, but MISSING wall holds, chest-to-wall progressions
+
+**Impact:** A beginner who wants calisthenics training will search for "how do I work up to a pull-up" and find NOTHING. We have the destination but not the journey.
+
+**Equipment-Based Gaps:**
+- Bodyweight-only users: Missing bodyweight squat, pike push-up, glute bridge, calf raise
+- Home gym users: Mostly covered (dumbbells + pull-up bar = complete programming possible)
+
+**Key Learnings:**
+
+1. **Exercise libraries need PROGRESSIONS, not just exercises** — Having muscle-ups without the prerequisite steps is like having calculus without algebra
+2. **Beginner accessibility > Advanced showcase** — Most users are NOT doing one-arm push-ups; they're trying to get their first full push-up
+3. **Movement pattern balance matters** — 24 horizontal push variations is great, but 1 anti-rotation exercise creates program design holes
+4. **Goal-based auditing reveals different gaps than category auditing** — We have 200 exercises but can't build a complete beginner bodyweight program
+5. **Equipment-free training is a PRIMARY use case** — Home/bodyweight training is not a nice-to-have; it's a core modality
+
+**Phase 1 Expansion Priority (informed by skill knowledge):**
+1. Calisthenics beginner progressions (12 exercises) — CRITICAL for accessibility
+2. Bodyweight basics (5 exercises) — CRITICAL for home training
+3. Core training gaps (3 exercises) — rotation/anti-rotation weak
+4. General fitness essentials (3 exercises) — toning/circuit gaps
+
+Total: 23 exercises to close critical modality gaps
+
+**Decision:**
+The training domain skill is now the authoritative reference for:
+- Library expansion decisions (what exercises to add)
+- AI coach prompts (modality-specific programming)
+- Exercise swap logic (movement pattern matching)
+- Program validation (can we build a complete program for this goal?)
+
+Any agent working on exercise-related tasks should read this skill first.
+
+**Files:**
+- Created: .squad/skills/training-domain/SKILL.md (18KB, comprehensive reference)
+- Analyzed: shared/data/exercises-seed.json (200 exercises)
+
+**Next Steps:**
+- Implement Phase 1 expansion (23 exercises)
+- Build calisthenics progression UI (show user their current level + next step)
+- Add movement pattern tags to existing exercises (enables swap logic)
+- Create "beginner bodyweight program" template to validate coverage
+
+### 2026-04-10: Adaptive Split Selection (Issue #381, PR #385)
+**The Problem:**
+- WorkoutPlanGenerator was generating workout days arbitrarily based on days/week but wasn't optimizing the *split type*
+- 3-day program used Upper/Lower/Full which is suboptimal — Full Body 3x is better for beginners
+- 6-day program used 5-day PPL structure — should be PPL 2x per week for optimal frequency
+
+**The Solution — Split-Based Plan Generation:**
+Implemented intelligent split selection based on training frequency and goals:
+
+1. **TrainingSplit enum** with evidence-based selection logic:
+   - 2 days/week → Full Body (only way to hit everything 2x)
+   - 3 days/week → Full Body (optimal for beginners) OR Powerlifting 3-Day (squat/bench/deadlift focus)
+   - 4 days/week → Upper/Lower (classic balanced split)
+   - 5 days/week → PPLUL (PPL + Upper/Lower hybrid for advanced lifters)
+   - 6+ days/week → PPL 2x per week (optimal hypertrophy frequency)
+
+2. **Refactored WorkoutPlanGenerator** to use split-based day generation:
+   - Created helper functions: generateFullBodyDays(), generateUpperLowerDays(), generatePPLDays(), generatePPLULDays()
+   - Each function creates appropriate muscle group distributions for its split type
+   - Removed arbitrary branching logic (when daysPerWeek == 3 { ... }) in favor of split-driven generation
+   - Added split field to WorkoutPlan model to track which split was used
+
+3. **Enhanced AI Coach awareness:**
+   - Updated system prompt with split knowledge (Full Body, Upper/Lower, PPL, PPLUL characteristics)
+   - Plan descriptions now explain the chosen split: "Upper/Lower split focused on muscle growth for 4 days/week"
+   - Sets foundation for AI coach to explain split trade-offs when users ask
+
+4. **Comprehensive test coverage:**
+   - TrainingSplitTest: 9 test cases covering all frequency ranges and goals
+   - WorkoutPlanGeneratorTest: 8 integration tests verifying split selection and application
+   - All 17 tests passing
+
+**Key design decisions:**
+- **Evidence-based split recommendations** from training-domain skill (compiled from Mike Israetel, Renaissance Periodization, Starting Strength)
+- **Goal-aware selection** — Powerlifting goal gets specialized 3-day split (squat/bench/deadlift focus) instead of generic full body
+- **Explicit enum over magic numbers** — TrainingSplit.UPPER_LOWER is clearer than "mode 2" or hardcoded strings
+- **Split type as first-class entity** — Added to WorkoutPlan model so UI/AI can reference it later
+- **Backward compatible** — split field is optional, existing plans without split still work
+
+**Impact on adaptive training:**
+- Foundation for AI coach to recommend split changes: "You're training 6 days/week but on Upper/Lower — consider switching to PPL for better frequency"
+- Enables split-specific progression rules: PPL can push harder per muscle per session since 3-day recovery window
+- Sets up recovery-aware split adaptation: if readiness drops, suggest consolidating 6-day PPL to 4-day Upper/Lower
+- Complements existing SmartDefaults, ReadinessScore, and PlateauDetection for holistic adaptive training
+
+**Technical implementation:**
+- \ndroid/core/src/main/java/com/gymbro/core/model/TrainingSplit.kt\ — enum with selectOptimalSplit() companion method
+- \ndroid/core/src/main/java/com/gymbro/core/service/WorkoutPlanGenerator.kt\ — refactored from 462 to 526 lines, much cleaner split-based logic
+- \ndroid/core/src/main/java/com/gymbro/core/model/WorkoutPlan.kt\ — added optional split field
+- \ndroid/core/src/main/java/com/gymbro/core/ai/AiCoachService.kt\ — enhanced system prompt with split knowledge
+
+**Next steps:**
+- Add UI to display split type on plan cards ("Full Body • 3 days/week")
+- Implement split change recommendations in PlateauDetectionService
+- Add readiness-aware split downscaling (6d PPL → 4d U/L when fatigued)
+- Track split adherence in ComplianceService (did user actually follow the split structure?)
+
+---
+
+## Learnings
+
+### PR #375 Review Response (2025-07-19)
+
+**Context:**
+- Tank's PR #375 (feat: Add data model for editing AI workout plans) received CHANGES REQUESTED from Morpheus
+- Per reviewer-protocol, Tank is locked out from revising rejected PRs
+- Assigned to address two issues: missing @Transient field and scope creep removal
+
+**Issue 1: Missing @Transient val originalPlan Field**
+- The decisions doc (lines 2167-2178) explicitly requires WorkoutPlan to store in-memory reference to original plan
+- Tank's PR added isModified and originalPlanId but omitted the @Transient val originalPlan field
+- Why this matters: Without it, ViewModels must maintain separate state for original plan → tight coupling
+- Fix: Added @Transient val originalPlan: WorkoutPlan? = null to WorkoutPlan data class (line 19)
+
+**Issue 2: targetWeightKg Scope Creep**
+- Tank added targetWeightKg: Double? to PlannedExercise (not in issue #365 scope)
+- Issue #365 scope: swap exercises, modify sets/reps/rest, add/remove — no weight targets
+- targetWeightKg exists in WorkoutTemplate and database entities (separate feature domain)
+- Fix: Removed targetWeightKg from PlannedExercise (line 44 deleted)
+
+**Key Learning: @Transient in Kotlin Data Classes**
+- @Transient annotation marks fields as non-persistent (not serialized to database)
+- Essential for in-memory-only references like originalPlan
+- Prevents circular serialization issues while enabling rich object graphs
+- Pattern: Use @Transient for derived/cached data, parent references, UI-specific state
+
+**Key Learning: Scope Discipline in Data Model PRs**
+- Data models are foundational — scope creep here cascades to ViewModels, repositories, migrations
+- Before adding a field, check: (1) Is it in the issue scope? (2) Is it documented in decisions?
+- If field exists elsewhere (targetWeightKg in WorkoutTemplate), investigate why separation exists
+- Progressive overload tracking ≠ plan definition → different features, different models
+
+**Reviewer Protocol Applied:**
+- Tank locked out after rejection (cannot revise own rejected PR)
+- Neo (me) assigned as fresh eyes to address feedback
+- This prevents "defensive fixing" where original author minimally addresses feedback
+- Clean slate: I read the decisions doc, understood the intent, made precise fixes
+
+**Technical Execution:**
+- Fetched PR branch: git fetch origin squad/365-edit-ai-plans && git checkout
+- Made two targeted edits to WorkoutPlan.kt (add @Transient line, remove targetWeightKg line)
+- Verified no other targetWeightKg references in PlannedExercise context (grep confirmed it's only in WorkoutTemplate)
+- Staged ONLY the modified file: git add android/core/.../WorkoutPlan.kt (NEVER git add .)
+- Verified diff: git diff --cached (confirmed 1 insertion, 1 deletion)
+- Committed with descriptive message referencing PR #375 and issues addressed
+- Pushed: git push origin squad/365-edit-ai-plans
+
+**Commit Message Pattern:**
+`
+fix: Address PR #375 review — add originalPlan transient, remove targetWeightKg scope creep
+
+- Add @Transient val originalPlan field to WorkoutPlan for ViewModel decoupling
+- Remove targetWeightKg from PlannedExercise (out of scope for #365)
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+`
+
+**Outcome:**
+- PR branch updated with both fixes
+- Ready for Morpheus re-review
+- Demonstrates reviewer protocol in action (lockout → reassignment → focused fix)
+
+**File Modified:**
+- android/core/src/main/java/com/gymbro/core/model/WorkoutPlan.kt
+
+**SHA:** aee2474
+
+### 2026-04-10: Issue #381 Complete — PR #385 Opened (Draft)
+
+**Task:** Implement adaptive split selection based on training frequency (Issue #381)  
+**Outcome:** PR #385 (draft) — Intelligent split selection implemented  
+
+**Split Selection Rules:**
+| Days/Week | Split Type | Why |
+|-----------|------------|-----|
+| 2 | Full Body | Only way to hit all muscle groups 2x/week |
+| 3 | Full Body (default) or Powerlifting 3-Day (PLers) | Optimal frequency for compound learning; PLers get Squat/Bench/Deadlift focus |
+| 4 | Upper/Lower | Classic balanced, 2x frequency per muscle |
+| 5 | PPLUL (PPL + Upper/Lower) | Advanced hybrid for high volume tolerance |
+| 6+ | PPL (2x per week) | Optimal hypertrophy frequency |
+
+**Implementation:**
+1. TrainingSplit enum with selectOptimalSplit(daysPerWeek, goal) method
+2. Refactored WorkoutPlanGenerator to use split-specific day generation
+3. Added split field to WorkoutPlan model
+4. Updated AI coach system prompt with split knowledge
+5. Full test coverage (all frequency/goal combinations)
+
+**Impact:**
+- User plans now match evidence-based recommendations for their frequency
+- Differentiation: No competitor adapts split to frequency automatically
+- Foundation for future recovery-aware split downscaling (6d → 4d when fatigued)
+
+**Evidence Base:** Mike Israetel (Renaissance Periodization), Starting Strength (full body), PPL community (6-day hypertrophy)
+
+**Status:** PR #385 draft ready for review. Unrelated: Morpheus review of Tank's PR #375 does not affect Neo's work.  
+**Reference:** .squad/decisions.md (new entry: "Adaptive Split Selection")

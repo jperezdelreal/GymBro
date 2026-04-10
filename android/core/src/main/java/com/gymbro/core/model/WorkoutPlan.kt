@@ -13,8 +13,23 @@ data class WorkoutPlan(
     val daysPerWeek: Int,
     val weeks: Int = 4,
     val workoutDays: List<WorkoutDay>,
+    val split: TrainingSplit? = null,
     val createdAt: Instant = Instant.now(),
-)
+    val isModified: Boolean = false,
+    val originalPlanId: String? = null,
+    @Transient val originalPlan: WorkoutPlan? = null,
+) {
+    fun createOriginalCopy(): WorkoutPlan = copy(
+        id = UUID.randomUUID().toString(),
+        isModified = false,
+        originalPlanId = null,
+    )
+
+    fun markAsModified(): WorkoutPlan = copy(
+        isModified = true,
+        originalPlanId = originalPlanId ?: id,
+    )
+}
 
 data class WorkoutDay(
     val dayNumber: Int,
@@ -23,6 +38,7 @@ data class WorkoutDay(
 )
 
 data class PlannedExercise(
+    val id: String = UUID.randomUUID().toString(),
     val exerciseName: String,
     val sets: Int,
     val repsRange: String,

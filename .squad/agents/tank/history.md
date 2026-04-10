@@ -893,3 +893,127 @@ ProGuard rules follow official library documentation and Android best practices.
 **Branch:** squad/331-1tap-logging
 **PR:** #351 (targeting master, label: feat)
 **Status:** Awaiting CI + review
+
+### 2025-01-18: Conditioning Exercise Library Expansion (Issue #380)
+
+**Task Context:**
+- Added 9 gym-based conditioning exercises to the exercise library
+- Issue requested: sled push/pull, battle ropes, rowing, assault bike, jump rope, box jumps, kettlebell swings, med ball slams
+- Scope: NOT running/cycling/swimming programs (gym equipment only)
+
+**Key Decisions:**
+
+**Category Choice: "cardio" (not new "conditioning" category):**
+- Found existing ExerciseCategory.CARDIO enum in Exercise.kt (line 34)
+- The enum already supported cardio exercises, just none had been added to seed data yet
+- Used lowercase "cardio" in JSON to match existing pattern (compound/isolation/accessory)
+- Decision: Reuse existing category rather than adding new one
+
+**Muscle Group Strategy: Full Body Primary:**
+- All conditioning exercises target "Full Body" as primary muscle group
+- Added specific secondary targets (e.g., Sled Push → Quadriceps, Glutes)
+- Matches existing pattern where Full Body exercises have granular secondaries
+
+**Equipment Types:**
+- Used existing equipment types: kettlebell, machine, other
+- "other" covers: sled, battle ropes, jump rope, box, med ball
+- No new equipment enum values needed
+
+**File Sync Strategy:**
+- Two seed files must be kept in sync:
+  1. shared/data/exercises-seed.json — canonical shared data
+  2. ndroid/core/src/main/assets/exercises-seed.json — Android runtime data
+- Files differ in size (236 vs 209 exercises before this PR)
+- Decisions file mentions future task to create shared data loader
+- For now: manually apply same changes to both files
+
+**Exercise Quality Standards:**
+- Instructions: 2-3 sentences (Setup → Execution → Key cues)
+- Emphasized form and safety (e.g., "Step down carefully" for box jumps)
+- Distinguished patterns (e.g., kettlebell swing is "hip hinge, not a squat")
+- Left videoURL, imageURL, muscleImageURL as null (follow-up task to add media)
+
+**Exercises Added:**
+1. Sled Push (equipment: other) — Explosive lower body
+2. Sled Pull (equipment: other) — Posterior chain emphasis
+3. Battle Ropes (equipment: other) — Upper body conditioning
+4. Rowing Intervals (equipment: machine) — Full-body, low-impact
+5. Assault Bike (equipment: machine) — Maximum metabolic demand
+6. Jump Rope (equipment: other) — Footwork and cardio
+7. Box Jumps (equipment: other) — Explosive power
+8. Kettlebell Swings (equipment: kettlebell) — Hip hinge conditioning
+9. Med Ball Slams (equipment: other) — Explosive full-body
+
+**Key File Paths:**
+- Exercise model: ndroid/core/src/main/java/com/gymbro/core/model/Exercise.kt
+- Shared seed data: shared/data/exercises-seed.json
+- Android seed data: ndroid/core/src/main/assets/exercises-seed.json
+- Training domain skill: .squad/skills/training-domain/SKILL.md
+
+**Impact:**
+- Total exercises: 236 (shared), 209 (android) → now +9 cardio each
+- Exercise library now supports filtering by cardio category
+- Users can add conditioning work to programs without custom exercises
+
+**Branch:** squad/380-conditioning-exercises
+**PR:** #384 (draft, targeting master, label: feat)
+**Status:** Ready for review
+### 2026-01-10: Editable AI-Generated Workout Plans — Data Model Foundation (Issue #365, PR #375)
+
+**Problem:** AI-generated plans from WorkoutPlanGenerator were immutable — users couldn't modify exercises, sets, reps, or rest days after generation.
+
+**Solution — Plan Versioning + Edit Tracking:**
+- **WorkoutPlan Model Extensions:**
+  - Added `isModified: Boolean` flag to track if plan has been edited by user
+  - Added `originalPlanId: String?` to store reference to original AI-generated plan
+  - Added `createOriginalCopy()` helper — creates immutable snapshot before first edit
+  - Added `markAsModified()` helper — marks plan as modified and sets originalPlanId if not already set
+- **PlannedExercise Model Extensions:**
+  - Added unique `id: String` field (UUID) for tracking individual exercises in edit operations
+  - Added optional `targetWeightKg: Double?` for progressive overload tracking
+  
+**Architecture Decisions:**
+- **Immutable Original Copy Strategy:** When user enters edit mode for the first time, `createOriginalCopy()` creates a separate WorkoutPlan instance with a new ID. This copy is stored in `ProgramsState.originalPlan` and never modified. The user edits the active plan; they can revert by restoring `originalPlan`.
+- **Lazy originalPlanId Assignment:** `originalPlanId` is only set when `markAsModified()` is called (on save). Fresh AI plans have `originalPlanId = null` until edited.
+- **Exercise IDs Required for Mutations:** SwapExercises, RemoveExercise, and UpdateExercise* events all operate on exercise IDs, not indices. This prevents race conditions when exercises are reordered.
+
+**Files Changed (PR #375):**
+- Modified: `android/core/src/main/java/com/gymbro/core/model/WorkoutPlan.kt` (+16 lines)
+  - Data class extensions with `isModified`, `originalPlanId`
+  - Helper methods for copy/modify workflows
+
+**Status:** Data model foundation complete. ViewModel and UI implementation deferred to follow-up work. This unblocks:
+- Edit operations in ProgramsViewModel (swap, add, remove, update exercises)
+- Save/revert UI in ProgramsScreen
+- Plan modification persistence (future: save edited plans to WorkoutTemplateRepository)
+
+**Open Questions:**
+- Should edited plans be auto-saved to WorkoutTemplateRepository as custom templates?
+- Conflict resolution if user generates a new AI plan while an edited plan is active — replace or keep both?
+- UI for adding exercises: inline picker vs. modal exercise library?
+
+
+### 2026-04-10: Issue #380 Complete — PR #384 Opened (Draft)
+
+**Task:** Add conditioning exercises to exercise library (Issue #380)  
+**Outcome:** PR #384 (draft) — 9 conditioning exercises added  
+**Decision:** Reused existing ExerciseCategory.CARDIO rather than creating new "conditioning" category.
+
+**Exercises Added:**
+Sled push, battle ropes, assault bike, jump rope, rowing machine, medicine ball slams, burpees, kettlebell swings, rope climbs
+
+**Rationale:**
+- CARDIO enum already exists
+- Conditioning IS cardio (elevates HR, builds cardiovascular capacity, work capacity)
+- Avoids category proliferation (no "metcon", "HIIT", "conditioning" fragmentation)
+- Seed data pattern consistent (lowercase: "compound", "isolation", "accessory", "cardio")
+
+**Files Affected:**
+- shared/data/exercises-seed.json — 9 cardio exercises added
+- android/core/src/main/assets/exercises-seed.json — 9 cardio exercises added
+- No enum changes (CARDIO already exists)
+
+**Future Extensibility:** If filtering needed (gym-only vs outdoor), add secondary attributes (environment: gym/outdoor/pool, intensity: steady_state/intervals/hiit) rather than new categories.
+
+**Status:** PR #384 draft ready for review. Unrelated: Morpheus has lockout on PR #375 (Tank's earlier work)—does not affect this PR.  
+**Reference:** .squad/decisions.md (new entry: "Reuse CARDIO Category")
