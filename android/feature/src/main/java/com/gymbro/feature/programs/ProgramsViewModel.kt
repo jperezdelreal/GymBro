@@ -3,6 +3,7 @@ package com.gymbro.feature.programs
 import androidx.lifecycle.viewModelScope
 import com.gymbro.core.preferences.UserPreferences
 import com.gymbro.core.repository.WorkoutTemplateRepository
+import com.gymbro.core.service.ActivePlanStore
 import com.gymbro.core.service.WorkoutPlanGenerator
 import com.gymbro.feature.common.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,6 +23,7 @@ class ProgramsViewModel @Inject constructor(
     private val templateRepository: WorkoutTemplateRepository,
     private val workoutPlanGenerator: WorkoutPlanGenerator,
     private val userPreferences: UserPreferences,
+    private val activePlanStore: ActivePlanStore,
 ) : BaseViewModel() {
 
     private val _state = MutableStateFlow(ProgramsState())
@@ -87,6 +89,7 @@ class ProgramsViewModel @Inject constructor(
             
             val plan = workoutPlanGenerator.generatePlan(goal, experience, daysPerWeek)
             
+            activePlanStore.setPlan(plan)
             _state.update {
                 it.copy(
                     activePlan = plan,

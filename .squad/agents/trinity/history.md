@@ -333,6 +333,15 @@
 - **Rule-based > AI-generated for first workout**: For MVP, deterministic first workout based on goals/equipment/experience is faster and more predictable than waiting for LLM suggestion. Can enhance with AI in v1.1.
 - **Empty states drive engagement**: Placeholder text ("Workout", "History") creates dead-end UX. EmptyStateView with clear CTA ("Start Workout", "View Workout Tab") guides new users to first action.
 - **Onboarding gate timing**: Check hasCompletedOnboarding after auth is known but before mainTabView renders. Use .task {} on Group, not on TabView, to avoid double-execution per tab.
+
+### 2026-04-10: PlanDayDetailScreen Implementation (Issue #382)
+**Critical Bug Fix — Navigation ViewModel Scoping:**
+- **Root Cause:** `PlanDayDetailRoute` used `hiltViewModel()` which created a NEW `ProgramsViewModel` scoped to the destination. The new VM had no `activePlan`, so `workoutDay` was always null, immediately popping back. The entire Plans feature was broken.
+- **Solution:** Created `ActivePlanStore` — a `@Singleton` in-memory store. `ProgramsViewModel` writes the generated plan there; `PlanDayDetailViewModel` reads from it. This survives navigation between composable destinations without requiring persistence.
+- **Architecture Pattern:** Followed `HistoryDetail` pattern: dedicated ViewModel + Contract + Screen file per detail screen. MVI with `PlanDayDetailState` / `PlanDayDetailIntent`.
+- **Files Created:** `ActivePlanStore.kt` (core/service), `PlanDayDetailContract.kt`, `PlanDayDetailViewModel.kt`, `PlanDayDetailScreen.kt` (feature/programs).
+- **Accessibility:** Added `semantics { contentDescription }` to exercise cards, summary items, and start workout button. Exercise names marked as headings. Localized accessibility strings for EN/ES.
+- **Key Learning:** When navigating to a new composable destination in Jetpack Compose Navigation, `hiltViewModel()` creates a ViewModel scoped to that destination — NOT the parent. To share data across destinations, use a singleton store, SavedStateHandle, or scoped nav graph ViewModels.
 - **FetchDescriptor pattern for single-item checks**: `FetchDescriptor<UserProfile>()` with try? fetch returns empty array on failure. First profile = current user (single-user app). More reliable than relying on implicit fetch.
 
 

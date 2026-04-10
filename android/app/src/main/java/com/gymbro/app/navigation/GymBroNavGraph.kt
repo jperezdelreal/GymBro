@@ -62,6 +62,7 @@ import com.gymbro.feature.history.HistoryDetailRoute
 import com.gymbro.feature.history.HistoryListRoute
 import com.gymbro.feature.onboarding.OnboardingRoute
 import com.gymbro.feature.profile.ProfileRoute
+import com.gymbro.feature.programs.PlanDayDetailRoute
 import com.gymbro.feature.programs.ProgramsRoute
 import com.gymbro.feature.progress.ProgressRoute
 import com.gymbro.feature.analytics.AnalyticsRoute
@@ -376,7 +377,7 @@ fun GymBroNavGraph(
             ),
         ) { backStackEntry ->
             val dayNumber = backStackEntry.arguments?.getInt("dayNumber") ?: 1
-            com.gymbro.feature.programs.PlanDayDetailRoute(
+            PlanDayDetailRoute(
                 dayNumber = dayNumber,
                 onNavigateBack = { navController.popBackStack() },
                 onNavigateToActiveWorkout = { navController.navigate("active_workout") },
