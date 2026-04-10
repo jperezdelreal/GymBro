@@ -32,6 +32,9 @@ class UserPreferences @Inject constructor(
         val TRAINING_GOAL = stringPreferencesKey("training_goal")
         val EXPERIENCE_LEVEL = stringPreferencesKey("experience_level")
         val TRAINING_DAYS_PER_WEEK = intPreferencesKey("training_days_per_week")
+        val MANUAL_SLEEP_QUALITY = intPreferencesKey("manual_sleep_quality")
+        val MANUAL_MUSCLE_SORENESS = intPreferencesKey("manual_muscle_soreness")
+        val MANUAL_ENERGY_LEVEL = intPreferencesKey("manual_energy_level")
     }
 
     enum class WeightUnit {
@@ -159,6 +162,26 @@ class UserPreferences @Inject constructor(
     suspend fun markTooltipShown(id: String) {
         dataStore.edit { preferences ->
             preferences[booleanPreferencesKey("tooltip_shown_$id")] = true
+        }
+    }
+
+    val manualSleepQuality: Flow<Int> = dataStore.data.map { preferences ->
+        preferences[MANUAL_SLEEP_QUALITY] ?: 5
+    }
+
+    val manualMuscleSoreness: Flow<Int> = dataStore.data.map { preferences ->
+        preferences[MANUAL_MUSCLE_SORENESS] ?: 5
+    }
+
+    val manualEnergyLevel: Flow<Int> = dataStore.data.map { preferences ->
+        preferences[MANUAL_ENERGY_LEVEL] ?: 5
+    }
+
+    suspend fun setManualRecoveryMetrics(sleepQuality: Int, muscleSoreness: Int, energyLevel: Int) {
+        dataStore.edit { preferences ->
+            preferences[MANUAL_SLEEP_QUALITY] = sleepQuality
+            preferences[MANUAL_MUSCLE_SORENESS] = muscleSoreness
+            preferences[MANUAL_ENERGY_LEVEL] = energyLevel
         }
     }
 }

@@ -23,6 +23,8 @@ import androidx.compose.material.icons.filled.DirectionsWalk
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.MonitorHeart
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.FitnessCenter
+import androidx.compose.material.icons.filled.BatteryChargingFull
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -31,6 +33,8 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -136,7 +140,13 @@ internal fun RecoveryScreen(
 
         when {
             !state.healthConnectAvailable -> {
-                HealthConnectUnavailableCard()
+                ManualRecoveryEntryCard(
+                    manualEntry = state.manualEntry,
+                    onSleepQualityChange = { onEvent(RecoveryEvent.UpdateSleepQuality(it)) },
+                    onMuscleSorenessChange = { onEvent(RecoveryEvent.UpdateMuscleSoreness(it)) },
+                    onEnergyLevelChange = { onEvent(RecoveryEvent.UpdateEnergyLevel(it)) },
+                    onSave = { onEvent(RecoveryEvent.SaveManualEntry) },
+                )
             }
             !state.permissionsGranted -> {
                 PermissionRequestCard(onRequestPermissions = {
@@ -462,41 +472,248 @@ private fun SleepChartCard(sleepHistory: List<SleepData>) {
 }
 
 @Composable
-private fun HealthConnectUnavailableCard() {
-    Card(
-        colors = CardDefaults.cardColors(containerColor = CardBackground),
-        shape = RoundedCornerShape(20.dp),
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
+private fun ManualRecoveryEntryCard(
+    manualEntry: ManualRecoveryEntry,
+    onSleepQualityChange: (Float) -> Unit,
+    onMuscleSorenessChange: (Float) -> Unit,
+    onEnergyLevelChange: (Float) -> Unit,
+    onSave: () -> Unit,
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        // Info banner
+        Card(
+            colors = CardDefaults.cardColors(containerColor = CardBackground),
+            shape = RoundedCornerShape(16.dp),
+            modifier = Modifier.fillMaxWidth(),
         ) {
-            Icon(
-                Icons.Default.MonitorHeart,
-                contentDescription = null,
-                tint = Color(0xFF9E9E9E),
-                modifier = Modifier.size(48.dp),
-            )
+            Row(
+                modifier = Modifier.padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(
+                    Icons.Default.MonitorHeart,
+                    contentDescription = null,
+                    tint = Color(0xFF9E9E9E),
+                    modifier = Modifier.size(24.dp),
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                Text(
+                    text = stringResource(R.string.recovery_manual_mode_info),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color(0xFF9E9E9E),
+                )
+            }
+        }
 
-            Spacer(modifier = Modifier.height(16.dp))
+        // Recovery Score Display
+        val scoreColor = when {
+            manualEntry.recoveryScore >= 70 -> AccentGreenStart
+            manualEntry.recoveryScore >= 40 -> AccentAmberStart
+            else -> AccentRed
+        }
 
+        GlassmorphicCard(modifier = Modifier.fillMaxWidth()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text(
+                    text = stringResource(R.string.recovery_score_label),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = OnSurfaceVariant,
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Text(
+                    text = "${manualEntry.recoveryScore}",
+                    fontSize = 56.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = scoreColor,
+                )
+
+                Text(
+                    text = when {
+                        manualEntry.recoveryScore >= 70 -> stringResource(R.string.recovery_status_good)
+                        manualEntry.recoveryScore >= 40 -> stringResource(R.string.recovery_status_fair)
+                        else -> stringResource(R.string.recovery_status_poor)
+                    },
+                    style = MaterialTheme.typography.titleLarge,
+                    color = scoreColor,
+                    fontWeight = FontWeight.SemiBold,
+                )
+            }
+        }
+
+        // Sleep Quality Slider
+        GlassmorphicCard(modifier = Modifier.fillMaxWidth()) {
+            Column(modifier = Modifier.padding(20.dp)) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(40.dp)
+                            .background(Color(0xFF7C4DFF).copy(alpha = 0.15f), CircleShape),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Icon(
+                            Icons.Default.Bedtime,
+                            contentDescription = null,
+                            tint = Color(0xFF7C4DFF),
+                            modifier = Modifier.size(20.dp),
+                        )
+                    }
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = stringResource(R.string.recovery_manual_sleep_quality),
+                            style = MaterialTheme.typography.titleMedium,
+                            color = Color.White,
+                            fontWeight = FontWeight.SemiBold,
+                        )
+                        Text(
+                            text = "${manualEntry.sleepQuality.toInt()}/10",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = OnSurfaceVariant,
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Slider(
+                    value = manualEntry.sleepQuality,
+                    onValueChange = onSleepQualityChange,
+                    valueRange = 1f..10f,
+                    steps = 8,
+                    colors = SliderDefaults.colors(
+                        thumbColor = Color(0xFF7C4DFF),
+                        activeTrackColor = Color(0xFF7C4DFF),
+                        inactiveTrackColor = Color(0xFF7C4DFF).copy(alpha = 0.3f),
+                    ),
+                )
+            }
+        }
+
+        // Muscle Soreness Slider
+        GlassmorphicCard(modifier = Modifier.fillMaxWidth()) {
+            Column(modifier = Modifier.padding(20.dp)) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(40.dp)
+                            .background(Color(0xFFFF5252).copy(alpha = 0.15f), CircleShape),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Icon(
+                            Icons.Default.FitnessCenter,
+                            contentDescription = null,
+                            tint = Color(0xFFFF5252),
+                            modifier = Modifier.size(20.dp),
+                        )
+                    }
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = stringResource(R.string.recovery_manual_muscle_soreness),
+                            style = MaterialTheme.typography.titleMedium,
+                            color = Color.White,
+                            fontWeight = FontWeight.SemiBold,
+                        )
+                        Text(
+                            text = "${manualEntry.muscleSoreness.toInt()}/10",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = OnSurfaceVariant,
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Slider(
+                    value = manualEntry.muscleSoreness,
+                    onValueChange = onMuscleSorenessChange,
+                    valueRange = 1f..10f,
+                    steps = 8,
+                    colors = SliderDefaults.colors(
+                        thumbColor = Color(0xFFFF5252),
+                        activeTrackColor = Color(0xFFFF5252),
+                        inactiveTrackColor = Color(0xFFFF5252).copy(alpha = 0.3f),
+                    ),
+                )
+            }
+        }
+
+        // Energy Level Slider
+        GlassmorphicCard(modifier = Modifier.fillMaxWidth()) {
+            Column(modifier = Modifier.padding(20.dp)) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(40.dp)
+                            .background(AccentGreen.copy(alpha = 0.15f), CircleShape),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Icon(
+                            Icons.Default.BatteryChargingFull,
+                            contentDescription = null,
+                            tint = AccentGreen,
+                            modifier = Modifier.size(20.dp),
+                        )
+                    }
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = stringResource(R.string.recovery_manual_energy_level),
+                            style = MaterialTheme.typography.titleMedium,
+                            color = Color.White,
+                            fontWeight = FontWeight.SemiBold,
+                        )
+                        Text(
+                            text = "${manualEntry.energyLevel.toInt()}/10",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = OnSurfaceVariant,
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Slider(
+                    value = manualEntry.energyLevel,
+                    onValueChange = onEnergyLevelChange,
+                    valueRange = 1f..10f,
+                    steps = 8,
+                    colors = SliderDefaults.colors(
+                        thumbColor = AccentGreen,
+                        activeTrackColor = AccentGreen,
+                        inactiveTrackColor = AccentGreen.copy(alpha = 0.3f),
+                    ),
+                )
+            }
+        }
+
+        // Save Button
+        Button(
+            onClick = onSave,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = AccentGreen,
+                contentColor = Color.Black,
+            ),
+            shape = RoundedCornerShape(12.dp),
+            modifier = Modifier.fillMaxWidth(),
+        ) {
             Text(
-                text = stringResource(R.string.recovery_health_connect_unavailable),
-                style = MaterialTheme.typography.titleMedium,
-                color = Color.White,
+                text = stringResource(R.string.recovery_manual_save),
                 fontWeight = FontWeight.SemiBold,
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = stringResource(R.string.recovery_health_connect_unavailable_message),
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color(0xFF9E9E9E),
-                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(vertical = 4.dp),
             )
         }
     }
