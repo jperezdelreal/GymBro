@@ -992,3 +992,28 @@ ProGuard rules follow official library documentation and Android best practices.
 - Conflict resolution if user generates a new AI plan while an edited plan is active — replace or keep both?
 - UI for adding exercises: inline picker vs. modal exercise library?
 
+
+### 2026-04-10: Issue #380 Complete — PR #384 Opened (Draft)
+
+**Task:** Add conditioning exercises to exercise library (Issue #380)  
+**Outcome:** PR #384 (draft) — 9 conditioning exercises added  
+**Decision:** Reused existing ExerciseCategory.CARDIO rather than creating new "conditioning" category.
+
+**Exercises Added:**
+Sled push, battle ropes, assault bike, jump rope, rowing machine, medicine ball slams, burpees, kettlebell swings, rope climbs
+
+**Rationale:**
+- CARDIO enum already exists
+- Conditioning IS cardio (elevates HR, builds cardiovascular capacity, work capacity)
+- Avoids category proliferation (no "metcon", "HIIT", "conditioning" fragmentation)
+- Seed data pattern consistent (lowercase: "compound", "isolation", "accessory", "cardio")
+
+**Files Affected:**
+- shared/data/exercises-seed.json — 9 cardio exercises added
+- android/core/src/main/assets/exercises-seed.json — 9 cardio exercises added
+- No enum changes (CARDIO already exists)
+
+**Future Extensibility:** If filtering needed (gym-only vs outdoor), add secondary attributes (environment: gym/outdoor/pool, intensity: steady_state/intervals/hiit) rather than new categories.
+
+**Status:** PR #384 draft ready for review. Unrelated: Morpheus has lockout on PR #375 (Tank's earlier work)—does not affect this PR.  
+**Reference:** .squad/decisions.md (new entry: "Reuse CARDIO Category")
