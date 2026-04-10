@@ -32,6 +32,7 @@ class UserPreferences @Inject constructor(
         val TRAINING_GOAL = stringPreferencesKey("training_goal")
         val EXPERIENCE_LEVEL = stringPreferencesKey("experience_level")
         val TRAINING_DAYS_PER_WEEK = intPreferencesKey("training_days_per_week")
+        val TRAINING_PHASE = stringPreferencesKey("training_phase")
         val MANUAL_SLEEP_HOURS = intPreferencesKey("manual_sleep_hours")
         val MANUAL_READINESS_SCORE = intPreferencesKey("manual_readiness_score")
         val MANUAL_SLEEP_QUALITY = intPreferencesKey("manual_sleep_quality")
@@ -49,6 +50,10 @@ class UserPreferences @Inject constructor(
 
     enum class ExperienceLevel {
         BEGINNER, INTERMEDIATE, ADVANCED
+    }
+
+    enum class TrainingPhase {
+        BULK, CUT, MAINTENANCE
     }
 
     val weightUnit: Flow<WeightUnit> = dataStore.data.map { preferences ->
@@ -95,6 +100,15 @@ class UserPreferences @Inject constructor(
 
     val trainingDaysPerWeek: Flow<Int> = dataStore.data.map { preferences ->
         preferences[TRAINING_DAYS_PER_WEEK] ?: 4
+    }
+
+    val trainingPhase: Flow<TrainingPhase> = dataStore.data.map { preferences ->
+        when (preferences[TRAINING_PHASE]) {
+            "BULK" -> TrainingPhase.BULK
+            "CUT" -> TrainingPhase.CUT
+            "MAINTENANCE" -> TrainingPhase.MAINTENANCE
+            else -> TrainingPhase.MAINTENANCE
+        }
     }
 
     suspend fun setWeightUnit(unit: WeightUnit) {
@@ -148,6 +162,12 @@ class UserPreferences @Inject constructor(
     suspend fun setTrainingDaysPerWeek(days: Int) {
         dataStore.edit { preferences ->
             preferences[TRAINING_DAYS_PER_WEEK] = days
+        }
+    }
+
+    suspend fun setTrainingPhase(phase: TrainingPhase) {
+        dataStore.edit { preferences ->
+            preferences[TRAINING_PHASE] = phase.name
         }
     }
 

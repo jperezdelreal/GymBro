@@ -195,6 +195,12 @@ internal fun ProfileScreen(
                 onClick = onNavigateToSettings,
             )
             SettingItem(
+                icon = Icons.Default.LocalFireDepartment,
+                label = stringResource(R.string.profile_training_phase),
+                iconTint = AccentCyanStart,
+                onClick = onNavigateToSettings,
+            )
+            SettingItem(
                 icon = Icons.Default.Notifications,
                 label = stringResource(R.string.profile_notifications),
                 iconTint = AccentCyanStart,

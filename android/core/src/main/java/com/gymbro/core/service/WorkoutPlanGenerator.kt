@@ -20,9 +20,15 @@ class WorkoutPlanGenerator @Inject constructor(
         goal: UserPreferences.TrainingGoal,
         experienceLevel: UserPreferences.ExperienceLevel,
         daysPerWeek: Int,
+        trainingPhase: UserPreferences.TrainingPhase = UserPreferences.TrainingPhase.MAINTENANCE,
     ): WorkoutPlan {
         val allExercises = exerciseRepository.getAllExercises().first()
         val split = TrainingSplit.selectOptimalSplit(daysPerWeek, goal)
+        val volumeMultiplier = when (trainingPhase) {
+            UserPreferences.TrainingPhase.BULK -> 1.2f
+            UserPreferences.TrainingPhase.CUT -> 0.8f
+            UserPreferences.TrainingPhase.MAINTENANCE -> 1.0f
+        }
 
         return when (goal) {
             UserPreferences.TrainingGoal.STRENGTH -> generateStrengthPlan(

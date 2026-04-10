@@ -178,6 +178,11 @@
     <string name="settings_rest_timer_value">%ds</string>
     <string name="settings_auto_start_rest_timer">Auto-Iniciar Temporizador de Descanso</string>
     <string name="settings_auto_start_rest_timer_subtitle">Iniciar temporizador después de completar una serie</string>
+    <string name="settings_training_phase">Fase de Entrenamiento</string>
+    <string name="settings_training_phase_subtitle">Afecta volumen, intensidad y recomendaciones del coach IA</string>
+    <string name="settings_training_phase_bulk">Volumen</string>
+    <string name="settings_training_phase_cut">Definición</string>
+    <string name="settings_training_phase_maintenance">Mantener</string>
     <string name="settings_workout_reminders">Recordatorios de Entrenamiento</string>
     <string name="settings_workout_reminders_subtitle">Recibe recordatorios para entrenar</string>
     <string name="settings_health_connect_connected">Conectado</string>
@@ -228,6 +233,7 @@
     <string name="onboarding_frequency_title">Frecuencia de Entrenamiento</string>
     <string name="onboarding_frequency_subtitle">¿Cuántos días por semana entrenas?</string>
     <string name="onboarding_frequency_days">%d días/semana</string>
+    <string name="onboarding_generating_plan">Creando tu plan…</string>
 
     <!-- Common -->
     <string name="common_loading">Cargando...</string>
@@ -273,6 +279,9 @@
     <string name="programs_built_in">Incorporado</string>
     <string name="programs_last_used">Último uso: %s</string>
     <string name="programs_active_plan_title">Plan Activo</string>
+    <string name="programs_your_first_program">Tu Primer Programa</string>
+    <string name="programs_first_program_title">Basado en tus objetivos, aquí está tu plan personalizado</string>
+    <string name="programs_first_program_subtitle">Creamos este programa a partir de tus respuestas. Toca cualquier día para ver el entrenamiento completo.</string>
     <string name="programs_templates_title">Plantillas Guardadas</string>
     <string name="programs_generate_new_plan">Generar Nuevo Plan de Entrenamiento</string>
     <string name="programs_generating_plan">Generando plan...</string>
@@ -399,6 +408,7 @@
     <string name="profile_weight_unit_label">Unidad de peso</string>
     <string name="profile_weight_unit_lbs">lbs</string>
     <string name="profile_notifications">Notificaciones</string>
+    <string name="profile_training_phase">Fase de entrenamiento</string>
     <string name="profile_data_section">Datos</string>
     <string name="profile_export_data">Exportar datos</string>
     <string name="profile_clear_all_data">Borrar todos los datos</string>
