@@ -372,3 +372,25 @@
 - **Root Cause 2a:** `hideKeyboard` uses back-key on Android → exits app from root activities (onboarding). Replaced with point-based tap (50%,20%) to dismiss Gboard toolbar.
 - **Root Cause 2b:** `onboarding_start` accessibility ID was on a wrapper View (912px wide) but actual clickable button only 259px. Maestro tapped wrapper center (x=540), missing the button (ends x=343). Fixed by tapping text `¡Vamos!` instead of ID.
 - **Lesson:** Never use `hideKeyboard` on Android root activities. Always verify element ID targets the actual clickable child, not an oversized wrapper. Use Maestro logs (`bounds=`) to debug tap misses.
+
+### 2026-04-10: Recovery Fallback Implementation (Issue #367)
+**Manual Entry for Users Without Health Connect:**
+- Replaced sleep quality/muscle soreness/energy sliders with focused metrics: sleep hours (0-12) and readiness score (1-10).
+- Implemented readiness labels (Wrecked/Tired/OK/Good/Crushed) based on score thresholds.
+- Updated recovery score calculation to use issue spec formula: (sleepHours/8)*0.5 + (readiness/10)*0.5 * 100.
+- Added new UserPreferences keys (MANUAL_SLEEP_HOURS, MANUAL_READINESS_SCORE) while keeping old ones for backward compatibility (deprecated).
+- Updated string resources in English and Spanish (values/strings.xml, values-es/strings.xml).
+
+**UX Pattern — Simplified Manual Entry:**
+- Reduced from 3 sliders (sleep quality, soreness, energy) to 2 focused inputs (sleep hours, readiness).
+- Sleep hours slider: 0-12 range with 0.5-hour increments (24 steps), displays as "X.X hours".
+- Readiness slider: 1-10 range, labeled at bottom with all 5 states for visual guidance.
+- Recovery score displayed prominently at top with color coding (green ≥70, amber ≥40, red <40).
+
+**Architecture Decision — Data Model Simplification:**
+- ManualRecoveryEntry now uses sleepHours (Float) and readinessScore (Float) instead of 3 separate metrics.
+- Recovery score calculation matches issue spec exactly — clear, predictable formula.
+- eadinessLabel computed property provides UX consistency across all readiness displays.
+- Health Connect availability check already existed — no changes needed there.
+
+**PR #374 opened, closes #367.**
