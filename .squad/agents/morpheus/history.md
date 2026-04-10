@@ -929,3 +929,104 @@ Exercise picker card taps don't trigger Compose `clickable` handlers via Maestro
 
 **Summary for Team:**
 PR #413 completes the E2E test migration following PR #409's UX redesign. All 24 Maestro flows now validate the new 4-tab navigation structure. Smoke tests pass. Team can now confidently deploy the home screen redesign knowing that automated E2E tests verify the navigation experience end-to-end. No regression risk from this PR—it's purely a test infrastructure update to match new product UX.
+
+---
+
+### 2026-04-11: Code Review & Merge — PRs #435, #436, #437, #438 (Tank, Trinity, Switch, Neo)
+
+**Oversight:** Lead review and merge of 4 integrated fix PRs addressing critical integration gaps and infrastructure work.
+
+**PR #435 — HomeScreen Reactive Refresh + SpeechRecognizer Lifecycle Leak (Closes #416, #420, Tank)**
+- Scope: Two adjacent Android bugs fixed in single PR
+- Issue #416: HomeScreen not refreshing when active plan changes
+  - Root cause: HomeViewModel.loadActivePlan() called getPlan() once in init — snapshot-based, not reactive
+  - Fix: Replaced with collectActivePlan() observing StateFlow continuously
+  - Architecture: Proper reactive pattern; eliminates need for manual refresh triggers
+- Issue #420: SpeechRecognizer lifecycle leak
+  - Root cause: VoiceRecognitionService created new instance without destroying previous; no composable lifecycle cleanup
+  - Fix: Added releaseRecognizer() called before new instance creation, DisposableEffect on VoiceInputButton disposal
+  - Lifecycle: 500ms debounce guard prevents rapid consecutive taps; tapping while listening stops cleanly
+  - Architecture: DisposableEffect is the correct Compose idiom for side-effect cleanup
+- Code Quality: Surgical changes, no scope creep, proper cleanup patterns
+- Decision: ✅ APPROVED & MERGED (squash, branch deleted)
+
+**PR #436 — Accessibility: contentDescriptions, Touch Targets, Haptic Feedback (Closes #421, #422, #425, Trinity)**
+- Scope: Three related accessibility issues fixed
+- Issue #421: Missing contentDescriptions on HomeScreen + ActiveWorkoutScreen icons
+  - Fix: Added bilingual string resources (EN/ES) for screen reader support
+  - TalkBack: 3 HomeScreen icons, Add Set button, warmup toggle all now have descriptions
+- Issue #422: Touch targets below 48dp (gym context: sweaty hands, gloves)
+  - VoiceInputButton: 32dp → 56dp (critical for gym environment)
+  - Delete exercise button: 32dp → 48dp
+  - Warmup toggle: 40dp → 48dp square
+  - Rest timer ±15s buttons: Explicit 48dp height
+  - Mic icon: 18dp → 24dp for visibility
+  - Architecture: User-centric fixes, not cosmetic; functional necessity for target demographic
+- Issue #425: Training phase selector haptic + accessibility
+  - Added: HapticFeedbackType.TextHandleMove on all 3 SegmentedButton clicks (Bulk/Cut/Maintenance)
+  - Semantics: contentDescription on selector row for TalkBack; improves discoverability
+- Decision: ✅ APPROVED & MERGED (squash, branch deleted)
+
+**PR #437 — Test Compilation Fix + 28 New Unit Tests (Closes #426, #428, Switch)**
+- Scope: Test infrastructure unblock + coverage expansion
+- Issue #428: ActiveWorkoutViewModelTest compilation failure
+  - Root cause: Missing TooltipManager mock (4th constructor param), incomplete FakeWorkoutRepository
+  - Fix: Added TooltipManager mock, implemented missing repository methods
+- Issue #429: RecoveryViewModelTest compilation failure
+  - Root cause: Missing UserPreferences mock (2nd constructor param) across all 15 test methods
+  - Fix: Added UserPreferences mock to all test methods
+- Issue #426: Missing unit test coverage (28 new tests)
+  - VoiceInputParserTest (14 tests): English/Spanish parsing, x/for/at formats, unit detection (kg/lbs), decimal weights, invalid input, format confirmation
+  - PlanDayDetailViewModelTest (6 tests): Load plan day, null plan error, invalid day error, retry behavior, per-day data validation
+  - HomeViewModelTest (8 tests): Active plan reactive updates, empty state, clearing plan, navigation effects, days since last workout
+- Code Quality: Focused test infrastructure work; no scope creep; proper mock setup; essential coverage
+- Decision: ✅ APPROVED & MERGED (squash, branch deleted)
+
+**PR #438 — Phase-Aware ProgressionEngine + Volume Multiplier Wiring (Closes #414, #415, Neo)**
+- Scope: Critical wiring gap fix — TrainingPhase was defined but unused
+- Issue #414: ProgressionEngine ignores TrainingPhase
+  - Before: Identical RPE thresholds regardless of phase
+  - After: Phase-aware thresholds (BULK: RPE ≤8 → progress, CUT: RPE ≤6 → progress, MAINTENANCE: RPE ≤7 → progress)
+  - Tests: 9 new tests (3 phases × 3 RPE scenarios)
+  - Architecture: Wiring complete from UserPreferences through ProgressionEngine
+- Issue #415: WorkoutPlanGenerator volume multiplier dead code
+  - Before: volumeMultiplier calculated but never applied to set counts
+  - After: Applied via applyVolumeMultiplier() to all plan generation paths (BULK: 1.2×, CUT: 0.8×, MAINTENANCE: 1.0×)
+  - Integration: OnboardingViewModel and ProgramsViewModel now pass TrainingPhase
+  - Tests: 4 new volume multiplier tests
+- Code Quality: Materializes previously-dead feature; proper end-to-end integration; comprehensive test coverage
+- Decision: ✅ APPROVED & MERGED (squash, branch deleted)
+
+---
+
+**Merged PR Summary:**
+✅ PR #435 (Tank): HomeScreen reactive + SpeechRecognizer lifecycle
+✅ PR #436 (Trinity): Accessibility (touch targets, contentDescriptions, haptics)
+✅ PR #437 (Switch): Test infrastructure + 28 new unit tests
+✅ PR #438 (Neo): TrainingPhase wiring + volume multiplier application
+
+**Board Status After Merges:**
+- All 4 PRs squashed and merged to master
+- Local feature branches deleted
+- Remote branches deleted
+- Master branch fresh, work tree clean
+- Integration gaps closed; infrastructure unblocked; accessibility improved
+
+**Architecture Validation:**
+- HomeScreen now properly reactive (StateFlow pattern, no manual refreshes)
+- SpeechRecognizer lifecycle managed correctly (DisposableEffect cleanup)
+- Accessibility improvements align with gym context (sweaty hands, gloves—48dp targets essential)
+- Test infrastructure unblocked (compilation fixes + essential coverage)
+- TrainingPhase fully materialized (from user selection through progression and volume calculations)
+
+**Team Impact:**
+- Infrastructure work (Switch, PR #437) unblocks further feature development
+- Integration gaps (Neo, PR #438) restore confidence in TrainingPhase features
+- Accessibility fixes (Trinity, PR #436) improve usability for target demographic
+- Lifecycle fixes (Tank, PR #435) stabilize HomeScreen experience
+
+**Next Steps:**
+- Monitor master branch stability; no regressions expected (surgical changes, comprehensive testing)
+- Team can now proceed with confidence that integration gaps are closed and infrastructure is sound
+- Consider follow-up optimization work (e.g., AI coach personalization based on training phase, persistent plan storage)
+
