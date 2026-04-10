@@ -8,6 +8,7 @@
     <string name="stats_widget_description">Ver tus estadísticas semanales de entrenamiento</string>
 
     <!-- Bottom Navigation -->
+    <string name="nav_home">Inicio</string>
     <string name="nav_library">Biblioteca</string>
     <string name="nav_history">Historial</string>
     <string name="nav_progress">Progreso</string>
@@ -231,4 +232,19 @@
     <string name="programs_total_sets_desc" formatted="false">%d series totales</string>
     <string name="programs_exercise_accessibility" formatted="false">%s: %d series de %s repeticiones, %d segundos de descanso</string>
     <string name="common_retry">Reintentar</string>
+
+    <!-- Home Screen -->
+    <string name="home_title">Inicio</string>
+    <string name="home_quick_start">Inicio Rápido</string>
+    <string name="home_quick_start_first">¿Listo para tu primer entrenamiento?</string>
+    <string name="home_quick_start_today">Ya entrenaste hoy — ¿otra vez?</string>
+    <string name="home_quick_start_yesterday">Último entrenamiento fue ayer</string>
+    <string name="home_quick_start_days_ago">Último entrenamiento hace %d días</string>
+    <string name="home_todays_workout">Entrenamiento de Hoy</string>
+    <string name="home_start">Iniciar</string>
+    <string name="home_view_all_programs">Ver todos los programas →</string>
+    <string name="home_create_program_title">Crea Tu Primer Programa</string>
+    <string name="home_create_program_subtitle">Obtén un plan de entrenamiento personalizado basado en tus objetivos</string>
+    <string name="home_recent_workouts">Entrenamientos Recientes</string>
+    <string name="home_exercises_count">%d ejercicios</string>
 </resources>
