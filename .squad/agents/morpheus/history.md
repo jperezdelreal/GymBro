@@ -290,6 +290,65 @@
 - **Fix:** Escaped to `\\(kg\\)` / `\\(lbs\\)` in all tapOn/assertVisible selectors
 - **Files:** `empty-state-screens.yaml`, `flow/ensure-post-onboarding.yaml`, `full-e2e.yaml`, `onboarding-edge-cases.yaml`, `onboarding-flow.yaml`, `verify-data-persistence.yaml`
 
+### 2026-04-09: Deep Feature Quality Audit (#343)
+
+**Scope:** Screen-by-screen audit of every Android feature to identify UX issues, incomplete functionality, dead buttons, and missing implementations  
+**Branch:** `squad/343-feature-audit`  
+**Status:** ✅ COMPLETE — Audit report delivered + Top 5 issues filed
+
+**Audit Coverage:**
+- 9 feature areas audited (Onboarding, Exercise Library, Active Workout, History, Progress, Recovery, AI Coach, Programs, Profile/Settings)
+- 18 issues identified (4 critical, 8 medium, 6 low)
+- Spanish translation status: 99.3% complete (407/410 strings)
+- Overall status: 🟡 Good foundation, needs polish before production
+
+**Critical Findings:**
+1. **Settings: Dead "Sign In" button** (Issue #353) — OAuth not implemented, empty onClick handler
+2. **Programs: Plan day detail view missing** (Issue #355) — ViewPlanDay event handler stubbed, generated plans unusable
+3. **Recovery: Health Connect dependency** (Issue #357) — No fallback for users without fitness trackers (~70% of users)
+4. **Settings: Dead "App Version" button** (Issue #356) — Empty onClick handler, confusing UX
+5. **Progress: Plateau alert UI missing** (Issue #354) — PlateauAlert model exists but no prominent UI to show warnings
+
+**Strengths Identified:**
+- ✅ All screens render without crashes
+- ✅ Navigation flows work correctly
+- ✅ Error states handled consistently (BaseViewModel pattern)
+- ✅ Empty states implemented for all list screens
+- ✅ Haptic feedback throughout
+- ✅ Repository pattern correctly implemented
+- ✅ Glassmorphic design system well-executed
+
+**GitHub Issues Created:**
+- #353: [Android] Settings: Implement or remove Sign In button — squad:trinity (UX decision)
+- #355: [Android] Programs: Implement plan day detail view — squad:tank (feature completion)
+- #357: [Android] Recovery: Add fallback UI when Health Connect unavailable — squad:trinity (UX fallback)
+- #356: [Android] Settings: Fix App Version button behavior — squad:trinity (UX polish)
+- #354: [Android] Progress: Add plateau alert UI — squad:neo (AI integration)
+
+**Production Readiness Assessment:**
+- Current state: 70% production-ready
+- Estimated effort to production-ready: 2-3 days (1 developer)
+- Must fix before launch: Issues #353, #355, #357, #356
+- Should fix before launch: Issue #354, Spanish translations (3 strings), voice input testing
+
+**Key Architecture Findings:**
+- Clean separation: UI (feature) → ViewModel → Repository → Data
+- Contract pattern (State/Event/Effect) consistently applied across all ViewModels
+- Dependency injection via Hilt properly configured
+- Reactive data with Flow throughout
+- No systemic issues found in architecture or error handling
+
+**Audit Artifacts:**
+- Comprehensive report: `docs/feature-audit-2026-04-09.md` (18 issues documented with severity, impact, recommendations)
+- All features reviewed for: crashes, dead buttons, placeholder data, Spanish translations, navigation, error/empty states
+
+**Next Steps (Assigned):**
+- Ralph to pick up Issues #353-357 in next work wave
+- Trinity to prioritize UX polish items (#353, #356, #357)
+- Tank to implement plan day detail (#355)
+- Neo to surface plateau alerts (#354)
+- Switch to complete remaining 3 Spanish translations
+
 **Root Cause 2: English-Only Text on es-ES Locale (2 files)**
 - **Problem:** `onboarding-flow.yaml` used English-only assertions; emulator runs Spanish locale
 - **Fix:** Added bilingual regex patterns using exact strings from `values-es/strings.xml`
