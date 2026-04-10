@@ -31,6 +31,7 @@ import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material.icons.filled.TrendingUp
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilterChip
@@ -870,50 +871,75 @@ private fun PlateauAlertCard(
     alert: PlateauAlert,
     onDismiss: () -> Unit,
 ) {
+    val haptic = LocalHapticFeedback.current
     val alertColor = when (alert.type) {
         PlateauType.STAGNATION -> Color(AccentAmberStart.value)
         PlateauType.REGRESSION -> AccentRed
     }
 
-    GlassmorphicCard(
-        accentColor = alertColor,
+    Card(
+        colors = CardDefaults.cardColors(
+            containerColor = alertColor.copy(alpha = 0.15f)
+        ),
+        shape = RoundedCornerShape(12.dp),
+        modifier = Modifier.fillMaxWidth()
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
             verticalAlignment = Alignment.Top,
         ) {
+            Icon(
+                imageVector = Icons.Default.Warning,
+                contentDescription = null,
+                tint = alertColor,
+                modifier = Modifier.size(28.dp)
+            )
+            Spacer(modifier = Modifier.width(12.dp))
             Column(modifier = Modifier.weight(1f)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = if (alert.type == PlateauType.STAGNATION) "⚠️" else "🔴",
-                        fontSize = 20.sp,
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = alert.exerciseName,
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        fontWeight = FontWeight.Bold,
-                    )
-                }
+                Text(
+                    text = when (alert.type) {
+                        PlateauType.STAGNATION -> stringResource(
+                            R.string.progress_plateau_detected_stagnation,
+                            alert.exerciseName
+                        )
+                        PlateauType.REGRESSION -> stringResource(
+                            R.string.progress_plateau_detected_regression,
+                            alert.exerciseName
+                        )
+                    },
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontWeight = FontWeight.Bold,
+                )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = stringResource(R.string.progress_weeks_no_progress, alert.weeksDuration),
-                    style = MaterialTheme.typography.bodySmall,
+                    text = stringResource(
+                        R.string.progress_plateau_duration,
+                        alert.weeksDuration
+                    ),
+                    style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = alert.suggestion,
+                    text = stringResource(R.string.progress_plateau_consider) + " " + alert.suggestion,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurface,
                 )
             }
-            IconButton(onClick = onDismiss) {
+            IconButton(
+                onClick = {
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    onDismiss()
+                }
+            ) {
                 Icon(
-                    Icons.Default.Close,
+                    imageVector = Icons.Default.Close,
                     contentDescription = stringResource(R.string.action_dismiss),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(20.dp)
                 )
             }
         }

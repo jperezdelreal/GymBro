@@ -342,6 +342,10 @@
     <string name="progress_detailed_insights">Ver información detallada de entrenamiento</string>
     <string name="progress_current_est_1rm">Est. 1RM Actual (%1$s kg × %2$d)</string>
     <string name="progress_this_week">Esta Semana</string>
+    <string name="progress_plateau_detected_stagnation">Estancamiento detectado en %1$s</string>
+    <string name="progress_plateau_detected_regression">Regresión detectada en %1$s</string>
+    <string name="progress_plateau_duration">Sin progreso en %1$d semanas.</string>
+    <string name="progress_plateau_consider">Considera:</string>
 
     <!-- History (additional) -->
     <string name="history_workout_details">Detalles del Entrenamiento</string>

@@ -342,6 +342,10 @@
     <string name="progress_detailed_insights">View detailed training insights</string>
     <string name="progress_current_est_1rm">Current Est. 1RM (%1$s kg × %2$d)</string>
     <string name="progress_this_week">This Week</string>
+    <string name="progress_plateau_detected_stagnation">Plateau detected on %1$s</string>
+    <string name="progress_plateau_detected_regression">Regression detected on %1$s</string>
+    <string name="progress_plateau_duration">No progress in %1$d weeks.</string>
+    <string name="progress_plateau_consider">Consider:</string>
 
     <!-- History -->
     <string name="history_workout_details">Workout Details</string>
