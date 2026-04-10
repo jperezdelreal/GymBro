@@ -25,13 +25,17 @@ object FirebaseModule {
 
     private const val TAG = "FirebaseModule"
 
-    private fun isFirebaseInitialized(): Boolean = try {
-        FirebaseApp.getInstance()
-        true
-    } catch (e: IllegalStateException) {
-        Log.w(TAG, "Firebase not initialized - running in offline mode")
-        false
+    private val firebaseAvailable: Boolean by lazy {
+        try {
+            FirebaseApp.getInstance()
+            true
+        } catch (e: IllegalStateException) {
+            Log.w(TAG, "Firebase not initialized - running in offline mode")
+            false
+        }
     }
+
+    private fun isFirebaseInitialized(): Boolean = firebaseAvailable
 
     @Provides
     @Singleton

@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ShowChart
@@ -96,6 +97,7 @@ private enum class BottomNavTab(
 @Composable
 fun GymBroNavGraph(
     userPreferences: UserPreferences = hiltViewModel<GymBroNavGraphViewModel>().userPreferences,
+    onFullyDrawn: () -> Unit = {},
 ) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -103,8 +105,22 @@ fun GymBroNavGraph(
 
     val showBottomBar = currentDestination?.route in BottomNavTab.entries.map { it.route }
 
-    val hasCompletedOnboarding by userPreferences.hasCompletedOnboarding.collectAsStateWithLifecycle(initialValue = false)
-    val startDestination = if (hasCompletedOnboarding) "exercise_library" else "onboarding"
+    // Use null initial value to distinguish "not yet loaded" from "false"
+    val hasCompletedOnboarding by userPreferences.hasCompletedOnboarding.collectAsStateWithLifecycle(initialValue = null)
+
+    // Wait for DataStore to load before deciding start destination
+    val resolvedOnboarding = hasCompletedOnboarding
+    if (resolvedOnboarding == null) {
+        Box(modifier = Modifier.fillMaxSize())
+        return
+    }
+
+    val startDestination = if (resolvedOnboarding) "exercise_library" else "onboarding"
+
+    // Report TTFD once we know which screen to show
+    LaunchedEffect(Unit) {
+        onFullyDrawn()
+    }
 
     Scaffold(
         modifier = Modifier.semantics {

@@ -16,7 +16,7 @@ import com.gymbro.core.model.MuscleGroup
  * - +20 for compound exercises (more comprehensive movements)
  * - -10 per equipment tier difference (bodyweight > barbell/dumbbell > cable/machine > other)
  */
-class ExerciseSubstitutionEngine {
+class ExerciseSubstitutionEngine @javax.inject.Inject constructor() {
 
     data class ScoredExercise(
         val exercise: Exercise,
