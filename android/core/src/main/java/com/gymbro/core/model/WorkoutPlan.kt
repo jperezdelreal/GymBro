@@ -13,6 +13,7 @@ data class WorkoutPlan(
     val daysPerWeek: Int,
     val weeks: Int = 4,
     val workoutDays: List<WorkoutDay>,
+    val split: TrainingSplit? = null,
     val createdAt: Instant = Instant.now(),
 )
 
