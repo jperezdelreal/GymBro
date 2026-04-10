@@ -31,15 +31,18 @@ public final class WorkoutGeneratorService {
     private let muscleRecoveryService: MuscleRecoveryService
     private let readinessProgramIntegration: ReadinessProgramIntegration
     private let overtrainingDetectionService: OvertrainingDetectionService
+    private let deloadAutomationService: DeloadAutomationService
 
     public init(
         muscleRecoveryService: MuscleRecoveryService = MuscleRecoveryService(),
         readinessProgramIntegration: ReadinessProgramIntegration = ReadinessProgramIntegration(),
-        overtrainingDetectionService: OvertrainingDetectionService = OvertrainingDetectionService()
+        overtrainingDetectionService: OvertrainingDetectionService = OvertrainingDetectionService(),
+        deloadAutomationService: DeloadAutomationService = DeloadAutomationService()
     ) {
         self.muscleRecoveryService = muscleRecoveryService
         self.readinessProgramIntegration = readinessProgramIntegration
         self.overtrainingDetectionService = overtrainingDetectionService
+        self.deloadAutomationService = deloadAutomationService
     }
 
     // MARK: - Public API
@@ -50,6 +53,8 @@ public final class WorkoutGeneratorService {
     ///   - activeProgram: The user's active program (nil = auto-generate)
     ///   - workoutHistory: Recent workouts (14 days recommended)
     ///   - readinessScore: Today's readiness score (nil = assume Good/75)
+    ///   - readinessScores: Recent readiness scores for deload detection (7+ days recommended)
+    ///   - lastDeloadDate: Date of last completed deload (nil if never)
     ///   - userProfile: User profile with experience/goals/frequency
     ///   - availableExercises: All exercises in the database for swap candidates
     ///   - timeConstraintMinutes: Target session length (30, 45, 60, 90)
@@ -59,6 +64,8 @@ public final class WorkoutGeneratorService {
         activeProgram: Program?,
         workoutHistory: [Workout],
         readinessScore: ReadinessScore?,
+        readinessScores: [ReadinessScore] = [],
+        lastDeloadDate: Date? = nil,
         userProfile: UserProfile?,
         availableExercises: [Exercise],
         timeConstraintMinutes: Int = 60,
@@ -103,6 +110,27 @@ public final class WorkoutGeneratorService {
                 summary: "Overtraining risk: \(analysis.riskLevel.rawValue). \(analysis.recommendations.first ?? "")",
                 impact: analysis.riskLevel == .high ? .restDay : .volumeIntensity
             ))
+        }
+        
+        // Step 3a: Check deload automation
+        let deloadRecommendation = deloadAutomationService.analyzeDeloadNeed(
+            workouts: workoutHistory,
+            readinessScores: readinessScores,
+            lastDeloadDate: lastDeloadDate,
+            currentDate: currentDate
+        )
+        
+        if deloadRecommendation.shouldDeload {
+            let urgencyLabel = deloadRecommendation.urgency == .immediate ? "URGENT" : "Recommended"
+            reasoning.append(ReasoningStep(
+                factor: .deloadAutomation,
+                summary: "\(urgencyLabel) Deload: \(deloadRecommendation.triggers.map { $0.type.rawValue }.joined(separator: ", "))",
+                impact: deloadRecommendation.urgency == .immediate ? .deloadWeek : .volumeIntensity
+            ))
+            
+            Self.logger.info(
+                "Deload automation triggered: state=\(deloadRecommendation.state.rawValue), urgency=\(deloadRecommendation.urgency.rawValue), ACWR=\(deloadRecommendation.acwr, privacy: .public)"
+            )
         }
 
         // Step 4: Resolve today's exercises from program or generate ad-hoc
@@ -600,6 +628,7 @@ public enum ReasoningFactor: String, Sendable {
     case muscleRecovery
     case readiness
     case overtraining
+    case deloadAutomation
     case programTemplate
     case exerciseHistory
     case timeConstraint
@@ -611,6 +640,7 @@ public enum ReasoningImpact: String, Sendable {
     case exerciseSelection
     case volumeIntensity
     case restDay
+    case deloadWeek
 }
 
 /// Internal slot used during generation before final output.
