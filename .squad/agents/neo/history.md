@@ -589,3 +589,103 @@ Implemented intelligent split selection based on training frequency and goals:
 - Add readiness-aware split downscaling (6d PPL → 4d U/L when fatigued)
 - Track split adherence in ComplianceService (did user actually follow the split structure?)
 
+---
+
+## Learnings
+
+### PR #375 Review Response (2025-07-19)
+
+**Context:**
+- Tank's PR #375 (feat: Add data model for editing AI workout plans) received CHANGES REQUESTED from Morpheus
+- Per reviewer-protocol, Tank is locked out from revising rejected PRs
+- Assigned to address two issues: missing @Transient field and scope creep removal
+
+**Issue 1: Missing @Transient val originalPlan Field**
+- The decisions doc (lines 2167-2178) explicitly requires WorkoutPlan to store in-memory reference to original plan
+- Tank's PR added isModified and originalPlanId but omitted the @Transient val originalPlan field
+- Why this matters: Without it, ViewModels must maintain separate state for original plan → tight coupling
+- Fix: Added @Transient val originalPlan: WorkoutPlan? = null to WorkoutPlan data class (line 19)
+
+**Issue 2: targetWeightKg Scope Creep**
+- Tank added targetWeightKg: Double? to PlannedExercise (not in issue #365 scope)
+- Issue #365 scope: swap exercises, modify sets/reps/rest, add/remove — no weight targets
+- targetWeightKg exists in WorkoutTemplate and database entities (separate feature domain)
+- Fix: Removed targetWeightKg from PlannedExercise (line 44 deleted)
+
+**Key Learning: @Transient in Kotlin Data Classes**
+- @Transient annotation marks fields as non-persistent (not serialized to database)
+- Essential for in-memory-only references like originalPlan
+- Prevents circular serialization issues while enabling rich object graphs
+- Pattern: Use @Transient for derived/cached data, parent references, UI-specific state
+
+**Key Learning: Scope Discipline in Data Model PRs**
+- Data models are foundational — scope creep here cascades to ViewModels, repositories, migrations
+- Before adding a field, check: (1) Is it in the issue scope? (2) Is it documented in decisions?
+- If field exists elsewhere (targetWeightKg in WorkoutTemplate), investigate why separation exists
+- Progressive overload tracking ≠ plan definition → different features, different models
+
+**Reviewer Protocol Applied:**
+- Tank locked out after rejection (cannot revise own rejected PR)
+- Neo (me) assigned as fresh eyes to address feedback
+- This prevents "defensive fixing" where original author minimally addresses feedback
+- Clean slate: I read the decisions doc, understood the intent, made precise fixes
+
+**Technical Execution:**
+- Fetched PR branch: git fetch origin squad/365-edit-ai-plans && git checkout
+- Made two targeted edits to WorkoutPlan.kt (add @Transient line, remove targetWeightKg line)
+- Verified no other targetWeightKg references in PlannedExercise context (grep confirmed it's only in WorkoutTemplate)
+- Staged ONLY the modified file: git add android/core/.../WorkoutPlan.kt (NEVER git add .)
+- Verified diff: git diff --cached (confirmed 1 insertion, 1 deletion)
+- Committed with descriptive message referencing PR #375 and issues addressed
+- Pushed: git push origin squad/365-edit-ai-plans
+
+**Commit Message Pattern:**
+`
+fix: Address PR #375 review — add originalPlan transient, remove targetWeightKg scope creep
+
+- Add @Transient val originalPlan field to WorkoutPlan for ViewModel decoupling
+- Remove targetWeightKg from PlannedExercise (out of scope for #365)
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+`
+
+**Outcome:**
+- PR branch updated with both fixes
+- Ready for Morpheus re-review
+- Demonstrates reviewer protocol in action (lockout → reassignment → focused fix)
+
+**File Modified:**
+- android/core/src/main/java/com/gymbro/core/model/WorkoutPlan.kt
+
+**SHA:** aee2474
+
+### 2026-04-10: Issue #381 Complete — PR #385 Opened (Draft)
+
+**Task:** Implement adaptive split selection based on training frequency (Issue #381)  
+**Outcome:** PR #385 (draft) — Intelligent split selection implemented  
+
+**Split Selection Rules:**
+| Days/Week | Split Type | Why |
+|-----------|------------|-----|
+| 2 | Full Body | Only way to hit all muscle groups 2x/week |
+| 3 | Full Body (default) or Powerlifting 3-Day (PLers) | Optimal frequency for compound learning; PLers get Squat/Bench/Deadlift focus |
+| 4 | Upper/Lower | Classic balanced, 2x frequency per muscle |
+| 5 | PPLUL (PPL + Upper/Lower) | Advanced hybrid for high volume tolerance |
+| 6+ | PPL (2x per week) | Optimal hypertrophy frequency |
+
+**Implementation:**
+1. TrainingSplit enum with selectOptimalSplit(daysPerWeek, goal) method
+2. Refactored WorkoutPlanGenerator to use split-specific day generation
+3. Added split field to WorkoutPlan model
+4. Updated AI coach system prompt with split knowledge
+5. Full test coverage (all frequency/goal combinations)
+
+**Impact:**
+- User plans now match evidence-based recommendations for their frequency
+- Differentiation: No competitor adapts split to frequency automatically
+- Foundation for future recovery-aware split downscaling (6d → 4d when fatigued)
+
+**Evidence Base:** Mike Israetel (Renaissance Periodization), Starting Strength (full body), PPL community (6-day hypertrophy)
+
+**Status:** PR #385 draft ready for review. Unrelated: Morpheus review of Tank's PR #375 does not affect Neo's work.  
+**Reference:** .squad/decisions.md (new entry: "Adaptive Split Selection")
