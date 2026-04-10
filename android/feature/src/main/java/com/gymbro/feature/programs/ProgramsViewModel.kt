@@ -1,7 +1,9 @@
 package com.gymbro.feature.programs
 
 import androidx.lifecycle.viewModelScope
+import com.gymbro.core.preferences.UserPreferences
 import com.gymbro.core.repository.WorkoutTemplateRepository
+import com.gymbro.core.service.WorkoutPlanGenerator
 import com.gymbro.feature.common.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -9,6 +11,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -17,6 +20,8 @@ import javax.inject.Inject
 @HiltViewModel
 class ProgramsViewModel @Inject constructor(
     private val templateRepository: WorkoutTemplateRepository,
+    private val workoutPlanGenerator: WorkoutPlanGenerator,
+    private val userPreferences: UserPreferences,
 ) : BaseViewModel() {
 
     private val _state = MutableStateFlow(ProgramsState())
@@ -35,7 +40,6 @@ class ProgramsViewModel @Inject constructor(
     fun onEvent(event: ProgramsEvent) {
         when (event) {
             is ProgramsEvent.TemplateClicked -> {
-                // Show options dialog or navigate to detail/edit
                 viewModelScope.launch {
                     _effect.send(ProgramsEffect.NavigateToCreateTemplate(event.template.id.toString()))
                 }
@@ -56,6 +60,36 @@ class ProgramsViewModel @Inject constructor(
                     templateRepository.updateLastUsed(event.template.id.toString())
                     _effect.send(ProgramsEffect.NavigateToActiveWorkout(event.template))
                 }
+            }
+            is ProgramsEvent.GenerateNewPlan -> {
+                generateWorkoutPlan()
+            }
+            is ProgramsEvent.ViewPlanDay -> {
+                // Future: navigate to day detail
+            }
+        }
+    }
+
+    private fun generateWorkoutPlan() {
+        safeLaunch(
+            onError = { error ->
+                _state.update { it.copy(isGeneratingPlan = false) }
+                handleError(error) { generateWorkoutPlan() }
+            }
+        ) {
+            _state.update { it.copy(isGeneratingPlan = true) }
+            
+            val goal = userPreferences.trainingGoal.first()
+            val experience = userPreferences.experienceLevel.first()
+            val daysPerWeek = userPreferences.trainingDaysPerWeek.first()
+            
+            val plan = workoutPlanGenerator.generatePlan(goal, experience, daysPerWeek)
+            
+            _state.update {
+                it.copy(
+                    activePlan = plan,
+                    isGeneratingPlan = false,
+                )
             }
         }
     }
