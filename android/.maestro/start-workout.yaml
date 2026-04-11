@@ -92,3 +92,35 @@ onFlowComplete:
 
 # Screenshot 05: Set data logged (weight and reps entered)
 - takeScreenshot: 05_start_workout_set_logged
+
+# ─── BUG REGRESSION: Verify exercise appears in workout list after picking ───
+# The exercise name from the picker should be visible in the workout
+- assertVisible:
+    text: ".*Squat.*"
+# Screenshot 06: Exercise name confirmed visible in workout list
+- takeScreenshot: 06_start_workout_exercise_name_confirmed
+
+# Add a second exercise to verify the list grows
+- tapOn: "Añadir Ejercicio|Add Exercise"
+- waitForAnimationToEnd:
+    timeout: 2000
+- assertVisible: "Elegir Ejercicio|Choose Exercise"
+- tapOn:
+    id: "search_bar"
+- inputText: "Bench"
+- hideKeyboard
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    text: ".*Bench.*Press.*"
+    index: 0
+- waitForAnimationToEnd:
+    timeout: 3000
+
+# Verify both exercises are now visible in the workout
+- assertVisible:
+    text: ".*Squat.*"
+- assertVisible:
+    text: ".*Bench.*Press.*"
+# Screenshot 07: Two exercises confirmed in workout list
+- takeScreenshot: 07_start_workout_two_exercises_added

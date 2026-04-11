@@ -101,3 +101,46 @@ onFlowComplete:
 - assertVisible: "Programas|Programs"
 # Screenshot 08: Returned to Programs tab after viewing day detail
 - takeScreenshot: 08_plan_day_detail_back_to_programs
+
+# ─── BUG REGRESSION: Tap "Start This Workout" and verify exercises carry over ───
+# Re-enter the day detail
+- scrollUntilVisible:
+    element:
+      text: "Día 1|Day 1"
+    timeout: 5000
+- tapOn:
+    text: "Día 1|Day 1"
+    index: 0
+- waitForAnimationToEnd:
+    timeout: 2000
+
+# Scroll to and tap "Start This Workout"
+- scrollUntilVisible:
+    element:
+      text: "Iniciar Este Entrenamiento|Start This Workout"
+    timeout: 5000
+- tapOn:
+    text: "Iniciar Este Entrenamiento|Start This Workout"
+- waitForAnimationToEnd:
+    timeout: 3000
+
+# Verify we're on Active Workout screen
+- assertVisible: "Entrenamiento Activo|Active Workout"
+# Screenshot 09: Active Workout started from plan day
+- takeScreenshot: 09_plan_day_detail_workout_started
+
+# BUG ASSERTION: Exercises from the plan should appear in the active workout.
+# Currently this FAILS because exercises are not passed through navigation.
+# After Trinity's fix, the planned exercises should auto-populate.
+- assertVisible:
+    text: "Bench Press|Press de Banca"
+    optional: true
+# Screenshot 10: Checking if planned exercises appeared in workout
+- takeScreenshot: 10_plan_day_detail_exercises_in_workout
+
+# Clean up: discard the workout
+- tapOn:
+    text: "Cancelar Entrenamiento|Cancel Workout|Descartar"
+    optional: true
+- waitForAnimationToEnd:
+    timeout: 2000

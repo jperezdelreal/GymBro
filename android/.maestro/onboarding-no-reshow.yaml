@@ -1,0 +1,75 @@
+appId: com.gymbro.app
+name: "Onboarding No Reshow - After onboarding completes, it must not reappear"
+#
+# Tests: Onboarding completion persists — relaunching the app shows Home, not onboarding
+# Preconditions: ensure-post-onboarding.yaml completes onboarding if needed
+# Test data: None
+# Assertions: After onboarding is done, the app shows Home tab content (quick_start_card),
+#             NOT the onboarding welcome screen
+# Cleanup: None
+# Dependencies: flow/ensure-post-onboarding.yaml
+#
+# BUG CONTEXT: Users reported seeing onboarding again after relaunch. This test
+# verifies the fix by completing onboarding, then relaunching WITHOUT clearState
+# and asserting that Home screen content is visible.
+tags:
+  - onboarding
+  - regression
+onFlowStart:
+  - launchApp
+  - waitForAnimationToEnd:
+      timeout: 3000
+
+---
+
+# Step 1: Ensure onboarding is complete
+- runFlow: flow/ensure-post-onboarding.yaml
+
+# Step 2: Navigate to Home to confirm we're post-onboarding
+- tapOn:
+    id: "nav_home"
+- waitForAnimationToEnd:
+    timeout: 2000
+- assertVisible: "Inicio|Home"
+# Screenshot 01: Home screen confirmed after onboarding
+- takeScreenshot: 01_onboarding_no_reshow_home_confirmed
+
+# Step 3: Verify home screen elements are present (not onboarding)
+- assertVisible:
+    id: "quick_start_card"
+# Screenshot 02: Quick start card visible — definitely on Home
+- takeScreenshot: 02_onboarding_no_reshow_quick_start_visible
+
+# Step 4: Relaunch the app WITHOUT clearing state
+- stopApp
+- launchApp
+- waitForAnimationToEnd:
+    timeout: 5000
+# Screenshot 03: App relaunched
+- takeScreenshot: 03_onboarding_no_reshow_relaunched
+
+# Step 5: KEY ASSERTION — onboarding should NOT be showing
+# If the bug exists, we'll see the onboarding welcome page ("GymBro" + "Tu compañero")
+# instead of the Home or Programs screen.
+- assertNotVisible:
+    text: "Tu compañero de gym inteligente|Your smart gym companion"
+    optional: false
+# Screenshot 04: Onboarding welcome text NOT visible (good!)
+- takeScreenshot: 04_onboarding_no_reshow_no_welcome
+
+# Step 6: Verify we landed on a main app screen (Home or Programs)
+- assertVisible:
+    text: "Inicio|Home|Programas|Programs"
+# Screenshot 05: Main app screen visible after relaunch
+- takeScreenshot: 05_onboarding_no_reshow_main_screen
+
+# Step 7: Navigate to Home and verify content
+- tapOn:
+    id: "nav_home"
+    optional: true
+- waitForAnimationToEnd:
+    timeout: 2000
+- assertVisible:
+    id: "quick_start_card"
+# Screenshot 06: Home screen content confirmed after relaunch
+- takeScreenshot: 06_onboarding_no_reshow_home_after_relaunch

@@ -134,4 +134,67 @@ class PlanDayDetailViewModelTest {
         assertEquals(1, state.workoutDay!!.exercises.size)
         assertEquals("Squat", state.workoutDay!!.exercises[0].exerciseName)
     }
+
+    // ──────────────────────────────────────────────────────────────────────
+    // BUG: "Start This Workout" does NOT pass exercises to ActiveWorkout
+    //
+    // The PlanDayDetailContract currently has NO StartWorkout intent and NO
+    // effect that carries exercise data. When the user taps "Start This
+    // Workout", navigation fires but the exercises are silently dropped.
+    //
+    // The tests below document what the correct contract SHOULD look like.
+    // They will NOT compile until PlanDayDetailContract is updated with:
+    //   - PlanDayDetailIntent.StartWorkout
+    //   - PlanDayDetailEffect.NavigateToWorkout(exercises: List<PlannedExercise>)
+    // ──────────────────────────────────────────────────────────────────────
+
+    // TODO: Uncomment when PlanDayDetailContract is updated with StartWorkout intent/effect
+    //
+    // @Test
+    // fun `startWorkout emits NavigateToWorkout effect with exercises`() {
+    //     activePlanStore.setPlan(testPlan)
+    //     viewModel.onIntent(PlanDayDetailIntent.LoadDay(1))
+    //
+    //     // Verify day loaded correctly first
+    //     val state = viewModel.state.value
+    //     assertEquals(2, state.workoutDay!!.exercises.size)
+    //
+    //     // Now fire StartWorkout — expect an effect carrying the exercises
+    //     viewModel.effect.test {
+    //         viewModel.onIntent(PlanDayDetailIntent.StartWorkout)
+    //
+    //         val effect = awaitItem()
+    //         assertTrue(effect is PlanDayDetailEffect.NavigateToWorkout)
+    //         val navEffect = effect as PlanDayDetailEffect.NavigateToWorkout
+    //         assertEquals(2, navEffect.exercises.size)
+    //         assertEquals("Bench Press", navEffect.exercises[0].exerciseName)
+    //         assertEquals("OHP", navEffect.exercises[1].exerciseName)
+    //     }
+    // }
+    //
+    // @Test
+    // fun `startWorkout before loadDay does not crash`() {
+    //     // No day loaded — should be a no-op or emit an error, never crash
+    //     viewModel.onIntent(PlanDayDetailIntent.StartWorkout)
+    //     // If no effect channel exists yet, this just verifies no exception
+    //     val state = viewModel.state.value
+    //     assertTrue(state.isLoading) // Still in initial state
+    // }
+    //
+    // @Test
+    // fun `startWorkout preserves sets and reps from plan`() {
+    //     activePlanStore.setPlan(testPlan)
+    //     viewModel.onIntent(PlanDayDetailIntent.LoadDay(1))
+    //
+    //     viewModel.effect.test {
+    //         viewModel.onIntent(PlanDayDetailIntent.StartWorkout)
+    //
+    //         val effect = awaitItem() as PlanDayDetailEffect.NavigateToWorkout
+    //         // Verify the planned sets/reps survive the trip
+    //         assertEquals(4, effect.exercises[0].sets)
+    //         assertEquals("6-8", effect.exercises[0].repsRange)
+    //         assertEquals(3, effect.exercises[1].sets)
+    //         assertEquals("8-10", effect.exercises[1].repsRange)
+    //     }
+    // }
 }
