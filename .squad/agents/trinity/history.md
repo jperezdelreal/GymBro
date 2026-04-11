@@ -433,3 +433,45 @@
 - `ActivePlanStore` is the team's shared in-memory store pattern — use it for passing data between screens that don't share a SavedStateHandle.
 - `Flow.first()` from Room DAOs: must import `kotlinx.coroutines.flow.first` explicitly; Room Flows are hot and need explicit terminal operators.
 - PlanDayDetail uses Intent/Effect pattern but the ViewModel extends plain `ViewModel` (not `BaseViewModel`) — different from other feature ViewModels.
+
+### P0 Quality Audit Fix — i18n, Weight Units, UX (Morpheus 6.5→9 push)
+**All 7 fixes applied in a single commit (16 files, 298 insertions):**
+
+**Fix 1 — i18n Enum DisplayNames (biggest impact):**
+- Created `core/ui/DisplayNames.kt` with `@Composable` extension functions: `MuscleGroup.localizedName()`, `ExerciseCategory.localizedName()`, `Equipment.localizedName()`, `RecordType.localizedName()`.
+- Added 28 string resources per language (muscle groups, categories, equipment, record types) to both `values/strings.xml` and `values-es/strings.xml`.
+- Replaced ALL `.displayName` usages across 11 screens: ExerciseDetailScreen, ExerciseLibraryScreen, CreateExerciseScreen, ActiveWorkoutScreen, SmartWorkoutScreen, HistoryListScreen, HistoryDetailScreen, ProgramsScreen, ProgressScreen.
+- Removed the hardcoded `Equipment.displayName()` private function from ExerciseDetailScreen (replaced by shared extension).
+
+**Fix 2 — Weight Unit Preference (kg/lb):**
+- HomeScreen, HistoryListScreen: Added Hilt `@EntryPoint` interfaces to access `UserPreferences.weightUnit` Flow.
+- ActiveWorkoutScreen: Already had weight unit access; threaded it into `WorkoutStatsContent` and replaced hardcoded header string.
+- Used `collectAsStateWithLifecycle` for reactive weight unit changes.
+- Pattern: `if (weightUnit == UserPreferences.WeightUnit.LBS) "lb" else "kg"` — simple inline formatting.
+
+**Fix 3 — Discard Workout Confirmation:**
+- Added `showDiscardDialog` local state in `ActiveWorkoutScreen`.
+- X button now shows AlertDialog with bilingual title/message/confirm/cancel.
+- Only fires `DiscardWorkout` event after user confirms.
+- Red destructive button color for "Discard".
+
+**Fix 4 — Template Click Dead-End:**
+- Removed `onClick` parameter from `TemplateCard` composable.
+- Removed `.clickable(onClick = onClick)` modifier from Card.
+- Cards remain visible but non-interactive (informational only).
+- Cleaned up the TODO comment in `GymBroNavGraph.kt`.
+
+**Fix 5 — Hardcoded ContentDescriptions:**
+- ExerciseDetailScreen: `"Watch exercise video on YouTube"` → `stringResource(R.string.cd_watch_exercise_video)`
+- PlanDayDetailScreen: `"Start this workout"` → `stringResource(R.string.cd_start_this_workout)`
+
+**Fix 6 — Dead Code Cleanup:**
+- Removed `PlaceholderScreen` from GymBroNavGraph.kt.
+- Removed `BiggerNumberField` from ActiveWorkoutScreen.kt.
+- Removed `NavigateBack` from `ExerciseDetailContract.kt` (ViewModel never sent it) + removed dead effect collection in screen.
+
+**Fix 7 — Empty Workout Guidance:**
+- When `state.exercises.isEmpty() && !state.isLoading`, shows centered hint: "Tap + to add your first exercise" / "Pulsa + para añadir tu primer ejercicio".
+
+**Key pattern established:**
+- For screens that need UserPreferences but don't inject it through ViewModel: use Hilt `@EntryPoint` + `EntryPointAccessors.fromApplication()` in the Route composable. Pattern already existed in ActiveWorkoutScreen; replicated for HomeScreen and HistoryListScreen.
