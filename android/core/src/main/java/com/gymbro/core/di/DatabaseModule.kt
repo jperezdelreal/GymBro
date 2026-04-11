@@ -104,7 +104,7 @@ private class SeedDatabaseCallback(private val context: Context) : RoomDatabase.
                     exercises.forEach { exercise ->
                         db.execSQL(
                             """
-                            INSERT INTO exercises (id, name, muscleGroup, category, equipment, description, youtubeUrl)
+                            INSERT OR IGNORE INTO exercises (id, name, muscleGroup, category, equipment, description, youtubeUrl)
                             VALUES (?, ?, ?, ?, ?, ?, ?)
                             """,
                             arrayOf(
