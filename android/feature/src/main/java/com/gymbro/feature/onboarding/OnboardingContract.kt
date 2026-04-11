@@ -14,6 +14,7 @@ data class OnboardingState(
     val trainingDaysPerWeek: Int = 4,
     val selectedPhase: TrainingPhase = TrainingPhase.MAINTENANCE,
     val isGeneratingPlan: Boolean = false,
+    val planGenerationError: String? = null,
 )
 
 sealed interface OnboardingEvent {
@@ -28,5 +29,6 @@ sealed interface OnboardingEvent {
 }
 
 sealed interface OnboardingEffect {
-    data object NavigateToMain : OnboardingEffect
+    data class NavigateToMain(val planGenerated: Boolean, val daysPerWeek: Int) : OnboardingEffect
+    data object ShowPlanGenerationError : OnboardingEffect
 }

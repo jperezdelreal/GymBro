@@ -712,4 +712,17 @@
     <!-- Issue #462: Progress polish -->
     <string name="progress_plateau_explanation">A plateau means your performance on this exercise hasn\'t improved recently. Try varying reps, weight, or technique.</string>
     <string name="progress_view_all_prs">View All PRs</string>
+
+    <!-- Final polish: plan confirmation, hardcoded string sweep, a11y -->
+    <string name="plan_ready_message">Your %d-day plan is ready! 🎉</string>
+    <string name="onboarding_first_program_name">Your First Program</string>
+    <string name="onboarding_plan_generation_error">Could not generate your workout plan. You can create one manually from the Home screen.</string>
+    <string name="settings_data_cleared">All data cleared</string>
+    <string name="settings_licenses_shown">Licenses will be displayed</string>
+    <string name="profile_signed_in_success">Signed in successfully</string>
+    <string name="profile_signed_out_success">Signed out</string>
+    <string name="profile_sign_in_failed">Sign-in failed</string>
+    <string name="profile_sign_out_failed">Sign-out failed</string>
+    <string name="home_cd_view_all_programs">View all programs</string>
+    <string name="home_cd_recent_workout">Workout on %1$s, %2$d exercises</string>
 </resources>

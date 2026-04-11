@@ -5,6 +5,7 @@ import androidx.health.connect.client.HealthConnectClient
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gymbro.core.notification.ReminderScheduler
+import com.gymbro.core.R
 import com.gymbro.core.preferences.UserPreferences
 import com.gymbro.core.preferences.UserPreferences.TrainingPhase
 import com.gymbro.core.preferences.UserPreferences.WeightUnit
@@ -144,7 +145,7 @@ class SettingsViewModel @Inject constructor(
     private fun clearAllData() {
         viewModelScope.launch {
             userPreferences.clearAllData()
-            _effects.send(SettingsEffect.ShowMessage("All data cleared"))
+            _effects.send(SettingsEffect.ShowMessage(context.getString(R.string.settings_data_cleared)))
         }
     }
 
@@ -169,7 +170,7 @@ class SettingsViewModel @Inject constructor(
 
     private fun viewLicenses() {
         viewModelScope.launch {
-            _effects.send(SettingsEffect.ShowMessage("Licenses will be displayed"))
+            _effects.send(SettingsEffect.ShowMessage(context.getString(R.string.settings_licenses_shown)))
         }
     }
 

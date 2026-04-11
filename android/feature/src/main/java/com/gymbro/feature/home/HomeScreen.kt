@@ -48,6 +48,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
@@ -328,6 +329,7 @@ private fun TodayWorkoutCard(
     onStartWorkout: () -> Unit,
     onViewPrograms: () -> Unit,
 ) {
+    val viewAllProgramsLabel = stringResource(R.string.home_cd_view_all_programs)
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -470,6 +472,7 @@ private fun TodayWorkoutCard(
                 color = AccentCyan,
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier
+                    .semantics { contentDescription = viewAllProgramsLabel }
                     .clickable(onClick = onViewPrograms)
                     .padding(vertical = 4.dp),
             )
@@ -537,9 +540,16 @@ private fun RecentWorkoutCard(
             .format(dateFormatter)
     }
 
+    val workoutDescription = stringResource(
+        R.string.home_cd_recent_workout,
+        formattedDate,
+        workout.exerciseCount,
+    )
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
+            .semantics(mergeDescendants = true) { contentDescription = workoutDescription }
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(

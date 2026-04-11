@@ -29,10 +29,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -68,23 +72,38 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun OnboardingRoute(
-    onNavigateToMain: () -> Unit,
+    onNavigateToMain: (planGenerated: Boolean, daysPerWeek: Int) -> Unit,
     viewModel: OnboardingViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
         viewModel.effects.collect { effect ->
             when (effect) {
-                OnboardingEffect.NavigateToMain -> onNavigateToMain()
+                is OnboardingEffect.NavigateToMain -> onNavigateToMain(effect.planGenerated, effect.daysPerWeek)
+                is OnboardingEffect.ShowPlanGenerationError -> {
+                    state.planGenerationError?.let { message ->
+                        snackbarHostState.showSnackbar(
+                            message = message,
+                            duration = SnackbarDuration.Long,
+                        )
+                    }
+                }
             }
         }
     }
 
-    OnboardingScreen(
-        state = state,
-        onEvent = viewModel::onEvent,
-    )
+    Box(modifier = Modifier.fillMaxSize()) {
+        OnboardingScreen(
+            state = state,
+            onEvent = viewModel::onEvent,
+        )
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.align(Alignment.BottomCenter),
+        )
+    }
 }
 
 @OptIn(ExperimentalFoundationApi::class)

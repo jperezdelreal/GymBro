@@ -712,4 +712,17 @@
     <!-- Issue #462: Progress polish -->
     <string name="progress_plateau_explanation">Un estancamiento significa que tu rendimiento en este ejercicio no ha mejorado recientemente. Intenta variar repeticiones, peso o técnica.</string>
     <string name="progress_view_all_prs">Ver todos los récords</string>
+
+    <!-- Final polish: plan confirmation, hardcoded string sweep, a11y -->
+    <string name="plan_ready_message">¡Tu plan de %d días está listo! 🎉</string>
+    <string name="onboarding_first_program_name">Tu Primer Programa</string>
+    <string name="onboarding_plan_generation_error">No se pudo generar tu plan de entrenamiento. Puedes crear uno manualmente desde la pantalla de Inicio.</string>
+    <string name="settings_data_cleared">Todos los datos borrados</string>
+    <string name="settings_licenses_shown">Las licencias se mostrarán</string>
+    <string name="profile_signed_in_success">Sesión iniciada correctamente</string>
+    <string name="profile_signed_out_success">Sesión cerrada</string>
+    <string name="profile_sign_in_failed">Error al iniciar sesión</string>
+    <string name="profile_sign_out_failed">Error al cerrar sesión</string>
+    <string name="home_cd_view_all_programs">Ver todos los programas</string>
+    <string name="home_cd_recent_workout">Entrenamiento del %1$s, %2$d ejercicios</string>
 </resources>

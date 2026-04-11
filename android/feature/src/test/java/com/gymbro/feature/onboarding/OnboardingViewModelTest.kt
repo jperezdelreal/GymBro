@@ -13,8 +13,10 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
 import io.mockk.verify
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -81,7 +83,7 @@ class OnboardingViewModelTest {
             viewModel.onEvent(OnboardingEvent.CompleteOnboarding)
             
             val effect = awaitItem()
-            assertEquals(OnboardingEffect.NavigateToMain, effect)
+            assertTrue(effect is OnboardingEffect.NavigateToMain)
             
             coVerify { userPreferences.setWeightUnit(WeightUnit.LBS) }
             coVerify { userPreferences.setUserName("John") }
@@ -132,13 +134,27 @@ class OnboardingViewModelTest {
             workoutPlanGenerator.generatePlan(any(), any(), any(), any())
         } throws RuntimeException("Failed to generate plan")
 
-        viewModel.effects.test {
+        viewModel.effects.test(timeout = 5.seconds) {
             viewModel.onEvent(OnboardingEvent.CompleteOnboarding)
 
-            val effect = awaitItem()
-            assertEquals(OnboardingEffect.NavigateToMain, effect)
+            // Error effect is emitted, then navigation
+            val effects = mutableListOf(awaitItem(), awaitItem())
+
+            assertTrue(
+                "Expected ShowPlanGenerationError effect",
+                effects.any { it is OnboardingEffect.ShowPlanGenerationError },
+            )
+            assertTrue(
+                "Expected NavigateToMain effect",
+                effects.any { it is OnboardingEffect.NavigateToMain },
+            )
+            val navEffect = effects.filterIsInstance<OnboardingEffect.NavigateToMain>().first()
+            assertEquals(false, navEffect.planGenerated)
 
             assertNull(activePlanStore.getPlan())
+            assertNotNull(viewModel.state.value.planGenerationError)
+
+            cancelAndIgnoreRemainingEvents()
         }
     }
 }

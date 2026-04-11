@@ -84,6 +84,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gymbro.core.R
 import com.gymbro.core.service.WorkoutResultStore
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 
 private val AccentGreen = Color(0xFF00FF87)
 
@@ -124,6 +128,9 @@ fun GymBroNavGraph(
 
     val startDestination = if (resolvedOnboarding) "home" else "onboarding"
 
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
+
     // Report fully drawn once we know which screen to show
     LaunchedEffect(Unit) {
         onFullyDrawn()
@@ -133,6 +140,7 @@ fun GymBroNavGraph(
         modifier = Modifier.semantics {
             testTagsAsResourceId = true
         },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
             if (showBottomBar) {
                 GymBroBottomNavBar(
@@ -194,10 +202,18 @@ fun GymBroNavGraph(
             },
         ) {
         composable("onboarding") {
+            val context = androidx.compose.ui.platform.LocalContext.current
             OnboardingRoute(
-                onNavigateToMain = {
+                onNavigateToMain = { planGenerated, daysPerWeek ->
                     navController.navigate("home") {
                         popUpTo("onboarding") { inclusive = true }
+                    }
+                    if (planGenerated) {
+                        coroutineScope.launch {
+                            snackbarHostState.showSnackbar(
+                                message = context.getString(R.string.plan_ready_message, daysPerWeek),
+                            )
+                        }
                     }
                 },
             )
