@@ -54,8 +54,11 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gymbro.core.R
 import com.gymbro.core.model.MuscleGroup
+import com.gymbro.core.preferences.UserPreferences
+import com.gymbro.core.ui.localizedName
 import com.gymbro.feature.common.EmptyState
 import com.gymbro.feature.common.FullScreenLoading
 import com.gymbro.feature.common.GlassmorphicCard
@@ -84,6 +87,14 @@ fun HistoryListRoute(
     viewModel: HistoryListViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsState()
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val userPreferences = remember {
+        dagger.hilt.android.EntryPointAccessors.fromApplication(
+            context.applicationContext,
+            HistoryPreferencesEntryPoint::class.java,
+        ).userPreferences()
+    }
+    val weightUnit = userPreferences.weightUnit.collectAsStateWithLifecycle(initialValue = UserPreferences.WeightUnit.KG)
 
     Scaffold(
         topBar = {
@@ -132,6 +143,7 @@ fun HistoryListRoute(
                         onWorkoutClick = { workoutId ->
                             onNavigateToDetail(workoutId)
                         },
+                        weightUnit = weightUnit.value,
                     )
                 }
             }
@@ -143,6 +155,7 @@ fun HistoryListRoute(
 private fun HistoryListContent(
     groupedWorkouts: List<WorkoutGroup>,
     onWorkoutClick: (String) -> Unit,
+    weightUnit: UserPreferences.WeightUnit = UserPreferences.WeightUnit.KG,
 ) {
     var itemIndex = 0
     LazyColumn(
@@ -167,6 +180,7 @@ private fun HistoryListContent(
                     workout = workout,
                     onClick = { onWorkoutClick(workout.workoutId) },
                     index = currentIndex,
+                    weightUnit = weightUnit,
                 )
             }
         }
@@ -219,6 +233,7 @@ private fun WorkoutCard(
     workout: WorkoutListItem,
     onClick: () -> Unit,
     index: Int,
+    weightUnit: UserPreferences.WeightUnit = UserPreferences.WeightUnit.KG,
 ) {
     var visible by remember { mutableStateOf(false) }
     
@@ -312,7 +327,7 @@ private fun WorkoutCard(
                 ) {
                     StatChip(
                         icon = Icons.Default.FitnessCenter,
-                        label = "${workout.totalVolume.toInt()} kg",
+                        label = "${workout.totalVolume.toInt()} ${if (weightUnit == UserPreferences.WeightUnit.LBS) "lb" else "kg"}",
                         gradientColors = listOf(AccentAmberStart, AccentAmberEnd),
                     )
                 }
@@ -410,7 +425,7 @@ private fun MuscleGroupTag(muscleGroup: MuscleGroup) {
     val gradientColors = getMuscleGroupGradient(muscleGroup)
     
     Text(
-        text = muscleGroup.displayName,
+        text = muscleGroup.localizedName(),
         style = MaterialTheme.typography.labelSmall,
         color = Color.White,
         fontWeight = FontWeight.Medium,
@@ -448,4 +463,10 @@ private fun formatDuration(totalSeconds: Long): String {
     } else {
         "${minutes}m"
     }
+}
+
+@dagger.hilt.EntryPoint
+@dagger.hilt.InstallIn(dagger.hilt.components.SingletonComponent::class)
+interface HistoryPreferencesEntryPoint {
+    fun userPreferences(): UserPreferences
 }

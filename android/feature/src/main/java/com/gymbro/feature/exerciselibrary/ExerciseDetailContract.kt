@@ -12,6 +12,4 @@ sealed interface ExerciseDetailEvent {
     data object RetryClicked : ExerciseDetailEvent
 }
 
-sealed interface ExerciseDetailEffect {
-    data object NavigateBack : ExerciseDetailEffect
-}
+sealed interface ExerciseDetailEffect

@@ -586,4 +586,58 @@
     <string name="exercise_detail_description">Descripción</string>
     <string name="exercise_detail_watch_video">Ver Video</string>
     <string name="exercise_picker_tap_to_add">Toca para añadir</string>
+
+    <!-- Localized Enum Display Names: Muscle Groups -->
+    <string name="muscle_group_chest">Pecho</string>
+    <string name="muscle_group_back">Espalda</string>
+    <string name="muscle_group_shoulders">Hombros</string>
+    <string name="muscle_group_biceps">Bíceps</string>
+    <string name="muscle_group_triceps">Tríceps</string>
+    <string name="muscle_group_quadriceps">Cuádriceps</string>
+    <string name="muscle_group_hamstrings">Isquiotibiales</string>
+    <string name="muscle_group_glutes">Glúteos</string>
+    <string name="muscle_group_calves">Pantorrillas</string>
+    <string name="muscle_group_core">Core</string>
+    <string name="muscle_group_forearms">Antebrazos</string>
+    <string name="muscle_group_full_body">Cuerpo Completo</string>
+
+    <!-- Localized Enum Display Names: Exercise Categories -->
+    <string name="exercise_category_compound">Compuesto</string>
+    <string name="exercise_category_isolation">Aislamiento</string>
+    <string name="exercise_category_accessory">Accesorio</string>
+    <string name="exercise_category_cardio">Cardio</string>
+
+    <!-- Localized Enum Display Names: Equipment -->
+    <string name="equipment_barbell">Barra</string>
+    <string name="equipment_dumbbell">Mancuerna</string>
+    <string name="equipment_cable">Cable</string>
+    <string name="equipment_machine">Máquina</string>
+    <string name="equipment_bodyweight">Peso Corporal</string>
+    <string name="equipment_kettlebell">Kettlebell</string>
+    <string name="equipment_band">Banda</string>
+    <string name="equipment_other">Otro</string>
+
+    <!-- Localized Enum Display Names: Record Types -->
+    <string name="record_type_max_weight">Peso Máximo</string>
+    <string name="record_type_max_reps">Reps Máximos</string>
+    <string name="record_type_max_volume">Volumen Máximo</string>
+    <string name="record_type_max_e1rm">Est. 1RM</string>
+
+    <!-- Weight Unit -->
+    <string name="weight_unit_kg">kg</string>
+    <string name="weight_unit_lb">lb</string>
+    <string name="active_workout_header_weight">PESO</string>
+
+    <!-- Discard Workout Dialog -->
+    <string name="discard_workout_title">¿Descartar entrenamiento?</string>
+    <string name="discard_workout_message">Se perderá todo el progreso.</string>
+    <string name="discard_workout_confirm">Descartar</string>
+    <string name="discard_workout_cancel">Seguir entrenando</string>
+
+    <!-- Content Descriptions -->
+    <string name="cd_watch_exercise_video">Ver video del ejercicio en YouTube</string>
+    <string name="cd_start_this_workout">Iniciar este entrenamiento</string>
+
+    <!-- Empty Workout Guidance -->
+    <string name="active_workout_empty_hint">Pulsa + para añadir tu primer ejercicio</string>
 </resources>

@@ -68,6 +68,7 @@ import com.gymbro.core.ui.theme.GlassBorder
 import com.gymbro.core.model.Exercise
 import com.gymbro.core.model.ExerciseCategory
 import com.gymbro.core.model.MuscleGroup
+import com.gymbro.core.ui.localizedName
 import com.gymbro.feature.common.FullScreenLoading
 import com.gymbro.feature.common.GlassmorphicCard
 import com.gymbro.feature.common.ObserveErrors
@@ -221,7 +222,7 @@ fun ExerciseLibraryScreen(
                                 ),
                             )
                         },
-                        label = group.displayName,
+                        label = group.localizedName(),
                         icon = group.icon(),
                     )
                 }
@@ -385,7 +386,7 @@ private fun ExerciseCard(
                         fontSize = 12.sp,
                     )
                     Text(
-                        text = exercise.muscleGroup.displayName,
+                        text = exercise.muscleGroup.localizedName(),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -447,7 +448,7 @@ private fun CategoryBadge(category: ExerciseCategory) {
             .padding(horizontal = 10.dp, vertical = 4.dp),
     ) {
         Text(
-            text = category.displayName.uppercase(),
+            text = category.localizedName().uppercase(),
             fontSize = 11.sp,
             fontWeight = FontWeight.Bold,
             color = Color.White,

@@ -48,6 +48,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gymbro.core.R
 import com.gymbro.core.model.Equipment
+import com.gymbro.core.ui.localizedName
 import com.gymbro.core.model.Exercise
 import com.gymbro.core.model.ExerciseCategory
 import com.gymbro.core.model.MuscleGroup
@@ -71,14 +72,6 @@ fun ExerciseDetailRoute(
     onNavigateBack: () -> Unit = {},
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle()
-
-    LaunchedEffect(Unit) {
-        viewModel.effect.collect { effect ->
-            when (effect) {
-                is ExerciseDetailEffect.NavigateBack -> onNavigateBack()
-            }
-        }
-    }
 
     ExerciseDetailScreen(
         state = state.value,
@@ -200,7 +193,7 @@ private fun ExerciseDetailContent(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     Text(
-                        text = exercise.muscleGroup.displayName,
+                        text = exercise.muscleGroup.localizedName(),
                         style = MaterialTheme.typography.titleMedium.copy(
                             fontWeight = FontWeight.SemiBold,
                         ),
@@ -252,7 +245,7 @@ private fun ExerciseDetailContent(
                             modifier = Modifier.size(20.dp),
                         )
                         Text(
-                            text = exercise.equipment.displayName(),
+                            text = exercise.equipment.localizedName(),
                             style = MaterialTheme.typography.bodyLarge.copy(
                                 fontWeight = FontWeight.Medium,
                             ),
@@ -295,7 +288,7 @@ private fun ExerciseDetailContent(
                     modifier = Modifier
                         .fillMaxWidth()
                         .semantics {
-                            contentDescription = "Watch exercise video on YouTube"
+                            contentDescription = stringResource(R.string.cd_watch_exercise_video)
                         },
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center,
@@ -340,7 +333,7 @@ private fun CategoryBadge(category: ExerciseCategory) {
             .padding(horizontal = 14.dp, vertical = 6.dp),
     ) {
         Text(
-            text = category.displayName.uppercase(),
+            text = category.localizedName().uppercase(),
             fontSize = 12.sp,
             fontWeight = FontWeight.Bold,
             color = Color.White,
@@ -355,15 +348,4 @@ private fun muscleGroupColor(muscleGroup: MuscleGroup): Color = when (muscleGrou
     MuscleGroup.SHOULDERS -> AccentGreenEnd
     MuscleGroup.CORE -> AccentCyanStart
     else -> AccentGreenStart
-}
-
-private fun Equipment.displayName(): String = when (this) {
-    Equipment.BARBELL -> "Barbell"
-    Equipment.DUMBBELL -> "Dumbbell"
-    Equipment.CABLE -> "Cable"
-    Equipment.MACHINE -> "Machine"
-    Equipment.BODYWEIGHT -> "Bodyweight"
-    Equipment.KETTLEBELL -> "Kettlebell"
-    Equipment.BAND -> "Band"
-    Equipment.OTHER -> "Other"
 }

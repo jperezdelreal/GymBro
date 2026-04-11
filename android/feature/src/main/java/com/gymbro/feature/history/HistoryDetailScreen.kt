@@ -54,6 +54,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.gymbro.core.R
+import com.gymbro.core.ui.localizedName
 import com.gymbro.feature.common.EmptyState
 import com.gymbro.feature.common.FullScreenLoading
 import com.gymbro.feature.common.GlassmorphicCard
@@ -268,7 +269,7 @@ private fun HistoryDetailContent(detail: WorkoutDetail) {
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             detail.volumeByMuscleGroup.entries.sortedByDescending { it.value }.forEach { (muscle, volume) ->
-                                MuscleVolumeRow(muscle = muscle.displayName, volume = volume)
+                                MuscleVolumeRow(muscle = muscle.localizedName(), volume = volume)
                             }
                         }
                     }
@@ -438,7 +439,7 @@ private fun ExerciseCard(exercise: ExerciseDetail, index: Int) {
                             color = Color.White,
                         )
                         Text(
-                            text = exercise.muscleGroup.displayName,
+                            text = exercise.muscleGroup.localizedName(),
                             style = MaterialTheme.typography.bodyMedium,
                             color = Color.White.copy(alpha = 0.6f),
                         )

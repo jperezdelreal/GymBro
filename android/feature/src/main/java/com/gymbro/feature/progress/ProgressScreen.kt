@@ -76,6 +76,7 @@ import com.gymbro.core.model.PlateauAlert
 import com.gymbro.core.model.PlateauType
 import com.gymbro.core.model.RecordType
 import com.gymbro.core.model.WorkoutHistoryItem
+import com.gymbro.core.ui.localizedName
 import com.gymbro.core.ui.theme.AccentAmberEnd
 import com.gymbro.core.ui.theme.AccentAmberStart
 import com.gymbro.core.ui.theme.AccentCyanEnd
@@ -395,9 +396,10 @@ private fun PRGrid(records: List<PersonalRecord>) {
 
 @Composable
 private fun PRCard(record: PersonalRecord, modifier: Modifier = Modifier) {
+    val localizedTypeName = record.type.localizedName()
     Card(
         modifier = modifier.semantics(mergeDescendants = true) {
-            contentDescription = "${record.type.displayName}: ${formatPRValue(record)} for ${record.exerciseName}"
+            contentDescription = "$localizedTypeName: ${formatPRValue(record)} for ${record.exerciseName}"
         },
         colors = CardDefaults.cardColors(containerColor = Surface),
         shape = RoundedCornerShape(12.dp),
@@ -412,7 +414,7 @@ private fun PRCard(record: PersonalRecord, modifier: Modifier = Modifier) {
                 )
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(
-                    text = record.type.displayName,
+                    text = localizedTypeName,
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -1076,7 +1078,7 @@ private fun PRShowcaseCard(record: PersonalRecord) {
                 )
                 Spacer(modifier = Modifier.height(2.dp))
                 Text(
-                    text = "${record.type.displayName}: ${formatPRValue(record)}",
+                    text = "${record.type.localizedName()}: ${formatPRValue(record)}",
                     style = MaterialTheme.typography.bodyLarge,
                     color = Color(AccentAmberStart.value),
                     fontWeight = FontWeight.SemiBold,

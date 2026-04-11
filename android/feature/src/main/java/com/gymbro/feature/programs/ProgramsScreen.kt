@@ -52,6 +52,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gymbro.core.model.MuscleGroup
 import com.gymbro.core.model.WorkoutTemplate
+import com.gymbro.core.ui.localizedName
 import com.gymbro.feature.common.EmptyState
 import com.gymbro.feature.common.FullScreenLoading
 import com.gymbro.feature.common.ObserveErrors
@@ -204,7 +205,6 @@ fun ProgramsScreen(
                     items(state.templates, key = { it.id.toString() }) { template ->
                         TemplateCard(
                             template = template,
-                            onClick = { onEvent(ProgramsEvent.TemplateClicked(template)) },
                             onStartWorkout = { onEvent(ProgramsEvent.StartWorkoutFromTemplate(template)) },
                         )
                     }
@@ -218,13 +218,11 @@ fun ProgramsScreen(
 @Composable
 private fun TemplateCard(
     template: WorkoutTemplate,
-    onClick: () -> Unit,
     onStartWorkout: () -> Unit,
 ) {
     Card(
         modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick),
+            .fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface,
@@ -351,7 +349,7 @@ private fun MuscleGroupChip(muscleGroup: MuscleGroup) {
             .padding(horizontal = 10.dp, vertical = 4.dp),
     ) {
         Text(
-            text = muscleGroup.displayName,
+            text = muscleGroup.localizedName(),
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )

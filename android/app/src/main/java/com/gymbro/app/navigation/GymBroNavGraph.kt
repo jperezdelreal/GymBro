@@ -405,9 +405,7 @@ fun GymBroNavGraph(
         }
         composable("programs") {
             ProgramsRoute(
-                onNavigateToCreateTemplate = { templateId ->
-                    // TODO: Navigate to create/edit template screen
-                },
+                onNavigateToCreateTemplate = { /* Template editing not yet implemented */ },
                 onNavigateToActiveWorkout = { template ->
                     navController.navigate("active_workout")
                 },
@@ -462,20 +460,6 @@ fun GymBroNavGraph(
             )
         }
         }
-    }
-}
-
-@Composable
-private fun PlaceholderScreen(title: String) {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center,
-    ) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.headlineLarge,
-            color = MaterialTheme.colorScheme.onBackground,
-        )
     }
 }
 

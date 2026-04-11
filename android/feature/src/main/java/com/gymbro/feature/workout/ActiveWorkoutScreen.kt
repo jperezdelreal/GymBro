@@ -86,6 +86,7 @@ import androidx.lifecycle.viewModelScope
 import com.gymbro.core.model.Exercise
 import com.gymbro.core.model.MuscleGroup
 import com.gymbro.core.preferences.UserPreferences
+import com.gymbro.core.ui.localizedName
 import com.gymbro.core.ui.theme.AccentAmberStart
 import com.gymbro.core.ui.theme.AccentCyanStart
 import com.gymbro.core.ui.theme.AccentGreenEnd
@@ -184,7 +185,8 @@ fun ActiveWorkoutRoute(
                 viewModel.tooltipManager.markShown("active_workout_complete_set")
             }
         },
-        onNavigateToCoach = onNavigateToCoach
+        onNavigateToCoach = onNavigateToCoach,
+        onDiscardWorkout = { onEvent(ActiveWorkoutEvent.DiscardWorkout) },
     )
 }
 
@@ -210,6 +212,7 @@ fun ActiveWorkoutScreen(
     showCompleteSetTooltip: Boolean = false,
     onTooltipDismissed: () -> Unit = {},
     onNavigateToCoach: () -> Unit = {},
+    onDiscardWorkout: () -> Unit = {},
 ) {
     if (state.isLoading) {
         FullScreenLoading(message = stringResource(R.string.active_workout_starting))
@@ -218,6 +221,35 @@ fun ActiveWorkoutScreen(
 
     Box {
         val haptic = LocalHapticFeedback.current
+        var showDiscardDialog by remember { mutableStateOf(false) }
+        
+        if (showDiscardDialog) {
+            androidx.compose.material3.AlertDialog(
+                onDismissRequest = { showDiscardDialog = false },
+                title = { Text(stringResource(R.string.discard_workout_title)) },
+                text = { Text(stringResource(R.string.discard_workout_message)) },
+                confirmButton = {
+                    androidx.compose.material3.TextButton(
+                        onClick = {
+                            showDiscardDialog = false
+                            onEvent(ActiveWorkoutEvent.DiscardWorkout)
+                        },
+                        colors = androidx.compose.material3.ButtonDefaults.textButtonColors(
+                            contentColor = com.gymbro.core.ui.theme.AccentRed,
+                        ),
+                    ) {
+                        Text(stringResource(R.string.discard_workout_confirm))
+                    }
+                },
+                dismissButton = {
+                    androidx.compose.material3.TextButton(
+                        onClick = { showDiscardDialog = false },
+                    ) {
+                        Text(stringResource(R.string.discard_workout_cancel))
+                    }
+                },
+            )
+        }
         
         Scaffold(
         topBar = {
@@ -240,7 +272,7 @@ fun ActiveWorkoutScreen(
                 navigationIcon = {
                     IconButton(onClick = { 
                         haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                        onEvent(ActiveWorkoutEvent.DiscardWorkout) 
+                        showDiscardDialog = true 
                     }) {
                         Icon(Icons.Default.Close, contentDescription = stringResource(R.string.workout_discard))
                     }
@@ -328,7 +360,26 @@ fun ActiveWorkoutScreen(
                             elapsedSeconds = state.elapsedSeconds,
                             totalVolume = state.totalVolume,
                             totalSets = state.totalSets,
+                            weightUnit = defaultWeightUnit,
                         )
+                    }
+                }
+
+                // Empty workout guidance
+                if (state.exercises.isEmpty() && !state.isLoading) {
+                    item {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 48.dp),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Text(
+                                text = stringResource(R.string.active_workout_empty_hint),
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = Color.White.copy(alpha = 0.5f),
+                            )
+                        }
                     }
                 }
 
@@ -382,13 +433,15 @@ private fun WorkoutStatsContent(
     elapsedSeconds: Long,
     totalVolume: Double,
     totalSets: Int,
+    weightUnit: UserPreferences.WeightUnit = UserPreferences.WeightUnit.KG,
 ) {
+    val unitLabel = if (weightUnit == UserPreferences.WeightUnit.LBS) "lb" else "kg"
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly,
     ) {
         StatItem(label = stringResource(R.string.common_duration), value = formatDuration(elapsedSeconds), color = AccentCyanStart)
-        StatItem(label = stringResource(R.string.common_volume), value = "${totalVolume.toInt()} kg", color = AccentGreenStart)
+        StatItem(label = stringResource(R.string.common_volume), value = "${totalVolume.toInt()} $unitLabel", color = AccentGreenStart)
         StatItem(label = stringResource(R.string.workout_sets), value = "$totalSets", color = AccentAmberStart)
     }
 }
@@ -710,7 +763,7 @@ private fun ExerciseCardContent(
         Spacer(modifier = Modifier.height(4.dp))
 
         Text(
-            text = exerciseUi.exercise.muscleGroup.displayName,
+            text = exerciseUi.exercise.muscleGroup.localizedName(),
             style = MaterialTheme.typography.bodySmall,
             color = Color.White.copy(alpha = 0.5f),
         )
@@ -724,7 +777,7 @@ private fun ExerciseCardContent(
                 .padding(horizontal = 4.dp),
         ) {
             Text(stringResource(R.string.active_workout_header_set), style = setHeaderStyle(), modifier = Modifier.width(40.dp))
-            Text(stringResource(R.string.active_workout_header_kg), style = setHeaderStyle(), modifier = Modifier.weight(1f), textAlign = TextAlign.Center)
+            Text(stringResource(R.string.active_workout_header_weight), style = setHeaderStyle(), modifier = Modifier.weight(1f), textAlign = TextAlign.Center)
             Text(stringResource(R.string.active_workout_header_reps), style = setHeaderStyle(), modifier = Modifier.weight(1f), textAlign = TextAlign.Center)
             Spacer(modifier = Modifier.width(56.dp)) // for complete button
         }
@@ -938,44 +991,6 @@ private fun GestureNumberField(
                     onDragEnd = { dragOffset = 0f }
                 )
             },
-        textStyle = MaterialTheme.typography.titleMedium.copy(
-            textAlign = TextAlign.Center,
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 20.sp,
-            color = if (enabled) Color.White else Color.White.copy(alpha = 0.5f),
-        ),
-        singleLine = true,
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-        colors = TextFieldDefaults.colors(
-            focusedContainerColor = Color.White.copy(alpha = 0.08f),
-            unfocusedContainerColor = Color.White.copy(alpha = 0.05f),
-            disabledContainerColor = Color.White.copy(alpha = 0.03f),
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent,
-            disabledIndicatorColor = Color.Transparent,
-            cursorColor = AccentGreenStart,
-        ),
-        shape = RoundedCornerShape(8.dp),
-    )
-}
-
-@Composable
-private fun BiggerNumberField(
-    value: String,
-    onValueChange: (String) -> Unit,
-    enabled: Boolean,
-    modifier: Modifier = Modifier,
-) {
-    TextField(
-        value = value,
-        onValueChange = { input ->
-            // Allow numbers and one decimal point
-            if (input.isEmpty() || input.matches(Regex("^\\d*\\.?\\d*$"))) {
-                onValueChange(input)
-            }
-        },
-        enabled = enabled,
-        modifier = modifier.height(56.dp),
         textStyle = MaterialTheme.typography.titleMedium.copy(
             textAlign = TextAlign.Center,
             fontWeight = FontWeight.SemiBold,

@@ -227,7 +227,7 @@ private fun PlanDayContent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .semantics {
-                        contentDescription = "Start this workout"
+                        contentDescription = stringResource(R.string.cd_start_this_workout)
                     },
                 colors = CardDefaults.cardColors(
                     containerColor = AccentGreen,

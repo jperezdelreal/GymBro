@@ -58,6 +58,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gymbro.core.R
 import com.gymbro.core.model.WorkoutDay
 import com.gymbro.core.model.WorkoutPlan
+import com.gymbro.core.preferences.UserPreferences
 import com.gymbro.feature.common.FullScreenLoading
 import com.gymbro.feature.common.ObserveErrors
 import java.time.Instant
@@ -77,6 +78,14 @@ fun HomeRoute(
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val userPreferences = remember {
+        dagger.hilt.android.EntryPointAccessors.fromApplication(
+            context.applicationContext,
+            HomePreferencesEntryPoint::class.java,
+        ).userPreferences()
+    }
+    val weightUnit = userPreferences.weightUnit.collectAsStateWithLifecycle(initialValue = UserPreferences.WeightUnit.KG)
 
     ObserveErrors(
         errorFlow = viewModel.errorEvents,
@@ -97,6 +106,7 @@ fun HomeRoute(
         state = state.value,
         onEvent = viewModel::onEvent,
         snackbarHostState = snackbarHostState,
+        weightUnit = weightUnit.value,
     )
 }
 
@@ -106,6 +116,7 @@ fun HomeScreen(
     state: HomeState,
     onEvent: (HomeEvent) -> Unit,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
+    weightUnit: UserPreferences.WeightUnit = UserPreferences.WeightUnit.KG,
 ) {
     Scaffold(
         topBar = {
@@ -184,6 +195,7 @@ fun HomeScreen(
                         RecentWorkoutCard(
                             workout = workout,
                             onClick = { onEvent(HomeEvent.ViewWorkoutDetail(workout.workoutId)) },
+                            weightUnit = weightUnit,
                         )
                     }
                 }
@@ -488,6 +500,7 @@ private fun CreateProgramCta(
 private fun RecentWorkoutCard(
     workout: RecentWorkoutItem,
     onClick: () -> Unit,
+    weightUnit: UserPreferences.WeightUnit = UserPreferences.WeightUnit.KG,
 ) {
     val dateFormatter = remember {
         DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
@@ -539,7 +552,7 @@ private fun RecentWorkoutCard(
             }
 
             Text(
-                text = "%.0f kg".format(workout.totalVolume),
+                text = "%.0f %s".format(workout.totalVolume, if (weightUnit == UserPreferences.WeightUnit.LBS) "lb" else "kg"),
                 style = MaterialTheme.typography.titleMedium.copy(
                     fontWeight = FontWeight.Bold,
                 ),
@@ -595,4 +608,10 @@ private fun formatDuration(seconds: Long): String {
     val hours = seconds / 3600
     val minutes = (seconds % 3600) / 60
     return if (hours > 0) "${hours}h ${minutes}m" else "${minutes}m"
+}
+
+@dagger.hilt.EntryPoint
+@dagger.hilt.InstallIn(dagger.hilt.components.SingletonComponent::class)
+interface HomePreferencesEntryPoint {
+    fun userPreferences(): UserPreferences
 }
