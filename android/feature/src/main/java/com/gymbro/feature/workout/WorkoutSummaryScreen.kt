@@ -60,8 +60,9 @@ fun WorkoutSummaryScreen(
     totalSets: Int,
     exerciseCount: Int,
     personalRecords: List<PersonalRecord>,
+    weightUnitLabel: String,
     onDone: () -> Unit,
-) {
+){
     var showCelebration by remember { mutableStateOf(personalRecords.isNotEmpty()) }
     var showCompletionConfetti by remember { mutableStateOf(true) }
     val view = LocalView.current
@@ -131,7 +132,7 @@ fun WorkoutSummaryScreen(
                 SummaryCard(
                     icon = Icons.Default.FitnessCenter,
                     label = stringResource(R.string.common_volume),
-                    value = "${totalVolume.toInt()} kg",
+                    value = "${totalVolume.toInt()} $weightUnitLabel",
                     color = AccentGreen,
                     modifier = Modifier.weight(1f),
                 )

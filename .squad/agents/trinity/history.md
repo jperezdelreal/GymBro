@@ -475,3 +475,29 @@
 
 **Key pattern established:**
 - For screens that need UserPreferences but don't inject it through ViewModel: use Hilt `@EntryPoint` + `EntryPointAccessors.fromApplication()` in the Route composable. Pattern already existed in ActiveWorkoutScreen; replicated for HomeScreen and HistoryListScreen.
+
+### Tier-1 Quality Fixes — Issues #445, #449, #448, #453
+
+**Fix: Hardcoded 'kg' in 5+ screens (#445):**
+- WorkoutSummaryScreen: Added `weightUnitLabel` parameter; volume card now respects user's weight unit preference.
+- ProgressScreen: Added `ProgressPreferencesEntryPoint` to collect `weightUnit`. Threaded label through E1RMChart, HeroKPISection, WorkoutHistoryRow, PRShowcaseCard, PRCard, PRGrid, and `formatPRValue`.
+- HistoryListScreen was already fixed in prior iteration.
+
+**Fix: Show all 12 muscle groups in filter chips (#449):**
+- Replaced hardcoded 6-element `filterGroups` list with `MuscleGroup.entries` in ExerciseLibraryScreen. All 12 muscle groups now shown as filter chips using `localizedName()`.
+
+**Fix: Exercise Library accessible from main navigation (#448):**
+- Added `onNavigateToExerciseLibrary` callback to ProfileRoute/ProfileScreen.
+- Added Exercise Library row in ProfileScreen (Preferences section) with FitnessCenter icon.
+- Wired navigation to `exercise_library` route in GymBroNavGraph.
+- Added bilingual strings: `profile_exercise_library`, `profile_exercise_library_subtitle`.
+
+**Fix: PR data loss in WorkoutSummaryScreen (#453):**
+- Created `WorkoutResultStore` singleton (same pattern as `ActivePlanStore`) — in-memory store that persists across navigation.
+- `onNavigateToSummary` now calls `workoutResultStore.setPersonalRecords(prs)` instead of writing to `savedStateHandle` on the back stack entry that gets destroyed by `popUpTo("active_workout") { inclusive = true }`.
+- WorkoutSummary composable reads PRs via `workoutResultStore.consumePersonalRecords()`.
+- Exposed `WorkoutResultStore` through `GymBroNavGraphViewModel`.
+
+**Key patterns reinforced:**
+- Use `@EntryPoint` pattern for accessing UserPreferences in composables without ViewModel injection (now also in ProgressScreen).
+- Use in-memory singleton stores (like `ActivePlanStore`, `WorkoutResultStore`) when navigation args or `savedStateHandle` can't survive `popUpTo` with `inclusive = true`.

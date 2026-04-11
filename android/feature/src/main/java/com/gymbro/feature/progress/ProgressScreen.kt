@@ -87,6 +87,7 @@ import com.gymbro.core.ui.theme.AccentRed
 import com.gymbro.core.ui.theme.Surface
 import com.gymbro.core.ui.theme.SurfaceVariant
 import com.gymbro.core.R
+import com.gymbro.core.preferences.UserPreferences
 import com.gymbro.feature.common.EmptyState
 import com.gymbro.feature.common.FullScreenLoading
 import com.gymbro.feature.common.GlassmorphicCard
@@ -109,6 +110,15 @@ fun ProgressRoute(
     val viewModel: ProgressViewModel = hiltViewModel()
     val state by viewModel.state.collectAsStateWithLifecycle()
     var showChartTooltip by remember { mutableStateOf(false) }
+
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val userPreferences = remember {
+        dagger.hilt.android.EntryPointAccessors.fromApplication(
+            context.applicationContext,
+            ProgressPreferencesEntryPoint::class.java,
+        ).userPreferences()
+    }
+    val weightUnit by userPreferences.weightUnit.collectAsStateWithLifecycle(initialValue = UserPreferences.WeightUnit.KG)
 
     LaunchedEffect(Unit) {
         showChartTooltip = viewModel.tooltipManager.shouldShow("progress_chart")
@@ -136,7 +146,8 @@ fun ProgressRoute(
             viewModel.viewModelScope.launch {
                 viewModel.tooltipManager.markShown("progress_chart")
             }
-        }
+        },
+        weightUnit = weightUnit,
     )
 }
 
@@ -148,6 +159,7 @@ private fun ProgressScreen(
     onNavigateToActiveWorkout: () -> Unit = {},
     showChartTooltip: Boolean = false,
     onTooltipDismissed: () -> Unit = {},
+    weightUnit: UserPreferences.WeightUnit = UserPreferences.WeightUnit.KG,
 ) {
     if (state.isLoading) {
         FullScreenLoading(message = stringResource(R.string.progress_loading_message))
@@ -177,12 +189,14 @@ private fun ProgressScreen(
 
         // Hero KPI Cards (3 across)
         item {
+            val unitLabel = if (weightUnit == UserPreferences.WeightUnit.LBS) "lb" else "kg"
             HeroKPISection(
                 totalVolume = state.totalVolume,
                 workoutsThisWeek = state.workoutsThisWeek,
                 recentPRs = state.recentPRs,
                 volumeChangePercent = state.volumeChangePercent,
                 workoutFrequencyGoal = state.workoutFrequencyGoal,
+                weightUnitLabel = unitLabel,
             )
         }
 
@@ -230,8 +244,9 @@ private fun ProgressScreen(
                 SectionHeader(title = stringResource(R.string.progress_recent_prs), icon = "🏆")
             }
             val displayPRs = state.recentPRsWithDetails.take(5)
+            val prUnitLabel = if (weightUnit == UserPreferences.WeightUnit.LBS) "lb" else "kg"
             items(displayPRs) { pr ->
-                PRShowcaseCard(record = pr)
+                PRShowcaseCard(record = pr, weightUnitLabel = prUnitLabel)
             }
         }
 
@@ -251,7 +266,8 @@ private fun ProgressScreen(
 
             if (state.chartData.isNotEmpty()) {
                 item {
-                    E1RMChart(data = state.chartData)
+                    val unitLabel = if (weightUnit == UserPreferences.WeightUnit.LBS) "lb" else "kg"
+                    E1RMChart(data = state.chartData, weightUnitLabel = unitLabel)
                 }
             } else {
                 item {
@@ -370,7 +386,7 @@ private fun SectionHeader(title: String, icon: String) {
 }
 
 @Composable
-private fun PRGrid(records: List<PersonalRecord>) {
+private fun PRGrid(records: List<PersonalRecord>, weightUnitLabel: String = "kg") {
     val grouped = records.groupBy { it.type }
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         // Show 2 cards per row
@@ -384,6 +400,7 @@ private fun PRGrid(records: List<PersonalRecord>) {
                     PRCard(
                         record = pr,
                         modifier = Modifier.weight(1f),
+                        weightUnitLabel = weightUnitLabel,
                     )
                 }
                 if (row.size == 1) {
@@ -395,11 +412,11 @@ private fun PRGrid(records: List<PersonalRecord>) {
 }
 
 @Composable
-private fun PRCard(record: PersonalRecord, modifier: Modifier = Modifier) {
+private fun PRCard(record: PersonalRecord, modifier: Modifier = Modifier, weightUnitLabel: String = "kg") {
     val localizedTypeName = record.type.localizedName()
     Card(
         modifier = modifier.semantics(mergeDescendants = true) {
-            contentDescription = "$localizedTypeName: ${formatPRValue(record)} for ${record.exerciseName}"
+            contentDescription = "$localizedTypeName: ${formatPRValue(record, weightUnitLabel)} for ${record.exerciseName}"
         },
         colors = CardDefaults.cardColors(containerColor = Surface),
         shape = RoundedCornerShape(12.dp),
@@ -421,7 +438,7 @@ private fun PRCard(record: PersonalRecord, modifier: Modifier = Modifier) {
             }
             Spacer(modifier = Modifier.height(6.dp))
             Text(
-                text = formatPRValue(record),
+                text = formatPRValue(record, weightUnitLabel),
                 style = MaterialTheme.typography.headlineSmall,
                 color = AccentGreenStart,
                 fontWeight = FontWeight.Bold,
@@ -485,7 +502,7 @@ private fun ExerciseChipRow(
 }
 
 @Composable
-private fun E1RMChart(data: List<E1RMDataPoint>) {
+private fun E1RMChart(data: List<E1RMDataPoint>, weightUnitLabel: String = "kg") {
     val textMeasurer = rememberTextMeasurer()
 
     Card(
@@ -497,7 +514,7 @@ private fun E1RMChart(data: List<E1RMDataPoint>) {
             val latest = data.lastOrNull()
             if (latest != null) {
                 Text(
-                    text = "${formatNumber(latest.e1rm)} kg",
+                    text = "${formatNumber(latest.e1rm)} $weightUnitLabel",
                     style = MaterialTheme.typography.headlineMedium,
                     color = AccentAmberStart,
                     fontWeight = FontWeight.Bold,
@@ -639,6 +656,7 @@ private fun E1RMChart(data: List<E1RMDataPoint>) {
 private fun WorkoutHistoryRow(
     item: WorkoutHistoryItem,
     onClick: () -> Unit,
+    weightUnitLabel: String = "kg",
 ) {
     val haptic = LocalHapticFeedback.current
     val zone = ZoneId.systemDefault()
@@ -681,7 +699,7 @@ private fun WorkoutHistoryRow(
                     )
                     StatChip(
                         icon = Icons.AutoMirrored.Filled.ShowChart,
-                        text = "${formatNumber(item.totalVolume)} kg",
+                        text = "${formatNumber(item.totalVolume)} $weightUnitLabel",
                     )
                     if (item.durationSeconds > 0) {
                         StatChip(
@@ -732,6 +750,7 @@ private fun HeroKPISection(
     recentPRs: Int,
     volumeChangePercent: Double?,
     workoutFrequencyGoal: Int,
+    weightUnitLabel: String = "kg",
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -776,7 +795,7 @@ private fun HeroKPISection(
                         tint = Color(AccentGreenStart.value),
                     )
                     Text(
-                        text = " kg",
+                        text = " $weightUnitLabel",
                         fontSize = 11.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -1055,7 +1074,7 @@ private fun PlateauEmptyState() {
 }
 
 @Composable
-private fun PRShowcaseCard(record: PersonalRecord) {
+private fun PRShowcaseCard(record: PersonalRecord, weightUnitLabel: String = "kg") {
     val zone = ZoneId.systemDefault()
     GlassmorphicCard(
         accentColor = Color(AccentAmberStart.value),
@@ -1078,7 +1097,7 @@ private fun PRShowcaseCard(record: PersonalRecord) {
                 )
                 Spacer(modifier = Modifier.height(2.dp))
                 Text(
-                    text = "${record.type.localizedName()}: ${formatPRValue(record)}",
+                    text = "${record.type.localizedName()}: ${formatPRValue(record, weightUnitLabel)}",
                     style = MaterialTheme.typography.bodyLarge,
                     color = Color(AccentAmberStart.value),
                     fontWeight = FontWeight.SemiBold,
@@ -1219,12 +1238,12 @@ private fun TopExercisesSection(exercises: List<TopExercise>) {
 }
 
 
-private fun formatPRValue(record: PersonalRecord): String {
+private fun formatPRValue(record: PersonalRecord, weightUnitLabel: String = "kg"): String {
     return when (record.type) {
-        RecordType.MAX_WEIGHT -> "${formatNumber(record.value)} kg"
+        RecordType.MAX_WEIGHT -> "${formatNumber(record.value)} $weightUnitLabel"
         RecordType.MAX_REPS -> "${record.value.toInt()} reps"
-        RecordType.MAX_VOLUME -> "${formatNumber(record.value)} kg"
-        RecordType.MAX_E1RM -> "${formatNumber(record.value)} kg"
+        RecordType.MAX_VOLUME -> "${formatNumber(record.value)} $weightUnitLabel"
+        RecordType.MAX_E1RM -> "${formatNumber(record.value)} $weightUnitLabel"
     }
 }
 
@@ -1240,4 +1259,10 @@ private fun formatDuration(seconds: Long): String {
     val h = seconds / 3600
     val m = (seconds % 3600) / 60
     return if (h > 0) "${h}h ${m}m" else "${m}m"
+}
+
+@dagger.hilt.EntryPoint
+@dagger.hilt.InstallIn(dagger.hilt.components.SingletonComponent::class)
+interface ProgressPreferencesEntryPoint {
+    fun userPreferences(): UserPreferences
 }

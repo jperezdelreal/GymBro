@@ -200,10 +200,6 @@ fun ExerciseLibraryScreen(
             }
 
             // Muscle group filter chips with gradient when selected
-            val filterGroups = listOf(
-                MuscleGroup.CHEST, MuscleGroup.BACK, MuscleGroup.QUADRICEPS,
-                MuscleGroup.SHOULDERS, MuscleGroup.BICEPS, MuscleGroup.CORE,
-            )
             FlowRow(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -211,7 +207,7 @@ fun ExerciseLibraryScreen(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
-                filterGroups.forEach { group ->
+                MuscleGroup.entries.forEach { group ->
                     val isSelected = state.selectedMuscleGroup == group
                     GradientFilterChip(
                         selected = isSelected,

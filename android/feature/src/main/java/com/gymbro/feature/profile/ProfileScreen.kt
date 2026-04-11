@@ -81,6 +81,7 @@ import java.util.Locale
 fun ProfileRoute(
     onNavigateToSettings: () -> Unit = {},
     onNavigateToCoach: () -> Unit = {},
+    onNavigateToExerciseLibrary: () -> Unit = {},
     viewModel: ProfileViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -99,6 +100,7 @@ fun ProfileRoute(
         onEvent = viewModel::onEvent,
         onNavigateToSettings = onNavigateToSettings,
         onNavigateToCoach = onNavigateToCoach,
+        onNavigateToExerciseLibrary = onNavigateToExerciseLibrary,
     )
 }
 
@@ -108,6 +110,7 @@ internal fun ProfileScreen(
     onEvent: (ProfileEvent) -> Unit,
     onNavigateToSettings: () -> Unit = {},
     onNavigateToCoach: () -> Unit = {},
+    onNavigateToExerciseLibrary: () -> Unit = {},
 ) {
     Column(
         modifier = Modifier
@@ -211,6 +214,22 @@ internal fun ProfileScreen(
                 label = stringResource(R.string.profile_health_integration),
                 iconTint = AccentCyanStart,
                 onClick = onNavigateToSettings,
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Exercise Library
+        SettingsGroup(
+            title = stringResource(R.string.profile_exercise_library),
+            accentColor = AccentGreenStart,
+        ) {
+            SettingItem(
+                icon = Icons.Default.FitnessCenter,
+                label = stringResource(R.string.profile_exercise_library),
+                subtitle = stringResource(R.string.profile_exercise_library_subtitle),
+                iconTint = AccentGreenStart,
+                onClick = onNavigateToExerciseLibrary,
             )
         }
 

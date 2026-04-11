@@ -38,6 +38,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -82,6 +83,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gymbro.core.R
+import com.gymbro.core.service.WorkoutResultStore
 
 private val AccentGreen = Color(0xFF00FF87)
 
@@ -100,6 +102,7 @@ private enum class BottomNavTab(
 @Composable
 fun GymBroNavGraph(
     userPreferences: UserPreferences = hiltViewModel<GymBroNavGraphViewModel>().userPreferences,
+    workoutResultStore: WorkoutResultStore = hiltViewModel<GymBroNavGraphViewModel>().workoutResultStore,
     onFullyDrawn: () -> Unit = {},
 ) {
     val navController = rememberNavController()
@@ -273,9 +276,7 @@ fun GymBroNavGraph(
                     navController.navigate("exercise_picker")
                 },
                 onNavigateToSummary = { duration, volume, sets, exercises, prs ->
-                    navController.currentBackStackEntry
-                        ?.savedStateHandle
-                        ?.set("summary_prs", prs)
+                    workoutResultStore.setPersonalRecords(prs)
                     navController.navigate(
                         "workout_summary/$duration/$volume/$sets/$exercises"
                     ) {
@@ -343,7 +344,9 @@ fun GymBroNavGraph(
             val volume = backStackEntry.arguments?.getFloat("volume")?.toDouble() ?: 0.0
             val sets = backStackEntry.arguments?.getInt("sets") ?: 0
             val exercises = backStackEntry.arguments?.getInt("exercises") ?: 0
-            val prs = navController.previousBackStackEntry?.savedStateHandle?.get<List<PersonalRecord>>("summary_prs") ?: emptyList()
+            val prs = remember { workoutResultStore.consumePersonalRecords() }
+            val weightUnit by userPreferences.weightUnit.collectAsStateWithLifecycle(initialValue = UserPreferences.WeightUnit.KG)
+            val weightUnitLabel = if (weightUnit == UserPreferences.WeightUnit.LBS) "lb" else "kg"
 
             WorkoutSummaryScreen(
                 durationSeconds = duration,
@@ -351,6 +354,7 @@ fun GymBroNavGraph(
                 totalSets = sets,
                 exerciseCount = exercises,
                 personalRecords = prs,
+                weightUnitLabel = weightUnitLabel,
                 onDone = {
                     navController.navigate("home") {
                         popUpTo("home") { inclusive = true }
@@ -449,6 +453,9 @@ fun GymBroNavGraph(
                 },
                 onNavigateToCoach = {
                     navController.navigate("coach")
+                },
+                onNavigateToExerciseLibrary = {
+                    navController.navigate("exercise_library")
                 },
             )
         }

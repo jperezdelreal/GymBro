@@ -640,4 +640,8 @@
 
     <!-- Empty Workout Guidance -->
     <string name="active_workout_empty_hint">Pulsa + para añadir tu primer ejercicio</string>
+
+    <!-- Profile: Exercise Library Link -->
+    <string name="profile_exercise_library">Biblioteca de Ejercicios</string>
+    <string name="profile_exercise_library_subtitle">Explorar y gestionar ejercicios</string>
 </resources>
