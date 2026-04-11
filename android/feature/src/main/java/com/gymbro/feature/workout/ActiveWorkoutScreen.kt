@@ -186,7 +186,7 @@ fun ActiveWorkoutRoute(
             }
         },
         onNavigateToCoach = onNavigateToCoach,
-        onDiscardWorkout = { onEvent(ActiveWorkoutEvent.DiscardWorkout) },
+        onDiscardWorkout = { viewModel.onEvent(ActiveWorkoutEvent.DiscardWorkout) },
     )
 }
 

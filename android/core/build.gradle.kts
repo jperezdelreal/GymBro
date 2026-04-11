@@ -41,8 +41,9 @@ dependencies {
     // AndroidX Core
     implementation(libs.androidx.core.ktx)
 
-    // Compose UI (minimal - for Color and Brush definitions in theme)
+    // Compose UI (for theme + localized display name extensions)
     implementation(platform(libs.compose.bom))
+    implementation(libs.compose.ui)
     implementation(libs.compose.ui.graphics)
 
     // Hilt

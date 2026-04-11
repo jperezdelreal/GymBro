@@ -219,6 +219,7 @@ private fun PlanDayContent(
         item {
             Spacer(modifier = Modifier.height(8.dp))
 
+            val startWorkoutDesc = stringResource(R.string.cd_start_this_workout)
             Card(
                 onClick = {
                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
@@ -227,7 +228,7 @@ private fun PlanDayContent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .semantics {
-                        contentDescription = stringResource(R.string.cd_start_this_workout)
+                        contentDescription = startWorkoutDesc
                     },
                 colors = CardDefaults.cardColors(
                     containerColor = AccentGreen,

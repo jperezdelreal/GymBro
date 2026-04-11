@@ -277,6 +277,7 @@ private fun ExerciseDetailContent(
 
         // YouTube link button
         if (!exercise.youtubeUrl.isNullOrBlank()) {
+            val videoContentDesc = stringResource(R.string.cd_watch_exercise_video)
             GlassmorphicCard(
                 accentColor = AccentRed,
                 onClick = {
@@ -288,7 +289,7 @@ private fun ExerciseDetailContent(
                     modifier = Modifier
                         .fillMaxWidth()
                         .semantics {
-                            contentDescription = stringResource(R.string.cd_watch_exercise_video)
+                            contentDescription = videoContentDesc
                         },
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center,
