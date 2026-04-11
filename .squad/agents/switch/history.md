@@ -1165,3 +1165,37 @@ Identified 5 untested critical paths:
 - `ActiveWorkoutViewModel.kt:170` has broken syntax (`.kotlinx.coroutines.flow.first()`) blocking all test compilation
 - Decision written to `.squad/decisions/inbox/switch-test-gaps.md`
 
+### 2025-07-21: Fix #459 — Missing Tests (Branch: squad/459-missing-tests)
+
+**Context:**
+- Branch: `squad/459-missing-tests` from `squad/452-tier3-polish`
+- Task: Fill test gaps — ExerciseDetailVM, PlanDayDetail StartWorkout, weight unit propagation, Maestro library reachability
+
+**Deliverables:**
+
+1. **ExerciseDetailViewModelTest** (6 tests) — NEW file
+   - `exercise loads successfully by ID` — happy path with FakeExerciseRepository
+   - `exercise not found shows error state` — empty repo returns error
+   - `retry reloads exercise` — add exercise after failure, retry succeeds
+   - `loading state transitions correctly` — Turbine flow verification
+   - `invalid UUID exercise ID shows error` — edge case for bad IDs
+   - `exercise loads correct details` — muscle group, category, equipment preserved
+   - Uses `SavedStateHandle`, `FakeExerciseRepository`, mocked `Context`
+
+2. **PlanDayDetailViewModelTest** — 4 previously-commented tests UNCOMMENTED and updated
+   - `startWorkout emits NavigateToActiveWorkout effect` — matches actual contract
+   - `startWorkout stores pending workout day in ActivePlanStore` — verifies data flow
+   - `startWorkout before loadDay is a no-op` — edge case safety
+   - `startWorkout preserves sets and reps from plan` — data integrity via ActivePlanStore
+   - Original tests expected `NavigateToWorkout(exercises)` — updated to match actual `NavigateToActiveWorkout` effect
+
+3. **SettingsViewModelTest** — 1 new test for weight unit propagation
+   - `weight unit LBS from preferences propagates to state` — creates ViewModel with LBS upstream flow, verifies state
+
+4. **Maestro: exercise-library-from-profile.yaml** — NEW flow
+   - Navigate to Profile → tap Exercise Library → assert library screen → search "Press" → back
+   - Tags: library, navigation, regression
+
+**Build Note:**
+- Pre-existing compilation errors in `SettingsScreen.kt` (missing `NavigateToOnboarding` branch, unresolved `CardBackground`) prevent test execution. These are from uncommitted #452 work, not from these changes.
+

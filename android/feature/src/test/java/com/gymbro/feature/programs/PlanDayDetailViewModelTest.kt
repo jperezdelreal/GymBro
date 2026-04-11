@@ -1,11 +1,13 @@
 package com.gymbro.feature.programs
 
+import app.cash.turbine.test
 import com.gymbro.core.model.PlannedExercise
 import com.gymbro.core.model.WorkoutDay
 import com.gymbro.core.model.WorkoutPlan
 import com.gymbro.core.preferences.UserPreferences
 import com.gymbro.core.service.ActivePlanStore
 import com.gymbro.feature.MainDispatcherRule
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
@@ -136,65 +138,74 @@ class PlanDayDetailViewModelTest {
     }
 
     // ──────────────────────────────────────────────────────────────────────
-    // BUG: "Start This Workout" does NOT pass exercises to ActiveWorkout
+    // StartWorkout intent → NavigateToActiveWorkout effect
     //
-    // The PlanDayDetailContract currently has NO StartWorkout intent and NO
-    // effect that carries exercise data. When the user taps "Start This
-    // Workout", navigation fires but the exercises are silently dropped.
-    //
-    // The tests below document what the correct contract SHOULD look like.
-    // They will NOT compile until PlanDayDetailContract is updated with:
-    //   - PlanDayDetailIntent.StartWorkout
-    //   - PlanDayDetailEffect.NavigateToWorkout(exercises: List<PlannedExercise>)
+    // PlanDayDetailContract now has StartWorkout intent and
+    // NavigateToActiveWorkout effect. The ViewModel stores the workout day
+    // in ActivePlanStore before emitting the navigation effect.
     // ──────────────────────────────────────────────────────────────────────
 
-    // TODO: Uncomment when PlanDayDetailContract is updated with StartWorkout intent/effect
-    //
-    // @Test
-    // fun `startWorkout emits NavigateToWorkout effect with exercises`() {
-    //     activePlanStore.setPlan(testPlan)
-    //     viewModel.onIntent(PlanDayDetailIntent.LoadDay(1))
-    //
-    //     // Verify day loaded correctly first
-    //     val state = viewModel.state.value
-    //     assertEquals(2, state.workoutDay!!.exercises.size)
-    //
-    //     // Now fire StartWorkout — expect an effect carrying the exercises
-    //     viewModel.effect.test {
-    //         viewModel.onIntent(PlanDayDetailIntent.StartWorkout)
-    //
-    //         val effect = awaitItem()
-    //         assertTrue(effect is PlanDayDetailEffect.NavigateToWorkout)
-    //         val navEffect = effect as PlanDayDetailEffect.NavigateToWorkout
-    //         assertEquals(2, navEffect.exercises.size)
-    //         assertEquals("Bench Press", navEffect.exercises[0].exerciseName)
-    //         assertEquals("OHP", navEffect.exercises[1].exerciseName)
-    //     }
-    // }
-    //
-    // @Test
-    // fun `startWorkout before loadDay does not crash`() {
-    //     // No day loaded — should be a no-op or emit an error, never crash
-    //     viewModel.onIntent(PlanDayDetailIntent.StartWorkout)
-    //     // If no effect channel exists yet, this just verifies no exception
-    //     val state = viewModel.state.value
-    //     assertTrue(state.isLoading) // Still in initial state
-    // }
-    //
-    // @Test
-    // fun `startWorkout preserves sets and reps from plan`() {
-    //     activePlanStore.setPlan(testPlan)
-    //     viewModel.onIntent(PlanDayDetailIntent.LoadDay(1))
-    //
-    //     viewModel.effect.test {
-    //         viewModel.onIntent(PlanDayDetailIntent.StartWorkout)
-    //
-    //         val effect = awaitItem() as PlanDayDetailEffect.NavigateToWorkout
-    //         // Verify the planned sets/reps survive the trip
-    //         assertEquals(4, effect.exercises[0].sets)
-    //         assertEquals("6-8", effect.exercises[0].repsRange)
-    //         assertEquals(3, effect.exercises[1].sets)
-    //         assertEquals("8-10", effect.exercises[1].repsRange)
-    //     }
-    // }
+    @Test
+    fun `startWorkout emits NavigateToActiveWorkout effect`() = runTest {
+        activePlanStore.setPlan(testPlan)
+        viewModel.onIntent(PlanDayDetailIntent.LoadDay(1))
+
+        // Verify day loaded correctly first
+        val state = viewModel.state.value
+        assertEquals(2, state.workoutDay!!.exercises.size)
+
+        // Now fire StartWorkout — expect NavigateToActiveWorkout effect
+        viewModel.effect.test {
+            viewModel.onIntent(PlanDayDetailIntent.StartWorkout)
+
+            val effect = awaitItem()
+            assertTrue(effect is PlanDayDetailEffect.NavigateToActiveWorkout)
+        }
+    }
+
+    @Test
+    fun `startWorkout stores pending workout day in ActivePlanStore`() = runTest {
+        activePlanStore.setPlan(testPlan)
+        viewModel.onIntent(PlanDayDetailIntent.LoadDay(1))
+
+        viewModel.effect.test {
+            viewModel.onIntent(PlanDayDetailIntent.StartWorkout)
+            awaitItem() // consume the effect
+
+            // Verify the workout day was stored for the active workout screen
+            val pendingDay = activePlanStore.pendingWorkoutDay.value
+            assertNotNull(pendingDay)
+            assertEquals("Push Day", pendingDay!!.name)
+            assertEquals(2, pendingDay.exercises.size)
+            assertEquals("Bench Press", pendingDay.exercises[0].exerciseName)
+            assertEquals("OHP", pendingDay.exercises[1].exerciseName)
+        }
+    }
+
+    @Test
+    fun `startWorkout before loadDay is a no-op`() = runTest {
+        // No day loaded — should be a no-op, never crash
+        viewModel.onIntent(PlanDayDetailIntent.StartWorkout)
+        // If no effect channel exists yet, this just verifies no exception
+        val state = viewModel.state.value
+        assertTrue(state.isLoading) // Still in initial state
+    }
+
+    @Test
+    fun `startWorkout preserves sets and reps from plan`() = runTest {
+        activePlanStore.setPlan(testPlan)
+        viewModel.onIntent(PlanDayDetailIntent.LoadDay(1))
+
+        viewModel.effect.test {
+            viewModel.onIntent(PlanDayDetailIntent.StartWorkout)
+            awaitItem()
+
+            // Verify the planned sets/reps survive the trip via ActivePlanStore
+            val pendingDay = activePlanStore.pendingWorkoutDay.value!!
+            assertEquals(4, pendingDay.exercises[0].sets)
+            assertEquals("6-8", pendingDay.exercises[0].repsRange)
+            assertEquals(3, pendingDay.exercises[1].sets)
+            assertEquals("8-10", pendingDay.exercises[1].repsRange)
+        }
+    }
 }

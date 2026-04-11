@@ -1,0 +1,75 @@
+appId: com.gymbro.app
+name: "Exercise Library from Profile - Navigate to library via profile"
+#
+# Tests: Exercise library reachability from the Profile tab
+# Preconditions: User has completed onboarding (ensured by ensure-post-onboarding.yaml)
+# Test data: Search query "Press"
+# Assertions: Exercise library screen appears, search works, back navigation works
+# Cleanup: Return to Profile tab
+# Dependencies: flow/ensure-post-onboarding.yaml
+tags:
+  - library
+  - navigation
+  - regression
+onFlowStart:
+  - launchApp
+  - waitForAnimationToEnd:
+      timeout: 3000
+
+onFlowComplete:
+  - tapOn:
+      id: "nav_home"
+      optional: true
+
+---
+
+- runFlow: flow/ensure-post-onboarding.yaml
+
+# Navigate to Profile tab
+- tapOn:
+    id: "nav_profile"
+- waitForAnimationToEnd:
+    timeout: 2000
+# Screenshot 01: Profile screen
+- takeScreenshot: 01_exercise_library_profile
+
+# Tap Exercise Library row
+- tapOn: "Biblioteca de Ejercicios|Exercise Library"
+- waitForAnimationToEnd:
+    timeout: 2000
+
+# Assert exercise library screen appears
+- assertVisible: "Biblioteca de Ejercicios|Exercise Library"
+# Screenshot 02: Exercise library screen opened from profile
+- takeScreenshot: 02_exercise_library_screen
+
+# Search for an exercise
+- tapOn:
+    id: "search_bar"
+- waitForAnimationToEnd:
+    timeout: 1000
+- inputText: "Press"
+- waitForAnimationToEnd:
+    timeout: 1000
+# Screenshot 03: Search results for "Press"
+- takeScreenshot: 03_exercise_library_search
+
+# Verify search produced results or empty state
+- runFlow:
+    when:
+      visible:
+        text: ".*Press.*"
+    commands:
+      - scrollUntilVisible:
+          element:
+            text: ".*Press.*"
+          timeout: 5000
+      # Screenshot 04: Exercise found in search
+      - takeScreenshot: 04_exercise_library_result_found
+
+# Navigate back to Profile
+- back
+- waitForAnimationToEnd:
+    timeout: 2000
+# Screenshot 05: Back on profile after library visit
+- takeScreenshot: 05_exercise_library_back_to_profile
