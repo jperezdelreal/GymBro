@@ -501,3 +501,41 @@
 **Key patterns reinforced:**
 - Use `@EntryPoint` pattern for accessing UserPreferences in composables without ViewModel injection (now also in ProgressScreen).
 - Use in-memory singleton stores (like `ActivePlanStore`, `WorkoutResultStore`) when navigation args or `savedStateHandle` can't survive `popUpTo` with `inclusive = true`.
+
+### Tier 2 Quality Sweep — Issues #446, #447, #450, #451, #454, #455, #463
+**16 files changed, 358 insertions, 35 deletions. Build passes.**
+
+**#446 — Localized date formats:**
+- Replaced 5 hardcoded EN date patterns with `DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM/LONG)` and `Locale.getDefault()`.
+- Files: HistoryListScreen, HistoryDetailScreen, ProgressScreen, ProgramsScreen, HistoryListViewModel.
+
+**#447 — Hardcoded English strings moved to resources (EN+ES):**
+- ProgressScreen: "exercises" → `stringResource(R.string.progress_exercises_count)`, PRs contentDescription hoisted.
+- HistoryListScreen: "Unknown error" → `stringResource(R.string.history_unknown_error)`.
+- CreateExerciseScreen: placeholder + "Cancel" → `stringResource()`.
+- ExerciseDetailViewModel & CreateExerciseViewModel: error strings via `context.getString(R.string.…)` with `@ApplicationContext`.
+- RecoveryScreen: readiness CD hoisted, metric CD hoisted, slider labels (Wrecked/Tired/OK/Good/Crushed) → `stringResource()`.
+- AnalyticsScreen: summary card CD hoisted from semantics block.
+
+**#450 — Replace active plan:**
+- Added `ReplacePlanCard` below active plan in ProgramsScreen with confirmation AlertDialog.
+- Users can now regenerate a plan without being stuck.
+
+**#451 — Profile dead-end clicks:**
+- Added `enabled` parameter to `SettingItem` composable.
+- Disabled 3 no-op rows (account details, cloud sync settings, version) with "Coming soon" subtitle.
+- Implemented "Send Feedback" → email intent via `Intent.ACTION_SENDTO`.
+
+**#454 — Workout summary guidance:**
+- Always shows motivational message ("Great effort! 💪" / "¡Gran esfuerzo! 💪").
+- Added optional `nextWorkoutName` parameter for next-workout hint.
+
+**#455 — Onboarding navigation buttons:**
+- Added Back (subtle, disabled on page 0) and Next (accent green) buttons flanking page indicators.
+- Last page omits Next (CTA "Let's Go" already exists on that page).
+
+**#463 — Home screen badge + Quick Start clarity:**
+- Added "TODAY 🎯" / "HOY 🎯" accent green chip badge at top of TodayWorkoutCard.
+- Added Quick Start subtitle explaining freestyle workout flow.
+
+**Pattern: `stringResource()` cannot be inside `semantics{}` blocks — hoist to variable before the modifier chain.**
