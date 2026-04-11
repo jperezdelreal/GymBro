@@ -539,3 +539,46 @@
 - Added Quick Start subtitle explaining freestyle workout flow.
 
 **Pattern: `stringResource()` cannot be inside `semantics{}` blocks — hoist to variable before the modifier chain.**
+
+### 2026-04-11: Tier-3 Polish — 7 Issues Fixed (#452, #456, #457, #458, #460, #461, #462)
+
+**#452 — Settings effect handlers:**
+- Implemented ShowMessage → Snackbar via SnackbarHostState
+- Implemented OpenUrl → Intent.ACTION_VIEW + context.startActivity
+- Implemented OpenHealthConnect → launch HC app, fallback to Play Store
+
+**#456 — Orphaned routes:**
+- Added Recovery row in ProfileScreen linking to recovery screen
+- Wired onNavigateToRecovery through GymBroNavGraph
+- Template create route verified clean (no TODO)
+
+**#457 — Centralize color constants:**
+- HistoryListScreen: removed 7 local color vals, imports from core.ui.theme
+- WorkoutSummaryScreen: removed 5 local color vals, imports from core.ui.theme
+- SettingsScreen: replaced local AccentGreen/CardBackground/SurfaceDark with theme imports
+- OnboardingScreen: removed local AccentGreen/SurfaceVariant, uses theme imports
+- ProgramsScreen: removed local AccentGreen/AccentCyan, imports from theme
+
+**#458 — Missing contentDescriptions:**
+- HistoryListScreen WorkoutCard: added semantics with workout date/exercise count/relative time
+- OnboardingScreen GoalCards: added onboarding_goal_cd content description
+- OnboardingScreen FrequencyCards: added onboarding_frequency_cd content description
+- OnboardingScreen UnitCards: added onboarding_unit_cd content description
+- ProgressScreen WeeklyVolumeChart Canvas: added progress_volume_chart_cd summary
+- All stringResource() calls hoisted outside semantics{} blocks
+
+**#460 — Onboarding frequency explanation + training phase hint:**
+- Added subtitle below frequency selection: "We'll build a workout plan around this schedule"
+- Added training phase settings hint: "You can change your training phase anytime in Settings"
+
+**#461 — Reset onboarding in Settings:**
+- Added RedoSetup event + NavigateToOnboarding effect
+- SettingsViewModel clears hasCompletedOnboarding and navigates
+- SettingsScreen shows Redo Setup row with confirmation dialog
+- GymBroNavGraph wires onNavigateToOnboarding to navigate("onboarding")
+
+**#462 — Progress screen polish:**
+- Plateau alerts: added explanation subtitle under section header
+- PR list: increased display limit from 5 to 20
+
+All strings bilingual (EN + ES). Build compiles clean.
