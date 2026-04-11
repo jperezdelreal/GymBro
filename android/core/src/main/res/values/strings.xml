@@ -575,4 +575,15 @@
     <string name="rest_timer_cd_subtract_time">Subtract 15 seconds</string>
     <string name="rest_timer_cd_add_time">Add 15 seconds</string>
     <string name="settings_cd_training_phase">Training phase selector</string>
+
+    <!-- Exercise Detail -->
+    <string name="exercise_detail_title">Exercise Detail</string>
+    <string name="exercise_detail_loading">Loading exercise…</string>
+    <string name="exercise_detail_error_title">Could Not Load Exercise</string>
+    <string name="exercise_detail_muscle_group">Muscle Group</string>
+    <string name="exercise_detail_category">Category</string>
+    <string name="exercise_detail_equipment">Equipment</string>
+    <string name="exercise_detail_description">Description</string>
+    <string name="exercise_detail_watch_video">Watch Video</string>
+    <string name="exercise_picker_tap_to_add">Tap to add</string>
 </resources>

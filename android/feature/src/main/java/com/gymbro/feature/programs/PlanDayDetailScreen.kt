@@ -66,11 +66,19 @@ fun PlanDayDetailRoute(
         viewModel.onIntent(PlanDayDetailIntent.LoadDay(dayNumber))
     }
 
+    LaunchedEffect(Unit) {
+        viewModel.effect.collect { effect ->
+            when (effect) {
+                is PlanDayDetailEffect.NavigateToActiveWorkout -> onNavigateToActiveWorkout()
+            }
+        }
+    }
+
     PlanDayDetailScreen(
         state = state.value,
         dayNumber = dayNumber,
         onNavigateBack = onNavigateBack,
-        onStartWorkout = onNavigateToActiveWorkout,
+        onStartWorkout = { viewModel.onIntent(PlanDayDetailIntent.StartWorkout) },
         onRetry = { viewModel.onIntent(PlanDayDetailIntent.Retry) },
     )
 }

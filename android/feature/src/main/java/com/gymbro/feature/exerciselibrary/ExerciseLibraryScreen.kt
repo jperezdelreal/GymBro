@@ -255,6 +255,7 @@ fun ExerciseLibraryScreen(
                             ExerciseCard(
                                 exercise = exercise,
                                 onClick = { onEvent(ExerciseLibraryEvent.ExerciseClicked(exercise)) },
+                                isPickerMode = isPickerMode,
                             )
                         }
                     }
@@ -329,6 +330,7 @@ private fun GradientFilterChip(
 private fun ExerciseCard(
     exercise: Exercise,
     onClick: () -> Unit,
+    isPickerMode: Boolean = false,
 ) {
     val haptic = LocalHapticFeedback.current
     var isPressed by remember { mutableStateOf(false) }
@@ -390,12 +392,31 @@ private fun ExerciseCard(
                 }
             }
 
-            Icon(
-                Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                contentDescription = stringResource(R.string.exercise_library_view_details),
-                tint = accentColor,
-                modifier = Modifier.size(24.dp),
-            )
+            if (isPickerMode) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Icon(
+                        Icons.Default.Add,
+                        contentDescription = stringResource(R.string.exercise_picker_tap_to_add),
+                        tint = accentColor,
+                        modifier = Modifier.size(24.dp),
+                    )
+                    Text(
+                        text = stringResource(R.string.exercise_picker_tap_to_add),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = accentColor,
+                        fontSize = 10.sp,
+                    )
+                }
+            } else {
+                Icon(
+                    Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    contentDescription = stringResource(R.string.exercise_library_view_details),
+                    tint = accentColor,
+                    modifier = Modifier.size(24.dp),
+                )
+            }
         }
     }
 

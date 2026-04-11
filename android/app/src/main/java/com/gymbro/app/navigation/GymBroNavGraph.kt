@@ -60,6 +60,7 @@ import com.gymbro.core.model.ExerciseCategory
 import com.gymbro.core.model.MuscleGroup
 import com.gymbro.core.preferences.UserPreferences
 import com.gymbro.feature.exerciselibrary.CreateExerciseRoute
+import com.gymbro.feature.exerciselibrary.ExerciseDetailRoute
 import com.gymbro.feature.exerciselibrary.ExerciseLibraryRoute
 import com.gymbro.feature.home.HomeRoute
 import com.gymbro.feature.history.HistoryDetailRoute
@@ -227,8 +228,15 @@ fun GymBroNavGraph(
                 },
             )
         }
-        composable("exercise_detail/{exerciseId}") {
-            PlaceholderScreen(title = "Exercise Detail")
+        composable(
+            route = "exercise_detail/{exerciseId}",
+            arguments = listOf(
+                navArgument("exerciseId") { type = NavType.StringType },
+            ),
+        ) {
+            ExerciseDetailRoute(
+                onNavigateBack = { navController.popBackStack() },
+            )
         }
         composable("create_exercise") {
             CreateExerciseRoute(

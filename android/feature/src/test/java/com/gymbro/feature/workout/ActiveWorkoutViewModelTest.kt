@@ -165,7 +165,15 @@ class ActiveWorkoutViewModelTest {
     @Before
     fun setup() = runTest(testDispatcher) {
         workoutRepository = FakeWorkoutRepository()
-        viewModel = ActiveWorkoutViewModel(workoutRepository, mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true))
+        viewModel = ActiveWorkoutViewModel(
+            workoutRepository,
+            mockk(relaxed = true),  // personalRecordService
+            mockk(relaxed = true),  // smartDefaultsService
+            mockk(relaxed = true),  // rpeTrendService
+            mockk(relaxed = true),  // exerciseRepository
+            com.gymbro.core.service.ActivePlanStore(),  // activePlanStore
+            mockk(relaxed = true),  // tooltipManager
+        )
         advanceUntilIdle()
     }
 
@@ -338,5 +346,76 @@ class ActiveWorkoutViewModelTest {
 
             assertEquals(ActiveWorkoutEffect.NavigateBack, awaitItem())
         }
+    }
+
+    // ──────────────────────────────────────────────────────────────────────
+    // BUG REGRESSION: Exercise picker integration
+    //
+    // After picking an exercise from the picker, the exercise must appear
+    // in the workout state with the correct name and an initial set.
+    // These tests validate the contract between exercise picker and
+    // active workout — the exact flow that broke silently.
+    // ──────────────────────────────────────────────────────────────────────
+
+    @Test
+    fun exercisePickedAppearsWithCorrectName() = runTest(testDispatcher) {
+        viewModel.onEvent(ActiveWorkoutEvent.ExercisePicked(TestFixtures.benchPress))
+        advanceUntilIdle()
+
+        val exercises = viewModel.state.value.exercises
+        assertEquals(1, exercises.size)
+        assertEquals("Bench Press", exercises[0].exercise.name)
+    }
+
+    @Test
+    fun multipleExercisesCanBeAddedInSequence() = runTest(testDispatcher) {
+        viewModel.onEvent(ActiveWorkoutEvent.ExercisePicked(TestFixtures.benchPress))
+        viewModel.onEvent(ActiveWorkoutEvent.ExercisePicked(TestFixtures.squat))
+        viewModel.onEvent(ActiveWorkoutEvent.ExercisePicked(TestFixtures.deadlift))
+        advanceUntilIdle()
+
+        val exercises = viewModel.state.value.exercises
+        assertEquals(3, exercises.size)
+        assertEquals("Bench Press", exercises[0].exercise.name)
+        assertEquals("Back Squat", exercises[1].exercise.name)
+        assertEquals("Deadlift", exercises[2].exercise.name)
+    }
+
+    @Test
+    fun exercisePickedHasInitialSetWithCorrectNumber() = runTest(testDispatcher) {
+        viewModel.onEvent(ActiveWorkoutEvent.ExercisePicked(TestFixtures.benchPress))
+        advanceUntilIdle()
+
+        val sets = viewModel.state.value.exercises[0].sets
+        assertEquals(1, sets.size)
+        assertEquals(1, sets[0].setNumber)
+        assertFalse(sets[0].isCompleted)
+        assertFalse(sets[0].isWarmup)
+    }
+
+    @Test
+    fun exercisePickedPreservesExerciseIdentity() = runTest(testDispatcher) {
+        viewModel.onEvent(ActiveWorkoutEvent.ExercisePicked(TestFixtures.benchPress))
+        advanceUntilIdle()
+
+        val addedExercise = viewModel.state.value.exercises[0].exercise
+        assertEquals(TestFixtures.benchPress.id, addedExercise.id)
+        assertEquals(TestFixtures.benchPress.muscleGroup, addedExercise.muscleGroup)
+        assertEquals(TestFixtures.benchPress.category, addedExercise.category)
+        assertEquals(TestFixtures.benchPress.equipment, addedExercise.equipment)
+    }
+
+    @Test
+    fun exercisePickedMultipleTimesCreatesDistinctEntries() = runTest(testDispatcher) {
+        // Edge case: same exercise added twice — both should appear
+        viewModel.onEvent(ActiveWorkoutEvent.ExercisePicked(TestFixtures.benchPress))
+        viewModel.onEvent(ActiveWorkoutEvent.ExercisePicked(TestFixtures.benchPress))
+        advanceUntilIdle()
+
+        val exercises = viewModel.state.value.exercises
+        assertEquals(2, exercises.size)
+        // Both should have initial sets
+        assertEquals(1, exercises[0].sets.size)
+        assertEquals(1, exercises[1].sets.size)
     }
 }

@@ -1,11 +1,15 @@
 package com.gymbro.feature.programs
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.gymbro.core.service.ActivePlanStore
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -16,6 +20,9 @@ class PlanDayDetailViewModel @Inject constructor(
     private val _state = MutableStateFlow(PlanDayDetailState())
     val state: StateFlow<PlanDayDetailState> = _state.asStateFlow()
 
+    private val _effect = Channel<PlanDayDetailEffect>(Channel.BUFFERED)
+    val effect = _effect.receiveAsFlow()
+
     private var currentDayNumber: Int = -1
 
     fun onIntent(intent: PlanDayDetailIntent) {
@@ -24,6 +31,7 @@ class PlanDayDetailViewModel @Inject constructor(
             is PlanDayDetailIntent.Retry -> {
                 if (currentDayNumber > 0) loadDay(currentDayNumber)
             }
+            is PlanDayDetailIntent.StartWorkout -> startWorkout()
         }
     }
 
@@ -55,5 +63,13 @@ class PlanDayDetailViewModel @Inject constructor(
             workoutDay = workoutDay,
             planName = plan.name,
         )
+    }
+
+    private fun startWorkout() {
+        val workoutDay = _state.value.workoutDay ?: return
+        activePlanStore.setPendingWorkoutDay(workoutDay)
+        viewModelScope.launch {
+            _effect.send(PlanDayDetailEffect.NavigateToActiveWorkout)
+        }
     }
 }

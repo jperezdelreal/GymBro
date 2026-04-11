@@ -12,4 +12,9 @@ data class PlanDayDetailState(
 sealed interface PlanDayDetailIntent {
     data class LoadDay(val dayNumber: Int) : PlanDayDetailIntent
     data object Retry : PlanDayDetailIntent
+    data object StartWorkout : PlanDayDetailIntent
+}
+
+sealed interface PlanDayDetailEffect {
+    data object NavigateToActiveWorkout : PlanDayDetailEffect
 }

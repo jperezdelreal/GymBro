@@ -419,3 +419,17 @@
 - Voice result flows: SpeechRecognizer → Flow<VoiceRecognitionState> → VoiceInputParser.parse() → ActiveWorkoutEvent.VoiceInput → ViewModel auto-fills set fields.
 
 **PR #405 opened, closes #392.**
+
+### 2026-04-10: Fix 4 Broken UX Flows (Bug Fixes)
+**BUG 1 — Exercise Detail Screen:** Created `ExerciseDetailContract.kt`, `ExerciseDetailViewModel.kt`, and `ExerciseDetailScreen.kt` to replace `PlaceholderScreen`. Full detail screen shows exercise name, muscle group with icon, category badge, equipment, description, and YouTube link button. Uses existing `ExerciseRepository.getExerciseById()`. Wired into `GymBroNavGraph` with `navArgument("exerciseId")` and back navigation. All strings bilingual (EN + ES).
+
+**BUG 2 — Plan → Active Workout passes exercises:** Added `pendingWorkoutDay` to `ActivePlanStore` with `setPendingWorkoutDay()` / `consumePendingWorkoutDay()`. `PlanDayDetailViewModel` now has `StartWorkout` intent that sets the pending day before emitting `NavigateToActiveWorkout` effect. `ActiveWorkoutViewModel` calls `loadPendingWorkoutDay()` after `startWorkout()` — looks up each `PlannedExercise` by name from `ExerciseRepository`, creates `WorkoutExerciseUi` entries with planned sets and smart defaults.
+
+**BUG 3 — Exercise Picker mode visual clarity:** The picker code path was functionally correct (ExerciseLibraryRoute intercepts `ExerciseClicked` in picker mode). Issue was visual: the arrow icon (`KeyboardArrowRight`) was the same in both modes. Now shows "+" icon with "Tap to add" label in picker mode. Added `exercise_picker_tap_to_add` string (bilingual).
+
+**BUG 4 — Onboarding verification:** Confirmed working correctly — `hasCompletedOnboarding` defaults to `false` via DataStore (`preferences[ONBOARDING_COMPLETE] ?: false`). The 7-page onboarding flow covers goal, experience, frequency, phase, and units, then generates a workout plan. Issue was likely a stale development flag, not a code bug.
+
+**Key patterns learned:**
+- `ActivePlanStore` is the team's shared in-memory store pattern — use it for passing data between screens that don't share a SavedStateHandle.
+- `Flow.first()` from Room DAOs: must import `kotlinx.coroutines.flow.first` explicitly; Room Flows are hot and need explicit terminal operators.
+- PlanDayDetail uses Intent/Effect pattern but the ViewModel extends plain `ViewModel` (not `BaseViewModel`) — different from other feature ViewModels.
