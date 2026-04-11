@@ -24,6 +24,7 @@ class WorkoutPlanGenerator @Inject constructor(
         trainingPhase: UserPreferences.TrainingPhase = UserPreferences.TrainingPhase.MAINTENANCE,
     ): WorkoutPlan {
         val allExercises = exerciseRepository.getAllExercises().first()
+        require(allExercises.isNotEmpty()) { "No exercises available — seed data may not be loaded yet" }
         val split = TrainingSplit.selectOptimalSplit(daysPerWeek, goal)
         val volumeMultiplier = when (trainingPhase) {
             UserPreferences.TrainingPhase.BULK -> 1.2f

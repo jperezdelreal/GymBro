@@ -1,5 +1,6 @@
 package com.gymbro.feature.workout
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.RepeatMode
@@ -222,6 +223,8 @@ fun ActiveWorkoutScreen(
     Box {
         val haptic = LocalHapticFeedback.current
         var showDiscardDialog by remember { mutableStateOf(false) }
+
+        BackHandler { showDiscardDialog = true }
         
         if (showDiscardDialog) {
             androidx.compose.material3.AlertDialog(

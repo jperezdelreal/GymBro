@@ -11,7 +11,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
 import javax.inject.Inject
+
+private const val PLAN_GENERATION_MAX_RETRIES = 5
+private const val PLAN_GENERATION_RETRY_DELAY_MS = 500L
 
 @HiltViewModel
 class OnboardingViewModel @Inject constructor(
@@ -68,19 +72,36 @@ class OnboardingViewModel @Inject constructor(
             userPreferences.setTrainingPhase(_state.value.selectedPhase)
             userPreferences.setOnboardingComplete(true)
 
-            try {
-                val plan = workoutPlanGenerator.generatePlan(
-                    goal = _state.value.selectedGoal,
-                    experienceLevel = _state.value.selectedExperience,
-                    daysPerWeek = _state.value.trainingDaysPerWeek,
-                    trainingPhase = _state.value.selectedPhase,
+            // Retry plan generation — exercise seed data loads asynchronously
+            // on first install and may not be available immediately.
+            var lastException: Exception? = null
+            for (attempt in 1..PLAN_GENERATION_MAX_RETRIES) {
+                try {
+                    val plan = workoutPlanGenerator.generatePlan(
+                        goal = _state.value.selectedGoal,
+                        experienceLevel = _state.value.selectedExperience,
+                        daysPerWeek = _state.value.trainingDaysPerWeek,
+                        trainingPhase = _state.value.selectedPhase,
+                    )
+                    val personalizedPlan = plan.copy(
+                        name = "Your First Program",
+                    )
+                    activePlanStore.setPlanFromOnboarding(personalizedPlan)
+                    lastException = null
+                    break
+                } catch (e: Exception) {
+                    lastException = e
+                    if (attempt < PLAN_GENERATION_MAX_RETRIES) {
+                        delay(PLAN_GENERATION_RETRY_DELAY_MS)
+                    }
+                }
+            }
+            if (lastException != null) {
+                android.util.Log.e(
+                    "OnboardingViewModel",
+                    "Plan generation failed after $PLAN_GENERATION_MAX_RETRIES attempts",
+                    lastException,
                 )
-                val personalizedPlan = plan.copy(
-                    name = "Your First Program",
-                )
-                activePlanStore.setPlanFromOnboarding(personalizedPlan)
-            } catch (_: Exception) {
-                // Plan generation failure should not block onboarding completion
             }
 
             _state.value = _state.value.copy(isGeneratingPlan = false)
