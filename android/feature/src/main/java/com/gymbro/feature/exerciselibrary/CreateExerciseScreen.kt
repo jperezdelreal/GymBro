@@ -319,7 +319,7 @@ fun CreateExerciseScreen(
                                 .height(120.dp),
                             placeholder = {
                                 Text(
-                                    "Add notes about form, cues, or variations...",
+                                    stringResource(R.string.create_exercise_notes_placeholder),
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                             },
@@ -351,7 +351,7 @@ fun CreateExerciseScreen(
                             contentColor = MaterialTheme.colorScheme.onSurface,
                         ),
                     ) {
-                        Text("Cancel")
+                        Text(stringResource(R.string.action_cancel))
                     }
 
                     Button(

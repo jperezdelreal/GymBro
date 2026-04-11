@@ -281,6 +281,14 @@ private fun QuickStartCard(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
 
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Text(
+                    text = stringResource(R.string.home_quick_start_subtitle),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+
                 Spacer(modifier = Modifier.height(12.dp))
 
                 Button(
@@ -335,6 +343,24 @@ private fun TodayWorkoutCard(
                 .fillMaxWidth()
                 .padding(16.dp),
         ) {
+            // TODAY badge
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(AccentGreen.copy(alpha = 0.15f))
+                    .padding(horizontal = 10.dp, vertical = 4.dp),
+            ) {
+                Text(
+                    text = stringResource(R.string.home_today_badge),
+                    style = MaterialTheme.typography.labelMedium.copy(
+                        fontWeight = FontWeight.Bold,
+                    ),
+                    color = AccentGreen,
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,

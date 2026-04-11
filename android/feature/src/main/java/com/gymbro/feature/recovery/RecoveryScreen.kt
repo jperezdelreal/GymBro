@@ -227,8 +227,9 @@ private fun ReadinessScoreCard(score: Int, label: String) {
             Spacer(modifier = Modifier.height(16.dp))
 
             // Large animated progress circle with gradient
+            val readinessCd = stringResource(R.string.recovery_readiness_cd, score, label)
             Box(contentAlignment = Alignment.Center, modifier = Modifier.semantics {
-                contentDescription = "Readiness score: $score out of 100, $label"
+                contentDescription = readinessCd
             }) {
                 AnimatedProgressCircle(
                     progress = score / 100f,
@@ -327,9 +328,10 @@ private fun MetricCard(
     value: String,
     iconTint: Color,
 ) {
+    val metricCd = stringResource(R.string.recovery_metric_cd, label, value)
     GlassmorphicCard(
         modifier = modifier.semantics(mergeDescendants = true) { 
-            contentDescription = "$label: $value"
+            contentDescription = metricCd
         },
     ) {
         Column(
@@ -653,27 +655,27 @@ private fun ManualRecoveryEntryCard(
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
                     Text(
-                        text = "Wrecked",
+                        text = stringResource(R.string.recovery_label_wrecked),
                         style = MaterialTheme.typography.labelSmall,
                         color = Color(0xFF9E9E9E),
                     )
                     Text(
-                        text = "Tired",
+                        text = stringResource(R.string.recovery_label_tired),
                         style = MaterialTheme.typography.labelSmall,
                         color = Color(0xFF9E9E9E),
                     )
                     Text(
-                        text = "OK",
+                        text = stringResource(R.string.recovery_label_ok),
                         style = MaterialTheme.typography.labelSmall,
                         color = Color(0xFF9E9E9E),
                     )
                     Text(
-                        text = "Good",
+                        text = stringResource(R.string.recovery_label_good),
                         style = MaterialTheme.typography.labelSmall,
                         color = Color(0xFF9E9E9E),
                     )
                     Text(
-                        text = "Crushed",
+                        text = stringResource(R.string.recovery_label_crushed),
                         style = MaterialTheme.typography.labelSmall,
                         color = Color(0xFF9E9E9E),
                     )

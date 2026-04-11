@@ -1,10 +1,13 @@
 package com.gymbro.feature.exerciselibrary
 
+import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.gymbro.core.R
 import com.gymbro.core.repository.ExerciseRepository
 import com.gymbro.feature.common.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,6 +20,7 @@ import javax.inject.Inject
 class ExerciseDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val exerciseRepository: ExerciseRepository,
+    @ApplicationContext private val context: Context,
 ) : BaseViewModel() {
 
     private val exerciseId: String = checkNotNull(savedStateHandle["exerciseId"])
@@ -41,7 +45,7 @@ class ExerciseDetailViewModel @Inject constructor(
         safeLaunch(
             onError = { error ->
                 _state.update {
-                    it.copy(isLoading = false, error = "Failed to load exercise")
+                    it.copy(isLoading = false, error = context.getString(R.string.exercise_detail_load_error))
                 }
             }
         ) {
@@ -50,7 +54,7 @@ class ExerciseDetailViewModel @Inject constructor(
             if (exercise != null) {
                 _state.update { it.copy(exercise = exercise, isLoading = false) }
             } else {
-                _state.update { it.copy(isLoading = false, error = "Exercise not found") }
+                _state.update { it.copy(isLoading = false, error = context.getString(R.string.exercise_detail_not_found)) }
             }
         }
     }

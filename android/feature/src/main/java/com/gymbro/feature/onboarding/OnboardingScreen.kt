@@ -33,6 +33,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -60,6 +61,7 @@ import com.gymbro.core.ui.theme.OnSurfaceVariant
 import com.gymbro.core.ui.theme.GlassOverlay
 import com.gymbro.feature.common.GlassmorphicCard
 import com.gymbro.feature.common.GradientButton
+import kotlinx.coroutines.launch
 
 private val AccentGreen = Color(0xFF00FF87)
 private val SurfaceVariant = Color(0xFF2C2C2E)
@@ -93,6 +95,7 @@ fun OnboardingScreen(
 ) {
     val haptic = LocalHapticFeedback.current
     val pagerState = rememberPagerState(pageCount = { 7 })
+    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(pagerState) {
         snapshotFlow { pagerState.currentPage }.collect { page ->
@@ -141,11 +144,65 @@ fun OnboardingScreen(
                 }
             }
 
-            PageIndicators(
-                pageCount = 7,
-                currentPage = pagerState.currentPage,
-                modifier = Modifier.padding(bottom = 32.dp),
-            )
+            // Navigation buttons + page indicators
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp, vertical = 16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                // Back button (subtle, disabled on first page)
+                OutlinedButton(
+                    onClick = {
+                        coroutineScope.launch {
+                            pagerState.animateScrollToPage(pagerState.currentPage - 1)
+                        }
+                    },
+                    enabled = pagerState.currentPage > 0,
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = Color.White,
+                        disabledContentColor = Color.White.copy(alpha = 0.3f),
+                    ),
+                ) {
+                    Text(
+                        text = stringResource(R.string.onboarding_back),
+                        fontWeight = FontWeight.Medium,
+                    )
+                }
+
+                PageIndicators(
+                    pageCount = 7,
+                    currentPage = pagerState.currentPage,
+                )
+
+                // Next/Let's Go button (last page shows Let's Go via existing CTA)
+                if (pagerState.currentPage < 6) {
+                    Button(
+                        onClick = {
+                            coroutineScope.launch {
+                                pagerState.animateScrollToPage(pagerState.currentPage + 1)
+                            }
+                        },
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = AccentGreenStart,
+                            contentColor = Color.Black,
+                        ),
+                    ) {
+                        Text(
+                            text = stringResource(R.string.onboarding_next),
+                            fontWeight = FontWeight.Bold,
+                        )
+                    }
+                } else {
+                    // Empty spacer to keep layout balanced on last page
+                    Spacer(modifier = Modifier.width(80.dp))
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }

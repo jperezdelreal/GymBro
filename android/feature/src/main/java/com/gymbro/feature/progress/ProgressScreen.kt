@@ -96,9 +96,10 @@ import com.gymbro.feature.common.TooltipPosition
 import kotlinx.coroutines.launch
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 
-private val dateFormatter = DateTimeFormatter.ofPattern("MMM d")
-private val fullDateFormatter = DateTimeFormatter.ofPattern("MMM d, yyyy")
+private val dateFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
+private val fullDateFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
 
 @Composable
 fun ProgressRoute(
@@ -695,7 +696,7 @@ private fun WorkoutHistoryRow(
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     StatChip(
                         icon = Icons.Default.FitnessCenter,
-                        text = "${item.exerciseCount} exercises",
+                        text = stringResource(R.string.progress_exercises_count, item.exerciseCount),
                     )
                     StatChip(
                         icon = Icons.AutoMirrored.Filled.ShowChart,
@@ -711,9 +712,10 @@ private fun WorkoutHistoryRow(
             }
 
             if (item.prCount > 0) {
+                val prsDesc = stringResource(R.string.progress_prs_cd, item.prCount)
                 Icon(
                     Icons.Default.EmojiEvents,
-                    contentDescription = "${item.prCount} PRs",
+                    contentDescription = prsDesc,
                     tint = AccentGreenStart,
                     modifier = Modifier.size(20.dp),
                 )

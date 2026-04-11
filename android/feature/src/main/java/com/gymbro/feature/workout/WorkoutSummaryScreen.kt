@@ -61,6 +61,7 @@ fun WorkoutSummaryScreen(
     exerciseCount: Int,
     personalRecords: List<PersonalRecord>,
     weightUnitLabel: String,
+    nextWorkoutName: String? = null,
     onDone: () -> Unit,
 ){
     var showCelebration by remember { mutableStateOf(personalRecords.isNotEmpty()) }
@@ -113,6 +114,15 @@ fun WorkoutSummaryScreen(
                 text = stringResource(R.string.workout_summary_subtitle),
                 style = MaterialTheme.typography.bodyMedium,
                 color = Color.White.copy(alpha = 0.6f),
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = stringResource(R.string.workout_summary_motivation),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = AccentGreen,
             )
 
             Spacer(modifier = Modifier.height(32.dp))
@@ -168,6 +178,15 @@ fun WorkoutSummaryScreen(
                     value = "${personalRecords.size}",
                     color = AccentAmber,
                     modifier = Modifier.fillMaxWidth(),
+                )
+            }
+
+            if (nextWorkoutName != null) {
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = stringResource(R.string.workout_summary_next_hint, nextWorkoutName),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.White.copy(alpha = 0.6f),
                 )
             }
 

@@ -67,6 +67,7 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 import kotlinx.coroutines.delay
 
 private val AccentGreenStart = Color(0xFF00FF87)
@@ -123,7 +124,7 @@ fun HistoryListRoute(
                     EmptyState(
                         icon = Icons.Default.Close,
                         title = stringResource(R.string.history_error_title),
-                        subtitle = state.error ?: "Unknown error",
+                        subtitle = state.error ?: stringResource(R.string.history_unknown_error),
                         actionText = stringResource(R.string.action_retry),
                         onActionClick = { viewModel.onIntent(HistoryListIntent.Retry) },
                     )
@@ -244,7 +245,7 @@ private fun WorkoutCard(
     
     val workoutDate = Instant.ofEpochMilli(workout.date)
         .atZone(ZoneId.systemDefault())
-    val date = workoutDate.format(DateTimeFormatter.ofPattern("EEE, MMM d"))
+    val date = workoutDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM))
     val relativeTime = getRelativeTime(workoutDate.toLocalDate())
     
     val accentColor = getAccentColorForMuscleGroups(workout.muscleGroups)

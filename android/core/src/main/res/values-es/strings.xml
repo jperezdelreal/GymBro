@@ -644,4 +644,43 @@
     <!-- Profile: Exercise Library Link -->
     <string name="profile_exercise_library">Biblioteca de Ejercicios</string>
     <string name="profile_exercise_library_subtitle">Explorar y gestionar ejercicios</string>
+
+    <!-- Issue #447: Remaining hardcoded strings -->
+    <string name="progress_exercises_count">%d ejercicios</string>
+    <string name="history_unknown_error">Error desconocido</string>
+    <string name="exercise_detail_load_error">Error al cargar el ejercicio</string>
+    <string name="exercise_detail_not_found">Ejercicio no encontrado</string>
+    <string name="create_exercise_name_taken">Ya existe un ejercicio con este nombre</string>
+    <string name="recovery_readiness_cd">Puntuación de preparación: %1$d de 100, %2$s</string>
+    <string name="recovery_label_wrecked">Destrozado</string>
+    <string name="recovery_label_tired">Cansado</string>
+    <string name="recovery_label_ok">OK</string>
+    <string name="recovery_label_good">Bien</string>
+    <string name="recovery_label_crushed">Lo aplasté</string>
+    <string name="progress_prs_cd">%d récords</string>
+    <string name="recovery_metric_cd">%1$s: %2$s</string>
+    <string name="analytics_summary_cd">%1$s: %2$s%3$s</string>
+
+    <!-- Issue #450: Replace active plan -->
+    <string name="programs_change_plan">Generar Nuevo Plan</string>
+    <string name="programs_change_plan_subtitle">Reemplaza tu plan actual con uno nuevo</string>
+    <string name="programs_replace_plan_title">¿Reemplazar Plan Actual?</string>
+    <string name="programs_replace_plan_message">Esto reemplazará tu plan actual. ¿Continuar?</string>
+    <string name="programs_replace_plan_confirm">Reemplazar</string>
+
+    <!-- Issue #451: Profile coming soon -->
+    <string name="profile_coming_soon">Próximamente</string>
+
+    <!-- Issue #454: Workout summary motivational -->
+    <string name="workout_summary_motivation">¡Gran esfuerzo! 💪</string>
+    <string name="workout_summary_next_hint">Siguiente: %s</string>
+
+    <!-- Issue #455: Onboarding nav buttons -->
+    <string name="onboarding_back">Atrás</string>
+    <string name="onboarding_next">Siguiente</string>
+    <string name="onboarding_continue">Continuar</string>
+
+    <!-- Issue #463: Home screen badge -->
+    <string name="home_today_badge">HOY 🎯</string>
+    <string name="home_quick_start_subtitle">Inicia un entrenamiento libre — elige ejercicios sobre la marcha</string>
 </resources>

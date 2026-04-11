@@ -24,6 +24,8 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -38,9 +40,14 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -61,6 +68,7 @@ import com.gymbro.core.R
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 
 private val AccentGreen = Color(0xFF00FF87)
 private val AccentCyan = Color(0xFF00E5FF)
@@ -177,6 +185,14 @@ fun ProgramsScreen(
                             onViewDay = { dayNumber ->
                                 onEvent(ProgramsEvent.ViewPlanDay(dayNumber))
                             },
+                        )
+                    }
+                    // Show option to replace the active plan
+                    item {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        ReplacePlanCard(
+                            isGenerating = state.isGeneratingPlan,
+                            onGenerate = { onEvent(ProgramsEvent.GenerateNewPlan) },
                         )
                     }
                 } else {
@@ -589,8 +605,101 @@ private fun WorkoutDayItem(
     }
 }
 
+@Composable
+private fun ReplacePlanCard(
+    isGenerating: Boolean,
+    onGenerate: () -> Unit,
+) {
+    var showConfirmDialog by remember { mutableStateOf(false) }
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = stringResource(R.string.programs_change_plan),
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+                Text(
+                    text = stringResource(R.string.programs_change_plan_subtitle),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            Spacer(modifier = Modifier.width(8.dp))
+            OutlinedButton(
+                onClick = { showConfirmDialog = true },
+                enabled = !isGenerating,
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.outlinedButtonColors(
+                    contentColor = AccentGreen,
+                ),
+            ) {
+                Text(
+                    text = if (isGenerating) {
+                        stringResource(R.string.programs_generating_plan)
+                    } else {
+                        stringResource(R.string.programs_replace_plan_confirm)
+                    },
+                    fontWeight = FontWeight.SemiBold,
+                )
+            }
+        }
+    }
+
+    if (showConfirmDialog) {
+        AlertDialog(
+            onDismissRequest = { showConfirmDialog = false },
+            title = {
+                Text(
+                    text = stringResource(R.string.programs_replace_plan_title),
+                    fontWeight = FontWeight.Bold,
+                )
+            },
+            text = {
+                Text(text = stringResource(R.string.programs_replace_plan_message))
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showConfirmDialog = false
+                        onGenerate()
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = AccentGreen,
+                        contentColor = Color.Black,
+                    ),
+                ) {
+                    Text(
+                        text = stringResource(R.string.programs_replace_plan_confirm),
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
+            },
+            dismissButton = {
+                OutlinedButton(onClick = { showConfirmDialog = false }) {
+                    Text(text = stringResource(R.string.action_cancel))
+                }
+            },
+        )
+    }
+}
+
 private fun formatDate(instant: Instant): String {
-    val formatter = DateTimeFormatter.ofPattern("MMM d, yyyy")
+    val formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
         .withZone(ZoneId.systemDefault())
     return formatter.format(instant)
 }

@@ -61,6 +61,7 @@ import com.gymbro.feature.common.GlassmorphicCard
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 import kotlinx.coroutines.delay
 
 private val AccentGreenStart = Color(0xFF00FF87)
@@ -307,7 +308,7 @@ private fun AnimatedItem(
 private fun WorkoutHeader(detail: WorkoutDetail, index: Int) {
     val date = Instant.ofEpochMilli(detail.date)
         .atZone(ZoneId.systemDefault())
-        .format(DateTimeFormatter.ofPattern("EEEE, d 'de' MMMM"))
+        .format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG))
 
     var visible by remember { mutableStateOf(false) }
     

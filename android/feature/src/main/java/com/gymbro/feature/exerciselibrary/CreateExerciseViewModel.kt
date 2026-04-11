@@ -1,10 +1,13 @@
 package com.gymbro.feature.exerciselibrary
 
+import android.content.Context
 import androidx.lifecycle.viewModelScope
+import com.gymbro.core.R
 import com.gymbro.core.model.Exercise
 import com.gymbro.core.repository.ExerciseRepository
 import com.gymbro.feature.common.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,6 +20,7 @@ import javax.inject.Inject
 @HiltViewModel
 class CreateExerciseViewModel @Inject constructor(
     private val exerciseRepository: ExerciseRepository,
+    @ApplicationContext private val context: Context,
 ) : BaseViewModel() {
 
     private val _state = MutableStateFlow(CreateExerciseState())
@@ -58,7 +62,7 @@ class CreateExerciseViewModel @Inject constructor(
         val name = currentState.exerciseName.trim()
 
         if (name.isEmpty()) {
-            _state.update { it.copy(nameError = "Exercise name is required") }
+            _state.update { it.copy(nameError = context.getString(R.string.create_exercise_name_required)) }
             return
         }
 
@@ -75,7 +79,7 @@ class CreateExerciseViewModel @Inject constructor(
                 _state.update {
                     it.copy(
                         isLoading = false,
-                        nameError = "An exercise with this name already exists"
+                        nameError = context.getString(R.string.create_exercise_name_taken)
                     )
                 }
                 return@safeLaunch
