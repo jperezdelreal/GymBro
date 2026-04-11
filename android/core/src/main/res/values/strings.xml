@@ -683,4 +683,33 @@
     <!-- Issue #463: Home screen badge -->
     <string name="home_today_badge">TODAY 🎯</string>
     <string name="home_quick_start_subtitle">Start a freestyle workout — pick exercises as you go</string>
+
+    <!-- Issue #452: Settings effects -->
+    <string name="settings_open_health_connect_error">Could not open Health Connect</string>
+
+    <!-- Issue #456: Recovery navigation -->
+    <string name="profile_recovery">Recovery</string>
+    <string name="profile_recovery_subtitle">Track sleep, readiness, and recovery</string>
+
+    <!-- Issue #458: Content descriptions -->
+    <string name="history_workout_cd">Workout on %1$s, %2$d exercises, %3$s</string>
+    <string name="onboarding_goal_cd">Training goal: %s</string>
+    <string name="onboarding_frequency_cd">%d days per week</string>
+    <string name="onboarding_unit_cd">Weight unit: %s</string>
+    <string name="progress_volume_chart_cd">Weekly volume chart showing last %d weeks of training volume</string>
+
+    <!-- Issue #460: Onboarding frequency explanation -->
+    <string name="onboarding_frequency_explanation">We\'ll build a workout plan around this schedule</string>
+    <string name="onboarding_training_phase_settings_hint">You can change your training phase anytime in Settings</string>
+
+    <!-- Issue #461: Redo setup -->
+    <string name="settings_redo_setup">Redo Setup</string>
+    <string name="settings_redo_setup_subtitle">Go through onboarding again</string>
+    <string name="settings_redo_setup_confirm_title">Redo Setup?</string>
+    <string name="settings_redo_setup_confirm_message">This will take you through the onboarding setup again. Your workout data will be kept.</string>
+    <string name="settings_redo_setup_confirm">Redo Setup</string>
+
+    <!-- Issue #462: Progress polish -->
+    <string name="progress_plateau_explanation">A plateau means your performance on this exercise hasn\'t improved recently. Try varying reps, weight, or technique.</string>
+    <string name="progress_view_all_prs">View All PRs</string>
 </resources>

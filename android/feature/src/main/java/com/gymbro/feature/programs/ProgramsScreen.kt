@@ -70,8 +70,8 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
-private val AccentGreen = Color(0xFF00FF87)
-private val AccentCyan = Color(0xFF00E5FF)
+import com.gymbro.core.ui.theme.AccentGreen
+import com.gymbro.core.ui.theme.AccentCyan
 
 @Composable
 fun ProgramsRoute(

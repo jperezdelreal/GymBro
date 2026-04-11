@@ -1,5 +1,8 @@
 package com.gymbro.feature.settings
 
+import android.content.Intent
+import android.net.Uri
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -27,6 +30,7 @@ import androidx.compose.material.icons.filled.LocalFireDepartment
 import androidx.compose.material.icons.filled.MonitorHeart
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -42,6 +46,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
@@ -60,6 +66,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
@@ -71,26 +78,57 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gymbro.core.R
 import com.gymbro.core.preferences.UserPreferences.TrainingPhase
 import com.gymbro.core.preferences.UserPreferences.WeightUnit
+import com.gymbro.core.ui.theme.AccentGreen
+import com.gymbro.core.ui.theme.SurfacePrimary
+import com.gymbro.core.ui.theme.Surface
 
-private val AccentGreen = Color(0xFF00FF87)
-private val CardBackground = Color(0xFF1E1E1E)
-private val SurfaceDark = Color(0xFF121212)
+private val CardBackground = Surface
 
 @Composable
 fun SettingsRoute(
     onNavigateBack: () -> Unit,
+    onNavigateToOnboarding: () -> Unit = {},
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
         viewModel.effects.collect { effect ->
             when (effect) {
-                is SettingsEffect.ShowMessage -> { /* Show snackbar */ }
-                is SettingsEffect.ShowError -> { /* Show error snackbar */ }
+                is SettingsEffect.ShowMessage -> {
+                    snackbarHostState.showSnackbar(effect.message)
+                }
+                is SettingsEffect.ShowError -> {
+                    snackbarHostState.showSnackbar(effect.message)
+                }
                 is SettingsEffect.NavigateBack -> onNavigateBack()
-                is SettingsEffect.OpenUrl -> { /* Open URL in browser */ }
-                is SettingsEffect.OpenHealthConnectSettings -> { /* Open Health Connect */ }
+                is SettingsEffect.OpenUrl -> {
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(effect.url))
+                    context.startActivity(intent)
+                }
+                is SettingsEffect.OpenHealthConnectSettings -> {
+                    try {
+                        val intent = context.packageManager.getLaunchIntentForPackage(
+                            "com.google.android.apps.healthdata"
+                        )
+                        if (intent != null) {
+                            context.startActivity(intent)
+                        } else {
+                            val playStoreIntent = Intent(
+                                Intent.ACTION_VIEW,
+                                Uri.parse("https://play.google.com/store/apps/details?id=com.google.android.apps.healthdata")
+                            )
+                            context.startActivity(playStoreIntent)
+                        }
+                    } catch (e: Exception) {
+                        snackbarHostState.showSnackbar(
+                            context.getString(R.string.settings_open_health_connect_error)
+                        )
+                    }
+                }
+                is SettingsEffect.NavigateToOnboarding -> onNavigateToOnboarding()
             }
         }
     }
@@ -99,6 +137,7 @@ fun SettingsRoute(
         state = state,
         onEvent = viewModel::onEvent,
         onNavigateBack = onNavigateBack,
+        snackbarHostState = snackbarHostState,
     )
 }
 
@@ -108,8 +147,10 @@ internal fun SettingsScreen(
     state: SettingsState,
     onEvent: (SettingsEvent) -> Unit,
     onNavigateBack: () -> Unit,
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
 ) {
     var showClearDataDialog by remember { mutableStateOf(false) }
+    var showRedoSetupDialog by remember { mutableStateOf(false) }
     val haptic = LocalHapticFeedback.current
     val trainingPhaseSelectorDescription = stringResource(R.string.settings_cd_training_phase)
 
@@ -134,11 +175,12 @@ internal fun SettingsScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = SurfaceDark,
+                    containerColor = SurfacePrimary,
                 ),
             )
         },
-        containerColor = SurfaceDark,
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        containerColor = SurfacePrimary,
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -152,6 +194,14 @@ internal fun SettingsScreen(
             SectionTitle(stringResource(R.string.settings_section_account))
             SettingsCard {
                 Column {
+                    SettingsRow(
+                        icon = Icons.Default.Refresh,
+                        title = stringResource(R.string.settings_redo_setup),
+                        subtitle = stringResource(R.string.settings_redo_setup_subtitle),
+                        iconTint = AccentGreen,
+                        onClick = { showRedoSetupDialog = true },
+                    )
+                    SettingsDivider()
                     SettingsRow(
                         icon = Icons.Default.Delete,
                         title = stringResource(R.string.settings_clear_data),
@@ -423,6 +473,44 @@ internal fun SettingsScreen(
             },
             dismissButton = {
                 OutlinedButton(onClick = { showClearDataDialog = false }) {
+                    Text(stringResource(R.string.action_cancel), color = Color.White)
+                }
+            },
+        )
+    }
+
+    if (showRedoSetupDialog) {
+        AlertDialog(
+            onDismissRequest = { showRedoSetupDialog = false },
+            containerColor = CardBackground,
+            title = {
+                Text(
+                    text = stringResource(R.string.settings_redo_setup_confirm_title),
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                )
+            },
+            text = {
+                Text(
+                    text = stringResource(R.string.settings_redo_setup_confirm_message),
+                    color = Color(0xFF9E9E9E),
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        onEvent(SettingsEvent.RedoSetup)
+                        showRedoSetupDialog = false
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = AccentGreen,
+                    ),
+                ) {
+                    Text(stringResource(R.string.settings_redo_setup_confirm), color = Color.Black)
+                }
+            },
+            dismissButton = {
+                OutlinedButton(onClick = { showRedoSetupDialog = false }) {
                     Text(stringResource(R.string.action_cancel), color = Color.White)
                 }
             },

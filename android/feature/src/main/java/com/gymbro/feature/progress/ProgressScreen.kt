@@ -224,6 +224,12 @@ private fun ProgressScreen(
         // Plateau Alerts Section
         item {
             SectionHeader(title = stringResource(R.string.progress_plateau_alerts), icon = "⚠️")
+            Text(
+                text = stringResource(R.string.progress_plateau_explanation),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 4.dp),
+            )
         }
         if (state.plateauAlerts.isNotEmpty()) {
             items(state.plateauAlerts) { alert ->
@@ -244,7 +250,8 @@ private fun ProgressScreen(
             item {
                 SectionHeader(title = stringResource(R.string.progress_recent_prs), icon = "🏆")
             }
-            val displayPRs = state.recentPRsWithDetails.take(5)
+            val showAll = state.recentPRsWithDetails.size > 5
+            val displayPRs = if (showAll) state.recentPRsWithDetails.take(20) else state.recentPRsWithDetails
             val prUnitLabel = if (weightUnit == UserPreferences.WeightUnit.LBS) "lb" else "kg"
             items(displayPRs) { pr ->
                 PRShowcaseCard(record = pr, weightUnitLabel = prUnitLabel)
@@ -860,6 +867,7 @@ private fun HeroKPISection(
 @Composable
 private fun WeeklyVolumeChart(data: List<WeeklyVolume>) {
     val textMeasurer = rememberTextMeasurer()
+    val chartDescription = stringResource(R.string.progress_volume_chart_cd, data.size)
     Card(
         colors = CardDefaults.cardColors(containerColor = Surface),
         shape = RoundedCornerShape(12.dp),
@@ -876,7 +884,8 @@ private fun WeeklyVolumeChart(data: List<WeeklyVolume>) {
             Canvas(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(200.dp),
+                    .height(200.dp)
+                    .semantics { contentDescription = chartDescription },
             ) {
                 if (data.isEmpty()) return@Canvas
 

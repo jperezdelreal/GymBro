@@ -683,4 +683,33 @@
     <!-- Issue #463: Home screen badge -->
     <string name="home_today_badge">HOY 🎯</string>
     <string name="home_quick_start_subtitle">Inicia un entrenamiento libre — elige ejercicios sobre la marcha</string>
+
+    <!-- Issue #452: Settings effects -->
+    <string name="settings_open_health_connect_error">No se pudo abrir Health Connect</string>
+
+    <!-- Issue #456: Recovery navigation -->
+    <string name="profile_recovery">Recuperación</string>
+    <string name="profile_recovery_subtitle">Seguimiento de sueño, preparación y recuperación</string>
+
+    <!-- Issue #458: Content descriptions -->
+    <string name="history_workout_cd">Entrenamiento del %1$s, %2$d ejercicios, %3$s</string>
+    <string name="onboarding_goal_cd">Objetivo de entrenamiento: %s</string>
+    <string name="onboarding_frequency_cd">%d días por semana</string>
+    <string name="onboarding_unit_cd">Unidad de peso: %s</string>
+    <string name="progress_volume_chart_cd">Gráfico de volumen semanal mostrando las últimas %d semanas de volumen de entrenamiento</string>
+
+    <!-- Issue #460: Onboarding frequency explanation -->
+    <string name="onboarding_frequency_explanation">Crearemos un plan de entrenamiento basado en esta frecuencia</string>
+    <string name="onboarding_training_phase_settings_hint">Puedes cambiar tu fase de entrenamiento en cualquier momento en Ajustes</string>
+
+    <!-- Issue #461: Redo setup -->
+    <string name="settings_redo_setup">Rehacer configuración</string>
+    <string name="settings_redo_setup_subtitle">Volver a pasar por la configuración inicial</string>
+    <string name="settings_redo_setup_confirm_title">¿Rehacer configuración?</string>
+    <string name="settings_redo_setup_confirm_message">Esto te llevará de nuevo por la configuración inicial. Tus datos de entrenamiento se conservarán.</string>
+    <string name="settings_redo_setup_confirm">Rehacer</string>
+
+    <!-- Issue #462: Progress polish -->
+    <string name="progress_plateau_explanation">Un estancamiento significa que tu rendimiento en este ejercicio no ha mejorado recientemente. Intenta variar repeticiones, peso o técnica.</string>
+    <string name="progress_view_all_prs">Ver todos los récords</string>
 </resources>

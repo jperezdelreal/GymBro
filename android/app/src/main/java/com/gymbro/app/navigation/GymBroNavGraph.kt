@@ -457,12 +457,20 @@ fun GymBroNavGraph(
                 onNavigateToExerciseLibrary = {
                     navController.navigate("exercise_library")
                 },
+                onNavigateToRecovery = {
+                    navController.navigate("recovery")
+                },
             )
         }
         composable("settings") {
             SettingsRoute(
                 onNavigateBack = {
                     navController.popBackStack()
+                },
+                onNavigateToOnboarding = {
+                    navController.navigate("onboarding") {
+                        popUpTo("home") { inclusive = true }
+                    }
                 },
             )
         }

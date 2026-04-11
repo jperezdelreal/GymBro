@@ -98,6 +98,7 @@ class SettingsViewModel @Inject constructor(
             is SettingsEvent.SetAutoStartRestTimer -> setAutoStartRestTimer(event.enabled)
             is SettingsEvent.SetNotifications -> setNotifications(event.enabled)
             is SettingsEvent.ClearAllData -> clearAllData()
+            is SettingsEvent.RedoSetup -> redoSetup()
             is SettingsEvent.OpenHealthConnect -> openHealthConnect()
             is SettingsEvent.SendFeedback -> sendFeedback()
             is SettingsEvent.ViewLicenses -> viewLicenses()
@@ -144,6 +145,13 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             userPreferences.clearAllData()
             _effects.send(SettingsEffect.ShowMessage("All data cleared"))
+        }
+    }
+
+    private fun redoSetup() {
+        viewModelScope.launch {
+            userPreferences.setOnboardingComplete(false)
+            _effects.send(SettingsEffect.NavigateToOnboarding)
         }
     }
 

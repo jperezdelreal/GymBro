@@ -44,6 +44,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -59,12 +61,10 @@ import com.gymbro.core.ui.theme.AccentGreenEnd
 import com.gymbro.core.ui.theme.Background
 import com.gymbro.core.ui.theme.OnSurfaceVariant
 import com.gymbro.core.ui.theme.GlassOverlay
+import com.gymbro.core.ui.theme.AccentGreen
 import com.gymbro.feature.common.GlassmorphicCard
 import com.gymbro.feature.common.GradientButton
 import kotlinx.coroutines.launch
-
-private val AccentGreen = Color(0xFF00FF87)
-private val SurfaceVariant = Color(0xFF2C2C2E)
 
 @Composable
 fun OnboardingRoute(
@@ -413,6 +413,7 @@ private fun UnitCard(
     modifier: Modifier = Modifier,
 ) {
     val haptic = LocalHapticFeedback.current
+    val unitDescription = stringResource(R.string.onboarding_unit_cd, text)
     GlassmorphicCard(
         modifier = modifier
             .height(80.dp)
@@ -429,6 +430,9 @@ private fun UnitCard(
                 }
             )
             .clip(RoundedCornerShape(16.dp))
+            .semantics(mergeDescendants = true) {
+                contentDescription = unitDescription
+            }
             .then(
                 Modifier.clickable {
                     haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
@@ -503,6 +507,13 @@ private fun TrainingGoalPage(
             description = stringResource(R.string.onboarding_goal_general_fitness_desc),
             isSelected = selectedGoal == UserPreferences.TrainingGoal.GENERAL_FITNESS,
             onClick = { onGoalSelected(UserPreferences.TrainingGoal.GENERAL_FITNESS) },
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = stringResource(R.string.onboarding_training_phase_settings_hint),
+            style = MaterialTheme.typography.bodySmall,
+            color = OnSurfaceVariant,
+            textAlign = TextAlign.Center,
         )
     }
 }
@@ -582,6 +593,14 @@ private fun TrainingFrequencyPage(
             color = OnSurfaceVariant,
             textAlign = TextAlign.Center,
         )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = stringResource(R.string.onboarding_frequency_explanation),
+            style = MaterialTheme.typography.bodyMedium,
+            color = AccentGreenStart,
+            textAlign = TextAlign.Center,
+            fontWeight = FontWeight.Medium,
+        )
         Spacer(modifier = Modifier.height(48.dp))
 
         Row(
@@ -643,6 +662,7 @@ private fun GoalCard(
     onClick: () -> Unit,
 ) {
     val haptic = LocalHapticFeedback.current
+    val goalDescription = stringResource(R.string.onboarding_goal_cd, title)
     GlassmorphicCard(
         modifier = Modifier
             .fillMaxWidth()
@@ -659,6 +679,9 @@ private fun GoalCard(
                 }
             )
             .clip(RoundedCornerShape(16.dp))
+            .semantics(mergeDescendants = true) {
+                contentDescription = goalDescription
+            }
             .clickable {
                 haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                 onClick()
@@ -690,6 +713,7 @@ private fun FrequencyCard(
     modifier: Modifier = Modifier,
 ) {
     val haptic = LocalHapticFeedback.current
+    val frequencyDescription = stringResource(R.string.onboarding_frequency_cd, days)
     GlassmorphicCard(
         modifier = modifier
             .height(100.dp)
@@ -706,6 +730,9 @@ private fun FrequencyCard(
                 }
             )
             .clip(RoundedCornerShape(16.dp))
+            .semantics(mergeDescendants = true) {
+                contentDescription = frequencyDescription
+            }
             .clickable {
                 haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                 onClick()

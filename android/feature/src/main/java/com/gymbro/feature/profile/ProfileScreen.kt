@@ -85,6 +85,7 @@ fun ProfileRoute(
     onNavigateToSettings: () -> Unit = {},
     onNavigateToCoach: () -> Unit = {},
     onNavigateToExerciseLibrary: () -> Unit = {},
+    onNavigateToRecovery: () -> Unit = {},
     viewModel: ProfileViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -104,6 +105,7 @@ fun ProfileRoute(
         onNavigateToSettings = onNavigateToSettings,
         onNavigateToCoach = onNavigateToCoach,
         onNavigateToExerciseLibrary = onNavigateToExerciseLibrary,
+        onNavigateToRecovery = onNavigateToRecovery,
     )
 }
 
@@ -114,6 +116,7 @@ internal fun ProfileScreen(
     onNavigateToSettings: () -> Unit = {},
     onNavigateToCoach: () -> Unit = {},
     onNavigateToExerciseLibrary: () -> Unit = {},
+    onNavigateToRecovery: () -> Unit = {},
 ) {
     val context = LocalContext.current
     Column(
@@ -237,6 +240,22 @@ internal fun ProfileScreen(
                 subtitle = stringResource(R.string.profile_exercise_library_subtitle),
                 iconTint = AccentGreenStart,
                 onClick = onNavigateToExerciseLibrary,
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Recovery
+        SettingsGroup(
+            title = stringResource(R.string.profile_recovery),
+            accentColor = AccentCyanStart,
+        ) {
+            SettingItem(
+                icon = Icons.Default.MonitorHeart,
+                label = stringResource(R.string.profile_recovery),
+                subtitle = stringResource(R.string.profile_recovery_subtitle),
+                iconTint = AccentCyanStart,
+                onClick = onNavigateToRecovery,
             )
         }
 

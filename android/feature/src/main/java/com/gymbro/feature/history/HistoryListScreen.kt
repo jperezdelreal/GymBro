@@ -49,6 +49,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
@@ -59,6 +60,13 @@ import com.gymbro.core.R
 import com.gymbro.core.model.MuscleGroup
 import com.gymbro.core.preferences.UserPreferences
 import com.gymbro.core.ui.localizedName
+import com.gymbro.core.ui.theme.AccentAmberEnd
+import com.gymbro.core.ui.theme.AccentAmberStart
+import com.gymbro.core.ui.theme.AccentCyanEnd
+import com.gymbro.core.ui.theme.AccentCyanStart
+import com.gymbro.core.ui.theme.AccentGreenEnd
+import com.gymbro.core.ui.theme.AccentGreenStart
+import com.gymbro.core.ui.theme.Background
 import com.gymbro.feature.common.EmptyState
 import com.gymbro.feature.common.FullScreenLoading
 import com.gymbro.feature.common.GlassmorphicCard
@@ -69,15 +77,6 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import kotlinx.coroutines.delay
-
-private val AccentGreenStart = Color(0xFF00FF87)
-private val AccentGreenEnd = Color(0xFF00D9B5)
-private val AccentCyanStart = Color(0xFF00D4FF)
-private val AccentCyanEnd = Color(0xFF0091FF)
-private val AccentAmberStart = Color(0xFFFFB800)
-private val AccentAmberEnd = Color(0xFFFF8A00)
-
-private val SurfaceDark = Color(0xFF0A0A0A)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -113,7 +112,7 @@ fun HistoryListRoute(
                 ),
             )
         },
-        containerColor = SurfaceDark,
+        containerColor = Background,
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)) {
             when {
@@ -162,7 +161,7 @@ private fun HistoryListContent(
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .background(SurfaceDark)
+            .background(Background)
             .padding(horizontal = 16.dp, vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
@@ -249,6 +248,12 @@ private fun WorkoutCard(
     val relativeTime = getRelativeTime(workoutDate.toLocalDate())
     
     val accentColor = getAccentColorForMuscleGroups(workout.muscleGroups)
+    val workoutCardDescription = stringResource(
+        R.string.history_workout_cd,
+        date,
+        workout.exerciseCount,
+        relativeTime,
+    )
 
     AnimatedVisibility(
         visible = visible,
@@ -257,6 +262,9 @@ private fun WorkoutCard(
         GlassmorphicCard(
             onClick = onClick,
             accentColor = accentColor,
+            modifier = Modifier.semantics(mergeDescendants = true) {
+                contentDescription = workoutCardDescription
+            },
         ) {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Row(

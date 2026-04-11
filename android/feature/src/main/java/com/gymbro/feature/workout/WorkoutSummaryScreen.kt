@@ -43,15 +43,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.gymbro.core.model.PersonalRecord
 import com.gymbro.core.R
+import com.gymbro.core.ui.theme.AccentGreen
+import com.gymbro.core.ui.theme.AccentCyan
+import com.gymbro.core.ui.theme.AccentAmber
+import com.gymbro.core.ui.theme.Surface
+import com.gymbro.core.ui.theme.Background
 import com.gymbro.feature.common.ConfettiOverlay
 import com.gymbro.feature.common.PRCelebration
 import kotlinx.coroutines.delay
-
-private val AccentGreen = Color(0xFF00FF87)
-private val AccentCyan = Color(0xFF00E5FF)
-private val AccentAmber = Color(0xFFFFAB00)
-private val SurfaceCard = Color(0xFF1A1A1A)
-private val SurfaceDark = Color(0xFF0A0A0A)
 
 @Composable
 fun WorkoutSummaryScreen(
@@ -78,7 +77,7 @@ fun WorkoutSummaryScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(SurfaceDark)
+                .background(Background)
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
@@ -233,7 +232,7 @@ private fun SummaryCard(
     Column(
         modifier = modifier
             .clip(RoundedCornerShape(12.dp))
-            .background(SurfaceCard)
+            .background(Surface)
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {

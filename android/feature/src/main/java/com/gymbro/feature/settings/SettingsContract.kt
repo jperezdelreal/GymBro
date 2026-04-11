@@ -22,6 +22,7 @@ sealed interface SettingsEvent {
     data class SetAutoStartRestTimer(val enabled: Boolean) : SettingsEvent
     data class SetNotifications(val enabled: Boolean) : SettingsEvent
     data object ClearAllData : SettingsEvent
+    data object RedoSetup : SettingsEvent
     data object OpenHealthConnect : SettingsEvent
     data object SendFeedback : SettingsEvent
     data object ViewLicenses : SettingsEvent
@@ -34,4 +35,5 @@ sealed interface SettingsEffect {
     data object NavigateBack : SettingsEffect
     data class OpenUrl(val url: String) : SettingsEffect
     data object OpenHealthConnectSettings : SettingsEffect
+    data object NavigateToOnboarding : SettingsEffect
 }
