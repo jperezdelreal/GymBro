@@ -11,6 +11,9 @@ data class ProfileState(
     val autoSyncEnabled: Boolean = true,
     val isLoading: Boolean = true,
     val error: String? = null,
+    val totalWorkouts: Int = 0,
+    val activeDays: Int = 0,
+    val currentStreak: Int = 0,
 )
 
 sealed interface ProfileEvent {

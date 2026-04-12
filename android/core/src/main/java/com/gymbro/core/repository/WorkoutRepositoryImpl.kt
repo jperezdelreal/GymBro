@@ -306,6 +306,72 @@ class WorkoutRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getTotalCompletedWorkoutsCount(): Int {
+        val result = retryWithBackoff {
+            runCatchingAsResult { workoutDao.getTotalCompletedWorkoutsCount() }
+        }
+        return when (result) {
+            is AppResult.Success -> result.data
+            is AppResult.Error -> {
+                Log.e(TAG, "Failed to get total workouts count: ${result.error.message}")
+                0
+            }
+        }
+    }
+
+    override suspend fun getActiveDaysCount(): Int {
+        val result = retryWithBackoff {
+            runCatchingAsResult { workoutDao.getActiveDaysCount() }
+        }
+        return when (result) {
+            is AppResult.Success -> result.data
+            is AppResult.Error -> {
+                Log.e(TAG, "Failed to get active days count: ${result.error.message}")
+                0
+            }
+        }
+    }
+
+    override suspend fun getCurrentStreak(): Int {
+        val result = retryWithBackoff {
+            runCatchingAsResult {
+                val allWorkouts = workoutDao.getAllCompletedWorkouts()
+                if (allWorkouts.isEmpty()) return@runCatchingAsResult 0
+
+                val workoutDates = allWorkouts.map { workout ->
+                    val instant = Instant.ofEpochMilli(workout.workout.startedAt)
+                    instant.atZone(java.time.ZoneId.systemDefault()).toLocalDate()
+                }.distinct().sortedDescending()
+
+                if (workoutDates.isEmpty()) return@runCatchingAsResult 0
+
+                val today = java.time.LocalDate.now()
+                val yesterday = today.minusDays(1)
+                
+                var streak = 0
+                var currentDate = if (workoutDates[0] == today) today else if (workoutDates[0] == yesterday) yesterday else return@runCatchingAsResult 0
+                
+                for (date in workoutDates) {
+                    if (date == currentDate) {
+                        streak++
+                        currentDate = currentDate.minusDays(1)
+                    } else if (date.isBefore(currentDate)) {
+                        break
+                    }
+                }
+                
+                streak
+            }
+        }
+        return when (result) {
+            is AppResult.Success -> result.data
+            is AppResult.Error -> {
+                Log.e(TAG, "Failed to get current streak: ${result.error.message}")
+                0
+            }
+        }
+    }
+
     companion object {
         private const val TAG = "WorkoutRepositoryImpl"
     }

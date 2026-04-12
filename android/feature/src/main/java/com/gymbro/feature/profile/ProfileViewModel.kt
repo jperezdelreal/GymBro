@@ -24,6 +24,7 @@ class ProfileViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val authService: AuthService,
     private val syncManager: OfflineSyncManager,
+    private val workoutRepository: com.gymbro.core.repository.WorkoutRepository,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ProfileState())
@@ -35,6 +36,7 @@ class ProfileViewModel @Inject constructor(
     init {
         observeAuth()
         observeSyncStatus()
+        loadWorkoutStats()
     }
 
     fun onEvent(event: ProfileEvent) {
@@ -117,5 +119,21 @@ class ProfileViewModel @Inject constructor(
 
     private fun toggleAutoSync(enabled: Boolean) {
         _state.update { it.copy(autoSyncEnabled = enabled) }
+    }
+
+    private fun loadWorkoutStats() {
+        viewModelScope.launch {
+            val totalWorkouts = workoutRepository.getTotalCompletedWorkoutsCount()
+            val activeDays = workoutRepository.getActiveDaysCount()
+            val currentStreak = workoutRepository.getCurrentStreak()
+            
+            _state.update {
+                it.copy(
+                    totalWorkouts = totalWorkouts,
+                    activeDays = activeDays,
+                    currentStreak = currentStreak,
+                )
+            }
+        }
     }
 }
