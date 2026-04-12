@@ -1,11 +1,14 @@
 package com.gymbro.feature.onboarding
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.gymbro.core.R
 import com.gymbro.core.preferences.UserPreferences
 import com.gymbro.core.service.ActivePlanStore
 import com.gymbro.core.service.WorkoutPlanGenerator
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,6 +18,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class OnboardingViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val userPreferences: UserPreferences,
     private val workoutPlanGenerator: WorkoutPlanGenerator,
     private val activePlanStore: ActivePlanStore,
@@ -83,7 +87,7 @@ class OnboardingViewModel @Inject constructor(
                     trainingPhase = _state.value.selectedPhase,
                 )
                 val personalizedPlan = plan.copy(
-                    name = "Your First Program",
+                    name = context.getString(R.string.onboarding_first_program_name),
                 )
                 activePlanStore.setPlanFromOnboarding(personalizedPlan)
                 planGenerated = true
@@ -94,7 +98,7 @@ class OnboardingViewModel @Inject constructor(
                     e,
                 )
                 _state.value = _state.value.copy(
-                    planGenerationError = "Could not generate your workout plan. You can create one manually from the Home screen.",
+                    planGenerationError = context.getString(R.string.onboarding_plan_generation_error),
                 )
                 _effects.send(OnboardingEffect.ShowPlanGenerationError)
             }

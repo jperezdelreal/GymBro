@@ -1,6 +1,8 @@
 package com.gymbro.feature.onboarding
 
+import android.content.Context
 import app.cash.turbine.test
+import com.gymbro.core.R
 import com.gymbro.core.model.WorkoutPlan
 import com.gymbro.core.preferences.UserPreferences
 import com.gymbro.core.preferences.UserPreferences.ExperienceLevel
@@ -11,6 +13,7 @@ import com.gymbro.core.service.WorkoutPlanGenerator
 import com.gymbro.feature.MainDispatcherRule
 import io.mockk.coEvery
 import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import kotlin.time.Duration.Companion.seconds
@@ -28,6 +31,7 @@ class OnboardingViewModelTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
+    private lateinit var context: Context
     private lateinit var userPreferences: UserPreferences
     private lateinit var workoutPlanGenerator: WorkoutPlanGenerator
     private lateinit var activePlanStore: ActivePlanStore
@@ -35,10 +39,13 @@ class OnboardingViewModelTest {
 
     @Before
     fun setup() {
+        context = mockk(relaxed = true)
+        every { context.getString(R.string.onboarding_first_program_name) } returns "Your First Program"
+        every { context.getString(R.string.onboarding_plan_generation_error) } returns "Could not generate your workout plan. You can create one manually from the Home screen."
         userPreferences = mockk(relaxed = true)
         workoutPlanGenerator = mockk(relaxed = true)
         activePlanStore = ActivePlanStore()
-        viewModel = OnboardingViewModel(userPreferences, workoutPlanGenerator, activePlanStore)
+        viewModel = OnboardingViewModel(context, userPreferences, workoutPlanGenerator, activePlanStore)
     }
 
     @Test
