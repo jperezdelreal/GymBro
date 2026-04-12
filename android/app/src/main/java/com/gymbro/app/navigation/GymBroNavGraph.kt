@@ -245,6 +245,9 @@ fun GymBroNavGraph(
                 onNavigateToCreateExercise = {
                     navController.navigate("create_exercise")
                 },
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
             )
         }
         composable(
@@ -342,6 +345,9 @@ fun GymBroNavGraph(
                     navController.previousBackStackEntry
                         ?.savedStateHandle
                         ?.set("picked_exercise_equipment", exercise.equipment.name)
+                    navController.popBackStack()
+                },
+                onNavigateBack = {
                     navController.popBackStack()
                 },
                 isPickerMode = true,
