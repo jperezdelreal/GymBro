@@ -113,7 +113,7 @@ fun OnboardingScreen(
     onEvent: (OnboardingEvent) -> Unit,
 ) {
     val haptic = LocalHapticFeedback.current
-    val pagerState = rememberPagerState(pageCount = { 7 })
+    val pagerState = rememberPagerState(pageCount = { 9 })
     val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(pagerState) {
@@ -146,13 +146,21 @@ fun OnboardingScreen(
                         selectedExperience = state.selectedExperience,
                         onExperienceSelected = { onEvent(OnboardingEvent.ExperienceSelected(it)) },
                     )
-                    3 -> TrainingFrequencyPage(
+                    3 -> TrainingPhasePage(
+                        selectedPhase = state.selectedPhase,
+                        onPhaseSelected = { onEvent(OnboardingEvent.TrainingPhaseSelected(it)) },
+                    )
+                    4 -> SessionDurationPage(
+                        selectedDuration = state.sessionDurationMinutes,
+                        onDurationSelected = { onEvent(OnboardingEvent.SessionDurationSelected(it)) },
+                    )
+                    5 -> TrainingFrequencyPage(
                         trainingDays = state.trainingDaysPerWeek,
                         onDaysSelected = { onEvent(OnboardingEvent.TrainingDaysSelected(it)) },
                     )
-                    4 -> TrackPage()
-                    5 -> ProgressPage()
-                    6 -> GetStartedPage(
+                    6 -> TrackPage()
+                    7 -> ProgressPage()
+                    8 -> GetStartedPage(
                         selectedUnit = state.selectedUnit,
                         userName = state.userName,
                         isGeneratingPlan = state.isGeneratingPlan,
@@ -192,12 +200,12 @@ fun OnboardingScreen(
                 }
 
                 PageIndicators(
-                    pageCount = 7,
+                    pageCount = 9,
                     currentPage = pagerState.currentPage,
                 )
 
                 // Next/Let's Go button (last page shows Let's Go via existing CTA)
-                if (pagerState.currentPage < 6) {
+                if (pagerState.currentPage < 8) {
                     Button(
                         onClick = {
                             coroutineScope.launch {
@@ -588,6 +596,128 @@ private fun ExperienceLevelPage(
 }
 
 @Composable
+private fun TrainingPhasePage(
+    selectedPhase: UserPreferences.TrainingPhase,
+    onPhaseSelected: (UserPreferences.TrainingPhase) -> Unit,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+    ) {
+        Text(
+            text = stringResource(R.string.onboarding_phase_title),
+            style = MaterialTheme.typography.headlineLarge,
+            fontWeight = FontWeight.Bold,
+            color = Color.White,
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = stringResource(R.string.onboarding_phase_subtitle),
+            style = MaterialTheme.typography.bodyLarge,
+            color = OnSurfaceVariant,
+            textAlign = TextAlign.Center,
+        )
+        Spacer(modifier = Modifier.height(48.dp))
+
+        GoalCard(
+            title = stringResource(R.string.onboarding_phase_bulk),
+            description = stringResource(R.string.onboarding_phase_bulk_desc),
+            isSelected = selectedPhase == UserPreferences.TrainingPhase.BULK,
+            onClick = { onPhaseSelected(UserPreferences.TrainingPhase.BULK) },
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+        GoalCard(
+            title = stringResource(R.string.onboarding_phase_cut),
+            description = stringResource(R.string.onboarding_phase_cut_desc),
+            isSelected = selectedPhase == UserPreferences.TrainingPhase.CUT,
+            onClick = { onPhaseSelected(UserPreferences.TrainingPhase.CUT) },
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+        GoalCard(
+            title = stringResource(R.string.onboarding_phase_maintain),
+            description = stringResource(R.string.onboarding_phase_maintain_desc),
+            isSelected = selectedPhase == UserPreferences.TrainingPhase.MAINTENANCE,
+            onClick = { onPhaseSelected(UserPreferences.TrainingPhase.MAINTENANCE) },
+        )
+    }
+}
+
+@Composable
+private fun SessionDurationPage(
+    selectedDuration: Int,
+    onDurationSelected: (Int) -> Unit,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+    ) {
+        Text(
+            text = stringResource(R.string.onboarding_duration_title),
+            style = MaterialTheme.typography.headlineLarge,
+            fontWeight = FontWeight.Bold,
+            color = Color.White,
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = stringResource(R.string.onboarding_duration_subtitle),
+            style = MaterialTheme.typography.bodyLarge,
+            color = OnSurfaceVariant,
+            textAlign = TextAlign.Center,
+        )
+        Spacer(modifier = Modifier.height(48.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            DurationCard(
+                minutes = 30,
+                isSelected = selectedDuration == 30,
+                onClick = { onDurationSelected(30) },
+                modifier = Modifier.weight(1f),
+            )
+            DurationCard(
+                minutes = 45,
+                isSelected = selectedDuration == 45,
+                onClick = { onDurationSelected(45) },
+                modifier = Modifier.weight(1f),
+            )
+        }
+        Spacer(modifier = Modifier.height(12.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            DurationCard(
+                minutes = 60,
+                isSelected = selectedDuration == 60,
+                onClick = { onDurationSelected(60) },
+                modifier = Modifier.weight(1f),
+            )
+            DurationCard(
+                minutes = 90,
+                isSelected = selectedDuration == 90,
+                onClick = { onDurationSelected(90) },
+                modifier = Modifier.weight(1f),
+            )
+        }
+        Spacer(modifier = Modifier.height(12.dp))
+        DurationCard(
+            minutes = 120,
+            isSelected = selectedDuration == 120,
+            onClick = { onDurationSelected(120) },
+            modifier = Modifier.fillMaxWidth(0.5f),
+        )
+    }
+}
+
+@Composable
 private fun TrainingFrequencyPage(
     trainingDays: Int,
     onDaysSelected: (Int) -> Unit,
@@ -763,6 +893,54 @@ private fun FrequencyCard(
         ) {
             Text(
                 text = stringResource(R.string.onboarding_frequency_days, days),
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                color = if (isSelected) Color.Black else Color.White,
+                textAlign = TextAlign.Center,
+            )
+        }
+    }
+}
+
+@Composable
+private fun DurationCard(
+    minutes: Int,
+    isSelected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val haptic = LocalHapticFeedback.current
+    val durationDescription = stringResource(R.string.onboarding_duration_cd, minutes)
+    GlassmorphicCard(
+        modifier = modifier
+            .height(100.dp)
+            .clip(RoundedCornerShape(16.dp))
+            .background(
+                if (isSelected) {
+                    Brush.linearGradient(
+                        colors = listOf(AccentGreenStart, AccentGreenEnd)
+                    )
+                } else {
+                    Brush.linearGradient(
+                        colors = listOf(GlassOverlay, GlassOverlay)
+                    )
+                }
+            )
+            .clip(RoundedCornerShape(16.dp))
+            .semantics(mergeDescendants = true) {
+                contentDescription = durationDescription
+            },
+        onClick = {
+            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+            onClick()
+        }
+    ) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(
+                text = stringResource(R.string.onboarding_duration_minutes, minutes),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
                 color = if (isSelected) Color.Black else Color.White,

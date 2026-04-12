@@ -33,6 +33,7 @@ class UserPreferences @Inject constructor(
         val EXPERIENCE_LEVEL = stringPreferencesKey("experience_level")
         val TRAINING_DAYS_PER_WEEK = intPreferencesKey("training_days_per_week")
         val TRAINING_PHASE = stringPreferencesKey("training_phase")
+        val SESSION_DURATION_MINUTES = intPreferencesKey("session_duration_minutes")
         val MANUAL_SLEEP_HOURS = intPreferencesKey("manual_sleep_hours")
         val MANUAL_READINESS_SCORE = intPreferencesKey("manual_readiness_score")
         val MANUAL_SLEEP_QUALITY = intPreferencesKey("manual_sleep_quality")
@@ -116,6 +117,10 @@ class UserPreferences @Inject constructor(
         }
     }
 
+    val sessionDurationMinutes: Flow<Int> = dataStore.data.map { preferences ->
+        preferences[SESSION_DURATION_MINUTES] ?: 60
+    }
+
     val themePreference: Flow<ThemePreference> = dataStore.data.map { preferences ->
         when (preferences[THEME_PREFERENCE]) {
             "DARK" -> ThemePreference.DARK
@@ -182,6 +187,12 @@ class UserPreferences @Inject constructor(
     suspend fun setTrainingPhase(phase: TrainingPhase) {
         dataStore.edit { preferences ->
             preferences[TRAINING_PHASE] = phase.name
+        }
+    }
+
+    suspend fun setSessionDurationMinutes(minutes: Int) {
+        dataStore.edit { preferences ->
+            preferences[SESSION_DURATION_MINUTES] = minutes
         }
     }
 

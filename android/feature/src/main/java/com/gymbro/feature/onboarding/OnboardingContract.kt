@@ -13,6 +13,7 @@ data class OnboardingState(
     val selectedExperience: ExperienceLevel = ExperienceLevel.INTERMEDIATE,
     val trainingDaysPerWeek: Int = 4,
     val selectedPhase: TrainingPhase = TrainingPhase.MAINTENANCE,
+    val sessionDurationMinutes: Int = 60,
     val isGeneratingPlan: Boolean = false,
     val planGenerationError: String? = null,
 )
@@ -25,6 +26,7 @@ sealed interface OnboardingEvent {
     data class ExperienceSelected(val experience: ExperienceLevel) : OnboardingEvent
     data class TrainingDaysSelected(val days: Int) : OnboardingEvent
     data class TrainingPhaseSelected(val phase: TrainingPhase) : OnboardingEvent
+    data class SessionDurationSelected(val minutes: Int) : OnboardingEvent
     data object CompleteOnboarding : OnboardingEvent
 }
 

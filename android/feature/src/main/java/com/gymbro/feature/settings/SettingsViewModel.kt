@@ -47,20 +47,22 @@ class SettingsViewModel @Inject constructor(
                 userPreferences.autoStartRestTimer,
                 userPreferences.notificationsEnabled,
                 userPreferences.trainingPhase,
-                userPreferences.themePreference,
-            ) { weightUnit, restTimer, autoStart, notifications, phase, theme ->
+            ) { values: Array<Any?> ->
+                @Suppress("UNCHECKED_CAST")
                 SettingsState(
-                    weightUnit = weightUnit,
-                    trainingPhase = phase,
-                    themePreference = theme,
-                    defaultRestTimer = restTimer,
-                    autoStartRestTimer = autoStart,
-                    notificationsEnabled = notifications,
+                    weightUnit = values[0] as WeightUnit,
+                    trainingPhase = values[4] as TrainingPhase,
+                    themePreference = _state.value.themePreference,
+                    defaultRestTimer = values[1] as Int,
+                    autoStartRestTimer = values[2] as Boolean,
+                    notificationsEnabled = values[3] as Boolean,
                     isHealthConnectAvailable = _state.value.isHealthConnectAvailable,
                     isHealthConnectConnected = _state.value.isHealthConnectConnected,
                     appVersion = getAppVersion(),
                     isLoading = false,
                 )
+            }.combine(userPreferences.themePreference) { state, theme ->
+                state.copy(themePreference = theme)
             }.collect { newState ->
                 _state.value = newState
             }
