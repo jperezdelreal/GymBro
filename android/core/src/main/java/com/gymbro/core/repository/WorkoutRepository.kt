@@ -3,6 +3,12 @@ package com.gymbro.core.repository
 import com.gymbro.core.model.ExerciseSet
 import com.gymbro.core.model.Workout
 import kotlinx.coroutines.flow.Flow
+import java.time.Instant
+
+data class ExerciseHistorySession(
+    val workoutDate: Instant,
+    val sets: List<ExerciseSet>,
+)
 
 interface WorkoutRepository {
     suspend fun startWorkout(): Workout
@@ -22,4 +28,6 @@ interface WorkoutRepository {
     suspend fun getTotalCompletedWorkoutsCount(): Int
     suspend fun getActiveDaysCount(): Int
     suspend fun getCurrentStreak(): Int
+    
+    suspend fun getExerciseHistory(exerciseId: String, limit: Int = 10): List<ExerciseHistorySession>
 }

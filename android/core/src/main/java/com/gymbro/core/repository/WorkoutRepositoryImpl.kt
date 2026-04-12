@@ -372,6 +372,46 @@ class WorkoutRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getExerciseHistory(exerciseId: String, limit: Int): List<ExerciseHistorySession> {
+        val result = retryWithBackoff {
+            runCatchingAsResult {
+                val setsWithDates = workoutDao.getExerciseHistorySets(exerciseId, limit * 5)
+                
+                // Group sets by workout date
+                val groupedByWorkout = setsWithDates.groupBy { it.workoutDate }
+                
+                // Convert to ExerciseHistorySession and take only the requested limit of sessions
+                groupedByWorkout.entries
+                    .sortedByDescending { it.key }
+                    .take(limit)
+                    .map { (workoutDate, setsWithDate) ->
+                        ExerciseHistorySession(
+                            workoutDate = Instant.ofEpochMilli(workoutDate),
+                            sets = setsWithDate.map { setWithDate ->
+                                ExerciseSet(
+                                    id = UUID.fromString(setWithDate.set.id),
+                                    exerciseId = UUID.fromString(setWithDate.set.exerciseId),
+                                    weightKg = setWithDate.set.weight,
+                                    reps = setWithDate.set.reps,
+                                    rpe = setWithDate.set.rpe,
+                                    rir = setWithDate.set.rir,
+                                    isWarmup = setWithDate.set.isWarmup,
+                                    completedAt = Instant.ofEpochMilli(setWithDate.set.completedAt),
+                                )
+                            }
+                        )
+                    }
+            }
+        }
+        return when (result) {
+            is AppResult.Success -> result.data
+            is AppResult.Error -> {
+                Log.e(TAG, "Failed to get exercise history: ${result.error.message}")
+                emptyList()
+            }
+        }
+    }
+
     companion object {
         private const val TAG = "WorkoutRepositoryImpl"
     }

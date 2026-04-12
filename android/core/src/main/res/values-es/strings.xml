@@ -847,4 +847,15 @@
     <string name="profile_sign_out_failed">Error al cerrar sesión</string>
     <string name="home_cd_view_all_programs">Ver todos los programas</string>
     <string name="home_cd_recent_workout">Entrenamiento del %1$s, %2$d ejercicios</string>
+
+    <!-- Exercise Detail Sheet - Additional strings -->
+    <string name="exercise_detail_sheet_title">Detalles del Ejercicio</string>
+    <string name="exercise_detail_history_title">Sesiones Recientes</string>
+    <string name="exercise_detail_history_empty">Sin historial aún para este ejercicio</string>
+    <string name="exercise_detail_history_loading">Cargando historial…</string>
+    <string name="exercise_detail_setup">Preparación</string>
+    <string name="exercise_detail_execution">Ejecución</string>
+    <string name="exercise_detail_tips">Consejos</string>
+    <string name="exercise_detail_set_format">%1$d × %2$.1f kg</string>
+    <string name="exercise_detail_set_format_with_rpe">%1$d × %2$.1f kg @ RPE %3$.1f</string>
 </resources>
