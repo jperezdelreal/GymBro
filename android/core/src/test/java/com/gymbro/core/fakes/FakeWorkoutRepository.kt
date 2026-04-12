@@ -115,4 +115,63 @@ class FakeWorkoutRepository : WorkoutRepository {
             inProgressWorkout = null
         }
     }
+
+    override suspend fun getTotalCompletedWorkoutsCount(): Int {
+        return workouts.value.values.count { it.completedAt != null }
+    }
+
+    override suspend fun getActiveDaysCount(): Int {
+        return workouts.value.values
+            .filter { it.completedAt != null }
+            .map { it.startedAt.epochSecond / 86400 }
+            .distinct()
+            .size
+    }
+
+    override suspend fun getCurrentStreak(): Int {
+        val completedWorkouts = workouts.value.values
+            .filter { it.completedAt != null }
+            .sortedByDescending { it.completedAt }
+        
+        if (completedWorkouts.isEmpty()) return 0
+        
+        var streak = 0
+        var lastDate = completedWorkouts.first().completedAt!!.epochSecond / 86400
+        val today = java.time.Instant.now().epochSecond / 86400
+        
+        if (today - lastDate > 7) return 0
+        
+        for (workout in completedWorkouts) {
+            val workoutDay = workout.completedAt!!.epochSecond / 86400
+            if (lastDate - workoutDay <= 7) {
+                streak++
+                lastDate = workoutDay
+            } else {
+                break
+            }
+        }
+        
+        return streak
+    }
+
+    override suspend fun getExerciseHistory(exerciseId: String, limit: Int): List<com.gymbro.core.repository.ExerciseHistorySession> {
+        val exerciseUuid = try {
+            UUID.fromString(exerciseId)
+        } catch (e: IllegalArgumentException) {
+            return emptyList()
+        }
+        
+        return workouts.value.values
+            .filter { it.completedAt != null }
+            .sortedByDescending { it.completedAt }
+            .take(limit)
+            .mapNotNull { workout ->
+                val sets = workout.sets.filter { it.exerciseId == exerciseUuid }
+                if (sets.isEmpty()) null
+                else com.gymbro.core.repository.ExerciseHistorySession(
+                    workoutDate = workout.startedAt,
+                    sets = sets
+                )
+            }
+    }
 }
