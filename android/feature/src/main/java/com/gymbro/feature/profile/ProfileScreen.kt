@@ -87,6 +87,7 @@ fun ProfileRoute(
     onNavigateToSettings: () -> Unit = {},
     onNavigateToCoach: () -> Unit = {},
     onNavigateToExerciseLibrary: () -> Unit = {},
+    onNavigateToTools: () -> Unit = {},
     onNavigateToRecovery: () -> Unit = {},
     viewModel: ProfileViewModel = hiltViewModel(),
 ) {
@@ -107,6 +108,7 @@ fun ProfileRoute(
         onNavigateToSettings = onNavigateToSettings,
         onNavigateToCoach = onNavigateToCoach,
         onNavigateToExerciseLibrary = onNavigateToExerciseLibrary,
+        onNavigateToTools = onNavigateToTools,
         onNavigateToRecovery = onNavigateToRecovery,
     )
 }
@@ -118,6 +120,7 @@ internal fun ProfileScreen(
     onNavigateToSettings: () -> Unit = {},
     onNavigateToCoach: () -> Unit = {},
     onNavigateToExerciseLibrary: () -> Unit = {},
+    onNavigateToTools: () -> Unit = {},
     onNavigateToRecovery: () -> Unit = {},
 ) {
     val context = LocalContext.current
@@ -245,6 +248,22 @@ internal fun ProfileScreen(
                 subtitle = stringResource(R.string.profile_exercise_library_subtitle),
                 iconTint = AccentGreenStart,
                 onClick = onNavigateToExerciseLibrary,
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Tools
+        SettingsGroup(
+            title = stringResource(R.string.tools_title),
+            accentColor = AccentAmberStart,
+        ) {
+            SettingItem(
+                icon = Icons.Default.FitnessCenter,
+                label = stringResource(R.string.tools_title),
+                subtitle = stringResource(R.string.tools_subtitle),
+                iconTint = AccentAmberStart,
+                onClick = onNavigateToTools,
             )
         }
 
