@@ -6,15 +6,16 @@
         <item name="android:navigationBarColor">#FF0A0A0A</item>
         <item name="android:windowBackground">#FF0A0A0A</item>
         <!-- Android 12+ Splash Screen -->
-        <item name="android:windowSplashScreenBackground">#FF0A0A0A</item>
-        <item name="android:windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
-        <item name="android:windowSplashScreenIconBackgroundColor">#FF0A0A0A</item>
+        <item name="android:windowSplashScreenBackground">#FF00FF87</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/ic_splash_logo</item>
+        <item name="android:windowSplashScreenIconBackgroundColor">#FF00FF87</item>
     </style>
 
     <!-- Splash Screen theme for AndroidX SplashScreen compat (pre-Android 12) -->
     <style name="Theme.GymBro.Splash" parent="Theme.SplashScreen">
-        <item name="windowSplashScreenBackground">#FF0A0A0A</item>
-        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
+        <item name="windowSplashScreenBackground">#FF00FF87</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash_logo</item>
+        <item name="windowSplashScreenIconBackgroundColor">#FF00FF87</item>
         <item name="postSplashScreenTheme">@style/Theme.GymBro</item>
     </style>
 </resources>

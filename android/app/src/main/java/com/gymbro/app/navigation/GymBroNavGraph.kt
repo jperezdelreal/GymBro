@@ -202,39 +202,24 @@ fun GymBroNavGraph(
             },
         ) {
         composable("onboarding") {
+            val context = androidx.compose.ui.platform.LocalContext.current
             OnboardingRoute(
                 onNavigateToMain = { planGenerated, daysPerWeek ->
-                    if (planGenerated) {
-                        navController.currentBackStackEntry
-                            ?.savedStateHandle
-                            ?.set("plan_generated", true)
-                        navController.currentBackStackEntry
-                            ?.savedStateHandle
-                            ?.set("plan_days_per_week", daysPerWeek)
-                    }
                     navController.navigate("home") {
                         popUpTo("onboarding") { inclusive = true }
+                    }
+                    if (planGenerated) {
+                        coroutineScope.launch {
+                            snackbarHostState.showSnackbar(
+                                message = context.getString(R.string.plan_ready_message, daysPerWeek),
+                            )
+                        }
                     }
                 },
             )
         }
-        composable("home") { backStackEntry ->
-            val planGenerated = navController.previousBackStackEntry
-                ?.savedStateHandle
-                ?.get<Boolean>("plan_generated")
-            val planDaysPerWeek = navController.previousBackStackEntry
-                ?.savedStateHandle
-                ?.get<Int>("plan_days_per_week")
-            navController.previousBackStackEntry
-                ?.savedStateHandle
-                ?.remove<Boolean>("plan_generated")
-            navController.previousBackStackEntry
-                ?.savedStateHandle
-                ?.remove<Int>("plan_days_per_week")
-            
+        composable("home") {
             HomeRoute(
-                planGenerated = planGenerated ?: false,
-                planDaysPerWeek = planDaysPerWeek ?: 0,
                 onNavigateToActiveWorkout = {
                     navController.navigate("active_workout")
                 },
