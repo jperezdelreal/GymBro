@@ -684,6 +684,22 @@
     <string name="profile_exercise_library">Exercise Library</string>
     <string name="profile_exercise_library_subtitle">Browse and manage exercises</string>
 
+    <!-- Tools -->
+    <string name="tools_title">Tools</string>
+    <string name="tools_subtitle">Workout calculators and utilities</string>
+    <string name="tools_plate_calculator">Plate Calculator</string>
+    <string name="tools_plate_calculator_subtitle">Load the right plates on your barbell</string>
+    <string name="tools_one_rm_calculator">1RM Calculator</string>
+    <string name="tools_one_rm_calculator_subtitle">Estimate your one rep max</string>
+    <string name="tools_plate_target_weight">Target Weight</string>
+    <string name="tools_plate_bar_weight">Bar Weight</string>
+    <string name="tools_plate_per_side">Per Side</string>
+    <string name="tools_one_rm_weight_lifted">Weight Lifted</string>
+    <string name="tools_one_rm_reps_performed">Reps Performed</string>
+    <string name="tools_one_rm_reps">reps</string>
+    <string name="tools_one_rm_estimated">Estimated 1RM</string>
+    <string name="tools_one_rm_percentage_chart">Percentage Chart</string>
+
     <!-- Issue #447: Remaining hardcoded strings -->
     <string name="progress_exercises_count">%d exercises</string>
     <string name="history_unknown_error">Unknown error</string>

@@ -75,6 +75,9 @@ import com.gymbro.feature.analytics.AnalyticsRoute
 import com.gymbro.feature.coach.CoachChatRoute
 import com.gymbro.feature.recovery.RecoveryRoute
 import com.gymbro.feature.settings.SettingsRoute
+import com.gymbro.feature.tools.OneRMCalculatorRoute
+import com.gymbro.feature.tools.PlateCalculatorRoute
+import com.gymbro.feature.tools.ToolsRoute
 import com.gymbro.feature.workout.ActiveWorkoutRoute
 import com.gymbro.feature.workout.SmartWorkoutRoute
 import com.gymbro.feature.workout.WorkoutSummaryScreen
@@ -485,8 +488,38 @@ fun GymBroNavGraph(
                 onNavigateToExerciseLibrary = {
                     navController.navigate("exercise_library")
                 },
+                onNavigateToTools = {
+                    navController.navigate("tools")
+                },
                 onNavigateToRecovery = {
                     navController.navigate("recovery")
+                },
+            )
+        }
+        composable("tools") {
+            ToolsRoute(
+                onNavigateToPlateCalculator = {
+                    navController.navigate("tools/plate_calculator")
+                },
+                onNavigateToOneRMCalculator = {
+                    navController.navigate("tools/one_rm_calculator")
+                },
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+            )
+        }
+        composable("tools/plate_calculator") {
+            PlateCalculatorRoute(
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+            )
+        }
+        composable("tools/one_rm_calculator") {
+            OneRMCalculatorRoute(
+                onNavigateBack = {
+                    navController.popBackStack()
                 },
             )
         }

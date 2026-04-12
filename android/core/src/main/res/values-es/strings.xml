@@ -690,6 +690,22 @@
     <string name="profile_exercise_library">Biblioteca de Ejercicios</string>
     <string name="profile_exercise_library_subtitle">Explorar y gestionar ejercicios</string>
 
+    <!-- Tools -->
+    <string name="tools_title">Herramientas</string>
+    <string name="tools_subtitle">Calculadoras y utilidades de entrenamiento</string>
+    <string name="tools_plate_calculator">Calculadora de Discos</string>
+    <string name="tools_plate_calculator_subtitle">Carga los discos correctos en tu barra</string>
+    <string name="tools_one_rm_calculator">Calculadora 1RM</string>
+    <string name="tools_one_rm_calculator_subtitle">Estima tu máximo de una repetición</string>
+    <string name="tools_plate_target_weight">Peso Objetivo</string>
+    <string name="tools_plate_bar_weight">Peso de la Barra</string>
+    <string name="tools_plate_per_side">Por Lado</string>
+    <string name="tools_one_rm_weight_lifted">Peso Levantado</string>
+    <string name="tools_one_rm_reps_performed">Repeticiones Realizadas</string>
+    <string name="tools_one_rm_reps">reps</string>
+    <string name="tools_one_rm_estimated">1RM Estimado</string>
+    <string name="tools_one_rm_percentage_chart">Tabla de Porcentajes</string>
+
     <!-- Issue #447: Remaining hardcoded strings -->
     <string name="progress_exercises_count">%d ejercicios</string>
     <string name="history_unknown_error">Error desconocido</string>
