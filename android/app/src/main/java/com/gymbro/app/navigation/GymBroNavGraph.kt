@@ -43,6 +43,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
@@ -499,6 +501,7 @@ private fun GymBroBottomNavBar(
     currentRoute: String?,
     onTabSelected: (BottomNavTab) -> Unit,
 ) {
+    val haptic = LocalHapticFeedback.current
     val selectedIndex = BottomNavTab.entries.indexOfFirst { it.route == currentRoute }.takeIf { it >= 0 } ?: 0
     val indicatorOffset by androidx.compose.animation.core.animateFloatAsState(
         targetValue = selectedIndex.toFloat(),
@@ -519,7 +522,10 @@ private fun GymBroBottomNavBar(
                 val label = stringResource(tab.labelResId)
                 NavigationBarItem(
                     selected = selected,
-                    onClick = { onTabSelected(tab) },
+                    onClick = {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        onTabSelected(tab)
+                    },
                     modifier = Modifier.testTag("nav_${tab.route}"),
                     icon = {
                         Icon(

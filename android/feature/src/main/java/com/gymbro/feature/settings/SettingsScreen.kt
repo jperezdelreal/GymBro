@@ -568,10 +568,14 @@ private fun SettingsRow(
     onClick: (() -> Unit)? = null,
     enabled: Boolean = true,
 ) {
+    val haptic = LocalHapticFeedback.current
     val modifier = Modifier
         .fillMaxWidth()
         .then(
-            if (onClick != null) Modifier.clickable(enabled = enabled, onClick = onClick)
+            if (onClick != null) Modifier.clickable(enabled = enabled, onClick = {
+                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                onClick()
+            })
             else Modifier
         )
         .padding(vertical = 8.dp)

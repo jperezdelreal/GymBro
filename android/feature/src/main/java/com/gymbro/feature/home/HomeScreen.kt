@@ -46,6 +46,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
@@ -244,6 +246,7 @@ private fun QuickStartCard(
     daysSinceLastWorkout: Int?,
     onQuickStart: () -> Unit,
 ) {
+    val haptic = LocalHapticFeedback.current
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -293,7 +296,10 @@ private fun QuickStartCard(
                 Spacer(modifier = Modifier.height(12.dp))
 
                 Button(
-                    onClick = onQuickStart,
+                    onClick = {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        onQuickStart()
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp)
@@ -329,6 +335,7 @@ private fun TodayWorkoutCard(
     onStartWorkout: () -> Unit,
     onViewPrograms: () -> Unit,
 ) {
+    val haptic = LocalHapticFeedback.current
     val viewAllProgramsLabel = stringResource(R.string.home_cd_view_all_programs)
     Card(
         modifier = Modifier
@@ -392,7 +399,10 @@ private fun TodayWorkoutCard(
                 }
 
                 Button(
-                    onClick = onStartWorkout,
+                    onClick = {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        onStartWorkout()
+                    },
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = AccentGreen,
@@ -473,7 +483,10 @@ private fun TodayWorkoutCard(
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier
                     .semantics { contentDescription = viewAllProgramsLabel }
-                    .clickable(onClick = onViewPrograms)
+                    .clickable(onClick = {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        onViewPrograms()
+                    })
                     .padding(vertical = 4.dp),
             )
         }
@@ -484,10 +497,14 @@ private fun TodayWorkoutCard(
 private fun CreateProgramCta(
     onCreateProgram: () -> Unit,
 ) {
+    val haptic = LocalHapticFeedback.current
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onCreateProgram)
+            .clickable(onClick = {
+                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                onCreateProgram()
+            })
             .testTag("create_program_cta"),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
@@ -531,6 +548,7 @@ private fun RecentWorkoutCard(
     onClick: () -> Unit,
     weightUnit: UserPreferences.WeightUnit = UserPreferences.WeightUnit.KG,
 ) {
+    val haptic = LocalHapticFeedback.current
     val dateFormatter = remember {
         DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
     }
@@ -550,7 +568,10 @@ private fun RecentWorkoutCard(
         modifier = Modifier
             .fillMaxWidth()
             .semantics(mergeDescendants = true) { contentDescription = workoutDescription }
-            .clickable(onClick = onClick),
+            .clickable(onClick = {
+                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                onClick()
+            }),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface,
