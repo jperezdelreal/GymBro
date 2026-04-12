@@ -94,7 +94,7 @@ class WorkoutPlanGenerator @Inject constructor(
 
         return WorkoutPlan(
             name = "Strength Building Program",
-            description = "Focus on progressive overload with compound movements. 5x5 protocol for major lifts. Using ${'$'}{split.displayName} split for ${'$'}daysPerWeek days/week.",
+            description = "Focus on progressive overload with compound movements. 5x5 protocol for major lifts. Using ${split.displayName} split for $daysPerWeek days/week.",
             goal = UserPreferences.TrainingGoal.STRENGTH,
             experienceLevel = experienceLevel,
             daysPerWeek = daysPerWeek,
@@ -122,7 +122,7 @@ class WorkoutPlanGenerator @Inject constructor(
 
         return WorkoutPlan(
             name = "Hypertrophy Program",
-            description = "${'$'}{split.displayName} split focused on muscle growth. Higher volume, moderate intensity for ${'$'}daysPerWeek days/week.",
+            description = "${split.displayName} split focused on muscle growth. Higher volume, moderate intensity for $daysPerWeek days/week.",
             goal = UserPreferences.TrainingGoal.HYPERTROPHY,
             experienceLevel = experienceLevel,
             daysPerWeek = daysPerWeek,
@@ -239,7 +239,7 @@ class WorkoutPlanGenerator @Inject constructor(
 
         return WorkoutPlan(
             name = "Powerlifting Program",
-            description = "Focus on the big three: squat, bench press, and deadlift. Low reps, high intensity using ${'$'}{split.displayName} split.",
+            description = "Focus on the big three: squat, bench press, and deadlift. Low reps, high intensity using ${split.displayName} split.",
             goal = UserPreferences.TrainingGoal.POWERLIFTING,
             experienceLevel = experienceLevel,
             daysPerWeek = daysPerWeek,
@@ -261,7 +261,7 @@ class WorkoutPlanGenerator @Inject constructor(
 
         return WorkoutPlan(
             name = "General Fitness Program",
-            description = "Balanced full-body workouts for overall fitness and health. ${'$'}{split.displayName} approach for ${'$'}daysPerWeek days/week.",
+            description = "Balanced full-body workouts for overall fitness and health. ${split.displayName} approach for $daysPerWeek days/week.",
             goal = UserPreferences.TrainingGoal.GENERAL_FITNESS,
             experienceLevel = experienceLevel,
             daysPerWeek = daysPerWeek,
