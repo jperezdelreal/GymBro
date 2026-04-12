@@ -4,8 +4,10 @@ import androidx.lifecycle.viewModelScope
 import com.gymbro.core.error.toUserMessage
 import com.gymbro.core.model.Exercise
 import com.gymbro.core.model.ExerciseSet
+import com.gymbro.core.model.MuscleGroup
 import com.gymbro.core.repository.ExerciseRepository
 import com.gymbro.core.repository.WorkoutRepository
+import com.gymbro.core.service.ActivePlanStore
 import com.gymbro.core.service.RpeTrendService
 import com.gymbro.core.service.PersonalRecordService
 import com.gymbro.core.service.SmartDefaultsService
@@ -18,6 +20,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -31,6 +34,7 @@ class ActiveWorkoutViewModel @Inject constructor(
     private val smartDefaultsService: SmartDefaultsService,
     private val rpeTrendService: RpeTrendService,
     private val exerciseRepository: ExerciseRepository,
+    private val activePlanStore: ActivePlanStore,
     val tooltipManager: TooltipManager,
 ) : BaseViewModel() {
 
@@ -88,6 +92,7 @@ class ActiveWorkoutViewModel @Inject constructor(
             val workout = workoutRepository.startWorkout()
             _state.update { it.copy(workoutId = workout.id.toString(), isLoading = false, errorMessage = null) }
             startElapsedTimer()
+            loadPendingWorkoutDay()
         }
     }
 
@@ -121,6 +126,51 @@ class ActiveWorkoutViewModel @Inject constructor(
             } catch (_: Exception) {
                 // Non-critical — silently ignore if fatigue data unavailable
             }
+        }
+    }
+
+    private fun loadPendingWorkoutDay() {
+        val pendingDay = activePlanStore.consumePendingWorkoutDay() ?: return
+        viewModelScope.launch {
+            for (planned in pendingDay.exercises) {
+                // Try to look up full Exercise by name from repository
+                val exercise = findExerciseByName(planned.exerciseName) ?: Exercise(
+                    id = UUID.randomUUID(),
+                    name = planned.exerciseName,
+                    muscleGroup = MuscleGroup.FULL_BODY,
+                )
+                val defaults = try {
+                    smartDefaultsService.getDefaults(exercise.id.toString())
+                } catch (_: Exception) {
+                    null
+                }
+                val sets = (1..planned.sets).map { setNum ->
+                    WorkoutSetUi(
+                        id = UUID.randomUUID().toString(),
+                        setNumber = setNum,
+                        weight = defaults?.weight?.toString() ?: "",
+                        reps = defaults?.reps?.toString()
+                            ?: planned.repsRange.split("-").firstOrNull() ?: "",
+                    )
+                }
+                _state.update { current ->
+                    current.copy(
+                        exercises = current.exercises + WorkoutExerciseUi(
+                            exercise = exercise,
+                            sets = sets,
+                        ),
+                    )
+                }
+            }
+        }
+    }
+
+    private suspend fun findExerciseByName(name: String): Exercise? {
+        return try {
+            val exercises = exerciseRepository.getFilteredExercises(null, name).first()
+            exercises.firstOrNull { it.name.equals(name, ignoreCase = true) }
+        } catch (_: Exception) {
+            null
         }
     }
 

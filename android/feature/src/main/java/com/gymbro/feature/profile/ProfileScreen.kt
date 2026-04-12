@@ -1,5 +1,7 @@
 package com.gymbro.feature.profile
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -55,6 +57,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
@@ -81,6 +84,8 @@ import java.util.Locale
 fun ProfileRoute(
     onNavigateToSettings: () -> Unit = {},
     onNavigateToCoach: () -> Unit = {},
+    onNavigateToExerciseLibrary: () -> Unit = {},
+    onNavigateToRecovery: () -> Unit = {},
     viewModel: ProfileViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -99,6 +104,8 @@ fun ProfileRoute(
         onEvent = viewModel::onEvent,
         onNavigateToSettings = onNavigateToSettings,
         onNavigateToCoach = onNavigateToCoach,
+        onNavigateToExerciseLibrary = onNavigateToExerciseLibrary,
+        onNavigateToRecovery = onNavigateToRecovery,
     )
 }
 
@@ -108,7 +115,10 @@ internal fun ProfileScreen(
     onEvent: (ProfileEvent) -> Unit,
     onNavigateToSettings: () -> Unit = {},
     onNavigateToCoach: () -> Unit = {},
+    onNavigateToExerciseLibrary: () -> Unit = {},
+    onNavigateToRecovery: () -> Unit = {},
 ) {
+    val context = LocalContext.current
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -145,15 +155,18 @@ internal fun ProfileScreen(
                 SettingItem(
                     icon = Icons.Default.Person,
                     label = state.user?.displayName ?: stringResource(R.string.profile_anonymous_account),
+                    subtitle = stringResource(R.string.profile_coming_soon),
                     iconTint = AccentGreenStart,
-                    onClick = { /* Navigate to account details */ },
+                    onClick = { },
+                    enabled = false,
                 )
                 SettingItem(
                     icon = Icons.Default.Cloud,
                     label = stringResource(R.string.profile_cloud_sync_title),
                     subtitle = getSyncStatusText(state.syncStatus),
                     iconTint = AccentGreenStart,
-                    onClick = { /* Navigate to sync settings */ },
+                    onClick = { },
+                    enabled = false,
                 )
                 SettingItemWithToggle(
                     icon = Icons.Default.Sync,
@@ -216,6 +229,38 @@ internal fun ProfileScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // Exercise Library
+        SettingsGroup(
+            title = stringResource(R.string.profile_exercise_library),
+            accentColor = AccentGreenStart,
+        ) {
+            SettingItem(
+                icon = Icons.Default.FitnessCenter,
+                label = stringResource(R.string.profile_exercise_library),
+                subtitle = stringResource(R.string.profile_exercise_library_subtitle),
+                iconTint = AccentGreenStart,
+                onClick = onNavigateToExerciseLibrary,
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Recovery
+        SettingsGroup(
+            title = stringResource(R.string.profile_recovery),
+            accentColor = AccentCyanStart,
+        ) {
+            SettingItem(
+                icon = Icons.Default.MonitorHeart,
+                label = stringResource(R.string.profile_recovery),
+                subtitle = stringResource(R.string.profile_recovery_subtitle),
+                iconTint = AccentCyanStart,
+                onClick = onNavigateToRecovery,
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
         // Data Group (Amber Accent)
         SettingsGroup(
             title = stringResource(R.string.profile_data_section),
@@ -245,14 +290,24 @@ internal fun ProfileScreen(
             SettingItem(
                 icon = Icons.Default.Info,
                 label = stringResource(R.string.profile_version),
+                subtitle = stringResource(R.string.profile_coming_soon),
                 iconTint = Color.White,
-                onClick = { /* Show version info */ },
+                onClick = { },
+                enabled = false,
             )
             SettingItem(
                 icon = Icons.Default.Feedback,
                 label = stringResource(R.string.profile_send_feedback_label),
                 iconTint = Color.White,
-                onClick = { /* Open feedback */ },
+                onClick = {
+                    val intent = Intent(Intent.ACTION_SENDTO).apply {
+                        data = Uri.parse("mailto:feedback@gymbro.app")
+                        putExtra(Intent.EXTRA_SUBJECT, "GymBro Feedback")
+                    }
+                    if (intent.resolveActivity(context.packageManager) != null) {
+                        context.startActivity(intent)
+                    }
+                },
             )
         }
 
@@ -480,18 +535,19 @@ private fun SettingItem(
     subtitle: String? = null,
     iconTint: Color,
     onClick: () -> Unit,
+    enabled: Boolean = true,
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick)
+            .clickable(enabled = enabled, onClick = onClick)
             .padding(vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = iconTint,
+            tint = if (enabled) iconTint else iconTint.copy(alpha = 0.4f),
             modifier = Modifier.size(24.dp),
         )
         Spacer(modifier = Modifier.width(12.dp))
@@ -499,7 +555,7 @@ private fun SettingItem(
             Text(
                 text = label,
                 style = MaterialTheme.typography.bodyLarge,
-                color = Color.White,
+                color = if (enabled) Color.White else Color.White.copy(alpha = 0.5f),
             )
             if (subtitle != null) {
                 Text(

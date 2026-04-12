@@ -28,7 +28,7 @@ class HistoryListViewModel @Inject constructor(
     private val _state = MutableStateFlow(HistoryListState())
     val state: StateFlow<HistoryListState> = _state.asStateFlow()
 
-    private val monthFormatter = DateTimeFormatter.ofPattern("MMMM yyyy")
+    private val monthFormatter = DateTimeFormatter.ofPattern("MMMM yyyy", java.util.Locale.getDefault())
 
     init {
         loadHistory()

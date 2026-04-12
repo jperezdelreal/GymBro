@@ -48,6 +48,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
@@ -58,6 +59,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gymbro.core.R
 import com.gymbro.core.model.WorkoutDay
 import com.gymbro.core.model.WorkoutPlan
+import com.gymbro.core.preferences.UserPreferences
 import com.gymbro.feature.common.FullScreenLoading
 import com.gymbro.feature.common.ObserveErrors
 import java.time.Instant
@@ -77,6 +79,14 @@ fun HomeRoute(
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val userPreferences = remember {
+        dagger.hilt.android.EntryPointAccessors.fromApplication(
+            context.applicationContext,
+            HomePreferencesEntryPoint::class.java,
+        ).userPreferences()
+    }
+    val weightUnit = userPreferences.weightUnit.collectAsStateWithLifecycle(initialValue = UserPreferences.WeightUnit.KG)
 
     ObserveErrors(
         errorFlow = viewModel.errorEvents,
@@ -97,6 +107,7 @@ fun HomeRoute(
         state = state.value,
         onEvent = viewModel::onEvent,
         snackbarHostState = snackbarHostState,
+        weightUnit = weightUnit.value,
     )
 }
 
@@ -106,6 +117,7 @@ fun HomeScreen(
     state: HomeState,
     onEvent: (HomeEvent) -> Unit,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
+    weightUnit: UserPreferences.WeightUnit = UserPreferences.WeightUnit.KG,
 ) {
     Scaffold(
         topBar = {
@@ -184,6 +196,7 @@ fun HomeScreen(
                         RecentWorkoutCard(
                             workout = workout,
                             onClick = { onEvent(HomeEvent.ViewWorkoutDetail(workout.workoutId)) },
+                            weightUnit = weightUnit,
                         )
                     }
                 }
@@ -269,6 +282,14 @@ private fun QuickStartCard(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
 
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Text(
+                    text = stringResource(R.string.home_quick_start_subtitle),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+
                 Spacer(modifier = Modifier.height(12.dp))
 
                 Button(
@@ -308,6 +329,7 @@ private fun TodayWorkoutCard(
     onStartWorkout: () -> Unit,
     onViewPrograms: () -> Unit,
 ) {
+    val viewAllProgramsLabel = stringResource(R.string.home_cd_view_all_programs)
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -323,6 +345,24 @@ private fun TodayWorkoutCard(
                 .fillMaxWidth()
                 .padding(16.dp),
         ) {
+            // TODAY badge
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(AccentGreen.copy(alpha = 0.15f))
+                    .padding(horizontal = 10.dp, vertical = 4.dp),
+            ) {
+                Text(
+                    text = stringResource(R.string.home_today_badge),
+                    style = MaterialTheme.typography.labelMedium.copy(
+                        fontWeight = FontWeight.Bold,
+                    ),
+                    color = AccentGreen,
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -432,6 +472,7 @@ private fun TodayWorkoutCard(
                 color = AccentCyan,
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier
+                    .semantics { contentDescription = viewAllProgramsLabel }
                     .clickable(onClick = onViewPrograms)
                     .padding(vertical = 4.dp),
             )
@@ -488,6 +529,7 @@ private fun CreateProgramCta(
 private fun RecentWorkoutCard(
     workout: RecentWorkoutItem,
     onClick: () -> Unit,
+    weightUnit: UserPreferences.WeightUnit = UserPreferences.WeightUnit.KG,
 ) {
     val dateFormatter = remember {
         DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
@@ -498,9 +540,16 @@ private fun RecentWorkoutCard(
             .format(dateFormatter)
     }
 
+    val workoutDescription = stringResource(
+        R.string.home_cd_recent_workout,
+        formattedDate,
+        workout.exerciseCount,
+    )
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
+            .semantics(mergeDescendants = true) { contentDescription = workoutDescription }
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
@@ -539,7 +588,7 @@ private fun RecentWorkoutCard(
             }
 
             Text(
-                text = "%.0f kg".format(workout.totalVolume),
+                text = "%.0f %s".format(workout.totalVolume, if (weightUnit == UserPreferences.WeightUnit.LBS) "lb" else "kg"),
                 style = MaterialTheme.typography.titleMedium.copy(
                     fontWeight = FontWeight.Bold,
                 ),
@@ -595,4 +644,10 @@ private fun formatDuration(seconds: Long): String {
     val hours = seconds / 3600
     val minutes = (seconds % 3600) / 60
     return if (hours > 0) "${hours}h ${minutes}m" else "${minutes}m"
+}
+
+@dagger.hilt.EntryPoint
+@dagger.hilt.InstallIn(dagger.hilt.components.SingletonComponent::class)
+interface HomePreferencesEntryPoint {
+    fun userPreferences(): UserPreferences
 }

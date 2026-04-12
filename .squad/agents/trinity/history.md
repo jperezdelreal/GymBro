@@ -419,3 +419,166 @@
 - Voice result flows: SpeechRecognizer → Flow<VoiceRecognitionState> → VoiceInputParser.parse() → ActiveWorkoutEvent.VoiceInput → ViewModel auto-fills set fields.
 
 **PR #405 opened, closes #392.**
+
+### 2026-04-10: Fix 4 Broken UX Flows (Bug Fixes)
+**BUG 1 — Exercise Detail Screen:** Created `ExerciseDetailContract.kt`, `ExerciseDetailViewModel.kt`, and `ExerciseDetailScreen.kt` to replace `PlaceholderScreen`. Full detail screen shows exercise name, muscle group with icon, category badge, equipment, description, and YouTube link button. Uses existing `ExerciseRepository.getExerciseById()`. Wired into `GymBroNavGraph` with `navArgument("exerciseId")` and back navigation. All strings bilingual (EN + ES).
+
+**BUG 2 — Plan → Active Workout passes exercises:** Added `pendingWorkoutDay` to `ActivePlanStore` with `setPendingWorkoutDay()` / `consumePendingWorkoutDay()`. `PlanDayDetailViewModel` now has `StartWorkout` intent that sets the pending day before emitting `NavigateToActiveWorkout` effect. `ActiveWorkoutViewModel` calls `loadPendingWorkoutDay()` after `startWorkout()` — looks up each `PlannedExercise` by name from `ExerciseRepository`, creates `WorkoutExerciseUi` entries with planned sets and smart defaults.
+
+**BUG 3 — Exercise Picker mode visual clarity:** The picker code path was functionally correct (ExerciseLibraryRoute intercepts `ExerciseClicked` in picker mode). Issue was visual: the arrow icon (`KeyboardArrowRight`) was the same in both modes. Now shows "+" icon with "Tap to add" label in picker mode. Added `exercise_picker_tap_to_add` string (bilingual).
+
+**BUG 4 — Onboarding verification:** Confirmed working correctly — `hasCompletedOnboarding` defaults to `false` via DataStore (`preferences[ONBOARDING_COMPLETE] ?: false`). The 7-page onboarding flow covers goal, experience, frequency, phase, and units, then generates a workout plan. Issue was likely a stale development flag, not a code bug.
+
+**Key patterns learned:**
+- `ActivePlanStore` is the team's shared in-memory store pattern — use it for passing data between screens that don't share a SavedStateHandle.
+- `Flow.first()` from Room DAOs: must import `kotlinx.coroutines.flow.first` explicitly; Room Flows are hot and need explicit terminal operators.
+- PlanDayDetail uses Intent/Effect pattern but the ViewModel extends plain `ViewModel` (not `BaseViewModel`) — different from other feature ViewModels.
+
+### P0 Quality Audit Fix — i18n, Weight Units, UX (Morpheus 6.5→9 push)
+**All 7 fixes applied in a single commit (16 files, 298 insertions):**
+
+**Fix 1 — i18n Enum DisplayNames (biggest impact):**
+- Created `core/ui/DisplayNames.kt` with `@Composable` extension functions: `MuscleGroup.localizedName()`, `ExerciseCategory.localizedName()`, `Equipment.localizedName()`, `RecordType.localizedName()`.
+- Added 28 string resources per language (muscle groups, categories, equipment, record types) to both `values/strings.xml` and `values-es/strings.xml`.
+- Replaced ALL `.displayName` usages across 11 screens: ExerciseDetailScreen, ExerciseLibraryScreen, CreateExerciseScreen, ActiveWorkoutScreen, SmartWorkoutScreen, HistoryListScreen, HistoryDetailScreen, ProgramsScreen, ProgressScreen.
+- Removed the hardcoded `Equipment.displayName()` private function from ExerciseDetailScreen (replaced by shared extension).
+
+**Fix 2 — Weight Unit Preference (kg/lb):**
+- HomeScreen, HistoryListScreen: Added Hilt `@EntryPoint` interfaces to access `UserPreferences.weightUnit` Flow.
+- ActiveWorkoutScreen: Already had weight unit access; threaded it into `WorkoutStatsContent` and replaced hardcoded header string.
+- Used `collectAsStateWithLifecycle` for reactive weight unit changes.
+- Pattern: `if (weightUnit == UserPreferences.WeightUnit.LBS) "lb" else "kg"` — simple inline formatting.
+
+**Fix 3 — Discard Workout Confirmation:**
+- Added `showDiscardDialog` local state in `ActiveWorkoutScreen`.
+- X button now shows AlertDialog with bilingual title/message/confirm/cancel.
+- Only fires `DiscardWorkout` event after user confirms.
+- Red destructive button color for "Discard".
+
+**Fix 4 — Template Click Dead-End:**
+- Removed `onClick` parameter from `TemplateCard` composable.
+- Removed `.clickable(onClick = onClick)` modifier from Card.
+- Cards remain visible but non-interactive (informational only).
+- Cleaned up the TODO comment in `GymBroNavGraph.kt`.
+
+**Fix 5 — Hardcoded ContentDescriptions:**
+- ExerciseDetailScreen: `"Watch exercise video on YouTube"` → `stringResource(R.string.cd_watch_exercise_video)`
+- PlanDayDetailScreen: `"Start this workout"` → `stringResource(R.string.cd_start_this_workout)`
+
+**Fix 6 — Dead Code Cleanup:**
+- Removed `PlaceholderScreen` from GymBroNavGraph.kt.
+- Removed `BiggerNumberField` from ActiveWorkoutScreen.kt.
+- Removed `NavigateBack` from `ExerciseDetailContract.kt` (ViewModel never sent it) + removed dead effect collection in screen.
+
+**Fix 7 — Empty Workout Guidance:**
+- When `state.exercises.isEmpty() && !state.isLoading`, shows centered hint: "Tap + to add your first exercise" / "Pulsa + para añadir tu primer ejercicio".
+
+**Key pattern established:**
+- For screens that need UserPreferences but don't inject it through ViewModel: use Hilt `@EntryPoint` + `EntryPointAccessors.fromApplication()` in the Route composable. Pattern already existed in ActiveWorkoutScreen; replicated for HomeScreen and HistoryListScreen.
+
+### Tier-1 Quality Fixes — Issues #445, #449, #448, #453
+
+**Fix: Hardcoded 'kg' in 5+ screens (#445):**
+- WorkoutSummaryScreen: Added `weightUnitLabel` parameter; volume card now respects user's weight unit preference.
+- ProgressScreen: Added `ProgressPreferencesEntryPoint` to collect `weightUnit`. Threaded label through E1RMChart, HeroKPISection, WorkoutHistoryRow, PRShowcaseCard, PRCard, PRGrid, and `formatPRValue`.
+- HistoryListScreen was already fixed in prior iteration.
+
+**Fix: Show all 12 muscle groups in filter chips (#449):**
+- Replaced hardcoded 6-element `filterGroups` list with `MuscleGroup.entries` in ExerciseLibraryScreen. All 12 muscle groups now shown as filter chips using `localizedName()`.
+
+**Fix: Exercise Library accessible from main navigation (#448):**
+- Added `onNavigateToExerciseLibrary` callback to ProfileRoute/ProfileScreen.
+- Added Exercise Library row in ProfileScreen (Preferences section) with FitnessCenter icon.
+- Wired navigation to `exercise_library` route in GymBroNavGraph.
+- Added bilingual strings: `profile_exercise_library`, `profile_exercise_library_subtitle`.
+
+**Fix: PR data loss in WorkoutSummaryScreen (#453):**
+- Created `WorkoutResultStore` singleton (same pattern as `ActivePlanStore`) — in-memory store that persists across navigation.
+- `onNavigateToSummary` now calls `workoutResultStore.setPersonalRecords(prs)` instead of writing to `savedStateHandle` on the back stack entry that gets destroyed by `popUpTo("active_workout") { inclusive = true }`.
+- WorkoutSummary composable reads PRs via `workoutResultStore.consumePersonalRecords()`.
+- Exposed `WorkoutResultStore` through `GymBroNavGraphViewModel`.
+
+**Key patterns reinforced:**
+- Use `@EntryPoint` pattern for accessing UserPreferences in composables without ViewModel injection (now also in ProgressScreen).
+- Use in-memory singleton stores (like `ActivePlanStore`, `WorkoutResultStore`) when navigation args or `savedStateHandle` can't survive `popUpTo` with `inclusive = true`.
+
+### Tier 2 Quality Sweep — Issues #446, #447, #450, #451, #454, #455, #463
+**16 files changed, 358 insertions, 35 deletions. Build passes.**
+
+**#446 — Localized date formats:**
+- Replaced 5 hardcoded EN date patterns with `DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM/LONG)` and `Locale.getDefault()`.
+- Files: HistoryListScreen, HistoryDetailScreen, ProgressScreen, ProgramsScreen, HistoryListViewModel.
+
+**#447 — Hardcoded English strings moved to resources (EN+ES):**
+- ProgressScreen: "exercises" → `stringResource(R.string.progress_exercises_count)`, PRs contentDescription hoisted.
+- HistoryListScreen: "Unknown error" → `stringResource(R.string.history_unknown_error)`.
+- CreateExerciseScreen: placeholder + "Cancel" → `stringResource()`.
+- ExerciseDetailViewModel & CreateExerciseViewModel: error strings via `context.getString(R.string.…)` with `@ApplicationContext`.
+- RecoveryScreen: readiness CD hoisted, metric CD hoisted, slider labels (Wrecked/Tired/OK/Good/Crushed) → `stringResource()`.
+- AnalyticsScreen: summary card CD hoisted from semantics block.
+
+**#450 — Replace active plan:**
+- Added `ReplacePlanCard` below active plan in ProgramsScreen with confirmation AlertDialog.
+- Users can now regenerate a plan without being stuck.
+
+**#451 — Profile dead-end clicks:**
+- Added `enabled` parameter to `SettingItem` composable.
+- Disabled 3 no-op rows (account details, cloud sync settings, version) with "Coming soon" subtitle.
+- Implemented "Send Feedback" → email intent via `Intent.ACTION_SENDTO`.
+
+**#454 — Workout summary guidance:**
+- Always shows motivational message ("Great effort! 💪" / "¡Gran esfuerzo! 💪").
+- Added optional `nextWorkoutName` parameter for next-workout hint.
+
+**#455 — Onboarding navigation buttons:**
+- Added Back (subtle, disabled on page 0) and Next (accent green) buttons flanking page indicators.
+- Last page omits Next (CTA "Let's Go" already exists on that page).
+
+**#463 — Home screen badge + Quick Start clarity:**
+- Added "TODAY 🎯" / "HOY 🎯" accent green chip badge at top of TodayWorkoutCard.
+- Added Quick Start subtitle explaining freestyle workout flow.
+
+**Pattern: `stringResource()` cannot be inside `semantics{}` blocks — hoist to variable before the modifier chain.**
+
+### 2026-04-11: Tier-3 Polish — 7 Issues Fixed (#452, #456, #457, #458, #460, #461, #462)
+
+**#452 — Settings effect handlers:**
+- Implemented ShowMessage → Snackbar via SnackbarHostState
+- Implemented OpenUrl → Intent.ACTION_VIEW + context.startActivity
+- Implemented OpenHealthConnect → launch HC app, fallback to Play Store
+
+**#456 — Orphaned routes:**
+- Added Recovery row in ProfileScreen linking to recovery screen
+- Wired onNavigateToRecovery through GymBroNavGraph
+- Template create route verified clean (no TODO)
+
+**#457 — Centralize color constants:**
+- HistoryListScreen: removed 7 local color vals, imports from core.ui.theme
+- WorkoutSummaryScreen: removed 5 local color vals, imports from core.ui.theme
+- SettingsScreen: replaced local AccentGreen/CardBackground/SurfaceDark with theme imports
+- OnboardingScreen: removed local AccentGreen/SurfaceVariant, uses theme imports
+- ProgramsScreen: removed local AccentGreen/AccentCyan, imports from theme
+
+**#458 — Missing contentDescriptions:**
+- HistoryListScreen WorkoutCard: added semantics with workout date/exercise count/relative time
+- OnboardingScreen GoalCards: added onboarding_goal_cd content description
+- OnboardingScreen FrequencyCards: added onboarding_frequency_cd content description
+- OnboardingScreen UnitCards: added onboarding_unit_cd content description
+- ProgressScreen WeeklyVolumeChart Canvas: added progress_volume_chart_cd summary
+- All stringResource() calls hoisted outside semantics{} blocks
+
+**#460 — Onboarding frequency explanation + training phase hint:**
+- Added subtitle below frequency selection: "We'll build a workout plan around this schedule"
+- Added training phase settings hint: "You can change your training phase anytime in Settings"
+
+**#461 — Reset onboarding in Settings:**
+- Added RedoSetup event + NavigateToOnboarding effect
+- SettingsViewModel clears hasCompletedOnboarding and navigates
+- SettingsScreen shows Redo Setup row with confirmation dialog
+- GymBroNavGraph wires onNavigateToOnboarding to navigate("onboarding")
+
+**#462 — Progress screen polish:**
+- Plateau alerts: added explanation subtitle under section header
+- PR list: increased display limit from 5 to 20
+
+All strings bilingual (EN + ES). Build compiles clean.

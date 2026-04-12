@@ -575,4 +575,154 @@
     <string name="rest_timer_cd_subtract_time">Subtract 15 seconds</string>
     <string name="rest_timer_cd_add_time">Add 15 seconds</string>
     <string name="settings_cd_training_phase">Training phase selector</string>
+
+    <!-- Exercise Detail -->
+    <string name="exercise_detail_title">Exercise Detail</string>
+    <string name="exercise_detail_loading">Loading exercise…</string>
+    <string name="exercise_detail_error_title">Could Not Load Exercise</string>
+    <string name="exercise_detail_muscle_group">Muscle Group</string>
+    <string name="exercise_detail_category">Category</string>
+    <string name="exercise_detail_equipment">Equipment</string>
+    <string name="exercise_detail_description">Description</string>
+    <string name="exercise_detail_watch_video">Watch Video</string>
+    <string name="exercise_picker_tap_to_add">Tap to add</string>
+
+    <!-- Localized Enum Display Names: Muscle Groups -->
+    <string name="muscle_group_chest">Chest</string>
+    <string name="muscle_group_back">Back</string>
+    <string name="muscle_group_shoulders">Shoulders</string>
+    <string name="muscle_group_biceps">Biceps</string>
+    <string name="muscle_group_triceps">Triceps</string>
+    <string name="muscle_group_quadriceps">Quadriceps</string>
+    <string name="muscle_group_hamstrings">Hamstrings</string>
+    <string name="muscle_group_glutes">Glutes</string>
+    <string name="muscle_group_calves">Calves</string>
+    <string name="muscle_group_core">Core</string>
+    <string name="muscle_group_forearms">Forearms</string>
+    <string name="muscle_group_full_body">Full Body</string>
+
+    <!-- Localized Enum Display Names: Exercise Categories -->
+    <string name="exercise_category_compound">Compound</string>
+    <string name="exercise_category_isolation">Isolation</string>
+    <string name="exercise_category_accessory">Accessory</string>
+    <string name="exercise_category_cardio">Cardio</string>
+
+    <!-- Localized Enum Display Names: Equipment -->
+    <string name="equipment_barbell">Barbell</string>
+    <string name="equipment_dumbbell">Dumbbell</string>
+    <string name="equipment_cable">Cable</string>
+    <string name="equipment_machine">Machine</string>
+    <string name="equipment_bodyweight">Bodyweight</string>
+    <string name="equipment_kettlebell">Kettlebell</string>
+    <string name="equipment_band">Band</string>
+    <string name="equipment_other">Other</string>
+
+    <!-- Localized Enum Display Names: Record Types -->
+    <string name="record_type_max_weight">Max Weight</string>
+    <string name="record_type_max_reps">Max Reps</string>
+    <string name="record_type_max_volume">Max Volume</string>
+    <string name="record_type_max_e1rm">Est. 1RM</string>
+
+    <!-- Weight Unit -->
+    <string name="weight_unit_kg">kg</string>
+    <string name="weight_unit_lb">lb</string>
+    <string name="active_workout_header_weight">WEIGHT</string>
+
+    <!-- Discard Workout Dialog -->
+    <string name="discard_workout_title">Discard Workout?</string>
+    <string name="discard_workout_message">All progress will be lost.</string>
+    <string name="discard_workout_confirm">Discard</string>
+    <string name="discard_workout_cancel">Keep Training</string>
+
+    <!-- Content Descriptions -->
+    <string name="cd_watch_exercise_video">Watch exercise video on YouTube</string>
+    <string name="cd_start_this_workout">Start this workout</string>
+
+    <!-- Empty Workout Guidance -->
+    <string name="active_workout_empty_hint">Tap + to add your first exercise</string>
+
+    <!-- Profile: Exercise Library Link -->
+    <string name="profile_exercise_library">Exercise Library</string>
+    <string name="profile_exercise_library_subtitle">Browse and manage exercises</string>
+
+    <!-- Issue #447: Remaining hardcoded strings -->
+    <string name="progress_exercises_count">%d exercises</string>
+    <string name="history_unknown_error">Unknown error</string>
+    <string name="exercise_detail_load_error">Failed to load exercise</string>
+    <string name="exercise_detail_not_found">Exercise not found</string>
+    <string name="create_exercise_name_taken">An exercise with this name already exists</string>
+    <string name="recovery_readiness_cd">Readiness score: %1$d out of 100, %2$s</string>
+    <string name="recovery_label_wrecked">Wrecked</string>
+    <string name="recovery_label_tired">Tired</string>
+    <string name="recovery_label_ok">OK</string>
+    <string name="recovery_label_good">Good</string>
+    <string name="recovery_label_crushed">Crushed it</string>
+    <string name="progress_prs_cd">%d PRs</string>
+    <string name="recovery_metric_cd">%1$s: %2$s</string>
+    <string name="analytics_summary_cd">%1$s: %2$s%3$s</string>
+
+    <!-- Issue #450: Replace active plan -->
+    <string name="programs_change_plan">Generate New Plan</string>
+    <string name="programs_change_plan_subtitle">Replace your current plan with a new one</string>
+    <string name="programs_replace_plan_title">Replace Current Plan?</string>
+    <string name="programs_replace_plan_message">This will replace your current plan. Continue?</string>
+    <string name="programs_replace_plan_confirm">Replace</string>
+
+    <!-- Issue #451: Profile coming soon -->
+    <string name="profile_coming_soon">Coming soon</string>
+
+    <!-- Issue #454: Workout summary motivational -->
+    <string name="workout_summary_motivation">Great effort! 💪</string>
+    <string name="workout_summary_next_hint">Next up: %s</string>
+
+    <!-- Issue #455: Onboarding nav buttons -->
+    <string name="onboarding_back">Back</string>
+    <string name="onboarding_next">Next</string>
+    <string name="onboarding_continue">Continue</string>
+
+    <!-- Issue #463: Home screen badge -->
+    <string name="home_today_badge">TODAY 🎯</string>
+    <string name="home_quick_start_subtitle">Start a freestyle workout — pick exercises as you go</string>
+
+    <!-- Issue #452: Settings effects -->
+    <string name="settings_open_health_connect_error">Could not open Health Connect</string>
+
+    <!-- Issue #456: Recovery navigation -->
+    <string name="profile_recovery">Recovery</string>
+    <string name="profile_recovery_subtitle">Track sleep, readiness, and recovery</string>
+
+    <!-- Issue #458: Content descriptions -->
+    <string name="history_workout_cd">Workout on %1$s, %2$d exercises, %3$s</string>
+    <string name="onboarding_goal_cd">Training goal: %s</string>
+    <string name="onboarding_frequency_cd">%d days per week</string>
+    <string name="onboarding_unit_cd">Weight unit: %s</string>
+    <string name="progress_volume_chart_cd">Weekly volume chart showing last %d weeks of training volume</string>
+
+    <!-- Issue #460: Onboarding frequency explanation -->
+    <string name="onboarding_frequency_explanation">We\'ll build a workout plan around this schedule</string>
+    <string name="onboarding_training_phase_settings_hint">You can change your training phase anytime in Settings</string>
+
+    <!-- Issue #461: Redo setup -->
+    <string name="settings_redo_setup">Redo Setup</string>
+    <string name="settings_redo_setup_subtitle">Go through onboarding again</string>
+    <string name="settings_redo_setup_confirm_title">Redo Setup?</string>
+    <string name="settings_redo_setup_confirm_message">This will take you through the onboarding setup again. Your workout data will be kept.</string>
+    <string name="settings_redo_setup_confirm">Redo Setup</string>
+
+    <!-- Issue #462: Progress polish -->
+    <string name="progress_plateau_explanation">A plateau means your performance on this exercise hasn\'t improved recently. Try varying reps, weight, or technique.</string>
+    <string name="progress_view_all_prs">View All PRs</string>
+
+    <!-- Final polish: plan confirmation, hardcoded string sweep, a11y -->
+    <string name="plan_ready_message">Your %d-day plan is ready! 🎉</string>
+    <string name="onboarding_first_program_name">Your First Program</string>
+    <string name="onboarding_plan_generation_error">Could not generate your workout plan. You can create one manually from the Home screen.</string>
+    <string name="settings_data_cleared">All data cleared</string>
+    <string name="settings_licenses_shown">Licenses will be displayed</string>
+    <string name="profile_signed_in_success">Signed in successfully</string>
+    <string name="profile_signed_out_success">Signed out</string>
+    <string name="profile_sign_in_failed">Sign-in failed</string>
+    <string name="profile_sign_out_failed">Sign-out failed</string>
+    <string name="home_cd_view_all_programs">View all programs</string>
+    <string name="home_cd_recent_workout">Workout on %1$s, %2$d exercises</string>
 </resources>

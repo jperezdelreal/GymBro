@@ -1129,3 +1129,73 @@ Identified 5 untested critical paths:
 
 **Files:** 5 new Maestro flow files, ~450 lines added
 **PR:** Pending
+
+## Learnings
+
+### 2025-07-22: Bug-Catching Tests for UX Bugs (Jose's Report)
+
+**Context:** Jose identified 4 critical UX bugs. Wrote tests to prove they exist and catch regressions.
+
+**Tests Created:**
+
+1. **PlanDayDetailViewModelTest** — 3 commented-out tests for `StartWorkout` intent/effect
+   - `startWorkout emits NavigateToWorkout effect with exercises` — verifies exercise data is carried
+   - `startWorkout before loadDay does not crash` — edge case safety
+   - `startWorkout preserves sets and reps from plan` — data integrity
+   - _Commented out because `PlanDayDetailContract` lacks `StartWorkout` intent — that's the bug_
+
+2. **ActiveWorkoutViewModelTest** — 5 new compilable tests for exercise picker integration
+   - `exercisePickedAppearsWithCorrectName` — name fidelity after pick
+   - `multipleExercisesCanBeAddedInSequence` — 3-exercise sequential add
+   - `exercisePickedHasInitialSetWithCorrectNumber` — initial set state
+   - `exercisePickedPreservesExerciseIdentity` — id/muscle/category/equipment survive
+   - `exercisePickedMultipleTimesCreatesDistinctEntries` — duplicate exercise edge case
+   - _Updated constructor call to 7 args (activePlanStore added by Trinity)_
+
+3. **Maestro E2E Updates:**
+   - `plan-day-detail.yaml` — added assertions after "Start This Workout" verifying exercises appear
+   - `start-workout.yaml` — added exercise name verification + second exercise add flow
+   - `exercise-detail.yaml` (NEW) — tests exercise detail shows real content, not placeholder
+   - `onboarding-no-reshow.yaml` (NEW) — relaunch app after onboarding, assert no re-show
+
+**Key Findings:**
+- `ActiveWorkoutViewModel` constructor changed from 6 to 7 params (added `activePlanStore`)
+- `ActivePlanStore` has `setPendingWorkoutDay`/`consumePendingWorkoutDay` plumbing but PlanDayDetailVM never calls it
+- `exercise_detail/{id}` route maps to `PlaceholderScreen("Exercise Detail")` — no real implementation
+- `ActiveWorkoutViewModel.kt:170` has broken syntax (`.kotlinx.coroutines.flow.first()`) blocking all test compilation
+- Decision written to `.squad/decisions/inbox/switch-test-gaps.md`
+
+### 2025-07-21: Fix #459 — Missing Tests (Branch: squad/459-missing-tests)
+
+**Context:**
+- Branch: `squad/459-missing-tests` from `squad/452-tier3-polish`
+- Task: Fill test gaps — ExerciseDetailVM, PlanDayDetail StartWorkout, weight unit propagation, Maestro library reachability
+
+**Deliverables:**
+
+1. **ExerciseDetailViewModelTest** (6 tests) — NEW file
+   - `exercise loads successfully by ID` — happy path with FakeExerciseRepository
+   - `exercise not found shows error state` — empty repo returns error
+   - `retry reloads exercise` — add exercise after failure, retry succeeds
+   - `loading state transitions correctly` — Turbine flow verification
+   - `invalid UUID exercise ID shows error` — edge case for bad IDs
+   - `exercise loads correct details` — muscle group, category, equipment preserved
+   - Uses `SavedStateHandle`, `FakeExerciseRepository`, mocked `Context`
+
+2. **PlanDayDetailViewModelTest** — 4 previously-commented tests UNCOMMENTED and updated
+   - `startWorkout emits NavigateToActiveWorkout effect` — matches actual contract
+   - `startWorkout stores pending workout day in ActivePlanStore` — verifies data flow
+   - `startWorkout before loadDay is a no-op` — edge case safety
+   - `startWorkout preserves sets and reps from plan` — data integrity via ActivePlanStore
+   - Original tests expected `NavigateToWorkout(exercises)` — updated to match actual `NavigateToActiveWorkout` effect
+
+3. **SettingsViewModelTest** — 1 new test for weight unit propagation
+   - `weight unit LBS from preferences propagates to state` — creates ViewModel with LBS upstream flow, verifies state
+
+4. **Maestro: exercise-library-from-profile.yaml** — NEW flow
+   - Navigate to Profile → tap Exercise Library → assert library screen → search "Press" → back
+   - Tags: library, navigation, regression
+
+**Build Note:**
+- Pre-existing compilation errors in `SettingsScreen.kt` (missing `NavigateToOnboarding` branch, unresolved `CardBackground`) prevent test execution. These are from uncommitted #452 work, not from these changes.
+

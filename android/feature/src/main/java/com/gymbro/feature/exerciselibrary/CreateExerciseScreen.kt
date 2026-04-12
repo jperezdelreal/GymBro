@@ -54,6 +54,7 @@ import com.gymbro.core.R
 import com.gymbro.core.model.ExerciseCategory
 import com.gymbro.core.model.Equipment
 import com.gymbro.core.model.MuscleGroup
+import com.gymbro.core.ui.localizedName
 import com.gymbro.feature.common.FullScreenLoading
 import com.gymbro.feature.common.ObserveErrors
 
@@ -197,7 +198,7 @@ fun CreateExerciseScreen(
                                     onClick = {
                                         onEvent(CreateExerciseEvent.MuscleGroupSelected(group))
                                     },
-                                    label = { Text(group.displayName, fontSize = 13.sp) },
+                                    label = { Text(group.localizedName(), fontSize = 13.sp) },
                                     colors = FilterChipDefaults.filterChipColors(
                                         containerColor = MaterialTheme.colorScheme.surface,
                                         labelColor = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -237,7 +238,7 @@ fun CreateExerciseScreen(
                                     onClick = {
                                         onEvent(CreateExerciseEvent.CategorySelected(category))
                                     },
-                                    label = { Text(category.displayName, fontSize = 13.sp) },
+                                    label = { Text(category.localizedName(), fontSize = 13.sp) },
                                     colors = FilterChipDefaults.filterChipColors(
                                         containerColor = MaterialTheme.colorScheme.surface,
                                         labelColor = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -318,7 +319,7 @@ fun CreateExerciseScreen(
                                 .height(120.dp),
                             placeholder = {
                                 Text(
-                                    "Add notes about form, cues, or variations...",
+                                    stringResource(R.string.create_exercise_notes_placeholder),
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                             },
@@ -350,7 +351,7 @@ fun CreateExerciseScreen(
                             contentColor = MaterialTheme.colorScheme.onSurface,
                         ),
                     ) {
-                        Text("Cancel")
+                        Text(stringResource(R.string.action_cancel))
                     }
 
                     Button(

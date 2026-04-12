@@ -57,7 +57,7 @@ class OnboardingViewModel @Inject constructor(
 
     private fun completeOnboarding() {
         viewModelScope.launch {
-            _state.value = _state.value.copy(isGeneratingPlan = true)
+            _state.value = _state.value.copy(isGeneratingPlan = true, planGenerationError = null)
 
             userPreferences.setWeightUnit(_state.value.selectedUnit)
             val userName = _state.value.userName.takeIf { it.isNotBlank() } ?: ""
@@ -68,7 +68,10 @@ class OnboardingViewModel @Inject constructor(
             userPreferences.setTrainingPhase(_state.value.selectedPhase)
             userPreferences.setOnboardingComplete(true)
 
+            var planGenerated = false
             try {
+                // generatePlan internally waits for seed exercises to be available
+                // via Flow, so no retry loop is needed.
                 val plan = workoutPlanGenerator.generatePlan(
                     goal = _state.value.selectedGoal,
                     experienceLevel = _state.value.selectedExperience,
@@ -79,12 +82,26 @@ class OnboardingViewModel @Inject constructor(
                     name = "Your First Program",
                 )
                 activePlanStore.setPlanFromOnboarding(personalizedPlan)
-            } catch (_: Exception) {
-                // Plan generation failure should not block onboarding completion
+                planGenerated = true
+            } catch (e: Exception) {
+                android.util.Log.e(
+                    "OnboardingViewModel",
+                    "Plan generation failed",
+                    e,
+                )
+                _state.value = _state.value.copy(
+                    planGenerationError = "Could not generate your workout plan. You can create one manually from the Home screen.",
+                )
+                _effects.send(OnboardingEffect.ShowPlanGenerationError)
             }
 
             _state.value = _state.value.copy(isGeneratingPlan = false)
-            _effects.send(OnboardingEffect.NavigateToMain)
+            _effects.send(
+                OnboardingEffect.NavigateToMain(
+                    planGenerated = planGenerated,
+                    daysPerWeek = _state.value.trainingDaysPerWeek,
+                ),
+            )
         }
     }
 }

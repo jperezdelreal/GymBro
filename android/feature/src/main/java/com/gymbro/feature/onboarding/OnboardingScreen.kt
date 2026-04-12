@@ -29,10 +29,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,6 +48,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -58,31 +65,45 @@ import com.gymbro.core.ui.theme.AccentGreenEnd
 import com.gymbro.core.ui.theme.Background
 import com.gymbro.core.ui.theme.OnSurfaceVariant
 import com.gymbro.core.ui.theme.GlassOverlay
+import com.gymbro.core.ui.theme.AccentGreen
 import com.gymbro.feature.common.GlassmorphicCard
 import com.gymbro.feature.common.GradientButton
-
-private val AccentGreen = Color(0xFF00FF87)
-private val SurfaceVariant = Color(0xFF2C2C2E)
+import kotlinx.coroutines.launch
 
 @Composable
 fun OnboardingRoute(
-    onNavigateToMain: () -> Unit,
+    onNavigateToMain: (planGenerated: Boolean, daysPerWeek: Int) -> Unit,
     viewModel: OnboardingViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
         viewModel.effects.collect { effect ->
             when (effect) {
-                OnboardingEffect.NavigateToMain -> onNavigateToMain()
+                is OnboardingEffect.NavigateToMain -> onNavigateToMain(effect.planGenerated, effect.daysPerWeek)
+                is OnboardingEffect.ShowPlanGenerationError -> {
+                    state.planGenerationError?.let { message ->
+                        snackbarHostState.showSnackbar(
+                            message = message,
+                            duration = SnackbarDuration.Long,
+                        )
+                    }
+                }
             }
         }
     }
 
-    OnboardingScreen(
-        state = state,
-        onEvent = viewModel::onEvent,
-    )
+    Box(modifier = Modifier.fillMaxSize()) {
+        OnboardingScreen(
+            state = state,
+            onEvent = viewModel::onEvent,
+        )
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.align(Alignment.BottomCenter),
+        )
+    }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -93,6 +114,7 @@ fun OnboardingScreen(
 ) {
     val haptic = LocalHapticFeedback.current
     val pagerState = rememberPagerState(pageCount = { 7 })
+    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(pagerState) {
         snapshotFlow { pagerState.currentPage }.collect { page ->
@@ -141,11 +163,65 @@ fun OnboardingScreen(
                 }
             }
 
-            PageIndicators(
-                pageCount = 7,
-                currentPage = pagerState.currentPage,
-                modifier = Modifier.padding(bottom = 32.dp),
-            )
+            // Navigation buttons + page indicators
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp, vertical = 16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                // Back button (subtle, disabled on first page)
+                OutlinedButton(
+                    onClick = {
+                        coroutineScope.launch {
+                            pagerState.animateScrollToPage(pagerState.currentPage - 1)
+                        }
+                    },
+                    enabled = pagerState.currentPage > 0,
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = Color.White,
+                        disabledContentColor = Color.White.copy(alpha = 0.3f),
+                    ),
+                ) {
+                    Text(
+                        text = stringResource(R.string.onboarding_back),
+                        fontWeight = FontWeight.Medium,
+                    )
+                }
+
+                PageIndicators(
+                    pageCount = 7,
+                    currentPage = pagerState.currentPage,
+                )
+
+                // Next/Let's Go button (last page shows Let's Go via existing CTA)
+                if (pagerState.currentPage < 6) {
+                    Button(
+                        onClick = {
+                            coroutineScope.launch {
+                                pagerState.animateScrollToPage(pagerState.currentPage + 1)
+                            }
+                        },
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = AccentGreenStart,
+                            contentColor = Color.Black,
+                        ),
+                    ) {
+                        Text(
+                            text = stringResource(R.string.onboarding_next),
+                            fontWeight = FontWeight.Bold,
+                        )
+                    }
+                } else {
+                    // Empty spacer to keep layout balanced on last page
+                    Spacer(modifier = Modifier.width(80.dp))
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }
@@ -356,6 +432,7 @@ private fun UnitCard(
     modifier: Modifier = Modifier,
 ) {
     val haptic = LocalHapticFeedback.current
+    val unitDescription = stringResource(R.string.onboarding_unit_cd, text)
     GlassmorphicCard(
         modifier = modifier
             .height(80.dp)
@@ -372,6 +449,9 @@ private fun UnitCard(
                 }
             )
             .clip(RoundedCornerShape(16.dp))
+            .semantics(mergeDescendants = true) {
+                contentDescription = unitDescription
+            }
             .then(
                 Modifier.clickable {
                     haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
@@ -446,6 +526,13 @@ private fun TrainingGoalPage(
             description = stringResource(R.string.onboarding_goal_general_fitness_desc),
             isSelected = selectedGoal == UserPreferences.TrainingGoal.GENERAL_FITNESS,
             onClick = { onGoalSelected(UserPreferences.TrainingGoal.GENERAL_FITNESS) },
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = stringResource(R.string.onboarding_training_phase_settings_hint),
+            style = MaterialTheme.typography.bodySmall,
+            color = OnSurfaceVariant,
+            textAlign = TextAlign.Center,
         )
     }
 }
@@ -525,6 +612,14 @@ private fun TrainingFrequencyPage(
             color = OnSurfaceVariant,
             textAlign = TextAlign.Center,
         )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = stringResource(R.string.onboarding_frequency_explanation),
+            style = MaterialTheme.typography.bodyMedium,
+            color = AccentGreenStart,
+            textAlign = TextAlign.Center,
+            fontWeight = FontWeight.Medium,
+        )
         Spacer(modifier = Modifier.height(48.dp))
 
         Row(
@@ -586,6 +681,7 @@ private fun GoalCard(
     onClick: () -> Unit,
 ) {
     val haptic = LocalHapticFeedback.current
+    val goalDescription = stringResource(R.string.onboarding_goal_cd, title)
     GlassmorphicCard(
         modifier = Modifier
             .fillMaxWidth()
@@ -602,6 +698,9 @@ private fun GoalCard(
                 }
             )
             .clip(RoundedCornerShape(16.dp))
+            .semantics(mergeDescendants = true) {
+                contentDescription = goalDescription
+            }
             .clickable {
                 haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                 onClick()
@@ -633,6 +732,7 @@ private fun FrequencyCard(
     modifier: Modifier = Modifier,
 ) {
     val haptic = LocalHapticFeedback.current
+    val frequencyDescription = stringResource(R.string.onboarding_frequency_cd, days)
     GlassmorphicCard(
         modifier = modifier
             .height(100.dp)
@@ -649,6 +749,9 @@ private fun FrequencyCard(
                 }
             )
             .clip(RoundedCornerShape(16.dp))
+            .semantics(mergeDescendants = true) {
+                contentDescription = frequencyDescription
+            }
             .clickable {
                 haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                 onClick()

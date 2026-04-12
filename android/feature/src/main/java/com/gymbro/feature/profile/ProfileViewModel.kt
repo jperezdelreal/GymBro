@@ -1,12 +1,15 @@
 package com.gymbro.feature.profile
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.gymbro.core.R
 import com.gymbro.core.auth.AuthService
 import com.gymbro.core.auth.AuthState
 import com.gymbro.core.sync.service.OfflineSyncManager
 import com.gymbro.core.sync.service.SyncStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,6 +21,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val authService: AuthService,
     private val syncManager: OfflineSyncManager,
 ) : ViewModel() {
@@ -86,11 +90,11 @@ class ProfileViewModel @Inject constructor(
             _state.update { it.copy(isLoading = true) }
             authService.signInAnonymously()
                 .onSuccess {
-                    _effects.send(ProfileEffect.ShowMessage("Signed in successfully"))
+                    _effects.send(ProfileEffect.ShowMessage(context.getString(R.string.profile_signed_in_success)))
                 }
                 .onFailure { error ->
                     _state.update { it.copy(isLoading = false, error = error.message) }
-                    _effects.send(ProfileEffect.ShowError(error.message ?: "Sign-in failed"))
+                    _effects.send(ProfileEffect.ShowError(error.message ?: context.getString(R.string.profile_sign_in_failed)))
                 }
         }
     }
@@ -99,10 +103,10 @@ class ProfileViewModel @Inject constructor(
         viewModelScope.launch {
             authService.signOut()
                 .onSuccess {
-                    _effects.send(ProfileEffect.ShowMessage("Signed out"))
+                    _effects.send(ProfileEffect.ShowMessage(context.getString(R.string.profile_signed_out_success)))
                 }
                 .onFailure { error ->
-                    _effects.send(ProfileEffect.ShowError(error.message ?: "Sign-out failed"))
+                    _effects.send(ProfileEffect.ShowError(error.message ?: context.getString(R.string.profile_sign_out_failed)))
                 }
         }
     }

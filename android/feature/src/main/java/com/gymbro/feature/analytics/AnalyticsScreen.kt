@@ -264,9 +264,11 @@ private fun SummaryCard(
     modifier: Modifier = Modifier,
     icon: androidx.compose.ui.graphics.vector.ImageVector,
 ) {
+    val changeText = change?.let { ", change: ${formatChange(it)}" } ?: ""
+    val summaryCd = stringResource(R.string.analytics_summary_cd, title, value, changeText)
     Card(
         modifier = modifier.semantics(mergeDescendants = true) {
-            contentDescription = "$title: $value${change?.let { ", change: ${formatChange(it)}" } ?: ""}"
+            contentDescription = summaryCd
         },
         colors = CardDefaults.cardColors(containerColor = SurfaceColor),
         shape = RoundedCornerShape(12.dp),

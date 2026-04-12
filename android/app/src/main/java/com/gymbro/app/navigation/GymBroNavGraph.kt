@@ -38,6 +38,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -60,6 +61,7 @@ import com.gymbro.core.model.ExerciseCategory
 import com.gymbro.core.model.MuscleGroup
 import com.gymbro.core.preferences.UserPreferences
 import com.gymbro.feature.exerciselibrary.CreateExerciseRoute
+import com.gymbro.feature.exerciselibrary.ExerciseDetailRoute
 import com.gymbro.feature.exerciselibrary.ExerciseLibraryRoute
 import com.gymbro.feature.home.HomeRoute
 import com.gymbro.feature.history.HistoryDetailRoute
@@ -81,6 +83,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gymbro.core.R
+import com.gymbro.core.service.WorkoutResultStore
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 
 private val AccentGreen = Color(0xFF00FF87)
 
@@ -99,6 +106,7 @@ private enum class BottomNavTab(
 @Composable
 fun GymBroNavGraph(
     userPreferences: UserPreferences = hiltViewModel<GymBroNavGraphViewModel>().userPreferences,
+    workoutResultStore: WorkoutResultStore = hiltViewModel<GymBroNavGraphViewModel>().workoutResultStore,
     onFullyDrawn: () -> Unit = {},
 ) {
     val navController = rememberNavController()
@@ -120,6 +128,9 @@ fun GymBroNavGraph(
 
     val startDestination = if (resolvedOnboarding) "home" else "onboarding"
 
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
+
     // Report fully drawn once we know which screen to show
     LaunchedEffect(Unit) {
         onFullyDrawn()
@@ -129,6 +140,7 @@ fun GymBroNavGraph(
         modifier = Modifier.semantics {
             testTagsAsResourceId = true
         },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
             if (showBottomBar) {
                 GymBroBottomNavBar(
@@ -190,10 +202,18 @@ fun GymBroNavGraph(
             },
         ) {
         composable("onboarding") {
+            val context = androidx.compose.ui.platform.LocalContext.current
             OnboardingRoute(
-                onNavigateToMain = {
+                onNavigateToMain = { planGenerated, daysPerWeek ->
                     navController.navigate("home") {
                         popUpTo("onboarding") { inclusive = true }
+                    }
+                    if (planGenerated) {
+                        coroutineScope.launch {
+                            snackbarHostState.showSnackbar(
+                                message = context.getString(R.string.plan_ready_message, daysPerWeek),
+                            )
+                        }
                     }
                 },
             )
@@ -227,8 +247,15 @@ fun GymBroNavGraph(
                 },
             )
         }
-        composable("exercise_detail/{exerciseId}") {
-            PlaceholderScreen(title = "Exercise Detail")
+        composable(
+            route = "exercise_detail/{exerciseId}",
+            arguments = listOf(
+                navArgument("exerciseId") { type = NavType.StringType },
+            ),
+        ) {
+            ExerciseDetailRoute(
+                onNavigateBack = { navController.popBackStack() },
+            )
         }
         composable("create_exercise") {
             CreateExerciseRoute(
@@ -265,9 +292,7 @@ fun GymBroNavGraph(
                     navController.navigate("exercise_picker")
                 },
                 onNavigateToSummary = { duration, volume, sets, exercises, prs ->
-                    navController.currentBackStackEntry
-                        ?.savedStateHandle
-                        ?.set("summary_prs", prs)
+                    workoutResultStore.setPersonalRecords(prs)
                     navController.navigate(
                         "workout_summary/$duration/$volume/$sets/$exercises"
                     ) {
@@ -335,7 +360,9 @@ fun GymBroNavGraph(
             val volume = backStackEntry.arguments?.getFloat("volume")?.toDouble() ?: 0.0
             val sets = backStackEntry.arguments?.getInt("sets") ?: 0
             val exercises = backStackEntry.arguments?.getInt("exercises") ?: 0
-            val prs = navController.previousBackStackEntry?.savedStateHandle?.get<List<PersonalRecord>>("summary_prs") ?: emptyList()
+            val prs = remember { workoutResultStore.consumePersonalRecords() }
+            val weightUnit by userPreferences.weightUnit.collectAsStateWithLifecycle(initialValue = UserPreferences.WeightUnit.KG)
+            val weightUnitLabel = if (weightUnit == UserPreferences.WeightUnit.LBS) "lb" else "kg"
 
             WorkoutSummaryScreen(
                 durationSeconds = duration,
@@ -343,6 +370,7 @@ fun GymBroNavGraph(
                 totalSets = sets,
                 exerciseCount = exercises,
                 personalRecords = prs,
+                weightUnitLabel = weightUnitLabel,
                 onDone = {
                     navController.navigate("home") {
                         popUpTo("home") { inclusive = true }
@@ -397,9 +425,7 @@ fun GymBroNavGraph(
         }
         composable("programs") {
             ProgramsRoute(
-                onNavigateToCreateTemplate = { templateId ->
-                    // TODO: Navigate to create/edit template screen
-                },
+                onNavigateToCreateTemplate = { /* Template editing not yet implemented */ },
                 onNavigateToActiveWorkout = { template ->
                     navController.navigate("active_workout")
                 },
@@ -444,6 +470,12 @@ fun GymBroNavGraph(
                 onNavigateToCoach = {
                     navController.navigate("coach")
                 },
+                onNavigateToExerciseLibrary = {
+                    navController.navigate("exercise_library")
+                },
+                onNavigateToRecovery = {
+                    navController.navigate("recovery")
+                },
             )
         }
         composable("settings") {
@@ -451,23 +483,14 @@ fun GymBroNavGraph(
                 onNavigateBack = {
                     navController.popBackStack()
                 },
+                onNavigateToOnboarding = {
+                    navController.navigate("onboarding") {
+                        popUpTo("home") { inclusive = true }
+                    }
+                },
             )
         }
         }
-    }
-}
-
-@Composable
-private fun PlaceholderScreen(title: String) {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center,
-    ) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.headlineLarge,
-            color = MaterialTheme.colorScheme.onBackground,
-        )
     }
 }
 

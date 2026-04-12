@@ -44,6 +44,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gymbro.core.model.Exercise
 import com.gymbro.core.R
+import com.gymbro.core.ui.localizedName
 
 private val AccentGreen = Color(0xFF00FF87)
 private val CardBackground = Color(0xFF1E1E1E)
@@ -293,7 +294,7 @@ private fun ExerciseCard(exercise: SuggestedExerciseUi) {
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = exercise.exercise.muscleGroup.displayName,
+                        text = exercise.exercise.muscleGroup.localizedName(),
                         style = MaterialTheme.typography.bodySmall,
                         color = AccentGreen,
                     )

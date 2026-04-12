@@ -5,6 +5,7 @@ import androidx.health.connect.client.HealthConnectClient
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gymbro.core.notification.ReminderScheduler
+import com.gymbro.core.R
 import com.gymbro.core.preferences.UserPreferences
 import com.gymbro.core.preferences.UserPreferences.TrainingPhase
 import com.gymbro.core.preferences.UserPreferences.WeightUnit
@@ -98,6 +99,7 @@ class SettingsViewModel @Inject constructor(
             is SettingsEvent.SetAutoStartRestTimer -> setAutoStartRestTimer(event.enabled)
             is SettingsEvent.SetNotifications -> setNotifications(event.enabled)
             is SettingsEvent.ClearAllData -> clearAllData()
+            is SettingsEvent.RedoSetup -> redoSetup()
             is SettingsEvent.OpenHealthConnect -> openHealthConnect()
             is SettingsEvent.SendFeedback -> sendFeedback()
             is SettingsEvent.ViewLicenses -> viewLicenses()
@@ -143,7 +145,14 @@ class SettingsViewModel @Inject constructor(
     private fun clearAllData() {
         viewModelScope.launch {
             userPreferences.clearAllData()
-            _effects.send(SettingsEffect.ShowMessage("All data cleared"))
+            _effects.send(SettingsEffect.ShowMessage(context.getString(R.string.settings_data_cleared)))
+        }
+    }
+
+    private fun redoSetup() {
+        viewModelScope.launch {
+            userPreferences.setOnboardingComplete(false)
+            _effects.send(SettingsEffect.NavigateToOnboarding)
         }
     }
 
@@ -161,7 +170,7 @@ class SettingsViewModel @Inject constructor(
 
     private fun viewLicenses() {
         viewModelScope.launch {
-            _effects.send(SettingsEffect.ShowMessage("Licenses will be displayed"))
+            _effects.send(SettingsEffect.ShowMessage(context.getString(R.string.settings_licenses_shown)))
         }
     }
 

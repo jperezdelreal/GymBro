@@ -82,4 +82,21 @@ class SettingsViewModelTest {
             coVerify { userPreferences.clearAllData() }
         }
     }
+
+    @Test
+    fun `weight unit LBS from preferences propagates to state`() = runTest {
+        // Create a ViewModel whose upstream emits LBS
+        val lbsPreferences = mockk<UserPreferences>(relaxed = true)
+        every { lbsPreferences.weightUnit } returns flowOf(WeightUnit.LBS)
+        every { lbsPreferences.defaultRestTimer } returns flowOf(90)
+        every { lbsPreferences.autoStartRestTimer } returns flowOf(true)
+        every { lbsPreferences.notificationsEnabled } returns flowOf(false)
+
+        val lbsViewModel = SettingsViewModel(context, lbsPreferences, reminderScheduler)
+
+        lbsViewModel.state.test {
+            val state = expectMostRecentItem()
+            assertEquals(WeightUnit.LBS, state.weightUnit)
+        }
+    }
 }

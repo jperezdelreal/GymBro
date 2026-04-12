@@ -575,4 +575,154 @@
     <string name="rest_timer_cd_subtract_time">Restar 15 segundos</string>
     <string name="rest_timer_cd_add_time">Añadir 15 segundos</string>
     <string name="settings_cd_training_phase">Selector de fase de entrenamiento</string>
+
+    <!-- Exercise Detail -->
+    <string name="exercise_detail_title">Detalle del Ejercicio</string>
+    <string name="exercise_detail_loading">Cargando ejercicio…</string>
+    <string name="exercise_detail_error_title">No Se Pudo Cargar el Ejercicio</string>
+    <string name="exercise_detail_muscle_group">Grupo Muscular</string>
+    <string name="exercise_detail_category">Categoría</string>
+    <string name="exercise_detail_equipment">Equipo</string>
+    <string name="exercise_detail_description">Descripción</string>
+    <string name="exercise_detail_watch_video">Ver Video</string>
+    <string name="exercise_picker_tap_to_add">Toca para añadir</string>
+
+    <!-- Localized Enum Display Names: Muscle Groups -->
+    <string name="muscle_group_chest">Pecho</string>
+    <string name="muscle_group_back">Espalda</string>
+    <string name="muscle_group_shoulders">Hombros</string>
+    <string name="muscle_group_biceps">Bíceps</string>
+    <string name="muscle_group_triceps">Tríceps</string>
+    <string name="muscle_group_quadriceps">Cuádriceps</string>
+    <string name="muscle_group_hamstrings">Isquiotibiales</string>
+    <string name="muscle_group_glutes">Glúteos</string>
+    <string name="muscle_group_calves">Pantorrillas</string>
+    <string name="muscle_group_core">Core</string>
+    <string name="muscle_group_forearms">Antebrazos</string>
+    <string name="muscle_group_full_body">Cuerpo Completo</string>
+
+    <!-- Localized Enum Display Names: Exercise Categories -->
+    <string name="exercise_category_compound">Compuesto</string>
+    <string name="exercise_category_isolation">Aislamiento</string>
+    <string name="exercise_category_accessory">Accesorio</string>
+    <string name="exercise_category_cardio">Cardio</string>
+
+    <!-- Localized Enum Display Names: Equipment -->
+    <string name="equipment_barbell">Barra</string>
+    <string name="equipment_dumbbell">Mancuerna</string>
+    <string name="equipment_cable">Cable</string>
+    <string name="equipment_machine">Máquina</string>
+    <string name="equipment_bodyweight">Peso Corporal</string>
+    <string name="equipment_kettlebell">Kettlebell</string>
+    <string name="equipment_band">Banda</string>
+    <string name="equipment_other">Otro</string>
+
+    <!-- Localized Enum Display Names: Record Types -->
+    <string name="record_type_max_weight">Peso Máximo</string>
+    <string name="record_type_max_reps">Reps Máximos</string>
+    <string name="record_type_max_volume">Volumen Máximo</string>
+    <string name="record_type_max_e1rm">Est. 1RM</string>
+
+    <!-- Weight Unit -->
+    <string name="weight_unit_kg">kg</string>
+    <string name="weight_unit_lb">lb</string>
+    <string name="active_workout_header_weight">PESO</string>
+
+    <!-- Discard Workout Dialog -->
+    <string name="discard_workout_title">¿Descartar entrenamiento?</string>
+    <string name="discard_workout_message">Se perderá todo el progreso.</string>
+    <string name="discard_workout_confirm">Descartar</string>
+    <string name="discard_workout_cancel">Seguir entrenando</string>
+
+    <!-- Content Descriptions -->
+    <string name="cd_watch_exercise_video">Ver video del ejercicio en YouTube</string>
+    <string name="cd_start_this_workout">Iniciar este entrenamiento</string>
+
+    <!-- Empty Workout Guidance -->
+    <string name="active_workout_empty_hint">Pulsa + para añadir tu primer ejercicio</string>
+
+    <!-- Profile: Exercise Library Link -->
+    <string name="profile_exercise_library">Biblioteca de Ejercicios</string>
+    <string name="profile_exercise_library_subtitle">Explorar y gestionar ejercicios</string>
+
+    <!-- Issue #447: Remaining hardcoded strings -->
+    <string name="progress_exercises_count">%d ejercicios</string>
+    <string name="history_unknown_error">Error desconocido</string>
+    <string name="exercise_detail_load_error">Error al cargar el ejercicio</string>
+    <string name="exercise_detail_not_found">Ejercicio no encontrado</string>
+    <string name="create_exercise_name_taken">Ya existe un ejercicio con este nombre</string>
+    <string name="recovery_readiness_cd">Puntuación de preparación: %1$d de 100, %2$s</string>
+    <string name="recovery_label_wrecked">Destrozado</string>
+    <string name="recovery_label_tired">Cansado</string>
+    <string name="recovery_label_ok">OK</string>
+    <string name="recovery_label_good">Bien</string>
+    <string name="recovery_label_crushed">Lo aplasté</string>
+    <string name="progress_prs_cd">%d récords</string>
+    <string name="recovery_metric_cd">%1$s: %2$s</string>
+    <string name="analytics_summary_cd">%1$s: %2$s%3$s</string>
+
+    <!-- Issue #450: Replace active plan -->
+    <string name="programs_change_plan">Generar Nuevo Plan</string>
+    <string name="programs_change_plan_subtitle">Reemplaza tu plan actual con uno nuevo</string>
+    <string name="programs_replace_plan_title">¿Reemplazar Plan Actual?</string>
+    <string name="programs_replace_plan_message">Esto reemplazará tu plan actual. ¿Continuar?</string>
+    <string name="programs_replace_plan_confirm">Reemplazar</string>
+
+    <!-- Issue #451: Profile coming soon -->
+    <string name="profile_coming_soon">Próximamente</string>
+
+    <!-- Issue #454: Workout summary motivational -->
+    <string name="workout_summary_motivation">¡Gran esfuerzo! 💪</string>
+    <string name="workout_summary_next_hint">Siguiente: %s</string>
+
+    <!-- Issue #455: Onboarding nav buttons -->
+    <string name="onboarding_back">Atrás</string>
+    <string name="onboarding_next">Siguiente</string>
+    <string name="onboarding_continue">Continuar</string>
+
+    <!-- Issue #463: Home screen badge -->
+    <string name="home_today_badge">HOY 🎯</string>
+    <string name="home_quick_start_subtitle">Inicia un entrenamiento libre — elige ejercicios sobre la marcha</string>
+
+    <!-- Issue #452: Settings effects -->
+    <string name="settings_open_health_connect_error">No se pudo abrir Health Connect</string>
+
+    <!-- Issue #456: Recovery navigation -->
+    <string name="profile_recovery">Recuperación</string>
+    <string name="profile_recovery_subtitle">Seguimiento de sueño, preparación y recuperación</string>
+
+    <!-- Issue #458: Content descriptions -->
+    <string name="history_workout_cd">Entrenamiento del %1$s, %2$d ejercicios, %3$s</string>
+    <string name="onboarding_goal_cd">Objetivo de entrenamiento: %s</string>
+    <string name="onboarding_frequency_cd">%d días por semana</string>
+    <string name="onboarding_unit_cd">Unidad de peso: %s</string>
+    <string name="progress_volume_chart_cd">Gráfico de volumen semanal mostrando las últimas %d semanas de volumen de entrenamiento</string>
+
+    <!-- Issue #460: Onboarding frequency explanation -->
+    <string name="onboarding_frequency_explanation">Crearemos un plan de entrenamiento basado en esta frecuencia</string>
+    <string name="onboarding_training_phase_settings_hint">Puedes cambiar tu fase de entrenamiento en cualquier momento en Ajustes</string>
+
+    <!-- Issue #461: Redo setup -->
+    <string name="settings_redo_setup">Rehacer configuración</string>
+    <string name="settings_redo_setup_subtitle">Volver a pasar por la configuración inicial</string>
+    <string name="settings_redo_setup_confirm_title">¿Rehacer configuración?</string>
+    <string name="settings_redo_setup_confirm_message">Esto te llevará de nuevo por la configuración inicial. Tus datos de entrenamiento se conservarán.</string>
+    <string name="settings_redo_setup_confirm">Rehacer</string>
+
+    <!-- Issue #462: Progress polish -->
+    <string name="progress_plateau_explanation">Un estancamiento significa que tu rendimiento en este ejercicio no ha mejorado recientemente. Intenta variar repeticiones, peso o técnica.</string>
+    <string name="progress_view_all_prs">Ver todos los récords</string>
+
+    <!-- Final polish: plan confirmation, hardcoded string sweep, a11y -->
+    <string name="plan_ready_message">¡Tu plan de %d días está listo! 🎉</string>
+    <string name="onboarding_first_program_name">Tu Primer Programa</string>
+    <string name="onboarding_plan_generation_error">No se pudo generar tu plan de entrenamiento. Puedes crear uno manualmente desde la pantalla de Inicio.</string>
+    <string name="settings_data_cleared">Todos los datos borrados</string>
+    <string name="settings_licenses_shown">Las licencias se mostrarán</string>
+    <string name="profile_signed_in_success">Sesión iniciada correctamente</string>
+    <string name="profile_signed_out_success">Sesión cerrada</string>
+    <string name="profile_sign_in_failed">Error al iniciar sesión</string>
+    <string name="profile_sign_out_failed">Error al cerrar sesión</string>
+    <string name="home_cd_view_all_programs">Ver todos los programas</string>
+    <string name="home_cd_recent_workout">Entrenamiento del %1$s, %2$d ejercicios</string>
 </resources>

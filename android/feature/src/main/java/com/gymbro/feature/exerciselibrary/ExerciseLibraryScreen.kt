@@ -68,6 +68,7 @@ import com.gymbro.core.ui.theme.GlassBorder
 import com.gymbro.core.model.Exercise
 import com.gymbro.core.model.ExerciseCategory
 import com.gymbro.core.model.MuscleGroup
+import com.gymbro.core.ui.localizedName
 import com.gymbro.feature.common.FullScreenLoading
 import com.gymbro.feature.common.GlassmorphicCard
 import com.gymbro.feature.common.ObserveErrors
@@ -199,10 +200,6 @@ fun ExerciseLibraryScreen(
             }
 
             // Muscle group filter chips with gradient when selected
-            val filterGroups = listOf(
-                MuscleGroup.CHEST, MuscleGroup.BACK, MuscleGroup.QUADRICEPS,
-                MuscleGroup.SHOULDERS, MuscleGroup.BICEPS, MuscleGroup.CORE,
-            )
             FlowRow(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -210,7 +207,7 @@ fun ExerciseLibraryScreen(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
-                filterGroups.forEach { group ->
+                MuscleGroup.entries.forEach { group ->
                     val isSelected = state.selectedMuscleGroup == group
                     GradientFilterChip(
                         selected = isSelected,
@@ -221,7 +218,7 @@ fun ExerciseLibraryScreen(
                                 ),
                             )
                         },
-                        label = group.displayName,
+                        label = group.localizedName(),
                         icon = group.icon(),
                     )
                 }
@@ -255,6 +252,7 @@ fun ExerciseLibraryScreen(
                             ExerciseCard(
                                 exercise = exercise,
                                 onClick = { onEvent(ExerciseLibraryEvent.ExerciseClicked(exercise)) },
+                                isPickerMode = isPickerMode,
                             )
                         }
                     }
@@ -329,6 +327,7 @@ private fun GradientFilterChip(
 private fun ExerciseCard(
     exercise: Exercise,
     onClick: () -> Unit,
+    isPickerMode: Boolean = false,
 ) {
     val haptic = LocalHapticFeedback.current
     var isPressed by remember { mutableStateOf(false) }
@@ -383,19 +382,38 @@ private fun ExerciseCard(
                         fontSize = 12.sp,
                     )
                     Text(
-                        text = exercise.muscleGroup.displayName,
+                        text = exercise.muscleGroup.localizedName(),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
             }
 
-            Icon(
-                Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                contentDescription = stringResource(R.string.exercise_library_view_details),
-                tint = accentColor,
-                modifier = Modifier.size(24.dp),
-            )
+            if (isPickerMode) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Icon(
+                        Icons.Default.Add,
+                        contentDescription = stringResource(R.string.exercise_picker_tap_to_add),
+                        tint = accentColor,
+                        modifier = Modifier.size(24.dp),
+                    )
+                    Text(
+                        text = stringResource(R.string.exercise_picker_tap_to_add),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = accentColor,
+                        fontSize = 10.sp,
+                    )
+                }
+            } else {
+                Icon(
+                    Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    contentDescription = stringResource(R.string.exercise_library_view_details),
+                    tint = accentColor,
+                    modifier = Modifier.size(24.dp),
+                )
+            }
         }
     }
 
@@ -426,7 +444,7 @@ private fun CategoryBadge(category: ExerciseCategory) {
             .padding(horizontal = 10.dp, vertical = 4.dp),
     ) {
         Text(
-            text = category.displayName.uppercase(),
+            text = category.localizedName().uppercase(),
             fontSize = 11.sp,
             fontWeight = FontWeight.Bold,
             color = Color.White,

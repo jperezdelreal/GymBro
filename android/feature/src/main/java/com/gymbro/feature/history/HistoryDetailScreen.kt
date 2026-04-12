@@ -54,12 +54,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.gymbro.core.R
+import com.gymbro.core.ui.localizedName
 import com.gymbro.feature.common.EmptyState
 import com.gymbro.feature.common.FullScreenLoading
 import com.gymbro.feature.common.GlassmorphicCard
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 import kotlinx.coroutines.delay
 
 private val AccentGreenStart = Color(0xFF00FF87)
@@ -268,7 +270,7 @@ private fun HistoryDetailContent(detail: WorkoutDetail) {
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             detail.volumeByMuscleGroup.entries.sortedByDescending { it.value }.forEach { (muscle, volume) ->
-                                MuscleVolumeRow(muscle = muscle.displayName, volume = volume)
+                                MuscleVolumeRow(muscle = muscle.localizedName(), volume = volume)
                             }
                         }
                     }
@@ -306,7 +308,7 @@ private fun AnimatedItem(
 private fun WorkoutHeader(detail: WorkoutDetail, index: Int) {
     val date = Instant.ofEpochMilli(detail.date)
         .atZone(ZoneId.systemDefault())
-        .format(DateTimeFormatter.ofPattern("EEEE, d 'de' MMMM"))
+        .format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG))
 
     var visible by remember { mutableStateOf(false) }
     
@@ -438,7 +440,7 @@ private fun ExerciseCard(exercise: ExerciseDetail, index: Int) {
                             color = Color.White,
                         )
                         Text(
-                            text = exercise.muscleGroup.displayName,
+                            text = exercise.muscleGroup.localizedName(),
                             style = MaterialTheme.typography.bodyMedium,
                             color = Color.White.copy(alpha = 0.6f),
                         )

@@ -66,11 +66,19 @@ fun PlanDayDetailRoute(
         viewModel.onIntent(PlanDayDetailIntent.LoadDay(dayNumber))
     }
 
+    LaunchedEffect(Unit) {
+        viewModel.effect.collect { effect ->
+            when (effect) {
+                is PlanDayDetailEffect.NavigateToActiveWorkout -> onNavigateToActiveWorkout()
+            }
+        }
+    }
+
     PlanDayDetailScreen(
         state = state.value,
         dayNumber = dayNumber,
         onNavigateBack = onNavigateBack,
-        onStartWorkout = onNavigateToActiveWorkout,
+        onStartWorkout = { viewModel.onIntent(PlanDayDetailIntent.StartWorkout) },
         onRetry = { viewModel.onIntent(PlanDayDetailIntent.Retry) },
     )
 }
@@ -211,6 +219,7 @@ private fun PlanDayContent(
         item {
             Spacer(modifier = Modifier.height(8.dp))
 
+            val startWorkoutDesc = stringResource(R.string.cd_start_this_workout)
             Card(
                 onClick = {
                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
@@ -219,7 +228,7 @@ private fun PlanDayContent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .semantics {
-                        contentDescription = "Start this workout"
+                        contentDescription = startWorkoutDesc
                     },
                 colors = CardDefaults.cardColors(
                     containerColor = AccentGreen,

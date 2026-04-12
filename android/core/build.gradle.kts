@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     alias(libs.plugins.room)
+    alias(libs.plugins.kotlin.compose)
     id("kotlin-parcelize")
 }
 
@@ -41,8 +42,9 @@ dependencies {
     // AndroidX Core
     implementation(libs.androidx.core.ktx)
 
-    // Compose UI (minimal - for Color and Brush definitions in theme)
+    // Compose UI (for theme + localized display name extensions)
     implementation(platform(libs.compose.bom))
+    implementation(libs.compose.ui)
     implementation(libs.compose.ui.graphics)
 
     // Hilt
