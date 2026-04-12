@@ -729,6 +729,22 @@
     <string name="programs_replace_plan_message">Esto reemplazará tu plan actual. ¿Continuar?</string>
     <string name="programs_replace_plan_confirm">Reemplazar</string>
 
+    <!-- Issue #499: Template Library -->
+    <string name="programs_browse_templates">Explorar Plantillas</string>
+    <string name="programs_browse_templates_subtitle">Elige entre programas de entrenamiento probados</string>
+    <string name="template_library_title">Plantillas de Entrenamiento</string>
+    <string name="template_filter_all">Todos</string>
+    <string name="template_filter_beginner">Principiante</string>
+    <string name="template_filter_intermediate">Intermedio</string>
+    <string name="template_filter_advanced">Avanzado</string>
+    <string name="template_detail_start_program">Iniciar Este Programa</string>
+    <string name="template_detail_starting">Iniciando programa...</string>
+    <string name="template_detail_exercises">Ejercicios</string>
+    <string name="template_detail_days">Días</string>
+    <string name="template_target_audience">Audiencia Objetivo</string>
+    <string name="template_split_type">Tipo de División</string>
+    <string name="template_program_started">¡Programa iniciado! 🎉</string>
+
     <!-- Issue #451: Profile coming soon -->
     <string name="profile_coming_soon">Próximamente</string>
 

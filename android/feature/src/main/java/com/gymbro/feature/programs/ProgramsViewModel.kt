@@ -72,6 +72,11 @@ class ProgramsViewModel @Inject constructor(
                     _effect.send(ProgramsEffect.NavigateToPlanDayDetail(event.dayNumber))
                 }
             }
+            is ProgramsEvent.BrowseTemplatesClicked -> {
+                viewModelScope.launch {
+                    _effect.send(ProgramsEffect.NavigateToTemplateLibrary)
+                }
+            }
         }
     }
 
