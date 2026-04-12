@@ -159,12 +159,16 @@
 
     <!-- Settings -->
     <string name="settings_title">Configuración</string>
+    <string name="settings_appearance">Apariencia</string>
     <string name="settings_section_account">Cuenta</string>
     <string name="settings_section_workout">Preferencias de Entrenamiento</string>
     <string name="settings_section_notifications">Notificaciones</string>
     <string name="settings_section_appearance">Apariencia</string>
     <string name="settings_section_health_connect">Health Connect</string>
     <string name="settings_section_about">Acerca de</string>
+    <string name="theme_dark">Oscuro</string>
+    <string name="theme_light">Claro</string>
+    <string name="theme_system">Sistema</string>
     <string name="settings_sign_in_status">Estado de Sesión</string>
     <string name="settings_sign_in_subtitle">Administra tu cuenta</string>
     <string name="settings_clear_data">Borrar Todos los Datos</string>
@@ -574,6 +578,10 @@
     <string name="home_no_plan_title">Sin Programa Activo</string>
     <string name="home_no_plan_message">Crea un programa de entrenamiento primero para que tu sesión tenga estructura y progresión.</string>
     <string name="home_no_plan_go_to_programs">Ir a Programas</string>
+    <string name="streak_badge">¡Racha de %d días!</string>
+    <string name="pr_banner_title">¡Nuevo PR! 🎉</string>
+    <string name="pr_banner">%1$s • %2$s</string>
+    <string name="dismiss">Cerrar</string>
 
     <!-- Accessibility — Content Descriptions -->
     <string name="home_cd_start_workout">Iniciar entrenamiento</string>
