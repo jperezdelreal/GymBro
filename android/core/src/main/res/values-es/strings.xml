@@ -566,6 +566,10 @@
     <string name="home_no_plan_title">Sin Programa Activo</string>
     <string name="home_no_plan_message">Crea un programa de entrenamiento primero para que tu sesión tenga estructura y progresión.</string>
     <string name="home_no_plan_go_to_programs">Ir a Programas</string>
+    <string name="streak_badge">¡Racha de %d días!</string>
+    <string name="pr_banner_title">¡Nuevo PR! 🎉</string>
+    <string name="pr_banner">%1$s • %2$s</string>
+    <string name="dismiss">Cerrar</string>
 
     <!-- Accessibility — Content Descriptions -->
     <string name="home_cd_start_workout">Iniciar entrenamiento</string>

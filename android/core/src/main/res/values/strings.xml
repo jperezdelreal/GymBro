@@ -566,6 +566,10 @@
     <string name="home_no_plan_title">No Active Program</string>
     <string name="home_no_plan_message">Create a training program first so your workout has structure and progression.</string>
     <string name="home_no_plan_go_to_programs">Go to Programs</string>
+    <string name="streak_badge">%d day streak!</string>
+    <string name="pr_banner_title">New PR! 🎉</string>
+    <string name="pr_banner">%1$s • %2$s</string>
+    <string name="dismiss">Dismiss</string>
 
     <!-- Accessibility — Content Descriptions -->
     <string name="home_cd_start_workout">Start workout</string>
