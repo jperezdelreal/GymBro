@@ -73,6 +73,8 @@ private val AccentCyan = Color(0xFF00E5FF)
 @Composable
 fun HomeRoute(
     viewModel: HomeViewModel = hiltViewModel(),
+    planGenerated: Boolean = false,
+    planDaysPerWeek: Int = 0,
     onNavigateToActiveWorkout: () -> Unit = {},
     onNavigateToPrograms: () -> Unit = {},
     onNavigateToWorkoutDetail: (String) -> Unit = {},
@@ -92,6 +94,15 @@ fun HomeRoute(
         errorFlow = viewModel.errorEvents,
         snackbarHostState = snackbarHostState,
     )
+
+    // Show post-onboarding snackbar when plan is generated
+    LaunchedEffect(planGenerated) {
+        if (planGenerated && planDaysPerWeek > 0) {
+            snackbarHostState.showSnackbar(
+                message = context.getString(R.string.plan_ready_message, planDaysPerWeek),
+            )
+        }
+    }
 
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
