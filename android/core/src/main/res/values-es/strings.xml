@@ -122,6 +122,10 @@
     <string name="recovery_manual_energy_level">Nivel de Energía</string>
     <string name="recovery_manual_save">Guardar Datos de Recuperación</string>
 
+    <!-- Editable Plans -->
+    <string name="programs_reps_range">Reps</string>
+    <string name="programs_rest_sec">Descanso (s)</string>
+
     <!-- Recovery Status Labels -->
     <string name="recovery_status_optimal">Óptimo</string>
     <string name="recovery_status_good">Bueno</string>

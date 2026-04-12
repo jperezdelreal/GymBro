@@ -1,6 +1,7 @@
 package com.gymbro.feature.programs
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -14,24 +15,37 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -42,6 +56,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -59,6 +74,7 @@ fun PlanDayDetailRoute(
     viewModel: PlanDayDetailViewModel = hiltViewModel(),
     onNavigateBack: () -> Unit,
     onNavigateToActiveWorkout: () -> Unit,
+    onNavigateToExercisePicker: (dayNumber: Int) -> Unit,
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle()
 
@@ -70,6 +86,8 @@ fun PlanDayDetailRoute(
         viewModel.effect.collect { effect ->
             when (effect) {
                 is PlanDayDetailEffect.NavigateToActiveWorkout -> onNavigateToActiveWorkout()
+                is PlanDayDetailEffect.NavigateToExercisePicker -> onNavigateToExercisePicker(dayNumber)
+                is PlanDayDetailEffect.ShowSaveSuccess -> { /* Could show snackbar */ }
             }
         }
     }
@@ -80,6 +98,12 @@ fun PlanDayDetailRoute(
         onNavigateBack = onNavigateBack,
         onStartWorkout = { viewModel.onIntent(PlanDayDetailIntent.StartWorkout) },
         onRetry = { viewModel.onIntent(PlanDayDetailIntent.Retry) },
+        onToggleEditMode = { viewModel.onIntent(PlanDayDetailIntent.ToggleEditMode) },
+        onRemoveExercise = { viewModel.onIntent(PlanDayDetailIntent.RemoveExercise(it)) },
+        onUpdateExercise = { viewModel.onIntent(PlanDayDetailIntent.UpdateExercise(it)) },
+        onSaveChanges = { viewModel.onIntent(PlanDayDetailIntent.SaveChanges) },
+        onDiscardChanges = { viewModel.onIntent(PlanDayDetailIntent.DiscardChanges) },
+        onAddExercise = { viewModel.onIntent(PlanDayDetailIntent.AddExercise) },
     )
 }
 
@@ -91,6 +115,12 @@ private fun PlanDayDetailScreen(
     onNavigateBack: () -> Unit,
     onStartWorkout: () -> Unit,
     onRetry: () -> Unit,
+    onToggleEditMode: () -> Unit,
+    onRemoveExercise: (String) -> Unit,
+    onUpdateExercise: (PlannedExercise) -> Unit,
+    onSaveChanges: () -> Unit,
+    onDiscardChanges: () -> Unit,
+    onAddExercise: () -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -118,6 +148,30 @@ private fun PlanDayDetailScreen(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.common_navigate_back),
                         )
+                    }
+                },
+                actions = {
+                    if (state.workoutDay != null && !state.isEditMode) {
+                        IconButton(onClick = onToggleEditMode) {
+                            Icon(
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = stringResource(R.string.programs_edit_plan),
+                            )
+                        }
+                    } else if (state.isEditMode) {
+                        TextButton(onClick = onDiscardChanges) {
+                            Text(stringResource(R.string.action_cancel))
+                        }
+                        IconButton(
+                            onClick = onSaveChanges,
+                            enabled = state.hasUnsavedChanges,
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Save,
+                                contentDescription = stringResource(R.string.action_save),
+                                tint = if (state.hasUnsavedChanges) AccentGreen else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
+                            )
+                        }
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -148,7 +202,11 @@ private fun PlanDayDetailScreen(
             state.workoutDay != null -> {
                 PlanDayContent(
                     day = state.workoutDay,
+                    isEditMode = state.isEditMode,
                     onStartWorkout = onStartWorkout,
+                    onRemoveExercise = onRemoveExercise,
+                    onUpdateExercise = onUpdateExercise,
+                    onAddExercise = onAddExercise,
                     modifier = Modifier.padding(paddingValues),
                 )
             }
@@ -159,7 +217,11 @@ private fun PlanDayDetailScreen(
 @Composable
 private fun PlanDayContent(
     day: WorkoutDay,
+    isEditMode: Boolean,
     onStartWorkout: () -> Unit,
+    onRemoveExercise: (String) -> Unit,
+    onUpdateExercise: (PlannedExercise) -> Unit,
+    onAddExercise: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val exerciseCount = day.exercises.size
@@ -208,58 +270,89 @@ private fun PlanDayContent(
             items = day.exercises,
             key = { it.id },
         ) { exercise ->
-            ExerciseCard(
-                exercise = exercise,
-                modifier = Modifier.animateItem(),
-            )
+            if (isEditMode) {
+                EditableExerciseCard(
+                    exercise = exercise,
+                    onRemove = { onRemoveExercise(exercise.id) },
+                    onUpdate = onUpdateExercise,
+                    modifier = Modifier.animateItem(),
+                )
+            } else {
+                ExerciseCard(
+                    exercise = exercise,
+                    modifier = Modifier.animateItem(),
+                )
+            }
             Spacer(modifier = Modifier.height(12.dp))
         }
 
-        // Start workout button
-        item {
-            Spacer(modifier = Modifier.height(8.dp))
-
-            val startWorkoutDesc = stringResource(R.string.cd_start_this_workout)
-            Card(
-                onClick = {
-                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                    onStartWorkout()
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .semantics {
-                        contentDescription = startWorkoutDesc
-                    },
-                colors = CardDefaults.cardColors(
-                    containerColor = AccentGreen,
-                ),
-                shape = RoundedCornerShape(12.dp),
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically,
+        // Add exercise button (edit mode only)
+        if (isEditMode) {
+            item {
+                FilledTonalButton(
+                    onClick = onAddExercise,
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
                 ) {
                     Icon(
-                        imageVector = Icons.Default.PlayArrow,
+                        imageVector = Icons.Default.Add,
                         contentDescription = null,
-                        tint = Color.Black,
-                        modifier = Modifier.size(24.dp),
+                        modifier = Modifier.size(20.dp),
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = stringResource(R.string.programs_start_this_workout),
-                        style = MaterialTheme.typography.titleMedium.copy(
-                            fontWeight = FontWeight.Bold,
-                        ),
-                        color = Color.Black,
-                    )
+                    Text(stringResource(R.string.programs_add_exercise))
                 }
+                Spacer(modifier = Modifier.height(12.dp))
             }
+        }
 
-            Spacer(modifier = Modifier.height(16.dp))
+        // Start workout button (only when NOT editing)
+        if (!isEditMode) {
+            item {
+                Spacer(modifier = Modifier.height(8.dp))
+
+                val startWorkoutDesc = stringResource(R.string.cd_start_this_workout)
+                Card(
+                    onClick = {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        onStartWorkout()
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .semantics {
+                            contentDescription = startWorkoutDesc
+                        },
+                    colors = CardDefaults.cardColors(
+                        containerColor = AccentGreen,
+                    ),
+                    shape = RoundedCornerShape(12.dp),
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.PlayArrow,
+                            contentDescription = null,
+                            tint = Color.Black,
+                            modifier = Modifier.size(24.dp),
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = stringResource(R.string.programs_start_this_workout),
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.Bold,
+                            ),
+                            color = Color.Black,
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+            }
         }
     }
 }
@@ -400,5 +493,108 @@ private fun ExerciseDetailItem(
             ),
             color = AccentGreen,
         )
+    }
+}
+
+@Composable
+private fun EditableExerciseCard(
+    exercise: PlannedExercise,
+    onRemove: () -> Unit,
+    onUpdate: (PlannedExercise) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    var sets by remember(exercise.id) { mutableStateOf(exercise.sets.toString()) }
+    var repsRange by remember(exercise.id) { mutableStateOf(exercise.repsRange) }
+    var restSeconds by remember(exercise.id) { mutableStateOf(exercise.restSeconds.toString()) }
+
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+        ),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+        ) {
+            // Header with name and delete button
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Default.FitnessCenter,
+                        contentDescription = null,
+                        tint = AccentGreen,
+                        modifier = Modifier.size(20.dp),
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = exercise.exerciseName,
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.SemiBold,
+                        ),
+                        color = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.weight(1f, fill = false),
+                    )
+                }
+                IconButton(onClick = onRemove) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = stringResource(R.string.action_delete),
+                        tint = MaterialTheme.colorScheme.error,
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Editable fields
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                OutlinedTextField(
+                    value = sets,
+                    onValueChange = { newValue ->
+                        sets = newValue
+                        newValue.toIntOrNull()?.let { newSets ->
+                            onUpdate(exercise.copy(sets = newSets))
+                        }
+                    },
+                    label = { Text(stringResource(R.string.workout_sets)) },
+                    modifier = Modifier.weight(1f),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    singleLine = true,
+                )
+                OutlinedTextField(
+                    value = repsRange,
+                    onValueChange = { newValue ->
+                        repsRange = newValue
+                        onUpdate(exercise.copy(repsRange = newValue))
+                    },
+                    label = { Text(stringResource(R.string.programs_reps_range)) },
+                    modifier = Modifier.weight(1f),
+                    singleLine = true,
+                )
+                OutlinedTextField(
+                    value = restSeconds,
+                    onValueChange = { newValue ->
+                        restSeconds = newValue
+                        newValue.toIntOrNull()?.let { newRest ->
+                            onUpdate(exercise.copy(restSeconds = newRest))
+                        }
+                    },
+                    label = { Text(stringResource(R.string.programs_rest_sec)) },
+                    modifier = Modifier.weight(1f),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    singleLine = true,
+                )
+            }
+        }
     }
 }

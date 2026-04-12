@@ -231,6 +231,10 @@
     <string name="programs_exercises_count_desc" formatted="false">%d ejercicios en este entrenamiento</string>
     <string name="programs_total_sets_desc" formatted="false">%d series totales</string>
     <string name="programs_exercise_accessibility" formatted="false">%s: %d series de %s repeticiones, %d segundos de descanso</string>
+    <string name="programs_edit_plan">Editar plan</string>
+    <string name="programs_add_exercise">Añadir Ejercicio</string>
+    <string name="programs_reps_range">Reps</string>
+    <string name="programs_rest_sec">Descanso (s)</string>
     <string name="common_retry">Reintentar</string>
 
     <!-- Home Screen -->
