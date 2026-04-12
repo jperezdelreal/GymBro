@@ -43,8 +43,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
@@ -204,24 +202,39 @@ fun GymBroNavGraph(
             },
         ) {
         composable("onboarding") {
-            val context = androidx.compose.ui.platform.LocalContext.current
             OnboardingRoute(
                 onNavigateToMain = { planGenerated, daysPerWeek ->
+                    if (planGenerated) {
+                        navController.currentBackStackEntry
+                            ?.savedStateHandle
+                            ?.set("plan_generated", true)
+                        navController.currentBackStackEntry
+                            ?.savedStateHandle
+                            ?.set("plan_days_per_week", daysPerWeek)
+                    }
                     navController.navigate("home") {
                         popUpTo("onboarding") { inclusive = true }
-                    }
-                    if (planGenerated) {
-                        coroutineScope.launch {
-                            snackbarHostState.showSnackbar(
-                                message = context.getString(R.string.plan_ready_message, daysPerWeek),
-                            )
-                        }
                     }
                 },
             )
         }
-        composable("home") {
+        composable("home") { backStackEntry ->
+            val planGenerated = navController.previousBackStackEntry
+                ?.savedStateHandle
+                ?.get<Boolean>("plan_generated")
+            val planDaysPerWeek = navController.previousBackStackEntry
+                ?.savedStateHandle
+                ?.get<Int>("plan_days_per_week")
+            navController.previousBackStackEntry
+                ?.savedStateHandle
+                ?.remove<Boolean>("plan_generated")
+            navController.previousBackStackEntry
+                ?.savedStateHandle
+                ?.remove<Int>("plan_days_per_week")
+            
             HomeRoute(
+                planGenerated = planGenerated ?: false,
+                planDaysPerWeek = planDaysPerWeek ?: 0,
                 onNavigateToActiveWorkout = {
                     navController.navigate("active_workout")
                 },
@@ -501,7 +514,6 @@ private fun GymBroBottomNavBar(
     currentRoute: String?,
     onTabSelected: (BottomNavTab) -> Unit,
 ) {
-    val haptic = LocalHapticFeedback.current
     val selectedIndex = BottomNavTab.entries.indexOfFirst { it.route == currentRoute }.takeIf { it >= 0 } ?: 0
     val indicatorOffset by androidx.compose.animation.core.animateFloatAsState(
         targetValue = selectedIndex.toFloat(),
@@ -522,10 +534,7 @@ private fun GymBroBottomNavBar(
                 val label = stringResource(tab.labelResId)
                 NavigationBarItem(
                     selected = selected,
-                    onClick = {
-                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                        onTabSelected(tab)
-                    },
+                    onClick = { onTabSelected(tab) },
                     modifier = Modifier.testTag("nav_${tab.route}"),
                     icon = {
                         Icon(
