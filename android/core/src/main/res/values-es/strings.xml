@@ -650,6 +650,9 @@
     <string name="exercise_detail_equipment">Equipo</string>
     <string name="exercise_detail_description">Descripción</string>
     <string name="exercise_detail_watch_video">Ver Video</string>
+    <string name="exercise_section_setup">Preparación</string>
+    <string name="exercise_section_execution">Ejecución</string>
+    <string name="exercise_section_tips">Claves</string>
     <string name="exercise_picker_tap_to_add">Toca para añadir</string>
 
     <!-- Localized Enum Display Names: Muscle Groups -->
