@@ -787,6 +787,13 @@
     <string name="profile_recovery">Recuperación</string>
     <string name="profile_recovery_subtitle">Seguimiento de sueño, preparación y recuperación</string>
 
+    <!-- Progress & Analytics navigation -->
+    <string name="profile_progress_analytics">Progreso y Estadísticas</string>
+    <string name="profile_progress">Progreso</string>
+    <string name="profile_progress_subtitle">Ver gráficos, récords y alertas de estancamiento</string>
+    <string name="profile_analytics">Analíticas</string>
+    <string name="profile_analytics_subtitle">Volumen, consistencia y análisis</string>
+
     <!-- Issue #458: Content descriptions -->
     <string name="history_workout_cd">Entrenamiento del %1$s, %2$d ejercicios, %3$s</string>
     <string name="onboarding_goal_cd">Objetivo de entrenamiento: %s</string>

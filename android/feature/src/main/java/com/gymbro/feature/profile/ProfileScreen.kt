@@ -22,6 +22,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Cloud
 import androidx.compose.material.icons.filled.CloudDone
 import androidx.compose.material.icons.filled.CloudOff
@@ -36,6 +37,7 @@ import androidx.compose.material.icons.filled.MonitorHeart
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.ShowChart
 import androidx.compose.material.icons.filled.SmartToy
 import androidx.compose.material.icons.filled.Storage
 import androidx.compose.material.icons.filled.Sync
@@ -89,6 +91,8 @@ fun ProfileRoute(
     onNavigateToExerciseLibrary: () -> Unit = {},
     onNavigateToTools: () -> Unit = {},
     onNavigateToRecovery: () -> Unit = {},
+    onNavigateToProgress: () -> Unit = {},
+    onNavigateToAnalytics: () -> Unit = {},
     viewModel: ProfileViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -110,6 +114,8 @@ fun ProfileRoute(
         onNavigateToExerciseLibrary = onNavigateToExerciseLibrary,
         onNavigateToTools = onNavigateToTools,
         onNavigateToRecovery = onNavigateToRecovery,
+        onNavigateToProgress = onNavigateToProgress,
+        onNavigateToAnalytics = onNavigateToAnalytics,
     )
 }
 
@@ -122,6 +128,8 @@ internal fun ProfileScreen(
     onNavigateToExerciseLibrary: () -> Unit = {},
     onNavigateToTools: () -> Unit = {},
     onNavigateToRecovery: () -> Unit = {},
+    onNavigateToProgress: () -> Unit = {},
+    onNavigateToAnalytics: () -> Unit = {},
 ) {
     val context = LocalContext.current
     Column(
@@ -153,6 +161,29 @@ internal fun ProfileScreen(
         )
 
         Spacer(modifier = Modifier.height(24.dp))
+
+        // Progress & Analytics Group (Amber Accent)
+        SettingsGroup(
+            title = stringResource(R.string.profile_progress_analytics),
+            accentColor = AccentAmberStart,
+        ) {
+            SettingItem(
+                icon = Icons.Default.ShowChart,
+                label = stringResource(R.string.profile_progress),
+                subtitle = stringResource(R.string.profile_progress_subtitle),
+                iconTint = AccentAmberStart,
+                onClick = onNavigateToProgress,
+            )
+            SettingItem(
+                icon = Icons.Default.BarChart,
+                label = stringResource(R.string.profile_analytics),
+                subtitle = stringResource(R.string.profile_analytics_subtitle),
+                iconTint = AccentAmberStart,
+                onClick = onNavigateToAnalytics,
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         // Account Settings Group (Green Accent)
         SettingsGroup(

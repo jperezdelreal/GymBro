@@ -520,6 +520,12 @@ fun GymBroNavGraph(
                 onNavigateToRecovery = {
                     navController.navigate("recovery")
                 },
+                onNavigateToProgress = {
+                    navController.navigate("progress")
+                },
+                onNavigateToAnalytics = {
+                    navController.navigate("analytics")
+                },
             )
         }
         composable("tools") {
