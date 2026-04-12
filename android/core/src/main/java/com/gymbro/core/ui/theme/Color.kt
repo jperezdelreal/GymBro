@@ -34,3 +34,12 @@ val OnSurfaceVariant = Color(0xFF9E9E9E)
 // Error Colors
 val Error = AccentRed
 val OnError = Color(0xFF000000)
+
+// Light Theme Colors
+val BackgroundLight = Color(0xFFF5F5F5)
+val SurfacePrimaryLight = Color(0xFFFFFFFF)
+val SurfaceLight = Color(0xFFFFFFFF)
+val SurfaceVariantLight = Color(0xFFF0F0F0)
+val OnBackgroundLight = Color(0xFF1C1C1E)
+val OnSurfaceLight = Color(0xFF000000)
+val OnSurfaceVariantLight = Color(0xFF616161)

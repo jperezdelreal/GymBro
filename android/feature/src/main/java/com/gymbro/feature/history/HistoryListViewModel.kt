@@ -95,10 +95,20 @@ class HistoryListViewModel @Inject constructor(
                     totalSets = sets.size,
                     muscleGroups = muscleGroups,
                     prCount = prExerciseIds.size,
+                    volumeHistory = emptyList(),
                 )
             }.sortedByDescending { it.date }
 
-            val groupedWorkouts = workoutListItems.groupBy { workoutItem ->
+            val workoutsWithHistory = workoutListItems.mapIndexed { index, workoutItem ->
+                val volumeHistory = workoutListItems
+                    .drop(index)
+                    .take(4)
+                    .map { it.totalVolume }
+                    .reversed()
+                workoutItem.copy(volumeHistory = volumeHistory)
+            }
+
+            val groupedWorkouts = workoutsWithHistory.groupBy { workoutItem ->
                 val instant = Instant.ofEpochMilli(workoutItem.date)
                 val zoned = instant.atZone(ZoneId.systemDefault())
                 zoned.format(monthFormatter)
@@ -110,7 +120,7 @@ class HistoryListViewModel @Inject constructor(
                 it.copy(
                     isLoading = false,
                     error = null,
-                    workouts = workoutListItems,
+                    workouts = workoutsWithHistory,
                     groupedWorkouts = groupedWorkouts,
                 )
             }

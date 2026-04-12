@@ -2,6 +2,9 @@ package com.gymbro.feature.exerciselibrary
 
 import android.content.Intent
 import android.net.Uri
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -66,10 +69,13 @@ import com.gymbro.feature.common.icon
 
 private val AccentGreen = AccentGreenStart
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun ExerciseDetailRoute(
     viewModel: ExerciseDetailViewModel = hiltViewModel(),
     onNavigateBack: () -> Unit = {},
+    sharedTransitionScope: SharedTransitionScope? = null,
+    animatedContentScope: AnimatedVisibilityScope? = null,
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle()
 
@@ -77,15 +83,19 @@ fun ExerciseDetailRoute(
         state = state.value,
         onNavigateBack = onNavigateBack,
         onRetry = { viewModel.onEvent(ExerciseDetailEvent.RetryClicked) },
+        sharedTransitionScope = sharedTransitionScope,
+        animatedContentScope = animatedContentScope,
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
 @Composable
 private fun ExerciseDetailScreen(
     state: ExerciseDetailState,
     onNavigateBack: () -> Unit,
     onRetry: () -> Unit,
+    sharedTransitionScope: SharedTransitionScope? = null,
+    animatedContentScope: AnimatedVisibilityScope? = null,
 ) {
     Scaffold(
         topBar = {
@@ -139,16 +149,21 @@ private fun ExerciseDetailScreen(
                 ExerciseDetailContent(
                     exercise = state.exercise,
                     modifier = Modifier.padding(paddingValues),
+                    sharedTransitionScope = sharedTransitionScope,
+                    animatedContentScope = animatedContentScope,
                 )
             }
         }
     }
 }
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 private fun ExerciseDetailContent(
     exercise: Exercise,
     modifier: Modifier = Modifier,
+    sharedTransitionScope: SharedTransitionScope? = null,
+    animatedContentScope: AnimatedVisibilityScope? = null,
 ) {
     val context = LocalContext.current
 
@@ -162,13 +177,24 @@ private fun ExerciseDetailContent(
         Spacer(modifier = Modifier.height(8.dp))
 
         // Exercise Name (heading)
+        val nameModifier = if (sharedTransitionScope != null && animatedContentScope != null) {
+            with(sharedTransitionScope) {
+                Modifier.sharedElement(
+                    sharedContentState = rememberSharedContentState(key = "exercise-name-${exercise.id}"),
+                    animatedVisibilityScope = animatedContentScope,
+                )
+            }
+        } else {
+            Modifier
+        }
+        
         Text(
             text = exercise.name,
             style = MaterialTheme.typography.headlineLarge.copy(
                 fontWeight = FontWeight.Bold,
             ),
             color = AccentGreen,
-            modifier = Modifier.semantics { heading() },
+            modifier = nameModifier.semantics { heading() },
         )
 
         // Muscle group with icon
