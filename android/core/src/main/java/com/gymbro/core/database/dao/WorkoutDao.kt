@@ -99,4 +99,10 @@ interface WorkoutDao {
 
     @Query("DELETE FROM in_progress_workouts")
     suspend fun clearAllInProgressWorkouts()
+
+    @Query("SELECT COUNT(*) FROM workouts WHERE completed = 1")
+    suspend fun getTotalCompletedWorkoutsCount(): Int
+
+    @Query("SELECT COUNT(DISTINCT date(startedAt / 1000, 'unixepoch')) FROM workouts WHERE completed = 1")
+    suspend fun getActiveDaysCount(): Int
 }

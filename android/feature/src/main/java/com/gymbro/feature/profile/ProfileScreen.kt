@@ -134,6 +134,9 @@ internal fun ProfileScreen(
             displayName = state.user?.displayName,
             isAnonymous = state.user?.isAnonymous ?: true,
             isLoading = state.isLoading,
+            totalWorkouts = state.totalWorkouts,
+            activeDays = state.activeDays,
+            currentStreak = state.currentStreak,
         )
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -368,6 +371,9 @@ private fun ProfileHeader(
     displayName: String?,
     isAnonymous: Boolean,
     isLoading: Boolean,
+    totalWorkouts: Int,
+    activeDays: Int,
+    currentStreak: Int,
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -454,19 +460,19 @@ private fun ProfileHeader(
         ) {
             StatCard(
                 icon = Icons.Default.FitnessCenter,
-                value = "42",
+                value = totalWorkouts.toString(),
                 label = stringResource(R.string.profile_workouts_label),
                 modifier = Modifier.weight(1f),
             )
             StatCard(
                 icon = Icons.Default.LocalFireDepartment,
-                value = "18",
+                value = activeDays.toString(),
                 label = stringResource(R.string.profile_active_days),
                 modifier = Modifier.weight(1f),
             )
             StatCard(
                 icon = Icons.Default.LocalFireDepartment,
-                value = "7",
+                value = currentStreak.toString(),
                 label = stringResource(R.string.profile_streak_label),
                 modifier = Modifier.weight(1f),
             )
