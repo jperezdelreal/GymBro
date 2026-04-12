@@ -38,6 +38,7 @@ class UserPreferences @Inject constructor(
         val MANUAL_SLEEP_QUALITY = intPreferencesKey("manual_sleep_quality")
         val MANUAL_MUSCLE_SORENESS = intPreferencesKey("manual_muscle_soreness")
         val MANUAL_ENERGY_LEVEL = intPreferencesKey("manual_energy_level")
+        val THEME_PREFERENCE = stringPreferencesKey("theme_preference")
     }
 
     enum class WeightUnit {
@@ -54,6 +55,10 @@ class UserPreferences @Inject constructor(
 
     enum class TrainingPhase {
         BULK, CUT, MAINTENANCE
+    }
+
+    enum class ThemePreference {
+        DARK, LIGHT, SYSTEM
     }
 
     val weightUnit: Flow<WeightUnit> = dataStore.data.map { preferences ->
@@ -108,6 +113,15 @@ class UserPreferences @Inject constructor(
             "CUT" -> TrainingPhase.CUT
             "MAINTENANCE" -> TrainingPhase.MAINTENANCE
             else -> TrainingPhase.MAINTENANCE
+        }
+    }
+
+    val themePreference: Flow<ThemePreference> = dataStore.data.map { preferences ->
+        when (preferences[THEME_PREFERENCE]) {
+            "DARK" -> ThemePreference.DARK
+            "LIGHT" -> ThemePreference.LIGHT
+            "SYSTEM" -> ThemePreference.SYSTEM
+            else -> ThemePreference.SYSTEM
         }
     }
 
@@ -168,6 +182,12 @@ class UserPreferences @Inject constructor(
     suspend fun setTrainingPhase(phase: TrainingPhase) {
         dataStore.edit { preferences ->
             preferences[TRAINING_PHASE] = phase.name
+        }
+    }
+
+    suspend fun setThemePreference(theme: ThemePreference) {
+        dataStore.edit { preferences ->
+            preferences[THEME_PREFERENCE] = theme.name
         }
     }
 
