@@ -723,6 +723,22 @@
     <string name="programs_replace_plan_message">This will replace your current plan. Continue?</string>
     <string name="programs_replace_plan_confirm">Replace</string>
 
+    <!-- Issue #499: Template Library -->
+    <string name="programs_browse_templates">Browse Templates</string>
+    <string name="programs_browse_templates_subtitle">Choose from proven workout programs</string>
+    <string name="template_library_title">Workout Templates</string>
+    <string name="template_filter_all">All</string>
+    <string name="template_filter_beginner">Beginner</string>
+    <string name="template_filter_intermediate">Intermediate</string>
+    <string name="template_filter_advanced">Advanced</string>
+    <string name="template_detail_start_program">Start This Program</string>
+    <string name="template_detail_starting">Starting program...</string>
+    <string name="template_detail_exercises">Exercises</string>
+    <string name="template_detail_days">Days</string>
+    <string name="template_target_audience">Target Audience</string>
+    <string name="template_split_type">Split Type</string>
+    <string name="template_program_started">Program started! 🎉</string>
+
     <!-- Issue #451: Profile coming soon -->
     <string name="profile_coming_soon">Coming soon</string>
 

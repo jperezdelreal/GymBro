@@ -447,6 +447,27 @@ fun GymBroNavGraph(
                 onNavigateToPlanDayDetail = { dayNumber ->
                     navController.navigate("programs/day/$dayNumber")
                 },
+                onNavigateToTemplateLibrary = {
+                    navController.navigate("programs/templates")
+                },
+            )
+        }
+        composable("programs/templates") {
+            com.gymbro.feature.programs.TemplateLibraryRoute(
+                onNavigateBack = { navController.popBackStack() },
+                onNavigateToTemplateDetail = { template ->
+                    navController.navigate("programs/templates/${template.name}")
+                }
+            )
+        }
+        composable(
+            route = "programs/templates/{templateName}",
+            arguments = listOf(
+                navArgument("templateName") { type = NavType.StringType },
+            ),
+        ) {
+            com.gymbro.feature.programs.TemplateDetailRoute(
+                onNavigateBack = { navController.popBackStack() },
             )
         }
         composable(

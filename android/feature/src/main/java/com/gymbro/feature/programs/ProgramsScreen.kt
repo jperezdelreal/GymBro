@@ -81,6 +81,7 @@ fun ProgramsRoute(
     onNavigateToCreateTemplate: (String?) -> Unit = {},
     onNavigateToActiveWorkout: (WorkoutTemplate) -> Unit = {},
     onNavigateToPlanDayDetail: (Int) -> Unit = {},
+    onNavigateToTemplateLibrary: () -> Unit = {},
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -101,6 +102,9 @@ fun ProgramsRoute(
                 }
                 is ProgramsEffect.NavigateToPlanDayDetail -> {
                     onNavigateToPlanDayDetail(effect.dayNumber)
+                }
+                is ProgramsEffect.NavigateToTemplateLibrary -> {
+                    onNavigateToTemplateLibrary()
                 }
             }
         }
@@ -204,6 +208,14 @@ fun ProgramsScreen(
                             onGenerate = { onEvent(ProgramsEvent.GenerateNewPlan) },
                         )
                     }
+                }
+
+                // Browse Templates Card
+                item {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    BrowseTemplatesCard(
+                        onClick = { onEvent(ProgramsEvent.BrowseTemplatesClicked) }
+                    )
                 }
 
                 // Templates Section
@@ -716,4 +728,49 @@ private fun formatDate(instant: Instant): String {
     val formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
         .withZone(ZoneId.systemDefault())
     return formatter.format(instant)
+}
+
+@Composable
+private fun BrowseTemplatesCard(
+    onClick: () -> Unit,
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = AccentGreen.copy(alpha = 0.1f),
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = stringResource(R.string.programs_browse_templates),
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.Bold
+                    ),
+                    color = AccentGreen,
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = stringResource(R.string.programs_browse_templates_subtitle),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                )
+            }
+            Spacer(modifier = Modifier.width(8.dp))
+            Icon(
+                imageVector = Icons.Default.PlayArrow,
+                contentDescription = null,
+                tint = AccentGreen,
+            )
+        }
+    }
 }

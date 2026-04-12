@@ -22,10 +22,12 @@ sealed interface ProgramsEvent {
     data class StartWorkoutFromTemplate(val template: WorkoutTemplate) : ProgramsEvent
     data object GenerateNewPlan : ProgramsEvent
     data class ViewPlanDay(val dayNumber: Int) : ProgramsEvent
+    data object BrowseTemplatesClicked : ProgramsEvent
 }
 
 sealed interface ProgramsEffect {
     data class NavigateToCreateTemplate(val templateId: String?) : ProgramsEffect
     data class NavigateToActiveWorkout(val template: WorkoutTemplate) : ProgramsEffect
     data class NavigateToPlanDayDetail(val dayNumber: Int) : ProgramsEffect
+    data object NavigateToTemplateLibrary : ProgramsEffect
 }
