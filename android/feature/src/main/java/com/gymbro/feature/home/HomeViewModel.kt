@@ -1,8 +1,10 @@
 package com.gymbro.feature.home
 
 import com.gymbro.core.repository.WorkoutRepository
+import com.gymbro.core.repository.ExerciseRepository
 import com.gymbro.core.service.ActivePlanStore
 import com.gymbro.core.service.PersonalRecordService
+import com.gymbro.core.service.PlateauDetectionService
 import com.gymbro.feature.common.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -20,6 +22,8 @@ class HomeViewModel @Inject constructor(
     private val workoutRepository: WorkoutRepository,
     private val activePlanStore: ActivePlanStore,
     private val personalRecordService: PersonalRecordService,
+    private val plateauDetectionService: PlateauDetectionService,
+    private val exerciseRepository: ExerciseRepository,
 ) : BaseViewModel() {
 
     private val _state = MutableStateFlow(HomeState())
@@ -34,6 +38,7 @@ class HomeViewModel @Inject constructor(
         loadDaysSinceLastWorkout()
         loadWorkoutStreak()
         loadRecentPR()
+        loadPlateauAlerts()
     }
 
     fun onEvent(event: HomeEvent) {
@@ -88,6 +93,28 @@ class HomeViewModel @Inject constructor(
             }
             is HomeEvent.DismissPRBanner -> {
                 _state.update { it.copy(showPRCelebration = false) }
+            }
+            is HomeEvent.DismissPlateauAlert -> {
+                _state.update { currentState ->
+                    currentState.copy(
+                        plateauAlerts = currentState.plateauAlerts.filter { 
+                            it.exerciseId != event.exerciseId 
+                        }
+                    )
+                }
+            }
+            is HomeEvent.OpenCoachForPlateau -> {
+                val context = when (event.alert.type) {
+                    com.gymbro.core.model.PlateauType.STAGNATION -> {
+                        "I've hit a plateau on ${event.alert.exerciseName}. No progress in ${event.alert.weeksDuration} weeks. ${event.alert.suggestion}"
+                    }
+                    com.gymbro.core.model.PlateauType.REGRESSION -> {
+                        "I'm regressing on ${event.alert.exerciseName}. Performance declining for ${event.alert.weeksDuration} weeks. ${event.alert.suggestion}"
+                    }
+                }
+                viewModelScope.launch {
+                    _effect.send(HomeEffect.NavigateToCoachWithContext(context))
+                }
             }
         }
     }
@@ -218,6 +245,24 @@ class HomeViewModel @Inject constructor(
                     }
                     break
                 }
+            }
+        }
+    }
+
+    private fun loadPlateauAlerts() {
+        safeLaunch {
+            val exerciseIds = personalRecordService.getExerciseIdsWithHistory()
+            if (exerciseIds.isEmpty()) return@safeLaunch
+
+            val exercisePairs = exerciseIds.mapNotNull { id ->
+                val exercise = exerciseRepository.getExerciseById(id)
+                exercise?.let { id to it.name }
+            }
+
+            val alerts = plateauDetectionService.detectAllPlateaus(exercisePairs)
+            
+            _state.update { 
+                it.copy(plateauAlerts = alerts.take(3))
             }
         }
     }
