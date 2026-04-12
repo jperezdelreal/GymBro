@@ -439,7 +439,7 @@ fun ActiveWorkoutScreen(
                     
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalAlignment = Alignment.Start
+                        horizontalArrangement = Arrangement.Start
                     ) {
                         if (supersetGroup != null) {
                             Box(

@@ -631,7 +631,6 @@
     <string name="milestone_100_message">100 entrenamientos — eres imparable</string>
     <string name="milestone_365_title">¡Leyenda de Un Año!</string>
     <string name="milestone_365_message">365 entrenamientos — has construido un imperio</string>
-    <string name="action_dismiss">Cerrar</string>
 
     <!-- Accessibility — Content Descriptions -->
     <string name="home_cd_start_workout">Iniciar entrenamiento</string>
@@ -780,7 +779,6 @@
 
     <!-- Issue #463: Home screen badge -->
     <string name="home_today_badge">HOY 🎯</string>
-    <string name="home_quick_start_subtitle">Inicia un entrenamiento libre — elige ejercicios sobre la marcha</string>
 
     <!-- Issue #452: Settings effects -->
     <string name="settings_open_health_connect_error">No se pudo abrir Health Connect</string>
