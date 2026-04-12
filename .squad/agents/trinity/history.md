@@ -625,3 +625,36 @@ otification_channel_rest_timer_desc
 
 **Branch:** squad/469-rest-timer-vibration (partial work staged)
 
+
+
+## Learnings
+
+### 2025-01-XX — Issue #528: Exercise Descriptions Redesign
+
+**What I did:**
+- Transformed all 209 exercises from pipe-separated legacy format to structured JSON with setup/execution/tips sections
+- Created bilingual descriptions (EN + ES) for 100% of exercises (was 20/209, now 209/209)
+- Updated DatabaseModule.kt to parse both structured and legacy formats with backward compatibility
+- Updated ExerciseDetailScreen.kt to render sections with styled cards, emojis, and accent colors
+- Added localized strings for section headers (Setup/Preparación, Execution/Ejecución, Key Cues/Claves)
+
+**Technical approach:**
+- Used JsonElement type in ExerciseSeed to support both String (legacy) and JsonObject (structured)
+- parseInstructions() detects format at runtime and converts structured to ##SECTION## markers
+- UI parser splits on markers and renders ExerciseSectionCard composables with section-specific styling
+- Generated default instructions using movement patterns (squat, press, row, curl, extension, raise, lunge, hinge)
+
+**Gym knowledge quality:**
+- Setup: Equipment + stance (1-2 sentences)
+- Execution: Numbered steps with action verbs
+- Tips: Bullet points with • prefix for key coaching cues
+- Spanish translations use proper gym terminology (e.g., "core" stays "core", "sentadilla" for squat in context)
+
+**Files modified:**
+- exercises-seed.json: 2697 insertions (all 209 exercises restructured)
+- DatabaseModule.kt: Added InstructionsSeed data class, parseInstructions() function
+- ExerciseDetailScreen.kt: Added parseExerciseSections(), ExerciseSectionCard composable
+- strings.xml + strings-es.xml: exercise_section_setup, exercise_section_execution, exercise_section_tips
+
+**Build:** ✅ Passed (1m 24s)
+**PR:** https://github.com/jperezdelreal/GymBro/pull/529
