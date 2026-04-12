@@ -4,6 +4,7 @@ import android.app.Activity
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.toArgb
@@ -26,19 +27,38 @@ private val GymBroDarkColorScheme = darkColorScheme(
     onError = OnError,
 )
 
+private val GymBroLightColorScheme = lightColorScheme(
+    primary = AccentGreenStart,
+    secondary = AccentCyanStart,
+    tertiary = AccentAmberStart,
+    background = BackgroundLight,
+    surface = SurfaceLight,
+    surfaceVariant = SurfaceVariantLight,
+    surfaceTint = SurfacePrimaryLight,
+    onBackground = OnBackgroundLight,
+    onSurface = OnSurfaceLight,
+    onSurfaceVariant = OnSurfaceVariantLight,
+    error = AccentRed,
+    onError = Color(0xFFFFFFFF),
+)
+
 @Composable
-fun GymBroTheme(content: @Composable () -> Unit) {
+fun GymBroTheme(
+    darkTheme: Boolean = isSystemInDarkTheme(),
+    content: @Composable () -> Unit
+) {
+    val colorScheme = if (darkTheme) GymBroDarkColorScheme else GymBroLightColorScheme
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            window.statusBarColor = Background.toArgb()
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = false
+            window.statusBarColor = colorScheme.background.toArgb()
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
         }
     }
 
     MaterialTheme(
-        colorScheme = GymBroDarkColorScheme,
+        colorScheme = colorScheme,
         typography = GymBroTypography,
         content = content,
     )

@@ -582,3 +582,46 @@
 - PR list: increased display limit from 5 to 20
 
 All strings bilingual (EN + ES). Build compiles clean.
+
+## 2026-12-04 — Issue #469: Rest Timer Vibration (WIP)
+
+**Context:** Rest timer completes silently. Users must watch the screen.
+
+**Implementation Started:**
+- ✅ Created HapticFeedbackManager in core/src/main/java/com/gymbro/core/haptic/
+  - Vibration pattern: 200ms, pause, 200ms, pause, 400ms (escalating)
+  - Handles API 26+ (VibrationEffect) and legacy (deprecated vibrate)
+  - Optional notification sound via RingtoneManager
+  - Singleton @Inject for Hilt DI
+
+**Still Required:**
+1. Add VIBRATE permission to pp/src/main/AndroidManifest.xml:
+   `xml
+   <uses-permission android:name="android.permission.VIBRATE" />
+   `
+
+2. Update NotificationHelper.kt:
+   - Add CHANNEL_REST_TIMER = "rest_timer" constant
+   - Add NOTIFICATION_ID_REST_TIMER = 1002 constant
+   - Create rest timer notification channel in createNotificationChannels()
+   - Implement showRestTimerFinished() method
+
+3. Update ActiveWorkoutScreen.kt:
+   - Add Hilt entry points for HapticFeedbackManager and NotificationHelper
+   - In RestTimerFinished effect handler (line 172), call:
+     `kotlin
+     hapticFeedbackManager.vibrateRestTimerFinished()
+     hapticFeedbackManager.playRestTimerFinishedSound()
+     notificationHelper.showRestTimerFinished()
+     `
+
+4. Bilingual strings already added to alues/strings.xml and alues-es/strings.xml:
+   - est_timer_finished_title, est_timer_finished_body
+   - 
+otification_channel_rest_timer, 
+otification_channel_rest_timer_desc
+
+**Blocker:** Build environment KSP cache corruption prevented verification. Code is correct but untested.
+
+**Branch:** squad/469-rest-timer-vibration (partial work staged)
+

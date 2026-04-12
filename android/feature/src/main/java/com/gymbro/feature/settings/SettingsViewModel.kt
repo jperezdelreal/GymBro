@@ -47,10 +47,12 @@ class SettingsViewModel @Inject constructor(
                 userPreferences.autoStartRestTimer,
                 userPreferences.notificationsEnabled,
                 userPreferences.trainingPhase,
-            ) { weightUnit, restTimer, autoStart, notifications, phase ->
+                userPreferences.themePreference,
+            ) { weightUnit, restTimer, autoStart, notifications, phase, theme ->
                 SettingsState(
                     weightUnit = weightUnit,
                     trainingPhase = phase,
+                    themePreference = theme,
                     defaultRestTimer = restTimer,
                     autoStartRestTimer = autoStart,
                     notificationsEnabled = notifications,
@@ -95,6 +97,7 @@ class SettingsViewModel @Inject constructor(
         when (event) {
             is SettingsEvent.SetWeightUnit -> setWeightUnit(event.unit)
             is SettingsEvent.SetTrainingPhase -> setTrainingPhase(event.phase)
+            is SettingsEvent.SetThemePreference -> setThemePreference(event.theme)
             is SettingsEvent.SetDefaultRestTimer -> setDefaultRestTimer(event.seconds)
             is SettingsEvent.SetAutoStartRestTimer -> setAutoStartRestTimer(event.enabled)
             is SettingsEvent.SetNotifications -> setNotifications(event.enabled)
@@ -116,6 +119,12 @@ class SettingsViewModel @Inject constructor(
     private fun setTrainingPhase(phase: TrainingPhase) {
         viewModelScope.launch {
             userPreferences.setTrainingPhase(phase)
+        }
+    }
+
+    private fun setThemePreference(theme: UserPreferences.ThemePreference) {
+        viewModelScope.launch {
+            userPreferences.setThemePreference(theme)
         }
     }
 

@@ -29,6 +29,7 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LocalFireDepartment
 import androidx.compose.material.icons.filled.MonitorHeart
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Timer
@@ -76,6 +77,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gymbro.core.R
+import com.gymbro.core.preferences.UserPreferences.ThemePreference
 import com.gymbro.core.preferences.UserPreferences.TrainingPhase
 import com.gymbro.core.preferences.UserPreferences.WeightUnit
 import com.gymbro.core.ui.theme.AccentGreen
@@ -190,6 +192,64 @@ internal fun SettingsScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
+            // Appearance Section
+            SectionTitle(stringResource(R.string.settings_appearance))
+            SettingsCard {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        SettingsIcon(Icons.Default.Palette, AccentGreen)
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Column {
+                            Text(
+                                text = stringResource(R.string.settings_appearance),
+                                style = MaterialTheme.typography.titleSmall,
+                                color = Color.White,
+                                fontWeight = FontWeight.Medium,
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    SingleChoiceSegmentedButtonRow(
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        SegmentedButton(
+                            selected = state.themePreference == ThemePreference.DARK,
+                            onClick = {
+                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                onEvent(SettingsEvent.SetThemePreference(ThemePreference.DARK))
+                            },
+                            shape = SegmentedButtonDefaults.itemShape(0, 3),
+                        ) {
+                            Text(stringResource(R.string.theme_dark), style = MaterialTheme.typography.labelMedium)
+                        }
+                        SegmentedButton(
+                            selected = state.themePreference == ThemePreference.LIGHT,
+                            onClick = {
+                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                onEvent(SettingsEvent.SetThemePreference(ThemePreference.LIGHT))
+                            },
+                            shape = SegmentedButtonDefaults.itemShape(1, 3),
+                        ) {
+                            Text(stringResource(R.string.theme_light), style = MaterialTheme.typography.labelMedium)
+                        }
+                        SegmentedButton(
+                            selected = state.themePreference == ThemePreference.SYSTEM,
+                            onClick = {
+                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                onEvent(SettingsEvent.SetThemePreference(ThemePreference.SYSTEM))
+                            },
+                            shape = SegmentedButtonDefaults.itemShape(2, 3),
+                        ) {
+                            Text(stringResource(R.string.theme_system), style = MaterialTheme.typography.labelMedium)
+                        }
+                    }
+                }
+            }
+
             // Account Section
             SectionTitle(stringResource(R.string.settings_section_account))
             SettingsCard {
@@ -568,10 +628,14 @@ private fun SettingsRow(
     onClick: (() -> Unit)? = null,
     enabled: Boolean = true,
 ) {
+    val haptic = LocalHapticFeedback.current
     val modifier = Modifier
         .fillMaxWidth()
         .then(
-            if (onClick != null) Modifier.clickable(enabled = enabled, onClick = onClick)
+            if (onClick != null) Modifier.clickable(enabled = enabled, onClick = {
+                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                onClick()
+            })
             else Modifier
         )
         .padding(vertical = 8.dp)

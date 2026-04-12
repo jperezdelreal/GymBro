@@ -1117,3 +1117,27 @@ Sled push, battle ropes, assault bike, jump rope, rowing machine, medicine ball 
 - `AndroidManifest.xml` — splash theme for MainActivity
 - `build.gradle.kts` — splashscreen dependency
 - `libs.versions.toml` — splashscreen version catalog entry
+
+---
+
+## Issue #465 — Synchronous Database Seed (2025-01-21)
+
+**Problem:**
+Room database seed ran asynchronously in `SeedDatabaseCallback.onCreate()`, causing a race condition on first install. `OnboardingViewModel.generatePlan()` would run before exercises were committed, causing the app to show "Create Your First Program" instead of auto-generating a plan. A 30s timeout workaround (`withTimeout` + `Flow.first { isNotEmpty() }`) was unreliable on cold emulators.
+
+**Root Cause:**
+`SeedDatabaseCallback` fired a coroutine on `Dispatchers.IO` — fire-and-forget pattern. By the time exercises were inserted, the plan generator had already checked and found an empty list.
+
+**Solution:**
+Moved seed logic into `DatabaseModule.provideDatabase()` to run synchronously before the database instance is returned to the DI container. Used `runBlocking` to call the suspend DAO methods (`count()` and `insertAll()`).
+
+**Key Learnings:**
+1. **Room callbacks are decoupled from provider lifecycle** — `RoomDatabase.Callback.onCreate()` is async by design, making it unsuitable for DI-critical seeding
+2. **runBlocking in providers is acceptable for one-time setup** — Since `provideDatabase()` is `@Singleton` and only runs once per app lifetime, blocking here doesn't hurt UX and guarantees seed order
+3. **Eliminate defensive timeouts when you control initialization order** — Removed 30s timeout from `WorkoutPlanGenerator` since exercises are now guaranteed to exist
+
+**Files Changed:**
+- `android/core/src/main/java/com/gymbro/core/di/DatabaseModule.kt` — synchronous seed with runBlocking
+- `android/core/src/main/java/com/gymbro/core/service/WorkoutPlanGenerator.kt` — removed timeout workaround
+
+**PR:** #476

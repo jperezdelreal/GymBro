@@ -1,5 +1,8 @@
 package com.gymbro.feature.exerciselibrary
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -81,6 +84,7 @@ private val AccentGreen = AccentGreenStart
 private val AccentCyan = AccentCyanStart
 private val AccentAmber = AccentAmberStart
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun ExerciseLibraryRoute(
     viewModel: ExerciseLibraryViewModel = hiltViewModel(),
@@ -88,6 +92,8 @@ fun ExerciseLibraryRoute(
     onNavigateToCreateExercise: () -> Unit = {},
     onExercisePicked: ((Exercise) -> Unit)? = null,
     isPickerMode: Boolean = false,
+    sharedTransitionScope: SharedTransitionScope? = null,
+    animatedContentScope: AnimatedVisibilityScope? = null,
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -119,10 +125,12 @@ fun ExerciseLibraryRoute(
         onNavigateToCreateExercise = onNavigateToCreateExercise,
         isPickerMode = isPickerMode,
         snackbarHostState = snackbarHostState,
+        sharedTransitionScope = sharedTransitionScope,
+        animatedContentScope = animatedContentScope,
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class, ExperimentalSharedTransitionApi::class)
 @Composable
 fun ExerciseLibraryScreen(
     state: ExerciseLibraryState,
@@ -130,6 +138,8 @@ fun ExerciseLibraryScreen(
     onNavigateToCreateExercise: () -> Unit = {},
     isPickerMode: Boolean = false,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
+    sharedTransitionScope: SharedTransitionScope? = null,
+    animatedContentScope: AnimatedVisibilityScope? = null,
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -253,6 +263,8 @@ fun ExerciseLibraryScreen(
                                 exercise = exercise,
                                 onClick = { onEvent(ExerciseLibraryEvent.ExerciseClicked(exercise)) },
                                 isPickerMode = isPickerMode,
+                                sharedTransitionScope = sharedTransitionScope,
+                                animatedContentScope = animatedContentScope,
                             )
                         }
                     }
@@ -323,11 +335,14 @@ private fun GradientFilterChip(
     }
 }
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 private fun ExerciseCard(
     exercise: Exercise,
     onClick: () -> Unit,
     isPickerMode: Boolean = false,
+    sharedTransitionScope: SharedTransitionScope? = null,
+    animatedContentScope: AnimatedVisibilityScope? = null,
 ) {
     val haptic = LocalHapticFeedback.current
     var isPressed by remember { mutableStateOf(false) }
@@ -362,11 +377,23 @@ private fun ExerciseCard(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(modifier = Modifier.weight(1f)) {
+                val nameModifier = if (sharedTransitionScope != null && animatedContentScope != null) {
+                    with(sharedTransitionScope) {
+                        Modifier.sharedElement(
+                            sharedContentState = rememberSharedContentState(key = "exercise-name-${exercise.id}"),
+                            animatedVisibilityScope = animatedContentScope,
+                        )
+                    }
+                } else {
+                    Modifier
+                }
+                
                 Text(
                     text = exercise.name,
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onBackground,
                     fontWeight = FontWeight.SemiBold,
+                    modifier = nameModifier,
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
