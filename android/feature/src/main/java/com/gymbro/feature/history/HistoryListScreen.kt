@@ -285,31 +285,42 @@ private fun WorkoutCard(
                             color = Color.White.copy(alpha = 0.5f),
                         )
                     }
-                    if (workout.prCount > 0) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(4.dp),
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(12.dp))
-                                .background(
-                                    brush = Brush.linearGradient(
-                                        colors = listOf(AccentAmberStart, AccentAmberEnd)
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        if (workout.volumeHistory.size >= 2) {
+                            SparklineChart(
+                                dataPoints = workout.volumeHistory,
+                                modifier = Modifier,
+                            )
+                        }
+                        if (workout.prCount > 0) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(12.dp))
+                                    .background(
+                                        brush = Brush.linearGradient(
+                                            colors = listOf(AccentAmberStart, AccentAmberEnd)
+                                        )
                                     )
+                                    .padding(horizontal = 12.dp, vertical = 6.dp),
+                            ) {
+                                Icon(
+                                    Icons.Default.Star,
+                                    contentDescription = stringResource(R.string.history_prs),
+                                    tint = Color.White,
+                                    modifier = Modifier.size(16.dp),
                                 )
-                                .padding(horizontal = 12.dp, vertical = 6.dp),
-                        ) {
-                            Icon(
-                                Icons.Default.Star,
-                                contentDescription = stringResource(R.string.history_prs),
-                                tint = Color.White,
-                                modifier = Modifier.size(16.dp),
-                            )
-                            Text(
-                                text = "${workout.prCount}",
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.White,
-                            )
+                                Text(
+                                    text = "${workout.prCount}",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.White,
+                                )
+                            }
                         }
                     }
                 }

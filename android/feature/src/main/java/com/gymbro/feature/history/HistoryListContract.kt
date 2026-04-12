@@ -18,6 +18,7 @@ data class WorkoutListItem(
     val totalSets: Int,
     val muscleGroups: Set<MuscleGroup>,
     val prCount: Int,
+    val volumeHistory: List<Double> = emptyList(),
 )
 
 data class WorkoutGroup(
