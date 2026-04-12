@@ -2,6 +2,7 @@ package com.gymbro.feature.workout
 
 import com.gymbro.core.model.Exercise
 import com.gymbro.core.model.PersonalRecord
+import com.gymbro.core.service.ProgressionEngine
 
 data class ActiveWorkoutState(
     val workoutId: String? = null,
@@ -29,6 +30,15 @@ data class FatigueWarningUi(
 data class WorkoutExerciseUi(
     val exercise: Exercise,
     val sets: List<WorkoutSetUi> = emptyList(),
+    val progressionSuggestion: ProgressionSuggestionUi? = null,
+)
+
+data class ProgressionSuggestionUi(
+    val lastWeight: Double,
+    val lastReps: Int,
+    val lastRpe: Double?,
+    val suggestedWeight: Double,
+    val reason: ProgressionEngine.ProgressionReason,
 )
 
 data class WorkoutSetUi(

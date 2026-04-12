@@ -35,6 +35,8 @@ class ActiveWorkoutViewModel @Inject constructor(
     private val rpeTrendService: RpeTrendService,
     private val exerciseRepository: ExerciseRepository,
     private val activePlanStore: ActivePlanStore,
+    private val progressionEngine: com.gymbro.core.service.ProgressionEngine,
+    private val workoutDao: com.gymbro.core.database.dao.WorkoutDao,
     val tooltipManager: TooltipManager,
 ) : BaseViewModel() {
 
@@ -144,6 +146,7 @@ class ActiveWorkoutViewModel @Inject constructor(
                 } catch (_: Exception) {
                     null
                 }
+                val progressionSuggestion = getProgressionSuggestionUi(exercise.id.toString())
                 val sets = (1..planned.sets).map { setNum ->
                     WorkoutSetUi(
                         id = UUID.randomUUID().toString(),
@@ -158,6 +161,7 @@ class ActiveWorkoutViewModel @Inject constructor(
                         exercises = current.exercises + WorkoutExerciseUi(
                             exercise = exercise,
                             sets = sets,
+                            progressionSuggestion = progressionSuggestion,
                         ),
                     )
                 }
@@ -221,6 +225,7 @@ class ActiveWorkoutViewModel @Inject constructor(
     private fun addExercise(exercise: Exercise) {
         safeLaunch {
             val defaults = smartDefaultsService.getDefaults(exercise.id.toString())
+            val progressionSuggestion = getProgressionSuggestionUi(exercise.id.toString())
             _state.update { current ->
                 val newExercise = WorkoutExerciseUi(
                     exercise = exercise,
@@ -232,6 +237,7 @@ class ActiveWorkoutViewModel @Inject constructor(
                             reps = defaults.reps?.toString() ?: "",
                         ),
                     ),
+                    progressionSuggestion = progressionSuggestion,
                 )
                 current.copy(exercises = current.exercises + newExercise)
             }
@@ -576,6 +582,34 @@ class ActiveWorkoutViewModel @Inject constructor(
                 // Silent failure - don't interrupt user's workout
                 android.util.Log.e("ActiveWorkoutViewModel", "Failed to auto-save workout state", e)
             }
+        }
+    }
+
+    private suspend fun getProgressionSuggestionUi(exerciseId: String): ProgressionSuggestionUi? {
+        return try {
+            val suggestion = progressionEngine.getSuggestion(exerciseId) ?: return null
+            
+            // Get last workout data for display
+            val sets = workoutDao.getSetsByExercise(exerciseId)
+            if (sets.isEmpty()) return null
+            
+            val lastWorkoutId = sets.last().workoutId
+            val lastWorkoutSets = sets.filter { it.workoutId == lastWorkoutId && !it.isWarmup }
+            if (lastWorkoutSets.isEmpty()) return null
+            
+            val lastWeight = lastWorkoutSets.maxOf { it.weight }
+            val lastReps = lastWorkoutSets.maxOf { it.reps }
+            val lastRpe = lastWorkoutSets.mapNotNull { it.rpe }.maxOrNull()
+            
+            ProgressionSuggestionUi(
+                lastWeight = lastWeight,
+                lastReps = lastReps,
+                lastRpe = lastRpe,
+                suggestedWeight = suggestion.suggestedWeightKg,
+                reason = suggestion.reason,
+            )
+        } catch (e: Exception) {
+            null
         }
     }
 

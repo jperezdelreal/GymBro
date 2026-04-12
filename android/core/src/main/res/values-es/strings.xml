@@ -514,6 +514,17 @@
     <string name="active_workout_rpe_label">RPE</string>
     <string name="active_workout_progression_up">↑ +2.5kg sugerido (RPE bajo)</string>
     <string name="active_workout_progression_down">↓ −5%% sugerido (RPE alto)</string>
+    
+    <!-- Progression Suggestions -->
+    <string name="progression_last" formatted="false">Anterior: %s × %d</string>
+    <string name="progression_last_with_rpe" formatted="false">Anterior: %s × %d (RPE %s)</string>
+    <string name="progression_suggested" formatted="false">→ Sugerido: %s</string>
+    <string name="progression_maintain" formatted="false">→ Mantener: %s</string>
+    <string name="progression_reduce" formatted="false">→ Reducir: %s</string>
+    <string name="progression_reason_progress">RPE bajo — progresa</string>
+    <string name="progression_reason_maintain">En camino — mantener</string>
+    <string name="progression_reason_regress">RPE alto — reducir</string>
+    <string name="progression_reason_no_data">Basado en último entrenamiento</string>
 
     <!-- Progress (additional new) -->
     <string name="progress_e1rm_trend">Tendencia Est. 1RM</string>

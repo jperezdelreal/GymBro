@@ -798,6 +798,15 @@ private fun ExerciseCardContent(
             style = MaterialTheme.typography.bodySmall,
             color = Color.White.copy(alpha = 0.5f),
         )
+        
+        // Progression suggestion chip
+        exerciseUi.progressionSuggestion?.let { suggestion ->
+            Spacer(modifier = Modifier.height(8.dp))
+            ProgressionSuggestionChip(
+                suggestion = suggestion,
+                defaultWeightUnit = defaultWeightUnit,
+            )
+        }
 
         Spacer(modifier = Modifier.height(12.dp))
 
@@ -1101,6 +1110,89 @@ private fun RpeQuickPicker(
             fontWeight = FontWeight.Bold,
             color = if (enabled) rpeColor else rpeColor.copy(alpha = 0.4f),
         )
+    }
+}
+
+@Composable
+private fun ProgressionSuggestionChip(
+    suggestion: ProgressionSuggestionUi,
+    defaultWeightUnit: com.gymbro.core.preferences.UserPreferences.WeightUnit,
+) {
+    val unitLabel = when (defaultWeightUnit) {
+        com.gymbro.core.preferences.UserPreferences.WeightUnit.KG -> stringResource(R.string.common_kg)
+        com.gymbro.core.preferences.UserPreferences.WeightUnit.LBS -> stringResource(R.string.common_lbs)
+    }
+    
+    val (chipColor, suggestionText, reasonText) = when (suggestion.reason) {
+        com.gymbro.core.service.ProgressionEngine.ProgressionReason.PROGRESS -> Triple(
+            AccentGreenStart,
+            stringResource(R.string.progression_suggested, "${suggestion.suggestedWeight} $unitLabel"),
+            stringResource(R.string.progression_reason_progress),
+        )
+        com.gymbro.core.service.ProgressionEngine.ProgressionReason.REGRESS -> Triple(
+            com.gymbro.core.ui.theme.AccentRed,
+            stringResource(R.string.progression_reduce, "${suggestion.suggestedWeight} $unitLabel"),
+            stringResource(R.string.progression_reason_regress),
+        )
+        com.gymbro.core.service.ProgressionEngine.ProgressionReason.MAINTAIN -> Triple(
+            AccentAmberStart,
+            stringResource(R.string.progression_maintain, "${suggestion.lastWeight} $unitLabel"),
+            stringResource(R.string.progression_reason_maintain),
+        )
+        com.gymbro.core.service.ProgressionEngine.ProgressionReason.NO_DATA -> Triple(
+            Color.White.copy(alpha = 0.6f),
+            stringResource(R.string.progression_maintain, "${suggestion.lastWeight} $unitLabel"),
+            stringResource(R.string.progression_reason_no_data),
+        )
+    }
+    
+    val lastWorkoutText = if (suggestion.lastRpe != null) {
+        stringResource(
+            R.string.progression_last_with_rpe,
+            "${suggestion.lastWeight} $unitLabel",
+            suggestion.lastReps,
+            String.format("%.1f", suggestion.lastRpe)
+        )
+    } else {
+        stringResource(
+            R.string.progression_last,
+            "${suggestion.lastWeight} $unitLabel",
+            suggestion.lastReps
+        )
+    }
+    
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(8.dp))
+            .background(chipColor.copy(alpha = 0.1f))
+            .border(1.dp, chipColor.copy(alpha = 0.3f), RoundedCornerShape(8.dp))
+            .padding(horizontal = 12.dp, vertical = 8.dp),
+    ) {
+        Text(
+            text = lastWorkoutText,
+            style = MaterialTheme.typography.bodySmall,
+            color = Color.White.copy(alpha = 0.7f),
+            fontSize = 12.sp,
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = suggestionText,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Bold,
+                color = chipColor,
+                modifier = Modifier.weight(1f),
+            )
+            Text(
+                text = reasonText,
+                style = MaterialTheme.typography.bodySmall,
+                color = Color.White.copy(alpha = 0.6f),
+                fontSize = 11.sp,
+            )
+        }
     }
 }
 
