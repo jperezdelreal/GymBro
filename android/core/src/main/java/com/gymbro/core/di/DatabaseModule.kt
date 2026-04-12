@@ -77,12 +77,19 @@ object DatabaseModule {
 }
 
 @Serializable
+private data class InstructionsSeed(
+    val setup: String,
+    val execution: String,
+    val tips: String,
+)
+
+@Serializable
 private data class ExerciseSeed(
     val name: String,
     val category: String,
     val equipment: String,
-    val instructions: String,
-    val instructionsEs: String? = null,
+    val instructions: kotlinx.serialization.json.JsonElement,
+    val instructionsEs: kotlinx.serialization.json.JsonElement? = null,
     val muscleGroups: List<MuscleGroupSeed>,
     val videoURL: String? = null,
 )
@@ -110,12 +117,11 @@ private fun loadExercisesFromAssets(context: Context): List<ExerciseEntity> {
             ?.replace(" ", "_") 
             ?: "FULL_BODY"
         
-        // Use Spanish instructions if available and locale is Spanish
-        val description = if (isSpanish && seed.instructionsEs != null) {
-            seed.instructionsEs
-        } else {
-            seed.instructions
-        }
+        // Parse instructions based on format (structured object or legacy string)
+        val description = parseInstructions(
+            instructionsElement = if (isSpanish && seed.instructionsEs != null) 
+                seed.instructionsEs else seed.instructions
+        )
         
         ExerciseEntity(
             id = UUID.nameUUIDFromBytes(seed.name.toByteArray()).toString(),
@@ -126,5 +132,33 @@ private fun loadExercisesFromAssets(context: Context): List<ExerciseEntity> {
             description = description,
             youtubeUrl = seed.videoURL,
         )
+    }
+}
+
+private fun parseInstructions(instructionsElement: kotlinx.serialization.json.JsonElement): String {
+    val jsonParser = Json { ignoreUnknownKeys = true }
+    return when {
+        // Structured format: { setup, execution, tips }
+        instructionsElement is kotlinx.serialization.json.JsonObject -> {
+            try {
+                val structured = jsonParser.decodeFromJsonElement(InstructionsSeed.serializer(), instructionsElement)
+                buildString {
+                    append("##SETUP##\n")
+                    append(structured.setup)
+                    append("\n\n##EXECUTION##\n")
+                    append(structured.execution)
+                    append("\n\n##TIPS##\n")
+                    append(structured.tips)
+                }
+            } catch (e: Exception) {
+                // Fallback if structured parsing fails
+                instructionsElement.toString()
+            }
+        }
+        // Legacy format: plain string
+        instructionsElement is kotlinx.serialization.json.JsonPrimitive -> {
+            instructionsElement.content
+        }
+        else -> ""
     }
 }

@@ -284,20 +284,9 @@ private fun ExerciseDetailContent(
 
         // Description
         if (exercise.description.isNotBlank()) {
-            GlassmorphicCard {
-                Column {
-                    Text(
-                        text = stringResource(R.string.exercise_detail_description),
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = exercise.description,
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onBackground,
-                    )
-                }
+            val sections = parseExerciseSections(exercise.description)
+            sections.forEach { section ->
+                ExerciseSectionCard(section = section)
             }
         }
 
@@ -375,4 +364,98 @@ private fun muscleGroupColor(muscleGroup: MuscleGroup): Color = when (muscleGrou
     MuscleGroup.SHOULDERS -> AccentGreenEnd
     MuscleGroup.CORE -> AccentCyanStart
     else -> AccentGreenStart
+}
+
+enum class SectionType { SETUP, EXECUTION, TIPS, LEGACY }
+
+private data class ExerciseSection(val type: SectionType, val content: String)
+
+private fun parseExerciseSections(description: String): List<ExerciseSection> {
+    if (!description.contains("##SETUP##")) {
+        // Legacy format: return as single block
+        return listOf(ExerciseSection(SectionType.LEGACY, description))
+    }
+    
+    val sections = mutableListOf<ExerciseSection>()
+    val parts = description.split("##")
+    
+    var i = 0
+    while (i < parts.size) {
+        val part = parts[i].trim()
+        if (part == "SETUP" && i + 1 < parts.size) {
+            sections.add(ExerciseSection(SectionType.SETUP, parts[i + 1].trim()))
+            i += 2
+        } else if (part == "EXECUTION" && i + 1 < parts.size) {
+            sections.add(ExerciseSection(SectionType.EXECUTION, parts[i + 1].trim()))
+            i += 2
+        } else if (part == "TIPS" && i + 1 < parts.size) {
+            sections.add(ExerciseSection(SectionType.TIPS, parts[i + 1].trim()))
+            i += 2
+        } else {
+            i++
+        }
+    }
+    
+    return sections
+}
+
+@Composable
+private fun ExerciseSectionCard(section: ExerciseSection) {
+    if (section.type == SectionType.LEGACY) {
+        // Legacy format: render as-is
+        GlassmorphicCard {
+            Column {
+                Text(
+                    text = stringResource(R.string.exercise_detail_description),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = section.content,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onBackground,
+                )
+            }
+        }
+        return
+    }
+    
+    val (emoji, titleRes, accentColor) = when (section.type) {
+        SectionType.SETUP -> Triple("🔧", R.string.exercise_section_setup, AccentCyanStart)
+        SectionType.EXECUTION -> Triple("💪", R.string.exercise_section_execution, AccentGreenStart)
+        SectionType.TIPS -> Triple("💡", R.string.exercise_section_tips, AccentAmberStart)
+        else -> Triple("", R.string.exercise_detail_description, AccentGreenStart)
+    }
+    
+    GlassmorphicCard(accentColor = accentColor) {
+        Column {
+            // Section header with emoji
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                Text(
+                    text = emoji,
+                    style = MaterialTheme.typography.titleLarge,
+                )
+                Text(
+                    text = stringResource(titleRes),
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.Bold,
+                    ),
+                    color = accentColor,
+                )
+            }
+            Spacer(modifier = Modifier.height(12.dp))
+            
+            // Section content
+            Text(
+                text = section.content,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onBackground,
+                lineHeight = 24.sp,
+            )
+        }
+    }
 }
