@@ -20,7 +20,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CalendarMonth
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Timer
@@ -31,7 +30,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
@@ -48,6 +46,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
@@ -61,7 +61,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gymbro.core.R
 import com.gymbro.core.model.WorkoutDay
 import com.gymbro.core.model.WorkoutPlan
-import com.gymbro.core.model.PersonalRecord
 import com.gymbro.core.preferences.UserPreferences
 import com.gymbro.feature.common.FullScreenLoading
 import com.gymbro.feature.common.ObserveErrors
@@ -150,24 +149,6 @@ fun HomeScreen(
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
-                // Workout Streak Badge
-                if (state.workoutStreak > 0) {
-                    item {
-                        WorkoutStreakBadge(streak = state.workoutStreak)
-                    }
-                }
-
-                // PR Celebration Banner
-                if (state.showPRCelebration && state.recentPR != null) {
-                    item {
-                        PRCelebrationBanner(
-                            pr = state.recentPR,
-                            onDismiss = { onEvent(HomeEvent.DismissPRBanner) },
-                            weightUnit = weightUnit,
-                        )
-                    }
-                }
-
                 // Quick Start Button — the hero action
                 item {
                     QuickStartCard(
@@ -265,6 +246,7 @@ private fun QuickStartCard(
     daysSinceLastWorkout: Int?,
     onQuickStart: () -> Unit,
 ) {
+    val haptic = LocalHapticFeedback.current
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -314,7 +296,10 @@ private fun QuickStartCard(
                 Spacer(modifier = Modifier.height(12.dp))
 
                 Button(
-                    onClick = onQuickStart,
+                    onClick = {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        onQuickStart()
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp)
@@ -350,6 +335,7 @@ private fun TodayWorkoutCard(
     onStartWorkout: () -> Unit,
     onViewPrograms: () -> Unit,
 ) {
+    val haptic = LocalHapticFeedback.current
     val viewAllProgramsLabel = stringResource(R.string.home_cd_view_all_programs)
     Card(
         modifier = Modifier
@@ -413,7 +399,10 @@ private fun TodayWorkoutCard(
                 }
 
                 Button(
-                    onClick = onStartWorkout,
+                    onClick = {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        onStartWorkout()
+                    },
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = AccentGreen,
@@ -494,7 +483,10 @@ private fun TodayWorkoutCard(
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier
                     .semantics { contentDescription = viewAllProgramsLabel }
-                    .clickable(onClick = onViewPrograms)
+                    .clickable(onClick = {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        onViewPrograms()
+                    })
                     .padding(vertical = 4.dp),
             )
         }
@@ -505,10 +497,14 @@ private fun TodayWorkoutCard(
 private fun CreateProgramCta(
     onCreateProgram: () -> Unit,
 ) {
+    val haptic = LocalHapticFeedback.current
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onCreateProgram)
+            .clickable(onClick = {
+                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                onCreateProgram()
+            })
             .testTag("create_program_cta"),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
@@ -552,6 +548,7 @@ private fun RecentWorkoutCard(
     onClick: () -> Unit,
     weightUnit: UserPreferences.WeightUnit = UserPreferences.WeightUnit.KG,
 ) {
+    val haptic = LocalHapticFeedback.current
     val dateFormatter = remember {
         DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
     }
@@ -571,7 +568,10 @@ private fun RecentWorkoutCard(
         modifier = Modifier
             .fillMaxWidth()
             .semantics(mergeDescendants = true) { contentDescription = workoutDescription }
-            .clickable(onClick = onClick),
+            .clickable(onClick = {
+                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                onClick()
+            }),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface,
@@ -665,112 +665,6 @@ private fun formatDuration(seconds: Long): String {
     val hours = seconds / 3600
     val minutes = (seconds % 3600) / 60
     return if (hours > 0) "${hours}h ${minutes}m" else "${minutes}m"
-}
-
-
-@Composable
-private fun WorkoutStreakBadge(streak: Int) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .testTag("workout_streak_badge"),
-        colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFFF6B35).copy(alpha = 0.15f),
-        ),
-        shape = RoundedCornerShape(16.dp),
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                text = "🔥",
-                style = MaterialTheme.typography.headlineMedium,
-                modifier = Modifier.padding(end = 8.dp),
-            )
-            Text(
-                text = stringResource(R.string.streak_badge, streak),
-                style = MaterialTheme.typography.titleLarge.copy(
-                    fontWeight = FontWeight.Bold,
-                ),
-                color = MaterialTheme.colorScheme.onSurface,
-            )
-        }
-    }
-}
-
-@Composable
-private fun PRCelebrationBanner(
-    pr: PersonalRecord,
-    onDismiss: () -> Unit,
-    weightUnit: UserPreferences.WeightUnit,
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .testTag("pr_celebration_banner"),
-        colors = CardDefaults.cardColors(
-            containerColor = AccentGreen.copy(alpha = 0.15f),
-        ),
-        shape = RoundedCornerShape(16.dp),
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Row(
-                modifier = Modifier.weight(1f),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(
-                    text = pr.type.emoji,
-                    style = MaterialTheme.typography.headlineMedium,
-                    modifier = Modifier.padding(end = 8.dp),
-                )
-                Column {
-                    Text(
-                        text = stringResource(R.string.pr_banner_title),
-                        style = MaterialTheme.typography.titleMedium.copy(
-                            fontWeight = FontWeight.Bold,
-                        ),
-                        color = MaterialTheme.colorScheme.onSurface,
-                    )
-                    val formattedValue = when (pr.type) {
-                        com.gymbro.core.model.RecordType.MAX_WEIGHT -> {
-                            "%.1f ${weightUnit.symbol}".format(pr.value)
-                        }
-                        com.gymbro.core.model.RecordType.MAX_REPS -> {
-                            "${pr.value.toInt()} reps"
-                        }
-                        com.gymbro.core.model.RecordType.MAX_VOLUME -> {
-                            "%.1f ${weightUnit.symbol}".format(pr.value)
-                        }
-                        com.gymbro.core.model.RecordType.MAX_E1RM -> {
-                            "%.1f ${weightUnit.symbol}".format(pr.value)
-                        }
-                    }
-                    Text(
-                        text = stringResource(R.string.pr_banner, pr.exerciseName, formattedValue),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
-                    )
-                }
-            }
-            IconButton(onClick = onDismiss) {
-                Icon(
-                    imageVector = Icons.Default.Close,
-                    contentDescription = stringResource(R.string.dismiss),
-                    tint = MaterialTheme.colorScheme.onSurface,
-                )
-            }
-        }
-    }
 }
 
 @dagger.hilt.EntryPoint

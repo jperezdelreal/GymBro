@@ -1,8 +1,6 @@
 package com.gymbro.app.navigation
 
 import androidx.compose.animation.AnimatedContentTransitionScope
-import androidx.compose.animation.ExperimentalSharedTransitionApi
-import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -45,6 +43,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
@@ -93,7 +93,6 @@ import kotlinx.coroutines.launch
 
 private val AccentGreen = Color(0xFF00FF87)
 
-@OptIn(ExperimentalSharedTransitionApi::class)
 private enum class BottomNavTab(
     val route: String,
     val labelResId: Int,
@@ -106,7 +105,6 @@ private enum class BottomNavTab(
     PROFILE("profile", R.string.nav_profile, Icons.Filled.Person, Icons.Outlined.Person),
 }
 
-@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun GymBroNavGraph(
     userPreferences: UserPreferences = hiltViewModel<GymBroNavGraphViewModel>().userPreferences,
@@ -176,36 +174,35 @@ fun GymBroNavGraph(
         },
         containerColor = MaterialTheme.colorScheme.background,
     ) { innerPadding ->
-        SharedTransitionLayout {
-            NavHost(
-                navController = navController,
-                startDestination = startDestination,
-                modifier = Modifier.padding(innerPadding),
-                enterTransition = {
-                    slideIntoContainer(
-                        towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                        animationSpec = tween(300)
-                    ) + fadeIn(animationSpec = tween(300))
-                },
-                exitTransition = {
-                    slideOutOfContainer(
-                        towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                        animationSpec = tween(300)
-                    ) + fadeOut(animationSpec = tween(300))
-                },
-                popEnterTransition = {
-                    slideIntoContainer(
-                        towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                        animationSpec = tween(300)
-                    ) + fadeIn(animationSpec = tween(300))
-                },
-                popExitTransition = {
-                    slideOutOfContainer(
-                        towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                        animationSpec = tween(300)
-                    ) + fadeOut(animationSpec = tween(300))
-                },
-            ) {
+        NavHost(
+            navController = navController,
+            startDestination = startDestination,
+            modifier = Modifier.padding(innerPadding),
+            enterTransition = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(300)
+                ) + fadeIn(animationSpec = tween(300))
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(300)
+                ) + fadeOut(animationSpec = tween(300))
+            },
+            popEnterTransition = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(300)
+                ) + fadeIn(animationSpec = tween(300))
+            },
+            popExitTransition = {
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(300)
+                ) + fadeOut(animationSpec = tween(300))
+            },
+        ) {
         composable("onboarding") {
             val context = androidx.compose.ui.platform.LocalContext.current
             OnboardingRoute(
@@ -250,8 +247,6 @@ fun GymBroNavGraph(
                 onNavigateToCreateExercise = {
                     navController.navigate("create_exercise")
                 },
-                sharedTransitionScope = this@SharedTransitionLayout,
-                animatedContentScope = this@composable,
             )
         }
         composable(
@@ -262,8 +257,6 @@ fun GymBroNavGraph(
         ) {
             ExerciseDetailRoute(
                 onNavigateBack = { navController.popBackStack() },
-                sharedTransitionScope = this@SharedTransitionLayout,
-                animatedContentScope = this@composable,
             )
         }
         composable("create_exercise") {
@@ -500,7 +493,6 @@ fun GymBroNavGraph(
             )
         }
         }
-        }
     }
 }
 
@@ -509,6 +501,7 @@ private fun GymBroBottomNavBar(
     currentRoute: String?,
     onTabSelected: (BottomNavTab) -> Unit,
 ) {
+    val haptic = LocalHapticFeedback.current
     val selectedIndex = BottomNavTab.entries.indexOfFirst { it.route == currentRoute }.takeIf { it >= 0 } ?: 0
     val indicatorOffset by androidx.compose.animation.core.animateFloatAsState(
         targetValue = selectedIndex.toFloat(),
@@ -529,7 +522,10 @@ private fun GymBroBottomNavBar(
                 val label = stringResource(tab.labelResId)
                 NavigationBarItem(
                     selected = selected,
-                    onClick = { onTabSelected(tab) },
+                    onClick = {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        onTabSelected(tab)
+                    },
                     modifier = Modifier.testTag("nav_${tab.route}"),
                     icon = {
                         Icon(

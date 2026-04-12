@@ -49,6 +49,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
@@ -235,6 +237,7 @@ private fun WorkoutCard(
     index: Int,
     weightUnit: UserPreferences.WeightUnit = UserPreferences.WeightUnit.KG,
 ) {
+    val haptic = LocalHapticFeedback.current
     var visible by remember { mutableStateOf(false) }
     
     LaunchedEffect(Unit) {
@@ -260,7 +263,10 @@ private fun WorkoutCard(
         enter = fadeIn() + slideInVertically(initialOffsetY = { it / 4 })
     ) {
         GlassmorphicCard(
-            onClick = onClick,
+            onClick = {
+                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                onClick()
+            },
             accentColor = accentColor,
             modifier = Modifier.semantics(mergeDescendants = true) {
                 contentDescription = workoutCardDescription
