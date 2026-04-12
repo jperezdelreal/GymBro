@@ -11,10 +11,7 @@ import com.gymbro.core.preferences.UserPreferences
 import com.gymbro.core.repository.ExerciseRepository
 import kotlin.math.roundToInt
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.withTimeout
 import javax.inject.Inject
-
-private const val SEED_WAIT_TIMEOUT_MS = 30_000L
 
 class WorkoutPlanGenerator @Inject constructor(
     private val exerciseRepository: ExerciseRepository,
@@ -26,12 +23,8 @@ class WorkoutPlanGenerator @Inject constructor(
         daysPerWeek: Int,
         trainingPhase: UserPreferences.TrainingPhase = UserPreferences.TrainingPhase.MAINTENANCE,
     ): WorkoutPlan {
-        // Wait for exercises to be available — on first install the seed data
-        // loads asynchronously, so the Room Flow may initially emit an empty list.
-        // first { isNotEmpty() } suspends until Room re-emits after the seed insert.
-        val allExercises = withTimeout(SEED_WAIT_TIMEOUT_MS) {
-            exerciseRepository.getAllExercises().first { it.isNotEmpty() }
-        }
+        // Seed is now synchronous — exercises are guaranteed to be available
+        val allExercises = exerciseRepository.getAllExercises().first()
         val split = TrainingSplit.selectOptimalSplit(daysPerWeek, goal)
         val volumeMultiplier = when (trainingPhase) {
             UserPreferences.TrainingPhase.BULK -> 1.2f
