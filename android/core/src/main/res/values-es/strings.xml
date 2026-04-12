@@ -412,6 +412,12 @@
     <string name="progress_plateau_get_coaching">Obtener Consejo del Coach</string>
     <string name="progress_plateau_empty_state">No se detectaron estancamientos — ¡sigue así!</string>
 
+    <!-- Home Plateau Alerts -->
+    <string name="home_plateau_alert_title">Alerta de Meseta</string>
+    <string name="home_plateau_stagnation_weeks">%1$s estancado %2$d semanas</string>
+    <string name="home_plateau_regression_weeks">%1$s en declive %2$d semanas</string>
+    <string name="home_plateau_talk_to_coach">Hablar con Entrenador</string>
+
     <!-- History (additional) -->
     <string name="history_workout_details">Detalles del Entrenamiento</string>
     <string name="history_loading_workout">Cargando entrenamiento...</string>
