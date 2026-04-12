@@ -49,6 +49,9 @@ class OnboardingViewModel @Inject constructor(
             is OnboardingEvent.TrainingPhaseSelected -> {
                 _state.value = _state.value.copy(selectedPhase = event.phase)
             }
+            is OnboardingEvent.SessionDurationSelected -> {
+                _state.value = _state.value.copy(sessionDurationMinutes = event.minutes)
+            }
             is OnboardingEvent.CompleteOnboarding -> {
                 completeOnboarding()
             }
@@ -66,6 +69,7 @@ class OnboardingViewModel @Inject constructor(
             userPreferences.setExperienceLevel(_state.value.selectedExperience)
             userPreferences.setTrainingDaysPerWeek(_state.value.trainingDaysPerWeek)
             userPreferences.setTrainingPhase(_state.value.selectedPhase)
+            userPreferences.setSessionDurationMinutes(_state.value.sessionDurationMinutes)
             userPreferences.setOnboardingComplete(true)
 
             var planGenerated = false
