@@ -781,6 +781,13 @@
     <string name="profile_recovery">Recovery</string>
     <string name="profile_recovery_subtitle">Track sleep, readiness, and recovery</string>
 
+    <!-- Progress & Analytics navigation -->
+    <string name="profile_progress_analytics">Progress &amp; Stats</string>
+    <string name="profile_progress">Progress</string>
+    <string name="profile_progress_subtitle">View charts, PRs, and plateau alerts</string>
+    <string name="profile_analytics">Analytics</string>
+    <string name="profile_analytics_subtitle">Volume, consistency, and insights</string>
+
     <!-- Issue #458: Content descriptions -->
     <string name="history_workout_cd">Workout on %1$s, %2$d exercises, %3$s</string>
     <string name="onboarding_goal_cd">Training goal: %s</string>
