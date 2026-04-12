@@ -21,6 +21,11 @@ data class WorkoutWithSets(
     val sets: List<WorkoutSetEntity>,
 )
 
+data class WorkoutSetWithDate(
+    @Embedded val set: WorkoutSetEntity,
+    val workoutDate: Long,
+)
+
 @Dao
 interface WorkoutDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -105,4 +110,15 @@ interface WorkoutDao {
 
     @Query("SELECT COUNT(DISTINCT date(startedAt / 1000, 'unixepoch')) FROM workouts WHERE completed = 1")
     suspend fun getActiveDaysCount(): Int
+
+    @Query(
+        """
+        SELECT ws.*, w.startedAt as workoutDate FROM workout_sets ws
+        INNER JOIN workouts w ON ws.workoutId = w.id
+        WHERE ws.exerciseId = :exerciseId AND w.completed = 1 AND ws.isWarmup = 0
+        ORDER BY w.startedAt DESC
+        LIMIT :limit
+        """
+    )
+    suspend fun getExerciseHistorySets(exerciseId: String, limit: Int): List<WorkoutSetWithDate>
 }

@@ -222,6 +222,8 @@ class ActiveWorkoutViewModel @Inject constructor(
             is ActiveWorkoutEvent.ToggleExerciseSelection -> toggleExerciseSelection(event.exerciseIndex)
             is ActiveWorkoutEvent.CreateSuperset -> createSuperset()
             is ActiveWorkoutEvent.UnlinkSuperset -> unlinkSuperset(event.groupId)
+            is ActiveWorkoutEvent.ShowExerciseDetail -> showExerciseDetail(event.exercise)
+            is ActiveWorkoutEvent.DismissExerciseDetail -> _state.update { it.copy(exerciseDetailSheet = null) }
         }
     }
     
@@ -258,6 +260,37 @@ class ActiveWorkoutViewModel @Inject constructor(
             val newGroups = current.supersetGroups.toMutableMap()
             newGroups.remove(groupId)
             current.copy(supersetGroups = newGroups)
+        }
+    }
+
+    private fun showExerciseDetail(exercise: Exercise) {
+        safeLaunch {
+            _state.update { it.copy(exerciseDetailSheet = ExerciseDetailSheetState(exercise = exercise, isLoadingHistory = true)) }
+            
+            val history = workoutRepository.getExerciseHistory(exercise.id.toString(), limit = 10)
+            
+            val historyUi = history.map { session ->
+                val formatter = java.time.format.DateTimeFormatter.ofPattern("MMM d, yyyy")
+                ExerciseHistorySessionUi(
+                    date = session.workoutDate.atZone(java.time.ZoneId.systemDefault()).format(formatter),
+                    sets = session.sets.map { set ->
+                        ExerciseHistorySetUi(
+                            weight = set.weightKg,
+                            reps = set.reps,
+                            rpe = set.rpe,
+                        )
+                    }
+                )
+            }
+            
+            _state.update { 
+                it.copy(
+                    exerciseDetailSheet = it.exerciseDetailSheet?.copy(
+                        history = historyUi,
+                        isLoadingHistory = false,
+                    )
+                )
+            }
         }
     }
 

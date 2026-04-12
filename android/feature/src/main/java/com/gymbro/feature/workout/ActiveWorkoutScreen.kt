@@ -29,6 +29,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -39,6 +41,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.SmartToy
 import androidx.compose.material3.AlertDialog
@@ -48,6 +51,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -56,6 +60,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -521,6 +526,15 @@ fun ActiveWorkoutScreen(
                 onDismiss = onTooltipDismissed
             )
         }
+
+        // Exercise Detail Bottom Sheet
+        state.exerciseDetailSheet?.let { detailState ->
+            ExerciseDetailBottomSheet(
+                detailState = detailState,
+                onDismiss = { onEvent(ActiveWorkoutEvent.DismissExerciseDetail) },
+                defaultWeightUnit = defaultWeightUnit,
+            )
+        }
     }
 }
 
@@ -793,7 +807,12 @@ private fun ExerciseCardContent(
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
-                modifier = Modifier.weight(1f).semantics { heading() },
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable(
+                        onClick = { onEvent(ActiveWorkoutEvent.ShowExerciseDetail(exerciseUi.exercise)) }
+                    )
+                    .semantics { heading() },
             )
             // Voice input — auto-fills the first incomplete set
             VoiceInputButton(
@@ -1515,3 +1534,252 @@ private fun formatDuration(totalSeconds: Long): String {
         "%d:%02d".format(minutes, seconds)
     }
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ExerciseDetailBottomSheet(
+    detailState: ExerciseDetailSheetState,
+    onDismiss: () -> Unit,
+    defaultWeightUnit: UserPreferences.WeightUnit,
+) {
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = sheetState,
+        containerColor = Color(0xFF1C1C1E),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 24.dp, vertical = 16.dp)
+        ) {
+            // Exercise Name Header
+            Text(
+                text = detailState.exercise.name,
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold,
+                color = Color.White,
+                modifier = Modifier.padding(bottom = 16.dp),
+            )
+            
+            // Exercise Metadata
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 24.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                ExerciseMetadataChip(
+                    label = stringResource(R.string.exercise_detail_equipment),
+                    value = detailState.exercise.equipment.name.lowercase().replaceFirstChar { it.uppercase() },
+                )
+                ExerciseMetadataChip(
+                    label = stringResource(R.string.exercise_detail_muscle_group),
+                    value = detailState.exercise.muscleGroup.displayName,
+                )
+            }
+            
+            // Description with structured sections
+            if (detailState.exercise.description.isNotBlank()) {
+                Text(
+                    text = stringResource(R.string.exercise_detail_description),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White,
+                    modifier = Modifier.padding(bottom = 8.dp),
+                )
+                
+                val sections = parseExerciseDescription(detailState.exercise.description)
+                sections.forEach { (sectionName, content) ->
+                    if (content.isNotBlank()) {
+                        Text(
+                            text = when (sectionName) {
+                                "SETUP" -> stringResource(R.string.exercise_detail_setup)
+                                "EXECUTION" -> stringResource(R.string.exercise_detail_execution)
+                                "TIPS" -> stringResource(R.string.exercise_detail_tips)
+                                else -> sectionName
+                            },
+                            style = MaterialTheme.typography.labelLarge,
+                            fontWeight = FontWeight.SemiBold,
+                            color = AccentCyanStart,
+                            modifier = Modifier.padding(top = 12.dp, bottom = 4.dp),
+                        )
+                        Text(
+                            text = content.trim(),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color.White.copy(alpha = 0.85f),
+                        )
+                    }
+                }
+                
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+            
+            // YouTube Video Link
+            detailState.exercise.youtubeUrl?.let { url ->
+                val context = androidx.compose.ui.platform.LocalContext.current
+                OutlinedButton(
+                    onClick = {
+                        // Open YouTube URL
+                        val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(url))
+                        context.startActivity(intent)
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 24.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = AccentCyanStart,
+                    ),
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.PlayArrow,
+                        contentDescription = null,
+                        modifier = Modifier.size(20.dp),
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(stringResource(R.string.exercise_detail_watch_video))
+                }
+            }
+            
+            // History Section
+            Text(
+                text = stringResource(R.string.exercise_detail_history_title),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = Color.White,
+                modifier = Modifier.padding(bottom = 12.dp),
+            )
+            
+            when {
+                detailState.isLoadingHistory -> {
+                    Text(
+                        text = stringResource(R.string.exercise_detail_history_loading),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.White.copy(alpha = 0.6f),
+                        modifier = Modifier.padding(vertical = 16.dp),
+                    )
+                }
+                detailState.history.isEmpty() -> {
+                    Text(
+                        text = stringResource(R.string.exercise_detail_history_empty),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.White.copy(alpha = 0.6f),
+                        modifier = Modifier.padding(vertical = 16.dp),
+                    )
+                }
+                else -> {
+                    detailState.history.forEach { session ->
+                        HistorySessionCard(
+                            session = session,
+                            weightUnit = defaultWeightUnit,
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                    }
+                }
+            }
+            
+            Spacer(modifier = Modifier.height(32.dp))
+        }
+    }
+}
+
+@Composable
+private fun ExerciseMetadataChip(label: String, value: String) {
+    Column {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelSmall,
+            color = Color.White.copy(alpha = 0.6f),
+        )
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.Medium,
+            color = Color.White,
+        )
+    }
+}
+
+@Composable
+private fun HistorySessionCard(
+    session: ExerciseHistorySessionUi,
+    weightUnit: UserPreferences.WeightUnit,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                color = Color.White.copy(alpha = 0.05f),
+                shape = RoundedCornerShape(12.dp)
+            )
+            .padding(16.dp)
+    ) {
+        Text(
+            text = session.date,
+            style = MaterialTheme.typography.labelMedium,
+            fontWeight = FontWeight.SemiBold,
+            color = AccentGreenStart,
+            modifier = Modifier.padding(bottom = 8.dp),
+        )
+        
+        session.sets.forEachIndexed { index, set ->
+            val weight = if (weightUnit == UserPreferences.WeightUnit.LBS) {
+                set.weight * 2.20462
+            } else {
+                set.weight
+            }
+            
+            val setInfo = if (set.rpe != null) {
+                stringResource(
+                    R.string.exercise_detail_set_format_with_rpe,
+                    set.reps,
+                    weight,
+                    set.rpe
+                )
+            } else {
+                stringResource(
+                    R.string.exercise_detail_set_format,
+                    set.reps,
+                    weight
+                )
+            }
+            
+            Text(
+                text = "Set ${index + 1}: $setInfo",
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.White.copy(alpha = 0.85f),
+                modifier = Modifier.padding(vertical = 2.dp),
+            )
+        }
+    }
+}
+
+private fun parseExerciseDescription(description: String): List<Pair<String, String>> {
+    val sections = mutableListOf<Pair<String, String>>()
+    val sectionPattern = "##(\\w+)##".toRegex()
+    
+    val matches = sectionPattern.findAll(description).toList()
+    
+    if (matches.isEmpty()) {
+        // No structured format, return the whole description as-is
+        return listOf("" to description)
+    }
+    
+    matches.forEachIndexed { index, match ->
+        val sectionName = match.groupValues[1]
+        val startIndex = match.range.last + 1
+        val endIndex = if (index < matches.size - 1) {
+            matches[index + 1].range.first
+        } else {
+            description.length
+        }
+        
+        val content = description.substring(startIndex, endIndex).trim()
+        sections.add(sectionName to content)
+    }
+    
+    return sections
+}
+

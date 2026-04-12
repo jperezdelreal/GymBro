@@ -841,4 +841,15 @@
     <string name="profile_sign_out_failed">Sign-out failed</string>
     <string name="home_cd_view_all_programs">View all programs</string>
     <string name="home_cd_recent_workout">Workout on %1$s, %2$d exercises</string>
+
+    <!-- Exercise Detail Sheet - Additional strings -->
+    <string name="exercise_detail_sheet_title">Exercise Details</string>
+    <string name="exercise_detail_history_title">Recent Sessions</string>
+    <string name="exercise_detail_history_empty">No history yet for this exercise</string>
+    <string name="exercise_detail_history_loading">Loading history…</string>
+    <string name="exercise_detail_setup">Setup</string>
+    <string name="exercise_detail_execution">Execution</string>
+    <string name="exercise_detail_tips">Tips</string>
+    <string name="exercise_detail_set_format">%1$d × %2$.1f kg</string>
+    <string name="exercise_detail_set_format_with_rpe">%1$d × %2$.1f kg @ RPE %3$.1f</string>
 </resources>
