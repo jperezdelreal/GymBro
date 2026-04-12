@@ -386,6 +386,15 @@ class ActiveWorkoutViewModel @Inject constructor(
 
             updateSetField(exerciseIndex, setIndex) { it.copy(isCompleted = true) }
 
+            // Auto-add next set if all current sets are completed (max 5)
+            val updatedExercise = _state.value.exercises.getOrNull(exerciseIndex)
+            if (updatedExercise != null &&
+                updatedExercise.sets.all { it.isCompleted } &&
+                updatedExercise.sets.size < 5
+            ) {
+                addSet(exerciseIndex)
+            }
+
             recalculateTotals()
 
             autoSaveState()

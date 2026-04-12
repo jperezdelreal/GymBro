@@ -1,0 +1,37 @@
+appId: com.gymbro.app
+name: "Log Set Helper - Enter weight and reps via number dialogs"
+# Sub-flow for entering a set: weight dialog → reps dialog → complete set
+# Uses env vars: SET_WEIGHT, SET_REPS
+---
+
+# Enter weight via dialog
+- tapOn:
+    id: "weight_input"
+    index: 0
+- waitForAnimationToEnd:
+    timeout: 500
+- eraseText: 10
+- inputText: "${SET_WEIGHT}"
+- hideKeyboard
+- tapOn: "Hecho|Done"
+- waitForAnimationToEnd:
+    timeout: 500
+
+# Enter reps via dialog
+- tapOn:
+    id: "reps_input"
+    index: 0
+- waitForAnimationToEnd:
+    timeout: 500
+- eraseText: 10
+- inputText: "${SET_REPS}"
+- hideKeyboard
+- tapOn: "Hecho|Done"
+- waitForAnimationToEnd:
+    timeout: 500
+
+# Complete set (green check button with content description)
+- tapOn:
+    text: "Completar serie.*"
+- waitForAnimationToEnd:
+    timeout: 1000

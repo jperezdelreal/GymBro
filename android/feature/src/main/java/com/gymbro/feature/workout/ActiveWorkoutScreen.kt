@@ -33,6 +33,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -76,12 +77,15 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -894,16 +898,21 @@ private fun ExerciseCardContent(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Column headers
+        // Column headers — must match SetRow layout: 56dp set + weight(1f) + 8dp + reps(1f) + 4dp + RPE(56dp) + 8dp + complete(56dp)
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(stringResource(R.string.active_workout_header_set), style = setHeaderStyle(), modifier = Modifier.width(40.dp))
+            Text(stringResource(R.string.active_workout_header_set), style = setHeaderStyle(), modifier = Modifier.width(56.dp), textAlign = TextAlign.Center)
             Text(stringResource(R.string.active_workout_header_weight), style = setHeaderStyle(), modifier = Modifier.weight(1f), textAlign = TextAlign.Center)
+            Spacer(modifier = Modifier.width(8.dp))
             Text(stringResource(R.string.active_workout_header_reps), style = setHeaderStyle(), modifier = Modifier.weight(1f), textAlign = TextAlign.Center)
-            Spacer(modifier = Modifier.width(56.dp)) // for complete button
+            Spacer(modifier = Modifier.width(4.dp))
+            Spacer(modifier = Modifier.width(56.dp)) // RPE column
+            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(56.dp)) // complete button
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -1354,6 +1363,11 @@ private fun NumberInputDialog(
 ) {
     val haptic = LocalHapticFeedback.current
     var currentValue by remember(value) { mutableStateOf(value) }
+    val focusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -1419,13 +1433,24 @@ private fun NumberInputDialog(
                         },
                         modifier = Modifier
                             .weight(1f)
-                            .height(72.dp),
+                            .height(72.dp)
+                            .focusRequester(focusRequester)
+                            .testTag("number_input_field"),
                         textStyle = MaterialTheme.typography.headlineMedium.copy(
                             textAlign = TextAlign.Center,
                             fontWeight = FontWeight.Bold,
                         ),
                         singleLine = true,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Decimal,
+                            imeAction = ImeAction.Done,
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onDone = {
+                                onValueChange(currentValue)
+                                onConfirm()
+                            },
+                        ),
                         colors = TextFieldDefaults.colors(
                             focusedContainerColor = Color.White.copy(alpha = 0.08f),
                             unfocusedContainerColor = Color.White.copy(alpha = 0.05f),

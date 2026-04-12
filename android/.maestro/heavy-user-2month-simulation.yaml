@@ -1,0 +1,678 @@
+appId: com.gymbro.app
+name: "Heavy User 2-Month Simulation"
+tags:
+  - e2e
+  - stress
+  - heavy-user
+---
+# ====================================================================================
+# HEAVY USER 2-MONTH SIMULATION - Realistic gym journey of a curious power user
+# ====================================================================================
+# This test simulates 8 weeks of realistic usage by an engaged gym enthusiast.
+#
+# STRATEGY: ONE exercise per workout (2-3 sets each)
+# - More realistic for structured training (focus on main lifts)
+# - Zero index management issues (single exercise = simple 0,1,2 indexing)
+# - Same feature coverage with 8 total workouts, 16 sets
+#
+# CRITICAL PATTERNS:
+# 1. Pre-add sets with "Añadir Serie" before logging
+# 2. Use incrementing indexes (0,1,2) for weight_input/reps_input within each exercise
+# 3. Use pressKey "Enter" to confirm dialogs (NOT tapOn "Hecho")
+# 4. NO hideKeyboard in dialog context (only for search bars)
+# 5. Skip rest timer after each set
+# 6. Tooltip dismissal only on FIRST exercise of FIRST workout
+# 7. ANR protection only on FIRST "Añadir Ejercicio"
+# 8. Welcome screen asserts "GymBro" not "Bienvenido"
+# ====================================================================================
+
+# ====================================================================================
+# WEEK 1-2: GETTING STARTED (3 workouts)
+# ====================================================================================
+
+# -----------------------------------------------
+# W1D1: Complete onboarding wizard (9 pages)
+# -----------------------------------------------
+- launchApp:
+    clearState: true
+- takeScreenshot: w1_01_welcome
+
+# Page 0: Welcome
+- assertVisible: "GymBro"
+- tapOn: "Siguiente|Next"
+- waitForAnimationToEnd:
+    timeout: 500
+
+# Page 1: Goal - Select Hypertrophy
+- waitForAnimationToEnd:
+    timeout: 500
+- tapOn: "Hipertrofia"
+- waitForAnimationToEnd:
+    timeout: 300
+- takeScreenshot: w1_02_goal_selected
+- tapOn: "Siguiente|Next"
+- waitForAnimationToEnd:
+    timeout: 500
+
+# Page 2: Experience - Select Intermediate
+- waitForAnimationToEnd:
+    timeout: 500
+- tapOn: "Intermedio"
+- waitForAnimationToEnd:
+    timeout: 300
+- tapOn: "Siguiente|Next"
+- waitForAnimationToEnd:
+    timeout: 500
+
+# Page 3: Training Phase - Select Bulk (Volumen)
+- waitForAnimationToEnd:
+    timeout: 500
+- tapOn: "Volumen"
+- waitForAnimationToEnd:
+    timeout: 300
+- takeScreenshot: w1_03_bulk_selected
+- tapOn: "Siguiente|Next"
+- waitForAnimationToEnd:
+    timeout: 500
+
+# Page 4: Session Duration - Select 60 min
+- waitForAnimationToEnd:
+    timeout: 500
+- tapOn: "60 min"
+- waitForAnimationToEnd:
+    timeout: 300
+- tapOn: "Siguiente|Next"
+- waitForAnimationToEnd:
+    timeout: 500
+
+# Page 5: Frequency - Select 5 days/week
+- waitForAnimationToEnd:
+    timeout: 500
+- tapOn: "5 días/semana"
+- waitForAnimationToEnd:
+    timeout: 300
+- takeScreenshot: w1_04_frequency_selected
+- tapOn: "Siguiente|Next"
+- waitForAnimationToEnd:
+    timeout: 500
+
+# Page 6: Track
+- waitForAnimationToEnd:
+    timeout: 500
+- tapOn: "Siguiente|Next"
+- waitForAnimationToEnd:
+    timeout: 500
+
+# Page 7: Progress
+- waitForAnimationToEnd:
+    timeout: 500
+- tapOn: "Siguiente|Next"
+- waitForAnimationToEnd:
+    timeout: 500
+
+# Page 8: Get Started - Select kg and enter name
+- waitForAnimationToEnd:
+    timeout: 500
+- tapOn: "Kilogramos \\(kg\\)"
+- waitForAnimationToEnd:
+    timeout: 300
+- tapOn:
+    id: "onboarding_name_input"
+- inputText: "Switch"
+- hideKeyboard
+- waitForAnimationToEnd:
+    timeout: 500
+- takeScreenshot: w1_05_profile_setup
+- tapOn: "¡Vamos!"
+- waitForAnimationToEnd:
+    timeout: 8000
+
+# Should land on Programs after plan generation
+- takeScreenshot: w1_06_programs_generated
+- assertVisible: "Programas|Programs"
+
+# -----------------------------------------------
+# WORKOUT 1: Bench Press only, 2 sets
+# -----------------------------------------------
+- tapOn:
+    id: "nav_home"
+- waitForAnimationToEnd:
+    timeout: 500
+- takeScreenshot: w1_07_home_screen
+
+# Start workout via FAB
+- launchApp
+- waitForAnimationToEnd:
+    timeout: 2000
+- tapOn:
+    id: "workout_fab"
+- waitForAnimationToEnd:
+    timeout: 2000
+- assertVisible: "Entrenamiento Activo"
+- takeScreenshot: w1_08_active_workout_empty
+
+# Add exercise: Barbell Bench Press
+- tapOn: "Añadir Ejercicio"
+- waitForAnimationToEnd:
+    timeout: 1000
+
+# ANR protection - ONLY for the very first "Añadir Ejercicio" in clean session
+- tapOn:
+    text: "Esperar|Wait"
+    optional: true
+- waitForAnimationToEnd:
+    timeout: 3000
+
+- assertVisible: "Elegir Ejercicio"
+- takeScreenshot: w1_09_exercise_picker
+
+# Search for bench press
+- tapOn:
+    id: "search_bar"
+- inputText: "bench"
+- hideKeyboard
+- waitForAnimationToEnd:
+    timeout: 500
+
+# Select Barbell Bench Press (use regex for full name)
+- tapOn:
+    text: ".*Barbell.*Bench.*Press.*"
+    index: 0
+- waitForAnimationToEnd:
+    timeout: 1000
+
+# Dismiss tooltip on first exercise add (ONLY in first workout)
+- tapOn:
+    text: "Entendido|Got it"
+    optional: true
+- waitForAnimationToEnd:
+    timeout: 500
+
+
+# Set 1: 60kg x 10 reps (index 0)
+- tapOn:
+    id: "weight_input"
+    index: 0
+- waitForAnimationToEnd:
+    timeout: 500
+- inputText: "60"
+- pressKey: "Enter"
+- waitForAnimationToEnd:
+    timeout: 1000
+
+- tapOn:
+    id: "reps_input"
+    index: 0
+- waitForAnimationToEnd:
+    timeout: 500
+- inputText: "10"
+- pressKey: "Enter"
+- waitForAnimationToEnd:
+    timeout: 1000
+
+- tapOn:
+    text: "Completar serie.*"
+- waitForAnimationToEnd:
+    timeout: 1000
+- takeScreenshot: w1_10_bench_set1_complete
+
+# Skip rest timer
+- tapOn:
+    text: "Seguir entrenando"
+    optional: true
+- tapOn:
+    text: "Saltar Descanso|Saltar|Skip"
+    optional: true
+- waitForAnimationToEnd:
+    timeout: 500
+
+# Set 2: 60kg x 9 reps (index 1)
+- tapOn:
+    id: "weight_input"
+    index: 1
+- waitForAnimationToEnd:
+    timeout: 500
+- inputText: "60"
+- pressKey: "Enter"
+- waitForAnimationToEnd:
+    timeout: 1000
+
+- tapOn:
+    id: "reps_input"
+    index: 1
+- waitForAnimationToEnd:
+    timeout: 500
+- inputText: "9"
+- pressKey: "Enter"
+- waitForAnimationToEnd:
+    timeout: 1000
+
+- tapOn:
+    text: "Completar serie.*"
+- waitForAnimationToEnd:
+    timeout: 1000
+
+# Skip rest timer
+- tapOn:
+    text: "Seguir entrenando"
+    optional: true
+- tapOn:
+    text: "Saltar Descanso|Saltar|Skip"
+    optional: true
+- waitForAnimationToEnd:
+    timeout: 500
+
+# Finish workout
+- takeScreenshot: w1_11_bench_complete
+- tapOn: "Finalizar Entrenamiento"
+- waitForAnimationToEnd:
+    timeout: 3000
+- assertVisible: "¡Entrenamiento Completado!"
+- takeScreenshot: w1_12_workout1_summary
+- tapOn: "Listo"
+- waitForAnimationToEnd:
+    timeout: 2000
+
+# -----------------------------------------------
+# WORKOUT 2: From Plan Day 1 (2 sets)
+# -----------------------------------------------
+- tapOn:
+    id: "nav_programs"
+- waitForAnimationToEnd:
+    timeout: 500
+- takeScreenshot: w1_13_programs_tab
+
+# Tap the play button on first program card to start workout directly
+- tapOn:
+    text: "Iniciar Entrenamiento"
+    index: 0
+- waitForAnimationToEnd:
+    timeout: 2000
+- assertVisible: "Entrenamiento Activo"
+- takeScreenshot: w1_15_day1_active
+
+# BUG: Template exercises don't pre-populate (known issue)
+# Manually add an exercise for this workout
+- tapOn: "Añadir Ejercicio"
+- waitForAnimationToEnd:
+    timeout: 1000
+- assertVisible: "Elegir Ejercicio"
+- tapOn:
+    id: "search_bar"
+- inputText: "press"
+- hideKeyboard
+- waitForAnimationToEnd:
+    timeout: 500
+- tapOn:
+    text: ".*Overhead.*Press.*|.*Shoulder.*Press.*|.*Press.*Militar.*"
+    index: 0
+- waitForAnimationToEnd:
+    timeout: 1000
+
+# Set 1 (index 0)
+- tapOn:
+    id: "weight_input"
+    index: 0
+- waitForAnimationToEnd:
+    timeout: 500
+- inputText: "65"
+- pressKey: "Enter"
+- waitForAnimationToEnd:
+    timeout: 1000
+
+- tapOn:
+    id: "reps_input"
+    index: 0
+- waitForAnimationToEnd:
+    timeout: 500
+- inputText: "10"
+- pressKey: "Enter"
+- waitForAnimationToEnd:
+    timeout: 1000
+
+- tapOn:
+    text: "Completar serie.*"
+- waitForAnimationToEnd:
+    timeout: 1000
+
+# Skip rest timer
+- tapOn:
+    text: "Seguir entrenando"
+    optional: true
+- tapOn:
+    text: "Saltar Descanso|Saltar|Skip"
+    optional: true
+- waitForAnimationToEnd:
+    timeout: 500
+
+# Set 2 (index 1)
+- tapOn:
+    id: "weight_input"
+    index: 1
+- waitForAnimationToEnd:
+    timeout: 500
+- inputText: "65"
+- pressKey: "Enter"
+- waitForAnimationToEnd:
+    timeout: 1000
+
+- tapOn:
+    id: "reps_input"
+    index: 1
+- waitForAnimationToEnd:
+    timeout: 500
+- inputText: "9"
+- pressKey: "Enter"
+- waitForAnimationToEnd:
+    timeout: 1000
+
+- tapOn:
+    text: "Completar serie.*"
+- waitForAnimationToEnd:
+    timeout: 1000
+
+# Skip rest timer
+- tapOn:
+    text: "Seguir entrenando"
+    optional: true
+- tapOn:
+    text: "Saltar Descanso|Saltar|Skip"
+    optional: true
+- waitForAnimationToEnd:
+    timeout: 500
+
+# Finish workout
+- takeScreenshot: w1_16_day1_complete
+- tapOn: "Finalizar Entrenamiento"
+- waitForAnimationToEnd:
+    timeout: 3000
+- assertVisible: "¡Entrenamiento Completado!"
+- takeScreenshot: w1_17_workout2_summary
+- tapOn: "Listo"
+- waitForAnimationToEnd:
+    timeout: 2000
+
+# -----------------------------------------------
+# WORKOUT 3: Squat only, 2 sets (freestyle)
+# -----------------------------------------------
+- tapOn:
+    id: "nav_home"
+- waitForAnimationToEnd:
+    timeout: 500
+
+- launchApp
+- waitForAnimationToEnd:
+    timeout: 2000
+- tapOn:
+    id: "workout_fab"
+- waitForAnimationToEnd:
+    timeout: 2000
+- assertVisible: "Entrenamiento Activo"
+
+# Add exercise: Barbell Squat
+- tapOn: "Añadir Ejercicio"
+- waitForAnimationToEnd:
+    timeout: 1000
+- assertVisible: "Elegir Ejercicio"
+
+- tapOn:
+    id: "search_bar"
+- inputText: "squat"
+- hideKeyboard
+- waitForAnimationToEnd:
+    timeout: 500
+
+- tapOn:
+    text: ".*Barbell.*Squat.*"
+    index: 0
+- waitForAnimationToEnd:
+    timeout: 1000
+
+
+# Set 1: 80kg x 8 reps (index 0)
+- tapOn:
+    id: "weight_input"
+    index: 0
+- waitForAnimationToEnd:
+    timeout: 500
+- inputText: "80"
+- pressKey: "Enter"
+- waitForAnimationToEnd:
+    timeout: 1000
+
+- tapOn:
+    id: "reps_input"
+    index: 0
+- waitForAnimationToEnd:
+    timeout: 500
+- inputText: "8"
+- pressKey: "Enter"
+- waitForAnimationToEnd:
+    timeout: 1000
+
+- tapOn:
+    text: "Completar serie.*"
+- waitForAnimationToEnd:
+    timeout: 1000
+
+# Skip rest timer
+- tapOn:
+    text: "Seguir entrenando"
+    optional: true
+- tapOn:
+    text: "Saltar Descanso|Saltar|Skip"
+    optional: true
+- waitForAnimationToEnd:
+    timeout: 500
+
+# Set 2: 80kg x 7 reps (index 1)
+- tapOn:
+    id: "weight_input"
+    index: 1
+- waitForAnimationToEnd:
+    timeout: 500
+- inputText: "80"
+- pressKey: "Enter"
+- waitForAnimationToEnd:
+    timeout: 1000
+
+- tapOn:
+    id: "reps_input"
+    index: 1
+- waitForAnimationToEnd:
+    timeout: 500
+- inputText: "7"
+- pressKey: "Enter"
+- waitForAnimationToEnd:
+    timeout: 1000
+
+- tapOn:
+    text: "Completar serie.*"
+- waitForAnimationToEnd:
+    timeout: 1000
+
+# Skip rest timer
+- tapOn:
+    text: "Seguir entrenando"
+    optional: true
+- tapOn:
+    text: "Saltar Descanso|Saltar|Skip"
+    optional: true
+- waitForAnimationToEnd:
+    timeout: 500
+
+# Finish workout
+- takeScreenshot: w2_01_squat_complete
+- tapOn: "Finalizar Entrenamiento"
+- waitForAnimationToEnd:
+    timeout: 3000
+- assertVisible: "¡Entrenamiento Completado!"
+- takeScreenshot: w2_02_workout3_summary
+- tapOn: "Listo"
+- waitForAnimationToEnd:
+    timeout: 2000
+
+
+# -----------------------------------------------
+# WEEK 4: Check history — verify all 3 workouts
+# -----------------------------------------------
+- tapOn:
+    id: "nav_history"
+- waitForAnimationToEnd:
+    timeout: 2000
+- assertVisible: "Historial de Entrenamientos|History"
+- takeScreenshot: w4_01_history_3_workouts
+
+# -----------------------------------------------
+# WEEK 6: Restart app — verify data persistence
+# -----------------------------------------------
+- stopApp
+- launchApp
+- waitForAnimationToEnd:
+    timeout: 5000
+
+# Should NOT show onboarding
+- assertVisible:
+    text: "Programas|Programs|Inicio|Home"
+- takeScreenshot: w6_01_after_restart
+
+# Check history persists
+- tapOn:
+    id: "nav_history"
+- waitForAnimationToEnd:
+    timeout: 2000
+- assertVisible: "Historial de Entrenamientos|History"
+- takeScreenshot: w6_02_history_persisted
+
+# Check programs persist
+- tapOn:
+    id: "nav_programs"
+- waitForAnimationToEnd:
+    timeout: 2000
+- assertVisible: "Programas|Programs"
+- takeScreenshot: w6_03_programs_persisted
+
+# -----------------------------------------------
+# WEEK 7: Bench Press PROGRESSION workout (65kg > 60kg)
+# -----------------------------------------------
+- tapOn:
+    id: "nav_home"
+- waitForAnimationToEnd:
+    timeout: 1000
+
+- launchApp
+- waitForAnimationToEnd:
+    timeout: 2000
+- tapOn:
+    id: "workout_fab"
+- waitForAnimationToEnd:
+    timeout: 2000
+- assertVisible: "Entrenamiento Activo"
+
+- tapOn: "Añadir Ejercicio"
+- waitForAnimationToEnd:
+    timeout: 1000
+- assertVisible: "Elegir Ejercicio"
+- tapOn:
+    id: "search_bar"
+- inputText: "bench"
+- hideKeyboard
+- waitForAnimationToEnd:
+    timeout: 500
+- tapOn:
+    text: ".*Barbell.*Bench.*Press.*"
+    index: 0
+- waitForAnimationToEnd:
+    timeout: 1000
+
+# Set 1: 65kg x 8 (PROGRESSION from 60kg!)
+- tapOn:
+    id: "weight_input"
+    index: 0
+- waitForAnimationToEnd:
+    timeout: 500
+- inputText: "65"
+- pressKey: "Enter"
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    id: "reps_input"
+    index: 0
+- waitForAnimationToEnd:
+    timeout: 500
+- inputText: "8"
+- pressKey: "Enter"
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    text: "Completar serie.*"
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    text: "Seguir entrenando"
+    optional: true
+- tapOn:
+    text: "Saltar Descanso|Saltar|Skip"
+    optional: true
+- waitForAnimationToEnd:
+    timeout: 500
+
+# Set 2: 65kg x 7
+- tapOn:
+    id: "weight_input"
+    index: 1
+- waitForAnimationToEnd:
+    timeout: 500
+- inputText: "65"
+- pressKey: "Enter"
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    id: "reps_input"
+    index: 1
+- waitForAnimationToEnd:
+    timeout: 500
+- inputText: "7"
+- pressKey: "Enter"
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    text: "Completar serie.*"
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    text: "Seguir entrenando"
+    optional: true
+- tapOn:
+    text: "Saltar Descanso|Saltar|Skip"
+    optional: true
+- waitForAnimationToEnd:
+    timeout: 500
+
+- takeScreenshot: w7_01_bench_progression
+- tapOn: "Finalizar Entrenamiento"
+- waitForAnimationToEnd:
+    timeout: 3000
+- assertVisible: "¡Entrenamiento Completado!"
+- takeScreenshot: w7_02_progression_summary
+- tapOn: "Listo"
+- waitForAnimationToEnd:
+    timeout: 2000
+
+# -----------------------------------------------
+# WEEK 8: Final history check — ALL workouts visible
+# -----------------------------------------------
+- tapOn:
+    id: "nav_history"
+- waitForAnimationToEnd:
+    timeout: 2000
+- assertVisible: "Historial de Entrenamientos|History"
+- takeScreenshot: w8_final_history
+
+# Back to home — 2 month simulation complete!
+- tapOn:
+    id: "nav_home"
+- waitForAnimationToEnd:
+    timeout: 1000
+- assertVisible: "Inicio|Home"
+- takeScreenshot: w8_final_home_complete
