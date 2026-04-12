@@ -440,6 +440,8 @@
     <string name="profile_sign_in_label">Iniciar sesión</string>
     <string name="profile_sign_in_subtitle_alt">Guarda tus datos en la nube</string>
     <string name="profile_preferences">Preferencias</string>
+    <string name="profile_settings">Configuración</string>
+    <string name="profile_settings_subtitle">Personaliza tus preferencias de entrenamiento</string>
     <string name="profile_rest_timer">Temporizador de descanso</string>
     <string name="profile_weight_unit_label">Unidad de peso</string>
     <string name="profile_weight_unit_lbs">lbs</string>
