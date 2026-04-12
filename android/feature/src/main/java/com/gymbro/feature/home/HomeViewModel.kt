@@ -43,6 +43,11 @@ class HomeViewModel @Inject constructor(
                 if (plan == null) {
                     _state.update { it.copy(showNoPlanDialog = true) }
                 } else {
+                    val dayIndex = (java.time.LocalDate.now().dayOfWeek.value - 1) % plan.workoutDays.size
+                    val todayWorkout = plan.workoutDays.getOrNull(dayIndex)
+                    if (todayWorkout != null) {
+                        activePlanStore.setPendingWorkoutDay(todayWorkout)
+                    }
                     viewModelScope.launch {
                         _effect.send(HomeEffect.NavigateToActiveWorkout)
                     }
@@ -54,6 +59,10 @@ class HomeViewModel @Inject constructor(
                 }
             }
             is HomeEvent.StartTodayWorkout -> {
+                val todayWorkout = _state.value.todayWorkout
+                if (todayWorkout != null) {
+                    activePlanStore.setPendingWorkoutDay(todayWorkout)
+                }
                 viewModelScope.launch {
                     _effect.send(HomeEffect.NavigateToActiveWorkout)
                 }
