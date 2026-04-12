@@ -481,6 +481,11 @@ fun GymBroNavGraph(
                 dayNumber = dayNumber,
                 onNavigateBack = { navController.popBackStack() },
                 onNavigateToActiveWorkout = { navController.navigate("active_workout") },
+                onNavigateToExercisePicker = { _ ->
+                    // For now, just navigate to exercise library
+                    // TODO: Implement exercise picker with callback
+                    navController.navigate("exercise_library")
+                },
             )
         }
         composable("coach") { backStackEntry ->
