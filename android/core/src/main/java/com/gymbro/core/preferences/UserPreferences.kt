@@ -121,7 +121,7 @@ class UserPreferences @Inject constructor(
             "DARK" -> ThemePreference.DARK
             "LIGHT" -> ThemePreference.LIGHT
             "SYSTEM" -> ThemePreference.SYSTEM
-            else -> ThemePreference.SYSTEM
+            else -> ThemePreference.DARK
         }
     }
 

@@ -163,7 +163,7 @@ internal fun SettingsScreen(
                     Text(
                         text = stringResource(R.string.settings_title),
                         fontWeight = FontWeight.Bold,
-                        color = Color.White,
+                        color = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.semantics { heading() }
                     )
                 },
@@ -172,7 +172,7 @@ internal fun SettingsScreen(
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.action_back),
-                            tint = Color.White,
+                            tint = MaterialTheme.colorScheme.onSurface,
                         )
                     }
                 },
@@ -207,7 +207,7 @@ internal fun SettingsScreen(
                             Text(
                                 text = stringResource(R.string.settings_appearance),
                                 style = MaterialTheme.typography.titleSmall,
-                                color = Color.White,
+                                color = MaterialTheme.colorScheme.onSurface,
                                 fontWeight = FontWeight.Medium,
                             )
                         }
@@ -291,13 +291,13 @@ internal fun SettingsScreen(
                                 Text(
                                     text = stringResource(R.string.settings_weight_unit),
                                     style = MaterialTheme.typography.titleSmall,
-                                    color = Color.White,
+                                    color = MaterialTheme.colorScheme.onSurface,
                                     fontWeight = FontWeight.Medium,
                                 )
                                 Text(
                                     text = stringResource(R.string.settings_weight_unit_subtitle),
                                     style = MaterialTheme.typography.bodySmall,
-                                    color = Color(0xFF9E9E9E),
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                             }
                         }
@@ -334,13 +334,13 @@ internal fun SettingsScreen(
                                 Text(
                                     text = stringResource(R.string.settings_training_phase),
                                     style = MaterialTheme.typography.titleSmall,
-                                    color = Color.White,
+                                    color = MaterialTheme.colorScheme.onSurface,
                                     fontWeight = FontWeight.Medium,
                                 )
                                 Text(
                                     text = stringResource(R.string.settings_training_phase_subtitle),
                                     style = MaterialTheme.typography.bodySmall,
-                                    color = Color(0xFF9E9E9E),
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                             }
                         }
@@ -400,13 +400,13 @@ internal fun SettingsScreen(
                                 Text(
                                     text = stringResource(R.string.settings_default_rest_timer),
                                     style = MaterialTheme.typography.titleSmall,
-                                    color = Color.White,
+                                    color = MaterialTheme.colorScheme.onSurface,
                                     fontWeight = FontWeight.Medium,
                                 )
                                 Text(
                                     text = stringResource(R.string.settings_rest_timer_subtitle),
                                     style = MaterialTheme.typography.bodySmall,
-                                    color = Color(0xFF9E9E9E),
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                             }
                         }
@@ -508,14 +508,14 @@ internal fun SettingsScreen(
             title = {
                 Text(
                     text = stringResource(R.string.settings_clear_data_confirm_title),
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.Bold,
                 )
             },
             text = {
                 Text(
                     text = stringResource(R.string.settings_clear_data_confirm_message),
-                    color = Color(0xFF9E9E9E),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             },
             confirmButton = {
@@ -528,12 +528,12 @@ internal fun SettingsScreen(
                         containerColor = Color(0xFFFF5252),
                     ),
                 ) {
-                    Text(stringResource(R.string.settings_clear_data_button), color = Color.White)
+                    Text(stringResource(R.string.settings_clear_data_button), color = MaterialTheme.colorScheme.onError)
                 }
             },
             dismissButton = {
                 OutlinedButton(onClick = { showClearDataDialog = false }) {
-                    Text(stringResource(R.string.action_cancel), color = Color.White)
+                    Text(stringResource(R.string.action_cancel), color = MaterialTheme.colorScheme.onSurface)
                 }
             },
         )
@@ -546,14 +546,14 @@ internal fun SettingsScreen(
             title = {
                 Text(
                     text = stringResource(R.string.settings_redo_setup_confirm_title),
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.Bold,
                 )
             },
             text = {
                 Text(
                     text = stringResource(R.string.settings_redo_setup_confirm_message),
-                    color = Color(0xFF9E9E9E),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             },
             confirmButton = {
@@ -571,7 +571,7 @@ internal fun SettingsScreen(
             },
             dismissButton = {
                 OutlinedButton(onClick = { showRedoSetupDialog = false }) {
-                    Text(stringResource(R.string.action_cancel), color = Color.White)
+                    Text(stringResource(R.string.action_cancel), color = MaterialTheme.colorScheme.onSurface)
                 }
             },
         )
@@ -583,7 +583,7 @@ private fun SectionTitle(title: String) {
     Text(
         text = title,
         style = MaterialTheme.typography.labelLarge,
-        color = Color(0xFF9E9E9E),
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
         fontWeight = FontWeight.SemiBold,
         modifier = Modifier.padding(start = 4.dp, bottom = 4.dp).semantics { heading() }
     )
@@ -649,13 +649,13 @@ private fun SettingsRow(
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleSmall,
-                color = if (enabled) Color.White else Color(0xFF757575),
+                color = if (enabled) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
                 fontWeight = FontWeight.Medium,
             )
             Text(
                 text = subtitle,
                 style = MaterialTheme.typography.bodySmall,
-                color = Color(0xFF9E9E9E),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
     }
@@ -681,13 +681,13 @@ private fun SettingsToggle(
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleSmall,
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.Medium,
             )
             Text(
                 text = subtitle,
                 style = MaterialTheme.typography.bodySmall,
-                color = Color(0xFF9E9E9E),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
         Switch(
