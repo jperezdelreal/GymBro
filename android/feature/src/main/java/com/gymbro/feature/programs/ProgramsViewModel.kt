@@ -93,8 +93,9 @@ class ProgramsViewModel @Inject constructor(
             val experience = userPreferences.experienceLevel.first()
             val daysPerWeek = userPreferences.trainingDaysPerWeek.first()
             val phase = userPreferences.trainingPhase.first()
+            val duration = userPreferences.sessionDurationMinutes.first()
             
-            val plan = workoutPlanGenerator.generatePlan(goal, experience, daysPerWeek, phase)
+            val plan = workoutPlanGenerator.generatePlan(goal, experience, daysPerWeek, phase, duration)
             
             activePlanStore.setPlan(plan)
             _state.update {
