@@ -25,7 +25,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val themePreference by userPreferences.themePreference.collectAsStateWithLifecycle(
-                initialValue = ThemePreference.SYSTEM
+                initialValue = ThemePreference.DARK
             )
             val darkTheme = when (themePreference) {
                 ThemePreference.DARK -> true
