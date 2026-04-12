@@ -1,5 +1,6 @@
 package com.gymbro.feature.profile
 
+import android.content.Context
 import app.cash.turbine.test
 import com.gymbro.core.auth.AuthService
 import com.gymbro.core.auth.AuthState
@@ -23,6 +24,7 @@ class ProfileViewModelTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
+    private lateinit var mockContext: Context
     private lateinit var mockAuthService: AuthService
     private lateinit var mockSyncManager: OfflineSyncManager
     private lateinit var viewModel: ProfileViewModel
@@ -39,6 +41,7 @@ class ProfileViewModelTest {
 
     @Before
     fun setup() {
+        mockContext = mockk(relaxed = true)
         mockAuthService = mockk(relaxed = true)
         mockSyncManager = mockk(relaxed = true)
         authStateFlow = MutableStateFlow<AuthState>(AuthState.Loading)
@@ -50,7 +53,7 @@ class ProfileViewModelTest {
 
     @Test
     fun `initial state shows loading`() = runTest {
-        viewModel = ProfileViewModel(mockAuthService, mockSyncManager)
+        viewModel = ProfileViewModel(mockContext, mockAuthService, mockSyncManager)
 
         viewModel.state.test {
             val state = expectMostRecentItem()
@@ -63,7 +66,7 @@ class ProfileViewModelTest {
 
     @Test
     fun `auth state signed in updates user state`() = runTest {
-        viewModel = ProfileViewModel(mockAuthService, mockSyncManager)
+        viewModel = ProfileViewModel(mockContext, mockAuthService, mockSyncManager)
 
         viewModel.state.test {
             skipItems(1) // Initial loading state
@@ -81,7 +84,7 @@ class ProfileViewModelTest {
 
     @Test
     fun `auth state signed out clears user state`() = runTest {
-        viewModel = ProfileViewModel(mockAuthService, mockSyncManager)
+        viewModel = ProfileViewModel(mockContext, mockAuthService, mockSyncManager)
 
         viewModel.state.test {
             skipItems(1)
@@ -101,7 +104,7 @@ class ProfileViewModelTest {
     @Test
     fun `sign in event calls auth service`() = runTest {
         coEvery { mockAuthService.signInAnonymously() } returns Result.success(testUser)
-        viewModel = ProfileViewModel(mockAuthService, mockSyncManager)
+        viewModel = ProfileViewModel(mockContext, mockAuthService, mockSyncManager)
 
         viewModel.effects.test {
             authStateFlow.value = AuthState.SignedIn(testUser)
@@ -117,7 +120,7 @@ class ProfileViewModelTest {
     fun `sign in failure shows error effect`() = runTest {
         val error = Exception("Authentication failed")
         coEvery { mockAuthService.signInAnonymously() } returns Result.failure(error)
-        viewModel = ProfileViewModel(mockAuthService, mockSyncManager)
+        viewModel = ProfileViewModel(mockContext, mockAuthService, mockSyncManager)
 
         viewModel.effects.test {
             viewModel.onEvent(ProfileEvent.SignIn)
@@ -131,7 +134,7 @@ class ProfileViewModelTest {
     @Test
     fun `sign out event calls auth service`() = runTest {
         coEvery { mockAuthService.signOut() } returns Result.success(Unit)
-        viewModel = ProfileViewModel(mockAuthService, mockSyncManager)
+        viewModel = ProfileViewModel(mockContext, mockAuthService, mockSyncManager)
 
         viewModel.effects.test {
             viewModel.onEvent(ProfileEvent.SignOut)
@@ -146,7 +149,7 @@ class ProfileViewModelTest {
     fun `sign out failure shows error effect`() = runTest {
         val error = Exception("Sign-out failed")
         coEvery { mockAuthService.signOut() } returns Result.failure(error)
-        viewModel = ProfileViewModel(mockAuthService, mockSyncManager)
+        viewModel = ProfileViewModel(mockContext, mockAuthService, mockSyncManager)
 
         viewModel.effects.test {
             viewModel.onEvent(ProfileEvent.SignOut)
@@ -159,7 +162,7 @@ class ProfileViewModelTest {
 
     @Test
     fun `sync status updates are reflected in state`() = runTest {
-        viewModel = ProfileViewModel(mockAuthService, mockSyncManager)
+        viewModel = ProfileViewModel(mockContext, mockAuthService, mockSyncManager)
 
         viewModel.state.test {
             skipItems(1)
@@ -179,7 +182,7 @@ class ProfileViewModelTest {
 
     @Test
     fun `sync now event triggers sync manager`() = runTest {
-        viewModel = ProfileViewModel(mockAuthService, mockSyncManager)
+        viewModel = ProfileViewModel(mockContext, mockAuthService, mockSyncManager)
 
         viewModel.onEvent(ProfileEvent.SyncNow)
 
@@ -188,7 +191,7 @@ class ProfileViewModelTest {
 
     @Test
     fun `toggle auto sync updates state`() = runTest {
-        viewModel = ProfileViewModel(mockAuthService, mockSyncManager)
+        viewModel = ProfileViewModel(mockContext, mockAuthService, mockSyncManager)
 
         viewModel.state.test {
             val initialState = expectMostRecentItem()
@@ -208,7 +211,7 @@ class ProfileViewModelTest {
 
     @Test
     fun `last sync time is updated on successful sync`() = runTest {
-        viewModel = ProfileViewModel(mockAuthService, mockSyncManager)
+        viewModel = ProfileViewModel(mockContext, mockAuthService, mockSyncManager)
 
         viewModel.state.test {
             val initialState = expectMostRecentItem()
@@ -224,7 +227,7 @@ class ProfileViewModelTest {
 
     @Test
     fun `last sync time is not updated on sync failure`() = runTest {
-        viewModel = ProfileViewModel(mockAuthService, mockSyncManager)
+        viewModel = ProfileViewModel(mockContext, mockAuthService, mockSyncManager)
 
         viewModel.state.test {
             skipItems(1)
@@ -243,7 +246,7 @@ class ProfileViewModelTest {
     @Test
     fun `anonymous user is handled correctly`() = runTest {
         val anonymousUser = testUser.copy(isAnonymous = true, displayName = null, email = null)
-        viewModel = ProfileViewModel(mockAuthService, mockSyncManager)
+        viewModel = ProfileViewModel(mockContext, mockAuthService, mockSyncManager)
 
         viewModel.state.test {
             skipItems(1)
@@ -261,7 +264,7 @@ class ProfileViewModelTest {
 
     @Test
     fun `sync status idle shows no sync activity`() = runTest {
-        viewModel = ProfileViewModel(mockAuthService, mockSyncManager)
+        viewModel = ProfileViewModel(mockContext, mockAuthService, mockSyncManager)
 
         viewModel.state.test {
             val state = expectMostRecentItem()
@@ -271,7 +274,7 @@ class ProfileViewModelTest {
 
     @Test
     fun `sync status offline is reflected in state`() = runTest {
-        viewModel = ProfileViewModel(mockAuthService, mockSyncManager)
+        viewModel = ProfileViewModel(mockContext, mockAuthService, mockSyncManager)
 
         viewModel.state.test {
             skipItems(1)
@@ -289,7 +292,7 @@ class ProfileViewModelTest {
             kotlinx.coroutines.delay(100)
             Result.success(testUser)
         }
-        viewModel = ProfileViewModel(mockAuthService, mockSyncManager)
+        viewModel = ProfileViewModel(mockContext, mockAuthService, mockSyncManager)
 
         viewModel.state.test {
             skipItems(1)
@@ -305,7 +308,7 @@ class ProfileViewModelTest {
     fun `error state is set on sign in failure`() = runTest {
         val errorMessage = "Network error"
         coEvery { mockAuthService.signInAnonymously() } returns Result.failure(Exception(errorMessage))
-        viewModel = ProfileViewModel(mockAuthService, mockSyncManager)
+        viewModel = ProfileViewModel(mockContext, mockAuthService, mockSyncManager)
 
         viewModel.state.test {
             skipItems(1)

@@ -32,6 +32,8 @@ class HomeViewModel @Inject constructor(
         collectActivePlan()
         loadRecentWorkouts()
         loadDaysSinceLastWorkout()
+        loadWorkoutStreak()
+        loadRecentPR()
     }
 
     fun onEvent(event: HomeEvent) {
@@ -74,6 +76,9 @@ class HomeViewModel @Inject constructor(
                 viewModelScope.launch {
                     _effect.send(HomeEffect.NavigateToPrograms)
                 }
+            }
+            is HomeEvent.DismissPRBanner -> {
+                _state.update { it.copy(showPRCelebration = false) }
             }
         }
     }
@@ -143,6 +148,68 @@ class HomeViewModel @Inject constructor(
         safeLaunch {
             val days = workoutRepository.getDaysSinceLastWorkout()
             _state.update { it.copy(daysSinceLastWorkout = days) }
+        }
+    }
+
+    private fun loadWorkoutStreak() {
+        safeLaunch {
+            val historyItems = personalRecordService.getWorkoutHistory()
+            if (historyItems.isEmpty()) {
+                _state.update { it.copy(workoutStreak = 0) }
+                return@safeLaunch
+            }
+
+            val sortedByDate = historyItems.sortedByDescending { it.date }
+            var streak = 0
+            var currentDate = java.time.LocalDate.now()
+
+            for (item in sortedByDate) {
+                val workoutDate = item.date.atZone(java.time.ZoneId.systemDefault()).toLocalDate()
+                val daysDiff = java.time.temporal.ChronoUnit.DAYS.between(workoutDate, currentDate)
+
+                if (daysDiff == 0L || (daysDiff == 1L && streak > 0)) {
+                    if (daysDiff == 1L) {
+                        streak++
+                        currentDate = workoutDate
+                    } else if (daysDiff == 0L && streak == 0) {
+                        streak = 1
+                    }
+                } else {
+                    break
+                }
+            }
+
+            _state.update { it.copy(workoutStreak = streak) }
+        }
+    }
+
+    private fun loadRecentPR() {
+        safeLaunch {
+            val historyItems = personalRecordService.getWorkoutHistory()
+            if (historyItems.isEmpty()) return@safeLaunch
+
+            val exerciseIds = personalRecordService.getExerciseIdsWithHistory()
+            if (exerciseIds.isEmpty()) return@safeLaunch
+
+            val now = java.time.Instant.now()
+            val last24Hours = now.minusSeconds(86400)
+
+            for (exerciseId in exerciseIds) {
+                val records = personalRecordService.getPersonalRecords(exerciseId, "")
+                val recentPR = records.firstOrNull { record ->
+                    record.date.isAfter(last24Hours) && record.previousValue != null
+                }
+
+                if (recentPR != null) {
+                    _state.update {
+                        it.copy(
+                            recentPR = recentPR,
+                            showPRCelebration = true,
+                        )
+                    }
+                    break
+                }
+            }
         }
     }
 

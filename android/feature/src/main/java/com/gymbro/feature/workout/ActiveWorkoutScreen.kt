@@ -80,6 +80,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.res.stringResource
+import android.content.Context
+import android.media.RingtoneManager
+import android.os.Build
+import android.os.VibrationEffect
+import android.os.Vibrator
 import kotlin.math.abs
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -169,7 +174,30 @@ fun ActiveWorkoutRoute(
                     effect.personalRecords,
                 )
                 is ActiveWorkoutEffect.NavigateBack -> onNavigateBack()
-                is ActiveWorkoutEffect.RestTimerFinished -> { /* vibration/sound handled externally */ }
+                is ActiveWorkoutEffect.RestTimerFinished -> {
+                    // Vibrate with a pattern (short-long-short-long-long)
+                    val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        vibrator.vibrate(
+                            VibrationEffect.createWaveform(
+                                longArrayOf(0, 200, 100, 200, 100, 300),
+                                -1
+                            )
+                        )
+                    } else {
+                        @Suppress("DEPRECATION")
+                        vibrator.vibrate(longArrayOf(0, 200, 100, 200, 100, 300), -1)
+                    }
+                    
+                    // Play notification sound
+                    try {
+                        val notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+                        val ringtone = RingtoneManager.getRingtone(context, notification)
+                        ringtone.play()
+                    } catch (e: Exception) {
+                        // Silently fail if sound cannot be played
+                    }
+                }
             }
         }
     }
