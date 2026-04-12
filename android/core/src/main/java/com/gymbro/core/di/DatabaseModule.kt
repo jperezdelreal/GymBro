@@ -82,6 +82,7 @@ private data class ExerciseSeed(
     val category: String,
     val equipment: String,
     val instructions: String,
+    val instructionsEs: String? = null,
     val muscleGroups: List<MuscleGroupSeed>,
     val videoURL: String? = null,
 )
@@ -97,6 +98,9 @@ private fun loadExercisesFromAssets(context: Context): List<ExerciseEntity> {
     val json = context.assets.open("exercises-seed.json").bufferedReader().use { it.readText() }
     val seeds = Json { ignoreUnknownKeys = true }.decodeFromString<List<ExerciseSeed>>(json)
     
+    // Check if device locale is Spanish
+    val isSpanish = context.resources.configuration.locales[0].language == "es"
+    
     return seeds.map { seed ->
         // Pick the first primary muscle group as the main muscleGroup
         val primaryMuscleGroup = seed.muscleGroups
@@ -106,13 +110,20 @@ private fun loadExercisesFromAssets(context: Context): List<ExerciseEntity> {
             ?.replace(" ", "_") 
             ?: "FULL_BODY"
         
+        // Use Spanish instructions if available and locale is Spanish
+        val description = if (isSpanish && seed.instructionsEs != null) {
+            seed.instructionsEs
+        } else {
+            seed.instructions
+        }
+        
         ExerciseEntity(
             id = UUID.nameUUIDFromBytes(seed.name.toByteArray()).toString(),
             name = seed.name,
             muscleGroup = primaryMuscleGroup,
             category = seed.category.uppercase(),
             equipment = seed.equipment.uppercase(),
-            description = seed.instructions,
+            description = description,
             youtubeUrl = seed.videoURL,
         )
     }

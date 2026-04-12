@@ -3,7 +3,8 @@
     "name": "Barbell Back Squat",
     "category": "compound",
     "equipment": "barbell",
-    "instructions": "Stand with barbell on upper back. Squat down until thighs are parallel or below. Drive through heels to return to start.",
+    "instructions": "Barbell | Position bar on upper back across traps. Stand with feet shoulder-width apart. | Descend by breaking at hips and knees simultaneously, keeping chest up and core braced. Lower until thighs are at least parallel to floor. Drive through heels to return to standing position.",
+    "instructionsEs": "Barra | Coloca la barra en la parte superior de la espalda sobre los trapecios. Párate con los pies separados al ancho de hombros. | Desciende flexionando las caderas y rodillas simultáneamente, manteniendo el pecho arriba y el core contraído. Baja hasta que los muslos estén al menos paralelos al suelo. Empuja con los talones para volver a la posición de pie.",
     "muscleGroups": [
       {
         "name": "Quadriceps",
@@ -30,7 +31,8 @@
     "name": "Barbell Bench Press",
     "category": "compound",
     "equipment": "barbell",
-    "instructions": "Lie on bench, grip barbell slightly wider than shoulders. Lower to chest, pause, then press up to lockout.",
+    "instructions": "Barbell | Lie flat on bench, feet planted on floor. Grip bar slightly wider than shoulder-width with wrists straight. | Unrack the bar and lower it with control to mid-chest, keeping elbows at 45-degree angle. Pause briefly, then press bar up explosively to lockout, maintaining shoulder blade retraction throughout.",
+    "instructionsEs": "Barra | Acuéstate en el banco, pies plantados en el suelo. Agarra la barra un poco más ancha que el ancho de hombros con muñecas rectas. | Saca la barra y bájala con control hacia el centro del pecho, manteniendo los codos en ángulo de 45 grados. Pausa brevemente, luego empuja la barra explosivamente hasta bloquearla, manteniendo las escápulas retraídas durante todo el movimiento.",
     "muscleGroups": [
       {
         "name": "Chest",
@@ -53,7 +55,8 @@
     "name": "Conventional Deadlift",
     "category": "compound",
     "equipment": "barbell",
-    "instructions": "Stand with feet hip-width, grip bar outside legs. Keep back flat, drive through heels to pull bar up to lockout.",
+    "instructions": "Barbell | Stand with feet hip-width apart, bar over mid-foot. Hinge at hips and grip bar just outside legs with mixed or double overhand grip. | Keep back flat and chest up. Drive through heels, extending hips and knees simultaneously to pull bar up along shins. Lock out at top by squeezing glutes. Lower bar with control by hinging at hips first.",
+    "instructionsEs": "Barra | Párate con los pies separados al ancho de caderas, barra sobre la mitad del pie. Flexiona las caderas y agarra la barra justo fuera de las piernas con agarre mixto o doble pronado. | Mantén la espalda plana y el pecho arriba. Empuja con los talones, extendiendo caderas y rodillas simultáneamente para levantar la barra a lo largo de las espinillas. Bloquea arriba apretando los glúteos. Baja la barra con control flexionando primero las caderas.",
     "muscleGroups": [
       {
         "name": "Hamstrings",
@@ -80,7 +83,8 @@
     "name": "Barbell Overhead Press",
     "category": "compound",
     "equipment": "barbell",
-    "instructions": "Stand with barbell at shoulders. Press overhead to lockout, keeping core tight. Lower under control.",
+    "instructions": "Barbell | Stand with feet shoulder-width apart, bar resting on front shoulders at collarbone height. Grip bar just outside shoulders. | Brace core and glutes. Press bar straight up overhead, moving head slightly back to clear path. Lock out arms at top. Lower bar with control back to starting position.",
+    "instructionsEs": "Barra | Párate con los pies separados al ancho de hombros, barra descansando sobre los hombros frontales a la altura de la clavícula. Agarra la barra justo fuera de los hombros. | Contrae core y glúteos. Empuja la barra directamente hacia arriba, moviendo ligeramente la cabeza hacia atrás para despejar el camino. Bloquea los brazos arriba. Baja la barra con control a la posición inicial.",
     "muscleGroups": [
       {
         "name": "Shoulders",
@@ -103,7 +107,8 @@
     "name": "Barbell Row",
     "category": "compound",
     "equipment": "barbell",
-    "instructions": "Hinge at hips, back flat, pull bar to lower chest. Squeeze shoulder blades together at top.",
+    "instructions": "Barbell | Hinge forward at hips with back flat and knees slightly bent. Grip bar with hands just outside shoulder-width. | Pull bar to lower chest/upper abdomen, driving elbows back and squeezing shoulder blades together at top. Keep torso stable throughout. Lower bar with control to full arm extension.",
+    "instructionsEs": "Barra | Inclínate hacia adelante en las caderas con la espalda plana y rodillas ligeramente flexionadas. Agarra la barra con las manos justo fuera del ancho de hombros. | Tira de la barra hacia el pecho inferior/abdomen superior, llevando los codos hacia atrás y apretando las escápulas juntas arriba. Mantén el torso estable durante todo el movimiento. Baja la barra con control hasta la extensión completa de brazos.",
     "muscleGroups": [
       {
         "name": "Lats",
@@ -126,7 +131,8 @@
     "name": "Romanian Deadlift",
     "category": "compound",
     "equipment": "barbell",
-    "instructions": "Start standing with barbell. Hinge at hips, keeping back flat and knees slightly bent. Lower bar to shins, drive hips forward to return.",
+    "instructions": "Barbell | Start standing with bar at hip level, feet hip-width apart. Grip bar with double overhand or mixed grip. | Keeping knees slightly bent and back flat, hinge at hips to lower bar down front of legs until you feel stretch in hamstrings. Drive hips forward to return to standing, squeezing glutes at top.",
+    "instructionsEs": "Barra | Comienza de pie con la barra a nivel de caderas, pies separados al ancho de caderas. Agarra la barra con agarre doble pronado o mixto. | Manteniendo las rodillas ligeramente flexionadas y la espalda plana, flexiona las caderas para bajar la barra por el frente de las piernas hasta sentir el estiramiento en los isquiotibiales. Empuja las caderas hacia adelante para volver a estar de pie, apretando los glúteos arriba.",
     "muscleGroups": [
       {
         "name": "Hamstrings",
@@ -199,7 +205,8 @@
     "name": "Incline Barbell Bench Press",
     "category": "compound",
     "equipment": "barbell",
-    "instructions": "On incline bench (30-45 degrees), lower bar to upper chest, press to lockout.",
+    "instructions": "Barbell | Set bench to 30-45 degree incline. Lie back with feet flat on floor. Grip bar slightly wider than shoulder-width. | Unrack bar and position over upper chest. Lower bar with control to upper chest. Press bar up explosively to lockout, maintaining tension in upper chest throughout.",
+    "instructionsEs": "Barra | Ajusta el banco a una inclinación de 30-45 grados. Acuéstate con los pies planos en el suelo. Agarra la barra un poco más ancha que el ancho de hombros. | Saca la barra y posiciónala sobre el pecho superior. Baja la barra con control hacia el pecho superior. Empuja la barra explosivamente hasta bloquearla, manteniendo tensión en el pecho superior durante todo el movimiento.",
     "muscleGroups": [
       {
         "name": "Upper Chest",
@@ -245,7 +252,8 @@
     "name": "Dumbbell Bench Press",
     "category": "compound",
     "equipment": "dumbbell",
-    "instructions": "Lie on bench with dumbbells at chest level. Press up to lockout, lower under control.",
+    "instructions": "Dumbbell | Lie flat on bench holding dumbbells at chest level with elbows bent at 90 degrees. Feet flat on floor. | Press dumbbells up and slightly together until arms are fully extended above chest. Lower dumbbells with control to starting position, allowing elbows to drop slightly below bench level for full stretch.",
+    "instructionsEs": "Mancuernas | Acuéstate en el banco sosteniendo mancuernas a nivel del pecho con codos doblados a 90 grados. Pies planos en el suelo. | Empuja las mancuernas hacia arriba y ligeramente juntas hasta que los brazos estén completamente extendidos sobre el pecho. Baja las mancuernas con control a la posición inicial, permitiendo que los codos bajen ligeramente por debajo del nivel del banco para un estiramiento completo.",
     "muscleGroups": [
       {
         "name": "Chest",
@@ -268,7 +276,8 @@
     "name": "Dumbbell Shoulder Press",
     "category": "compound",
     "equipment": "dumbbell",
-    "instructions": "Seated or standing, press dumbbells overhead to lockout. Lower to shoulder level.",
+    "instructions": "Dumbbell | Sit on bench with back support or stand. Hold dumbbells at shoulder height with elbows bent 90 degrees, palms facing forward. | Press dumbbells straight up overhead until arms are fully extended. Dumbbells should come close together at top but not touch. Lower dumbbells with control back to shoulder height.",
+    "instructionsEs": "Mancuernas | Siéntate en un banco con respaldo o párate. Sostén las mancuernas a la altura de los hombros con codos doblados 90 grados, palmas hacia adelante. | Empuja las mancuernas directamente hacia arriba sobre la cabeza hasta que los brazos estén completamente extendidos. Las mancuernas deben acercarse arriba pero sin tocarse. Baja las mancuernas con control de vuelta a la altura de los hombros.",
     "muscleGroups": [
       {
         "name": "Shoulders",
@@ -291,7 +300,8 @@
     "name": "Dumbbell Row",
     "category": "compound",
     "equipment": "dumbbell",
-    "instructions": "One knee on bench, pull dumbbell to hip, squeeze at top. Keep back flat.",
+    "instructions": "Dumbbell | Place one knee and hand on bench for support. Hold dumbbell in opposite hand with arm extended. Keep back flat and parallel to floor. | Pull dumbbell to hip, driving elbow back and squeezing shoulder blade. Keep torso stable. Lower dumbbell with control to full arm extension. Complete all reps before switching sides.",
+    "instructionsEs": "Mancuerna | Coloca una rodilla y mano en el banco para soporte. Sostén la mancuerna en la mano opuesta con el brazo extendido. Mantén la espalda plana y paralela al suelo. | Tira de la mancuerna hacia la cadera, llevando el codo hacia atrás y apretando la escápula. Mantén el torso estable. Baja la mancuerna con control hasta la extensión completa del brazo. Completa todas las repeticiones antes de cambiar de lado.",
     "muscleGroups": [
       {
         "name": "Lats",
@@ -314,7 +324,8 @@
     "name": "Goblet Squat",
     "category": "compound",
     "equipment": "dumbbell",
-    "instructions": "Hold dumbbell or kettlebell at chest. Squat down, keeping torso upright. Drive through heels.",
+    "instructions": "Dumbbell or Kettlebell | Hold dumbbell or kettlebell vertically at chest height, gripping top end with both hands under one side. Stand with feet slightly wider than shoulder-width, toes slightly out. | Squat down by breaking at hips and knees, keeping chest up and weight at chest. Descend until elbows touch inside of knees. Drive through heels to stand back up.",
+    "instructionsEs": "Mancuerna o Pesa Rusa | Sostén la mancuerna o pesa rusa verticalmente a la altura del pecho, agarrando el extremo superior con ambas manos bajo un lado. Párate con los pies ligeramente más anchos que el ancho de hombros, dedos ligeramente hacia afuera. | Baja en sentadilla flexionando caderas y rodillas, manteniendo el pecho arriba y el peso en el pecho. Desciende hasta que los codos toquen el interior de las rodillas. Empuja con los talones para volver a pararte.",
     "muscleGroups": [
       {
         "name": "Quadriceps",
@@ -360,7 +371,8 @@
     "name": "Pull-Up",
     "category": "compound",
     "equipment": "bodyweight",
-    "instructions": "Hang from bar, palms facing away. Pull up until chin over bar. Lower under control.",
+    "instructions": "Bodyweight | Hang from pull-up bar with arms fully extended, hands slightly wider than shoulder-width, palms facing away. | Pull body up by driving elbows down and back until chin clears the bar. Squeeze shoulder blades together at top. Lower with control to full arm extension.",
+    "instructionsEs": "Peso Corporal | Cuélgate de la barra con brazos completamente extendidos, manos ligeramente más anchas que el ancho de hombros, palmas hacia afuera. | Tira de tu cuerpo hacia arriba llevando los codos hacia abajo y atrás hasta que el mentón supere la barra. Aprieta las escápulas juntas arriba. Baja con control hasta la extensión completa de brazos.",
     "muscleGroups": [
       {
         "name": "Lats",
@@ -406,7 +418,8 @@
     "name": "Dip",
     "category": "compound",
     "equipment": "bodyweight",
-    "instructions": "On parallel bars, lower body until upper arms parallel to ground. Press back up.",
+    "instructions": "Bodyweight | Grip parallel bars and support body with arms fully extended. Lean slightly forward. | Lower body by bending elbows until upper arms are parallel to ground or slightly below. Keep elbows close to body. Press back up to starting position by extending arms. More forward lean targets chest, upright position targets triceps.",
+    "instructionsEs": "Peso Corporal | Agarra las barras paralelas y sostén el cuerpo con brazos completamente extendidos. Inclínate ligeramente hacia adelante. | Baja el cuerpo doblando los codos hasta que los brazos superiores estén paralelos al suelo o ligeramente por debajo. Mantén los codos cerca del cuerpo. Empuja de vuelta a la posición inicial extendiendo los brazos. Más inclinación hacia adelante trabaja el pecho, posición erguida trabaja los tríceps.",
     "muscleGroups": [
       {
         "name": "Chest",
@@ -429,7 +442,8 @@
     "name": "Push-Up",
     "category": "compound",
     "equipment": "bodyweight",
-    "instructions": "Hands shoulder-width, body straight. Lower chest to ground, press back up.",
+    "instructions": "Bodyweight | Start in plank position with hands shoulder-width apart directly under shoulders. Body should form straight line from head to heels. | Lower body by bending elbows until chest nearly touches floor, keeping elbows at 45-degree angle. Push through hands to return to starting position, maintaining rigid core throughout.",
+    "instructionsEs": "Peso Corporal | Comienza en posición de plancha con manos separadas al ancho de hombros directamente debajo de los hombros. El cuerpo debe formar una línea recta desde la cabeza hasta los talones. | Baja el cuerpo doblando los codos hasta que el pecho casi toque el suelo, manteniendo los codos en ángulo de 45 grados. Empuja con las manos para volver a la posición inicial, manteniendo el core rígido durante todo el movimiento.",
     "muscleGroups": [
       {
         "name": "Chest",
@@ -452,7 +466,8 @@
     "name": "Leg Press",
     "category": "compound",
     "equipment": "machine",
-    "instructions": "Seated in machine, feet shoulder-width on platform. Press up to lockout, lower under control.",
+    "instructions": "Leg Press Machine | Sit in machine with back and head against pad. Place feet shoulder-width apart in middle of platform, toes slightly outward. | Release safety handles. Lower platform by bending knees until they reach 90 degrees or slightly below. Press through heels to extend legs back to starting position without locking knees. Keep lower back pressed against pad throughout.",
+    "instructionsEs": "Máquina de Prensa de Piernas | Siéntate en la máquina con espalda y cabeza contra el respaldo. Coloca los pies separados al ancho de hombros en el centro de la plataforma, dedos ligeramente hacia afuera. | Suelta las manijas de seguridad. Baja la plataforma doblando las rodillas hasta que lleguen a 90 grados o ligeramente por debajo. Empuja con los talones para extender las piernas de vuelta a la posición inicial sin bloquear las rodillas. Mantén la espalda baja presionada contra el respaldo durante todo el movimiento.",
     "muscleGroups": [
       {
         "name": "Quadriceps",
@@ -475,7 +490,8 @@
     "name": "Lat Pulldown",
     "category": "compound",
     "equipment": "cable",
-    "instructions": "Seated at cable machine, pull bar down to upper chest. Squeeze shoulder blades together.",
+    "instructions": "Cable Machine | Sit at lat pulldown station with thighs secured under pads. Grip bar with hands wider than shoulder-width, palms facing away. | Pull bar down to upper chest, driving elbows down and back. Squeeze shoulder blades together at bottom. Control bar back up to full arm extension without letting weight stack touch.",
+    "instructionsEs": "Máquina de Cables | Siéntate en la estación de jalón dorsal con los muslos asegurados bajo las almohadillas. Agarra la barra con las manos más anchas que el ancho de hombros, palmas hacia afuera. | Tira de la barra hacia el pecho superior, llevando los codos hacia abajo y atrás. Aprieta las escápulas juntas abajo. Controla la barra de vuelta hasta la extensión completa de brazos sin dejar que toque el peso.",
     "muscleGroups": [
       {
         "name": "Lats",
@@ -498,7 +514,8 @@
     "name": "Cable Row",
     "category": "compound",
     "equipment": "cable",
-    "instructions": "Seated at cable, pull handle to torso. Keep back straight, squeeze shoulder blades.",
+    "instructions": "Cable Machine | Sit at cable row station with feet on footrests, knees slightly bent. Grip handle with both hands, arms fully extended. Sit upright with chest up. | Pull handle to torso, driving elbows straight back and squeezing shoulder blades together. Keep back straight and avoid using momentum. Extend arms forward with control to starting position.",
+    "instructionsEs": "Máquina de Cables | Siéntate en la estación de remo con cables con pies en los apoyos, rodillas ligeramente flexionadas. Agarra el mango con ambas manos, brazos completamente extendidos. Siéntate erguido con el pecho arriba. | Tira del mango hacia el torso, llevando los codos directamente hacia atrás y apretando las escápulas juntas. Mantén la espalda recta y evita usar impulso. Extiende los brazos hacia adelante con control a la posición inicial.",
     "muscleGroups": [
       {
         "name": "Lats",
@@ -521,7 +538,8 @@
     "name": "Leg Curl",
     "category": "isolation",
     "equipment": "machine",
-    "instructions": "Lying or seated, curl legs up against pad. Squeeze hamstrings at top.",
+    "instructions": "Leg Curl Machine | Lie face down or sit (depending on machine type) with pad positioned just above ankles. Grip handles for stability. | Curl legs up by bending knees, bringing heels toward glutes. Squeeze hamstrings at top of movement. Lower weight with control to starting position without letting weight stack touch.",
+    "instructionsEs": "Máquina de Curl de Piernas | Acuéstate boca abajo o siéntate (dependiendo del tipo de máquina) con la almohadilla posicionada justo arriba de los tobillos. Agarra las manijas para estabilidad. | Flexiona las piernas doblando las rodillas, llevando los talones hacia los glúteos. Aprieta los isquiotibiales arriba del movimiento. Baja el peso con control a la posición inicial sin dejar que toque el peso.",
     "muscleGroups": [
       {
         "name": "Hamstrings",
@@ -536,7 +554,8 @@
     "name": "Leg Extension",
     "category": "isolation",
     "equipment": "machine",
-    "instructions": "Seated, extend legs up against pad. Squeeze quads at top.",
+    "instructions": "Leg Extension Machine | Sit in machine with back against pad and pad positioned on lower shins just above ankles. Grip handles on sides. | Extend legs by straightening knees until fully extended. Squeeze quadriceps at top. Lower weight with control back to starting position, stopping just before weight stack touches.",
+    "instructionsEs": "Máquina de Extensión de Piernas | Siéntate en la máquina con la espalda contra el respaldo y la almohadilla posicionada en las espinillas inferiores justo arriba de los tobillos. Agarra las manijas a los lados. | Extiende las piernas enderezando las rodillas hasta estar completamente extendidas. Aprieta los cuádriceps arriba. Baja el peso con control a la posición inicial, deteniéndote justo antes de que toque el peso.",
     "muscleGroups": [
       {
         "name": "Quadriceps",
@@ -551,7 +570,8 @@
     "name": "Barbell Curl",
     "category": "isolation",
     "equipment": "barbell",
-    "instructions": "Standing, curl bar up to shoulders keeping elbows stationary. Lower under control.",
+    "instructions": "Barbell | Stand with feet shoulder-width apart, holding barbell with underhand grip (palms up) at hip level. Keep elbows close to torso. | Curl bar up toward shoulders by bending elbows. Keep upper arms stationary. Squeeze biceps at top. Lower bar with control to starting position without swinging or using momentum.",
+    "instructionsEs": "Barra | Párate con los pies separados al ancho de hombros, sosteniendo la barra con agarre supino (palmas arriba) a nivel de caderas. Mantén los codos cerca del torso. | Flexiona la barra hacia los hombros doblando los codos. Mantén los brazos superiores estacionarios. Aprieta los bíceps arriba. Baja la barra con control a la posición inicial sin balancear o usar impulso.",
     "muscleGroups": [
       {
         "name": "Biceps",
