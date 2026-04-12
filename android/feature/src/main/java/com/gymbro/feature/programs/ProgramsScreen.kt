@@ -52,6 +52,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -236,6 +238,7 @@ private fun TemplateCard(
     template: WorkoutTemplate,
     onStartWorkout: () -> Unit,
 ) {
+    val haptic = LocalHapticFeedback.current
     Card(
         modifier = Modifier
             .fillMaxWidth(),
@@ -274,7 +277,10 @@ private fun TemplateCard(
                 }
                 
                 IconButton(
-                    onClick = onStartWorkout,
+                    onClick = {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        onStartWorkout()
+                    },
                     modifier = Modifier
                         .size(48.dp)
                         .clip(RoundedCornerShape(24.dp))
@@ -414,10 +420,14 @@ private fun GenerateNewPlanCard(
     isGenerating: Boolean,
     onGenerate: () -> Unit,
 ) {
+    val haptic = LocalHapticFeedback.current
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(enabled = !isGenerating, onClick = onGenerate),
+            .clickable(enabled = !isGenerating, onClick = {
+                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                onGenerate()
+            }),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface,
@@ -543,10 +553,14 @@ private fun WorkoutDayItem(
     day: com.gymbro.core.model.WorkoutDay,
     onClick: () -> Unit,
 ) {
+    val haptic = LocalHapticFeedback.current
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick),
+            .clickable(onClick = {
+                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                onClick()
+            }),
         shape = RoundedCornerShape(8.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant,

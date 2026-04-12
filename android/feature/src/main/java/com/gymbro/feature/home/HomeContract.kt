@@ -2,6 +2,7 @@ package com.gymbro.feature.home
 
 import com.gymbro.core.model.WorkoutPlan
 import com.gymbro.core.model.WorkoutDay
+import com.gymbro.core.model.PersonalRecord
 
 data class HomeState(
     val activePlan: WorkoutPlan? = null,
@@ -11,6 +12,9 @@ data class HomeState(
     val isGeneratingPlan: Boolean = false,
     val daysSinceLastWorkout: Int? = null,
     val showNoPlanDialog: Boolean = false,
+    val workoutStreak: Int = 0,
+    val recentPR: PersonalRecord? = null,
+    val showPRCelebration: Boolean = false,
 )
 
 data class RecentWorkoutItem(
@@ -30,6 +34,7 @@ sealed interface HomeEvent {
     data object ViewAllPrograms : HomeEvent
     data object DismissNoPlanDialog : HomeEvent
     data object NoPlanGoToPrograms : HomeEvent
+    data object DismissPRBanner : HomeEvent
 }
 
 sealed interface HomeEffect {
