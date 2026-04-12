@@ -85,6 +85,7 @@ class OnboardingViewModel @Inject constructor(
                     experienceLevel = _state.value.selectedExperience,
                     daysPerWeek = _state.value.trainingDaysPerWeek,
                     trainingPhase = _state.value.selectedPhase,
+                    sessionDurationMinutes = _state.value.sessionDurationMinutes,
                 )
                 val personalizedPlan = plan.copy(
                     name = context.getString(R.string.onboarding_first_program_name),
