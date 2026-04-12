@@ -434,6 +434,8 @@
     <string name="profile_sign_in_label">Sign in</string>
     <string name="profile_sign_in_subtitle_alt">Save your data to the cloud</string>
     <string name="profile_preferences">Preferences</string>
+    <string name="profile_settings">Settings</string>
+    <string name="profile_settings_subtitle">Customize your workout preferences</string>
     <string name="profile_rest_timer">Rest timer</string>
     <string name="profile_weight_unit_label">Weight unit</string>
     <string name="profile_weight_unit_lbs">lbs</string>

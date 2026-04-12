@@ -227,40 +227,15 @@ internal fun ProfileScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Preferences Group (Cyan Accent)
+        // Settings Group (Cyan Accent)
         SettingsGroup(
-            title = stringResource(R.string.profile_preferences),
+            title = stringResource(R.string.profile_settings),
             accentColor = AccentCyanStart,
         ) {
             SettingItem(
-                icon = Icons.Default.Timer,
-                label = stringResource(R.string.profile_rest_timer),
-                subtitle = stringResource(R.string.profile_rest_timer_default),
-                iconTint = AccentCyanStart,
-                onClick = onNavigateToSettings,
-            )
-            SettingItem(
-                icon = Icons.Default.FitnessCenter,
-                label = stringResource(R.string.profile_weight_unit_label),
-                subtitle = stringResource(R.string.profile_weight_unit_lbs),
-                iconTint = AccentCyanStart,
-                onClick = onNavigateToSettings,
-            )
-            SettingItem(
-                icon = Icons.Default.LocalFireDepartment,
-                label = stringResource(R.string.profile_training_phase),
-                iconTint = AccentCyanStart,
-                onClick = onNavigateToSettings,
-            )
-            SettingItem(
-                icon = Icons.Default.Notifications,
-                label = stringResource(R.string.profile_notifications),
-                iconTint = AccentCyanStart,
-                onClick = onNavigateToSettings,
-            )
-            SettingItem(
-                icon = Icons.Default.MonitorHeart,
-                label = stringResource(R.string.profile_health_integration),
+                icon = Icons.Default.Settings,
+                label = stringResource(R.string.profile_settings),
+                subtitle = stringResource(R.string.profile_settings_subtitle),
                 iconTint = AccentCyanStart,
                 onClick = onNavigateToSettings,
             )
@@ -316,26 +291,7 @@ internal fun ProfileScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Data Group (Amber Accent)
-        SettingsGroup(
-            title = stringResource(R.string.profile_data_section),
-            accentColor = AccentAmberStart,
-        ) {
-            SettingItem(
-                icon = Icons.Default.Storage,
-                label = stringResource(R.string.profile_export_data),
-                iconTint = AccentAmberStart,
-                onClick = onNavigateToSettings,
-            )
-            SettingItem(
-                icon = Icons.Default.Delete,
-                label = stringResource(R.string.profile_clear_all_data),
-                iconTint = AccentRed,
-                onClick = onNavigateToSettings,
-            )
-        }
 
-        Spacer(modifier = Modifier.height(16.dp))
 
         // About Group (White Accent)
         SettingsGroup(
