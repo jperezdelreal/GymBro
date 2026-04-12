@@ -23,6 +23,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Search
@@ -31,11 +32,14 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -90,6 +94,7 @@ fun ExerciseLibraryRoute(
     viewModel: ExerciseLibraryViewModel = hiltViewModel(),
     onNavigateToDetail: (String) -> Unit = {},
     onNavigateToCreateExercise: () -> Unit = {},
+    onNavigateBack: () -> Unit = {},
     onExercisePicked: ((Exercise) -> Unit)? = null,
     isPickerMode: Boolean = false,
     sharedTransitionScope: SharedTransitionScope? = null,
@@ -123,6 +128,7 @@ fun ExerciseLibraryRoute(
             }
         },
         onNavigateToCreateExercise = onNavigateToCreateExercise,
+        onNavigateBack = onNavigateBack,
         isPickerMode = isPickerMode,
         snackbarHostState = snackbarHostState,
         sharedTransitionScope = sharedTransitionScope,
@@ -136,43 +142,53 @@ fun ExerciseLibraryScreen(
     state: ExerciseLibraryState,
     onEvent: (ExerciseLibraryEvent) -> Unit,
     onNavigateToCreateExercise: () -> Unit = {},
+    onNavigateBack: () -> Unit = {},
     isPickerMode: Boolean = false,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     sharedTransitionScope: SharedTransitionScope? = null,
     animatedContentScope: AnimatedVisibilityScope? = null,
 ) {
-    Box(modifier = Modifier.fillMaxSize()) {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = stringResource(if (isPickerMode) R.string.exercise_library_pick_title else R.string.exercise_library_title),
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Bold,
+                    )
+                },
+                navigationIcon = {
+                    IconButton(onClick = onNavigateBack) {
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.common_navigate_back),
+                        )
+                    }
+                },
+                actions = {
+                    if (!isPickerMode) {
+                        IconButton(onClick = onNavigateToCreateExercise) {
+                            Icon(
+                                Icons.Default.Add,
+                                contentDescription = stringResource(R.string.exercise_library_create),
+                                tint = AccentGreen,
+                            )
+                        }
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background,
+                    titleContentColor = MaterialTheme.colorScheme.onBackground,
+                ),
+            )
+        },
+        containerColor = MaterialTheme.colorScheme.background,
+    ) { paddingValues ->
+    Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
         Column(
             modifier = Modifier.fillMaxSize(),
         ) {
-            // Title Section
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 16.dp)
-            ) {
-                Text(
-                    text = stringResource(if (isPickerMode) R.string.exercise_library_pick_title else R.string.exercise_library_title),
-                    style = MaterialTheme.typography.headlineMedium,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier
-                        .align(Alignment.CenterStart)
-                        .semantics { heading() }
-                )
-                if (!isPickerMode) {
-                    IconButton(
-                        onClick = onNavigateToCreateExercise,
-                        modifier = Modifier.align(Alignment.CenterEnd)
-                    ) {
-                        Icon(
-                            Icons.Default.Add,
-                            contentDescription = stringResource(R.string.exercise_library_create),
-                            tint = AccentGreen,
-                        )
-                    }
-                }
-            }
             // Search bar - Glassmorphic style
             Surface(
                 modifier = Modifier
@@ -272,6 +288,7 @@ fun ExerciseLibraryScreen(
             }
         }
 
+    }
     }
 }
 
