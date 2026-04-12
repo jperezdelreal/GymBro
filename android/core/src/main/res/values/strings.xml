@@ -703,6 +703,22 @@
     <!-- Empty Workout Guidance -->
     <string name="active_workout_empty_hint">Tap + to add your first exercise</string>
 
+    <!-- Number Input Dialog -->
+    <string name="number_input_weight_title">Weight</string>
+    <string name="number_input_reps_title">Reps</string>
+    <string name="number_input_done">Done</string>
+    <string name="number_input_cancel">Cancel</string>
+
+    <!-- Warmup Set -->
+    <string name="warmup_badge_label">W</string>
+    <string name="warmup_tooltip_title">Warmup Set</string>
+    <string name="warmup_tooltip_message">Warmup sets help you prepare for heavier loads. They don\'t count toward total volume but are important for injury prevention.</string>
+
+    <!-- RPE Info -->
+    <string name="rpe_tooltip_title">RPE (Rate of Perceived Exertion)</string>
+    <string name="rpe_tooltip_message">Rate how hard the set felt:\n6-7: Easy, could do many more reps\n8: Challenging, 2-3 reps left\n9-10: Very hard, 0-1 reps left</string>
+    <string name="rpe_label">RPE</string>
+
     <!-- Profile: Exercise Library Link -->
     <string name="profile_exercise_library">Exercise Library</string>
     <string name="profile_exercise_library_subtitle">Browse and manage exercises</string>

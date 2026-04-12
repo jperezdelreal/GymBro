@@ -709,6 +709,22 @@
     <!-- Empty Workout Guidance -->
     <string name="active_workout_empty_hint">Pulsa + para añadir tu primer ejercicio</string>
 
+    <!-- Number Input Dialog -->
+    <string name="number_input_weight_title">Peso</string>
+    <string name="number_input_reps_title">Repeticiones</string>
+    <string name="number_input_done">Hecho</string>
+    <string name="number_input_cancel">Cancelar</string>
+
+    <!-- Warmup Set -->
+    <string name="warmup_badge_label">C</string>
+    <string name="warmup_tooltip_title">Serie de Calentamiento</string>
+    <string name="warmup_tooltip_message">Las series de calentamiento te ayudan a prepararte para cargas más pesadas. No cuentan para el volumen total pero son importantes para prevenir lesiones.</string>
+
+    <!-- RPE Info -->
+    <string name="rpe_tooltip_title">RPE (Esfuerzo Percibido)</string>
+    <string name="rpe_tooltip_message">Califica qué tan difícil fue la serie:\n6-7: Fácil, podrías hacer muchas más reps\n8: Desafiante, 2-3 reps restantes\n9-10: Muy difícil, 0-1 reps restantes</string>
+    <string name="rpe_label">RPE</string>
+
     <!-- Profile: Exercise Library Link -->
     <string name="profile_exercise_library">Biblioteca de Ejercicios</string>
     <string name="profile_exercise_library_subtitle">Explorar y gestionar ejercicios</string>

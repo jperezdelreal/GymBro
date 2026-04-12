@@ -15,7 +15,6 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -39,7 +38,10 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.FitnessCenter
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.SmartToy
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -49,6 +51,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
@@ -67,7 +70,6 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
@@ -934,6 +936,12 @@ private fun SetRow(
     val completedDescription = stringResource(R.string.active_workout_set_completed, setUi.setNumber)
     val completeDescription = stringResource(R.string.active_workout_complete_set, setUi.setNumber)
     val warmupToggleDescription = stringResource(R.string.active_workout_cd_warmup_toggle)
+    
+    var showWeightDialog by remember { mutableStateOf(false) }
+    var showRepsDialog by remember { mutableStateOf(false) }
+    var showWarmupTooltip by remember { mutableStateOf(false) }
+    var showRpeTooltip by remember { mutableStateOf(false) }
+    
     val rowBackground = when {
         setUi.isCompleted -> AccentGreenStart.copy(alpha = 0.08f)
         setUi.isWarmup -> AccentAmberStart.copy(alpha = 0.05f)
@@ -952,10 +960,10 @@ private fun SetRow(
             .padding(horizontal = 4.dp, vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        // Set number + warmup indicator
+        // Set number + warmup indicator with tooltip
         Box(
             modifier = Modifier
-                .size(48.dp)
+                .size(56.dp)
                 .clickable { 
                     haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                     onEvent(ActiveWorkoutEvent.ToggleWarmup(exerciseIndex, setIndex)) 
@@ -963,43 +971,92 @@ private fun SetRow(
                 .semantics { contentDescription = warmupToggleDescription },
             contentAlignment = Alignment.Center,
         ) {
-            Text(
-                text = if (setUi.isWarmup) "W" else "${setUi.setNumber}",
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Bold,
-                color = if (setUi.isWarmup) AccentAmberStart else Color.White,
-            )
+            if (setUi.isWarmup) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Text(
+                        text = stringResource(R.string.warmup_badge_label),
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = AccentAmberStart,
+                    )
+                    IconButton(
+                        onClick = { showWarmupTooltip = true },
+                        modifier = Modifier.size(16.dp),
+                    ) {
+                        Icon(
+                            Icons.Default.Info,
+                            contentDescription = "Warmup info",
+                            tint = AccentAmberStart.copy(alpha = 0.6f),
+                            modifier = Modifier.size(12.dp),
+                        )
+                    }
+                }
+            } else {
+                Text(
+                    text = "${setUi.setNumber}",
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White,
+                )
+            }
         }
 
-        // Weight with gesture support
-        GestureNumberField(
+        // Weight input field - tap to open dialog
+        ClickableNumberField(
             value = setUi.weight,
-            onValueChange = { onEvent(ActiveWorkoutEvent.UpdateSetWeight(exerciseIndex, setIndex, it)) },
             enabled = !setUi.isCompleted,
+            onClick = { if (!setUi.isCompleted) showWeightDialog = true },
             modifier = Modifier.weight(1f).testTag("weight_input"),
-            stepSize = 2.5,
         )
 
         Spacer(modifier = Modifier.width(8.dp))
 
-        // Reps with gesture support
-        GestureNumberField(
+        // Reps input field - tap to open dialog
+        ClickableNumberField(
             value = setUi.reps,
-            onValueChange = { onEvent(ActiveWorkoutEvent.UpdateSetReps(exerciseIndex, setIndex, it)) },
             enabled = !setUi.isCompleted,
+            onClick = { if (!setUi.isCompleted) showRepsDialog = true },
             modifier = Modifier.weight(1f).testTag("reps_input"),
-            stepSize = 1.0,
         )
 
         Spacer(modifier = Modifier.width(4.dp))
 
-        // RPE quick picker — compact tap-to-cycle selector
-        RpeQuickPicker(
-            selectedRpe = setUi.rpe,
-            onRpeSelected = { onEvent(ActiveWorkoutEvent.UpdateSetRpe(exerciseIndex, setIndex, it)) },
-            enabled = !setUi.isCompleted,
-            modifier = Modifier.width(48.dp),
-        )
+        // RPE with label and info icon
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.width(56.dp),
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center,
+            ) {
+                Text(
+                    text = stringResource(R.string.rpe_label),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Color.White.copy(alpha = 0.5f),
+                    fontSize = 9.sp,
+                )
+                IconButton(
+                    onClick = { showRpeTooltip = true },
+                    modifier = Modifier.size(12.dp),
+                ) {
+                    Icon(
+                        Icons.Default.Info,
+                        contentDescription = "RPE info",
+                        tint = Color.White.copy(alpha = 0.4f),
+                        modifier = Modifier.size(10.dp),
+                    )
+                }
+            }
+            RpeQuickPicker(
+                selectedRpe = setUi.rpe,
+                onRpeSelected = { onEvent(ActiveWorkoutEvent.UpdateSetRpe(exerciseIndex, setIndex, it)) },
+                enabled = !setUi.isCompleted,
+                modifier = Modifier.width(48.dp),
+            )
+        }
 
         Spacer(modifier = Modifier.width(8.dp))
 
@@ -1007,7 +1064,7 @@ private fun SetRow(
         if (setUi.isCompleted) {
             Box(
                 modifier = Modifier
-                    .size(48.dp)
+                    .size(56.dp)
                     .clip(CircleShape)
                     .background(Brush.horizontalGradient(listOf(AccentGreenStart, AccentGreenEnd)))
                     .semantics { contentDescription = completedDescription },
@@ -1023,7 +1080,7 @@ private fun SetRow(
         } else {
             Box(
                 modifier = Modifier
-                    .size(48.dp)
+                    .size(56.dp)
                     .clip(CircleShape)
                     .clickable {
                         haptic.performHapticFeedback(HapticFeedbackType.LongPress)
@@ -1043,77 +1100,81 @@ private fun SetRow(
             }
         }
     }
+    
+    // Dialogs
+    if (showWeightDialog) {
+        NumberInputDialog(
+            title = stringResource(R.string.number_input_weight_title),
+            value = setUi.weight,
+            stepSize = 2.5,
+            onValueChange = { onEvent(ActiveWorkoutEvent.UpdateSetWeight(exerciseIndex, setIndex, it)) },
+            onDismiss = { showWeightDialog = false },
+            onConfirm = { showWeightDialog = false },
+        )
+    }
+    
+    if (showRepsDialog) {
+        NumberInputDialog(
+            title = stringResource(R.string.number_input_reps_title),
+            value = setUi.reps,
+            stepSize = 1.0,
+            onValueChange = { onEvent(ActiveWorkoutEvent.UpdateSetReps(exerciseIndex, setIndex, it)) },
+            onDismiss = { showRepsDialog = false },
+            onConfirm = { showRepsDialog = false },
+        )
+    }
+    
+    if (showWarmupTooltip) {
+        InfoTooltipDialog(
+            title = stringResource(R.string.warmup_tooltip_title),
+            message = stringResource(R.string.warmup_tooltip_message),
+            onDismiss = { showWarmupTooltip = false },
+        )
+    }
+    
+    if (showRpeTooltip) {
+        InfoTooltipDialog(
+            title = stringResource(R.string.rpe_tooltip_title),
+            message = stringResource(R.string.rpe_tooltip_message),
+            onDismiss = { showRpeTooltip = false },
+        )
+    }
 }
 
+/**
+ * Clickable number field that opens a dialog when tapped.
+ * Replaces the gesture-based input for better UX.
+ */
 @Composable
-private fun GestureNumberField(
+private fun ClickableNumberField(
     value: String,
-    onValueChange: (String) -> Unit,
     enabled: Boolean,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    stepSize: Double = 1.0,
 ) {
-    val haptic = LocalHapticFeedback.current
-    var dragOffset by remember { mutableStateOf(0f) }
-    val dragThreshold = 40f
-
-    TextField(
-        value = value,
-        onValueChange = { input ->
-            if (input.isEmpty() || input.matches(Regex("^\\d*\\.?\\d*$"))) {
-                onValueChange(input)
-            }
-        },
-        enabled = enabled,
+    Box(
         modifier = modifier
             .height(56.dp)
-            .pointerInput(enabled) {
-                if (!enabled) return@pointerInput
-                detectVerticalDragGestures(
-                    onDragStart = { dragOffset = 0f },
-                    onVerticalDrag = { _, dragAmount ->
-                        dragOffset += dragAmount
-                        val threshold = dragThreshold
-                        
-                        if (abs(dragOffset) >= threshold) {
-                            val currentValue = value.toDoubleOrNull() ?: 0.0
-                            val delta = if (dragOffset < 0) stepSize else -stepSize
-                            val newValue = (currentValue + delta).coerceAtLeast(0.0)
-                            
-                            val formatted = if (stepSize >= 1.0) {
-                                newValue.toInt().toString()
-                            } else {
-                                String.format("%.1f", newValue)
-                            }
-                            onValueChange(formatted)
-                            
-                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                            dragOffset = 0f
-                        }
-                    },
-                    onDragEnd = { dragOffset = 0f }
-                )
-            },
-        textStyle = MaterialTheme.typography.titleMedium.copy(
-            textAlign = TextAlign.Center,
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 20.sp,
-            color = if (enabled) Color.White else Color.White.copy(alpha = 0.5f),
-        ),
-        singleLine = true,
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-        colors = TextFieldDefaults.colors(
-            focusedContainerColor = Color.White.copy(alpha = 0.08f),
-            unfocusedContainerColor = Color.White.copy(alpha = 0.05f),
-            disabledContainerColor = Color.White.copy(alpha = 0.03f),
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent,
-            disabledIndicatorColor = Color.Transparent,
-            cursorColor = AccentGreenStart,
-        ),
-        shape = RoundedCornerShape(8.dp),
-    )
+            .clip(RoundedCornerShape(8.dp))
+            .background(
+                if (enabled) Color.White.copy(alpha = 0.08f)
+                else Color.White.copy(alpha = 0.03f)
+            )
+            .clickable(enabled = enabled, onClick = onClick),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            text = if (value.isEmpty()) "—" else value,
+            style = MaterialTheme.typography.titleMedium.copy(
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 20.sp,
+                color = if (enabled) Color.White else Color.White.copy(alpha = 0.5f),
+            ),
+        )
+    }
 }
+
 
 @Composable
 private fun setHeaderStyle() = MaterialTheme.typography.labelSmall.copy(
@@ -1257,6 +1318,191 @@ private fun ProgressionSuggestionChip(
             )
         }
     }
+}
+
+/**
+ * Number input dialog with +/- buttons for quick adjustments and a number keyboard.
+ * Industry standard pattern for gym apps - large touch targets, clear visual feedback.
+ */
+@Composable
+private fun NumberInputDialog(
+    title: String,
+    value: String,
+    stepSize: Double,
+    onValueChange: (String) -> Unit,
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit,
+) {
+    val haptic = LocalHapticFeedback.current
+    var currentValue by remember(value) { mutableStateOf(value) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold,
+            )
+        },
+        text = {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                // Large number display
+                Text(
+                    text = if (currentValue.isEmpty()) "0" else currentValue,
+                    style = MaterialTheme.typography.displayLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = AccentGreenStart,
+                    modifier = Modifier.padding(vertical = 16.dp),
+                )
+
+                // +/- adjustment buttons
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(vertical = 8.dp),
+                ) {
+                    // Minus button
+                    OutlinedButton(
+                        onClick = {
+                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            val current = currentValue.toDoubleOrNull() ?: 0.0
+                            val newValue = (current - stepSize).coerceAtLeast(0.0)
+                            currentValue = if (stepSize >= 1.0) {
+                                newValue.toInt().toString()
+                            } else {
+                                String.format("%.1f", newValue)
+                            }
+                        },
+                        modifier = Modifier.size(72.dp),
+                        shape = CircleShape,
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = Color.White,
+                        ),
+                    ) {
+                        Icon(
+                            Icons.Default.Remove,
+                            contentDescription = "Decrease",
+                            modifier = Modifier.size(32.dp),
+                        )
+                    }
+
+                    // Manual input field
+                    TextField(
+                        value = currentValue,
+                        onValueChange = { input ->
+                            if (input.isEmpty() || input.matches(Regex("^\\d*\\.?\\d*$"))) {
+                                currentValue = input
+                            }
+                        },
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(72.dp),
+                        textStyle = MaterialTheme.typography.headlineMedium.copy(
+                            textAlign = TextAlign.Center,
+                            fontWeight = FontWeight.Bold,
+                        ),
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = Color.White.copy(alpha = 0.08f),
+                            unfocusedContainerColor = Color.White.copy(alpha = 0.05f),
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent,
+                            cursorColor = AccentGreenStart,
+                        ),
+                        shape = RoundedCornerShape(12.dp),
+                    )
+
+                    // Plus button
+                    OutlinedButton(
+                        onClick = {
+                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            val current = currentValue.toDoubleOrNull() ?: 0.0
+                            val newValue = current + stepSize
+                            currentValue = if (stepSize >= 1.0) {
+                                newValue.toInt().toString()
+                            } else {
+                                String.format("%.1f", newValue)
+                            }
+                        },
+                        modifier = Modifier.size(72.dp),
+                        shape = CircleShape,
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = AccentGreenStart,
+                        ),
+                    ) {
+                        Icon(
+                            Icons.Default.Add,
+                            contentDescription = "Increase",
+                            modifier = Modifier.size(32.dp),
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    onValueChange(currentValue)
+                    onConfirm()
+                },
+            ) {
+                Text(
+                    stringResource(R.string.number_input_done),
+                    color = AccentGreenStart,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.number_input_cancel))
+            }
+        },
+        containerColor = Color(0xFF1C1C1E),
+    )
+}
+
+/**
+ * Info tooltip dialog for explaining warmup sets and RPE.
+ */
+@Composable
+private fun InfoTooltipDialog(
+    title: String,
+    message: String,
+    onDismiss: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+            )
+        },
+        text = {
+            Text(
+                text = message,
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.White.copy(alpha = 0.8f),
+            )
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text(
+                    "Got it",
+                    color = AccentGreenStart,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
+        },
+        containerColor = Color(0xFF1C1C1E),
+    )
 }
 
 private fun formatDuration(totalSeconds: Long): String {
