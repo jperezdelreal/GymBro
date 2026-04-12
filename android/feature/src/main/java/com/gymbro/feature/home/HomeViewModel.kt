@@ -94,6 +94,9 @@ class HomeViewModel @Inject constructor(
             is HomeEvent.DismissPRBanner -> {
                 _state.update { it.copy(showPRCelebration = false) }
             }
+            is HomeEvent.DismissMilestoneBanner -> {
+                _state.update { it.copy(showMilestoneCelebration = false) }
+            }
             is HomeEvent.DismissPlateauAlert -> {
                 _state.update { currentState ->
                     currentState.copy(
@@ -191,32 +194,95 @@ class HomeViewModel @Inject constructor(
         safeLaunch {
             val historyItems = personalRecordService.getWorkoutHistory()
             if (historyItems.isEmpty()) {
-                _state.update { it.copy(workoutStreak = 0) }
+                _state.update { it.copy(
+                    workoutStreak = 0,
+                    weeklyStreak = 0,
+                    totalWorkouts = 0,
+                    nextMilestone = 7
+                ) }
                 return@safeLaunch
             }
 
+            val totalWorkouts = historyItems.size
+            
             val sortedByDate = historyItems.sortedByDescending { it.date }
-            var streak = 0
+            var dayStreak = 0
             var currentDate = java.time.LocalDate.now()
 
             for (item in sortedByDate) {
                 val workoutDate = item.date.atZone(java.time.ZoneId.systemDefault()).toLocalDate()
                 val daysDiff = java.time.temporal.ChronoUnit.DAYS.between(workoutDate, currentDate)
 
-                if (daysDiff == 0L || (daysDiff == 1L && streak > 0)) {
+                if (daysDiff == 0L || (daysDiff == 1L && dayStreak > 0)) {
                     if (daysDiff == 1L) {
-                        streak++
+                        dayStreak++
                         currentDate = workoutDate
-                    } else if (daysDiff == 0L && streak == 0) {
-                        streak = 1
+                    } else if (daysDiff == 0L && dayStreak == 0) {
+                        dayStreak = 1
                     }
                 } else {
                     break
                 }
             }
 
-            _state.update { it.copy(workoutStreak = streak) }
+            val weeklyStreak = calculateWeeklyStreak(historyItems)
+            
+            val milestones = listOf(7, 30, 100, 365)
+            val nextMilestone = milestones.firstOrNull { it > totalWorkouts }
+            
+            val lastMilestone = milestones.lastOrNull { it <= totalWorkouts }
+            val showMilestoneCelebration = lastMilestone != null && historyItems.size >= 2
+            val milestoneCelebration = if (lastMilestone != null && showMilestoneCelebration) {
+                when (lastMilestone) {
+                    7 -> MilestoneCelebration(7, "🎉", "milestone_7_title", "milestone_7_message")
+                    30 -> MilestoneCelebration(30, "🔥", "milestone_30_title", "milestone_30_message")
+                    100 -> MilestoneCelebration(100, "💯", "milestone_100_title", "milestone_100_message")
+                    365 -> MilestoneCelebration(365, "👑", "milestone_365_title", "milestone_365_message")
+                    else -> null
+                }
+            } else {
+                null
+            }
+
+            _state.update { it.copy(
+                workoutStreak = dayStreak,
+                weeklyStreak = weeklyStreak,
+                totalWorkouts = totalWorkouts,
+                nextMilestone = nextMilestone,
+                showMilestoneCelebration = milestoneCelebration != null,
+                milestoneCelebration = milestoneCelebration
+            ) }
         }
+    }
+    
+    private fun calculateWeeklyStreak(historyItems: List<com.gymbro.core.model.WorkoutHistoryItem>): Int {
+        if (historyItems.isEmpty()) return 0
+        
+        val workoutsByWeek = historyItems.groupBy { item ->
+            val date = item.date.atZone(java.time.ZoneId.systemDefault()).toLocalDate()
+            val weekStart = date.minusDays(date.dayOfWeek.value.toLong() - 1)
+            weekStart
+        }
+        
+        val currentWeekStart = java.time.LocalDate.now().let { date ->
+            date.minusDays(date.dayOfWeek.value.toLong() - 1)
+        }
+        
+        var streak = 0
+        var checkWeek = currentWeekStart
+        
+        while (true) {
+            val workoutsThisWeek = workoutsByWeek[checkWeek]?.size ?: 0
+            
+            if (workoutsThisWeek > 0) {
+                streak++
+                checkWeek = checkWeek.minusWeeks(1)
+            } else {
+                break
+            }
+        }
+        
+        return streak
     }
 
     private fun loadRecentPR() {

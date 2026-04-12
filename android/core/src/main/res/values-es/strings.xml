@@ -524,6 +524,9 @@
     <string name="active_workout_rpe_label">RPE</string>
     <string name="active_workout_progression_up">↑ +2.5kg sugerido (RPE bajo)</string>
     <string name="active_workout_progression_down">↓ −5%% sugerido (RPE alto)</string>
+    <string name="active_workout_create_superset">Vincular como Superserie</string>
+    <string name="active_workout_unlink_superset">Desvincular Superserie</string>
+    <string name="active_workout_superset_rest">Descanso después de superserie</string>
     
     <!-- Progression Suggestions -->
     <string name="progression_last" formatted="false">Anterior: %s × %d</string>
@@ -601,6 +604,7 @@
     <string name="home_quick_start_today">Ya entrenaste hoy — ¿otra vez?</string>
     <string name="home_quick_start_yesterday">Último entrenamiento fue ayer</string>
     <string name="home_quick_start_days_ago">Último entrenamiento hace %d días</string>
+    <string name="home_quick_start_subtitle">Inicia una nueva sesión ahora</string>
     <string name="home_todays_workout">Entrenamiento de Hoy</string>
     <string name="home_start">Iniciar</string>
     <string name="home_view_all_programs">Ver todos los programas →</string>
@@ -615,6 +619,19 @@
     <string name="pr_banner_title">¡Nuevo PR! 🎉</string>
     <string name="pr_banner">%1$s • %2$s</string>
     <string name="dismiss">Cerrar</string>
+    <string name="home_weekly_streak">Racha de %d semanas</string>
+    <string name="home_total_workouts">%d entrenamientos totales</string>
+    <string name="home_next_milestone">Próximo hito</string>
+    <string name="home_workouts_to_milestone">%1$d más para %2$d</string>
+    <string name="milestone_7_title">¡Primera Semana Completa!</string>
+    <string name="milestone_7_message">7 entrenamientos — la consistencia lo es todo</string>
+    <string name="milestone_30_title">¡Hito de 30 Entrenamientos!</string>
+    <string name="milestone_30_message">Un mes de dedicación — mantén el fuego encendido</string>
+    <string name="milestone_100_title">¡Club Centenario!</string>
+    <string name="milestone_100_message">100 entrenamientos — eres imparable</string>
+    <string name="milestone_365_title">¡Leyenda de Un Año!</string>
+    <string name="milestone_365_message">365 entrenamientos — has construido un imperio</string>
+    <string name="action_dismiss">Cerrar</string>
 
     <!-- Accessibility — Content Descriptions -->
     <string name="home_cd_start_workout">Iniciar entrenamiento</string>

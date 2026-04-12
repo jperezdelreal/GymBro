@@ -18,6 +18,8 @@ data class ActiveWorkoutState(
     val errorMessage: String? = null,
     val hasInProgressWorkout: Boolean = false,
     val fatigueWarnings: List<FatigueWarningUi> = emptyList(),
+    val supersetGroups: Map<String, List<Int>> = emptyMap(),
+    val selectedExercises: Set<Int> = emptySet(),
 )
 
 data class FatigueWarningUi(
@@ -74,6 +76,9 @@ sealed interface ActiveWorkoutEvent {
     data object RetryStartWorkout : ActiveWorkoutEvent
     data object ResumeWorkout : ActiveWorkoutEvent
     data object StartNewWorkout : ActiveWorkoutEvent
+    data class ToggleExerciseSelection(val exerciseIndex: Int) : ActiveWorkoutEvent
+    data object CreateSuperset : ActiveWorkoutEvent
+    data class UnlinkSuperset(val groupId: String) : ActiveWorkoutEvent
 }
 
 sealed interface ActiveWorkoutEffect {

@@ -518,6 +518,9 @@
     <string name="active_workout_rpe_label">RPE</string>
     <string name="active_workout_progression_up">↑ +2.5kg suggested (RPE was easy)</string>
     <string name="active_workout_progression_down">↓ −5%% suggested (RPE was high)</string>
+    <string name="active_workout_create_superset">Link as Superset</string>
+    <string name="active_workout_unlink_superset">Unlink Superset</string>
+    <string name="active_workout_superset_rest">Rest after superset</string>
     
     <!-- Progression Suggestions -->
     <string name="progression_last" formatted="false">Last: %s × %d</string>
@@ -595,6 +598,7 @@
     <string name="home_quick_start_today">Already trained today — go again?</string>
     <string name="home_quick_start_yesterday">Last workout was yesterday</string>
     <string name="home_quick_start_days_ago">Last workout %d days ago</string>
+    <string name="home_quick_start_subtitle">Start a new session now</string>
     <string name="home_todays_workout">Today\'s Workout</string>
     <string name="home_start">Start</string>
     <string name="home_view_all_programs">View all programs →</string>
@@ -609,6 +613,19 @@
     <string name="pr_banner_title">New PR! 🎉</string>
     <string name="pr_banner">%1$s • %2$s</string>
     <string name="dismiss">Dismiss</string>
+    <string name="home_weekly_streak">%d week streak</string>
+    <string name="home_total_workouts">%d total workouts</string>
+    <string name="home_next_milestone">Next milestone</string>
+    <string name="home_workouts_to_milestone">%1$d more to %2$d</string>
+    <string name="milestone_7_title">First Week Complete!</string>
+    <string name="milestone_7_message">7 workouts down — consistency is everything</string>
+    <string name="milestone_30_title">30 Workout Milestone!</string>
+    <string name="milestone_30_message">A month of dedication — keep the fire burning</string>
+    <string name="milestone_100_title">Century Club!</string>
+    <string name="milestone_100_message">100 workouts — you\'re unstoppable</string>
+    <string name="milestone_365_title">One Year Legend!</string>
+    <string name="milestone_365_message">365 workouts — you\'ve built an empire</string>
+    <string name="action_dismiss">Dismiss</string>
 
     <!-- Accessibility — Content Descriptions -->
     <string name="home_cd_start_workout">Start workout</string>
