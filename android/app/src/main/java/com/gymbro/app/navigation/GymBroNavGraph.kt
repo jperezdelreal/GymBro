@@ -235,6 +235,12 @@ fun GymBroNavGraph(
                 onNavigateToWorkoutDetail = { workoutId ->
                     navController.navigate("history/$workoutId")
                 },
+                onNavigateToCoach = { context ->
+                    navController.currentBackStackEntry
+                        ?.savedStateHandle
+                        ?.set("coach_initial_prompt", context)
+                    navController.navigate("coach")
+                },
             )
         }
         composable("exercise_library") {
