@@ -162,6 +162,7 @@
     <string name="settings_section_account">Cuenta</string>
     <string name="settings_section_workout">Preferencias de Entrenamiento</string>
     <string name="settings_section_notifications">Notificaciones</string>
+    <string name="settings_section_appearance">Apariencia</string>
     <string name="settings_section_health_connect">Health Connect</string>
     <string name="settings_section_about">Acerca de</string>
     <string name="settings_sign_in_status">Estado de Sesión</string>
@@ -187,6 +188,11 @@
     <string name="settings_training_phase_maintenance">Mantener</string>
     <string name="settings_workout_reminders">Recordatorios de Entrenamiento</string>
     <string name="settings_workout_reminders_subtitle">Recibe recordatorios para entrenar</string>
+    <string name="settings_theme">Tema</string>
+    <string name="settings_theme_subtitle">Elige el tema de la app</string>
+    <string name="settings_theme_dark">Oscuro</string>
+    <string name="settings_theme_light">Claro</string>
+    <string name="settings_theme_system">Sistema</string>
     <string name="settings_health_connect_connected">Conectado</string>
     <string name="settings_health_connect_not_connected">No Conectado</string>
     <string name="settings_health_connect_sync">Sincronizar con Health Connect</string>
@@ -333,6 +339,8 @@
     <string name="coach_input_placeholder_disabled">Firebase no configurado</string>
     <string name="coach_firebase_error">El Entrenador IA requiere Firebase AI (Vertex AI). Añade google-services.json a tu proyecto para habilitar esta función.</string>
     <string name="coach_label">Entrenador</string>
+    <string name="coach_contextual_ask_coach">Preguntar al Entrenador</string>
+    <string name="coach_contextual_dismiss">Descartar</string>
 
     <!-- Smart Workout -->
     <string name="smart_workout_title">Entrenamiento Inteligente</string>
