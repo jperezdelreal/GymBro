@@ -14,9 +14,21 @@ data class HomeState(
     val daysSinceLastWorkout: Int? = null,
     val showNoPlanDialog: Boolean = false,
     val workoutStreak: Int = 0,
+    val weeklyStreak: Int = 0,
+    val totalWorkouts: Int = 0,
+    val nextMilestone: Int? = null,
     val recentPR: PersonalRecord? = null,
     val showPRCelebration: Boolean = false,
+    val showMilestoneCelebration: Boolean = false,
+    val milestoneCelebration: MilestoneCelebration? = null,
     val plateauAlerts: List<PlateauAlert> = emptyList(),
+)
+
+data class MilestoneCelebration(
+    val milestone: Int,
+    val emoji: String,
+    val titleKey: String,
+    val messageKey: String,
 )
 
 data class RecentWorkoutItem(
@@ -37,6 +49,7 @@ sealed interface HomeEvent {
     data object DismissNoPlanDialog : HomeEvent
     data object NoPlanGoToPrograms : HomeEvent
     data object DismissPRBanner : HomeEvent
+    data object DismissMilestoneBanner : HomeEvent
     data class DismissPlateauAlert(val exerciseId: String) : HomeEvent
     data class OpenCoachForPlateau(val alert: PlateauAlert) : HomeEvent
 }

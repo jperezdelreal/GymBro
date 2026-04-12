@@ -219,6 +219,45 @@ class ActiveWorkoutViewModel @Inject constructor(
             is ActiveWorkoutEvent.ClearError -> _state.update { it.copy(errorMessage = null) }
             is ActiveWorkoutEvent.DismissFatigueWarnings -> _state.update { it.copy(fatigueWarnings = emptyList()) }
             is ActiveWorkoutEvent.RetryStartWorkout -> startWorkout()
+            is ActiveWorkoutEvent.ToggleExerciseSelection -> toggleExerciseSelection(event.exerciseIndex)
+            is ActiveWorkoutEvent.CreateSuperset -> createSuperset()
+            is ActiveWorkoutEvent.UnlinkSuperset -> unlinkSuperset(event.groupId)
+        }
+    }
+    
+    private fun toggleExerciseSelection(exerciseIndex: Int) {
+        _state.update { current ->
+            val selected = current.selectedExercises.toMutableSet()
+            if (selected.contains(exerciseIndex)) {
+                selected.remove(exerciseIndex)
+            } else {
+                selected.add(exerciseIndex)
+            }
+            current.copy(selectedExercises = selected)
+        }
+    }
+    
+    private fun createSuperset() {
+        _state.update { current ->
+            val selected = current.selectedExercises.toList().sorted()
+            if (selected.size < 2) return@update current
+            
+            val groupId = UUID.randomUUID().toString()
+            val newGroups = current.supersetGroups.toMutableMap()
+            newGroups[groupId] = selected
+            
+            current.copy(
+                supersetGroups = newGroups,
+                selectedExercises = emptySet()
+            )
+        }
+    }
+    
+    private fun unlinkSuperset(groupId: String) {
+        _state.update { current ->
+            val newGroups = current.supersetGroups.toMutableMap()
+            newGroups.remove(groupId)
+            current.copy(supersetGroups = newGroups)
         }
     }
 
@@ -314,14 +353,20 @@ class ActiveWorkoutViewModel @Inject constructor(
 
             updateSetField(exerciseIndex, setIndex) { it.copy(isCompleted = true) }
 
-            // Recalculate totals
             recalculateTotals()
 
-            // Auto-save state
             autoSaveState()
 
-            // Auto-start rest timer
-            startRestTimer()
+            val supersetGroup = currentState.supersetGroups.values.firstOrNull { exerciseIndex in it }
+            val shouldStartTimer = if (supersetGroup != null) {
+                exerciseIndex == supersetGroup.last()
+            } else {
+                true
+            }
+            
+            if (shouldStartTimer) {
+                startRestTimer()
+            }
         }
     }
 

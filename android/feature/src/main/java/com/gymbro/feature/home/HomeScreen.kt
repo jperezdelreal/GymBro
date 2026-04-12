@@ -164,6 +164,25 @@ fun HomeScreen(
                         onQuickStart = { onEvent(HomeEvent.QuickStartWorkout) },
                     )
                 }
+                
+                if (state.weeklyStreak > 0 || state.totalWorkouts > 0) {
+                    item {
+                        WeeklyStreakCard(
+                            weeklyStreak = state.weeklyStreak,
+                            totalWorkouts = state.totalWorkouts,
+                            nextMilestone = state.nextMilestone,
+                        )
+                    }
+                }
+                
+                if (state.showMilestoneCelebration && state.milestoneCelebration != null) {
+                    item {
+                        MilestoneCelebrationCard(
+                            celebration = state.milestoneCelebration,
+                            onDismiss = { onEvent(HomeEvent.DismissMilestoneBanner) },
+                        )
+                    }
+                }
 
                 // Today's Workout (if active plan exists)
                 if (state.activePlan != null && state.todayWorkout != null) {
@@ -789,6 +808,144 @@ private fun InfoChip(
             ),
             color = color,
         )
+    }
+}
+
+@Composable
+private fun WeeklyStreakCard(
+    weeklyStreak: Int,
+    totalWorkouts: Int,
+    nextMilestone: Int?,
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = "🔥",
+                        style = MaterialTheme.typography.headlineMedium,
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = stringResource(R.string.home_weekly_streak, weeklyStreak),
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.Bold,
+                        ),
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+                }
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = stringResource(R.string.home_total_workouts, totalWorkouts),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            
+            if (nextMilestone != null) {
+                Column(horizontalAlignment = Alignment.End) {
+                    Text(
+                        text = stringResource(R.string.home_next_milestone),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    val remaining = nextMilestone - totalWorkouts
+                    Text(
+                        text = stringResource(R.string.home_workouts_to_milestone, remaining, nextMilestone),
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            fontWeight = FontWeight.SemiBold,
+                        ),
+                        color = AccentGreen,
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun MilestoneCelebrationCard(
+    celebration: MilestoneCelebration,
+    onDismiss: () -> Unit,
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = AccentGreen.copy(alpha = 0.2f),
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+    ) {
+        Box(modifier = Modifier.fillMaxWidth()) {
+            IconButton(
+                onClick = onDismiss,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(4.dp),
+            ) {
+                Icon(
+                    Icons.Default.Close,
+                    contentDescription = stringResource(R.string.action_dismiss),
+                    tint = MaterialTheme.colorScheme.onSurface,
+                )
+            }
+            
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text(
+                    text = celebration.emoji,
+                    style = MaterialTheme.typography.displayLarge,
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = stringResource(
+                        when (celebration.titleKey) {
+                            "milestone_7_title" -> R.string.milestone_7_title
+                            "milestone_30_title" -> R.string.milestone_30_title
+                            "milestone_100_title" -> R.string.milestone_100_title
+                            "milestone_365_title" -> R.string.milestone_365_title
+                            else -> R.string.milestone_7_title
+                        }
+                    ),
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        fontWeight = FontWeight.Bold,
+                    ),
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = stringResource(
+                        when (celebration.messageKey) {
+                            "milestone_7_message" -> R.string.milestone_7_message
+                            "milestone_30_message" -> R.string.milestone_30_message
+                            "milestone_100_message" -> R.string.milestone_100_message
+                            "milestone_365_message" -> R.string.milestone_365_message
+                            else -> R.string.milestone_7_message
+                        }
+                    ),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                )
+            }
+        }
     }
 }
 

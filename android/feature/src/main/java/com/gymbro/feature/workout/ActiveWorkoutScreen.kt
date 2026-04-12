@@ -429,15 +429,78 @@ fun ActiveWorkoutScreen(
                     items = state.exercises,
                     key = { index, ex -> "${ex.exercise.id}_$index" },
                 ) { exerciseIndex, exerciseUi ->
-                    GlassmorphicCard(
-                        accentColor = getMuscleGroupColor(exerciseUi.exercise.muscleGroup),
+                    val supersetGroup = state.supersetGroups.entries.firstOrNull { exerciseIndex in it.value }
+                    val supersetLabel = if (supersetGroup != null) {
+                        val position = supersetGroup.value.indexOf(exerciseIndex)
+                        val letter = 'A' + (supersetGroup.value.first() / 26)
+                        "$letter${position + 1}"
+                    } else null
+                    val isSelected = state.selectedExercises.contains(exerciseIndex)
+                    
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.Start
                     ) {
-                        ExerciseCardContent(
-                            exerciseUi = exerciseUi,
-                            exerciseIndex = exerciseIndex,
-                            onEvent = onEvent,
-                            voiceRecognitionService = voiceRecognitionService,
-                            defaultWeightUnit = defaultWeightUnit,
+                        if (supersetGroup != null) {
+                            Box(
+                                modifier = Modifier
+                                    .width(4.dp)
+                                    .height(120.dp)
+                                    .background(
+                                        AccentGreenStart,
+                                        shape = if (exerciseIndex == supersetGroup.value.first() && exerciseIndex == supersetGroup.value.last()) {
+                                            RoundedCornerShape(4.dp)
+                                        } else if (exerciseIndex == supersetGroup.value.first()) {
+                                            RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp)
+                                        } else if (exerciseIndex == supersetGroup.value.last()) {
+                                            RoundedCornerShape(bottomStart = 4.dp, bottomEnd = 4.dp)
+                                        } else {
+                                            RoundedCornerShape(0.dp)
+                                        }
+                                    )
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                        }
+                        
+                        GlassmorphicCard(
+                            modifier = Modifier
+                                .weight(1f)
+                                .clickable { onEvent(ActiveWorkoutEvent.ToggleExerciseSelection(exerciseIndex)) }
+                                .border(
+                                    width = if (isSelected) 2.dp else 0.dp,
+                                    color = if (isSelected) AccentGreenStart else Color.Transparent,
+                                    shape = RoundedCornerShape(12.dp)
+                                ),
+                            accentColor = getMuscleGroupColor(exerciseUi.exercise.muscleGroup),
+                        ) {
+                            Column {
+                                if (supersetLabel != null) {
+                                    Text(
+                                        text = supersetLabel,
+                                        style = MaterialTheme.typography.labelSmall,
+                                        fontWeight = FontWeight.Bold,
+                                        color = AccentGreenStart,
+                                        modifier = Modifier.padding(start = 16.dp, top = 8.dp)
+                                    )
+                                }
+                                ExerciseCardContent(
+                                    exerciseUi = exerciseUi,
+                                    exerciseIndex = exerciseIndex,
+                                    onEvent = onEvent,
+                                    voiceRecognitionService = voiceRecognitionService,
+                                    defaultWeightUnit = defaultWeightUnit,
+                                )
+                            }
+                        }
+                    }
+                }
+                
+                if (state.selectedExercises.size >= 2) {
+                    item {
+                        GradientButton(
+                            text = stringResource(R.string.active_workout_create_superset),
+                            onClick = { onEvent(ActiveWorkoutEvent.CreateSuperset) },
+                            modifier = Modifier.fillMaxWidth()
                         )
                     }
                 }
