@@ -701,11 +701,11 @@ private fun GoalCard(
             .semantics(mergeDescendants = true) {
                 contentDescription = goalDescription
             }
-            .clickable {
-                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                onClick()
-            }
             .padding(20.dp),
+        onClick = {
+            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+            onClick()
+        }
     ) {
         Column {
             Text(
@@ -751,11 +751,11 @@ private fun FrequencyCard(
             .clip(RoundedCornerShape(16.dp))
             .semantics(mergeDescendants = true) {
                 contentDescription = frequencyDescription
-            }
-            .clickable {
-                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                onClick()
             },
+        onClick = {
+            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+            onClick()
+        }
     ) {
         Box(
             modifier = Modifier.fillMaxSize(),
