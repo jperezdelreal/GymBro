@@ -337,6 +337,8 @@
     <string name="coach_input_placeholder_disabled">Firebase not configured</string>
     <string name="coach_firebase_error">AI Coach requires Firebase AI (Vertex AI). Add google-services.json to your project to enable this feature.</string>
     <string name="coach_label">Coach</string>
+    <string name="coach_contextual_ask_coach">Ask Coach</string>
+    <string name="coach_contextual_dismiss">Dismiss</string>
 
     <!-- Smart Workout -->
     <string name="smart_workout_title">Smart Workout</string>

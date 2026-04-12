@@ -49,8 +49,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
@@ -237,7 +235,6 @@ private fun WorkoutCard(
     index: Int,
     weightUnit: UserPreferences.WeightUnit = UserPreferences.WeightUnit.KG,
 ) {
-    val haptic = LocalHapticFeedback.current
     var visible by remember { mutableStateOf(false) }
     
     LaunchedEffect(Unit) {
@@ -263,10 +260,7 @@ private fun WorkoutCard(
         enter = fadeIn() + slideInVertically(initialOffsetY = { it / 4 })
     ) {
         GlassmorphicCard(
-            onClick = {
-                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                onClick()
-            },
+            onClick = onClick,
             accentColor = accentColor,
             modifier = Modifier.semantics(mergeDescendants = true) {
                 contentDescription = workoutCardDescription
@@ -291,31 +285,42 @@ private fun WorkoutCard(
                             color = Color.White.copy(alpha = 0.5f),
                         )
                     }
-                    if (workout.prCount > 0) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(4.dp),
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(12.dp))
-                                .background(
-                                    brush = Brush.linearGradient(
-                                        colors = listOf(AccentAmberStart, AccentAmberEnd)
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        if (workout.volumeHistory.size >= 2) {
+                            SparklineChart(
+                                dataPoints = workout.volumeHistory,
+                                modifier = Modifier,
+                            )
+                        }
+                        if (workout.prCount > 0) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(12.dp))
+                                    .background(
+                                        brush = Brush.linearGradient(
+                                            colors = listOf(AccentAmberStart, AccentAmberEnd)
+                                        )
                                     )
+                                    .padding(horizontal = 12.dp, vertical = 6.dp),
+                            ) {
+                                Icon(
+                                    Icons.Default.Star,
+                                    contentDescription = stringResource(R.string.history_prs),
+                                    tint = Color.White,
+                                    modifier = Modifier.size(16.dp),
                                 )
-                                .padding(horizontal = 12.dp, vertical = 6.dp),
-                        ) {
-                            Icon(
-                                Icons.Default.Star,
-                                contentDescription = stringResource(R.string.history_prs),
-                                tint = Color.White,
-                                modifier = Modifier.size(16.dp),
-                            )
-                            Text(
-                                text = "${workout.prCount}",
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.White,
-                            )
+                                Text(
+                                    text = "${workout.prCount}",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.White,
+                                )
+                            }
                         }
                     }
                 }
