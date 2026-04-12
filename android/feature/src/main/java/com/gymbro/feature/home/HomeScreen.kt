@@ -667,6 +667,7 @@ private fun formatDuration(seconds: Long): String {
     return if (hours > 0) "${hours}h ${minutes}m" else "${minutes}m"
 }
 
+
 @Composable
 private fun WorkoutStreakBadge(streak: Int) {
     Card(
