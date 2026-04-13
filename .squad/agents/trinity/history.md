@@ -706,3 +706,20 @@ Full details: .squad/decisions/morpheus-v1-platform-strategy.md
 
 ---
 
+
+### 2026-04-13: QA Audit of Android App
+- **Recovery screen had no back button** — `RecoveryRoute` didn't accept `onNavigateBack`. Fixed by adding ArrowBack icon button and threading the callback from NavGraph.
+- **PlanDayDetail exercise picker was broken** — `GymBroNavGraph.kt:487` had TODO. The picker route (`exercise_picker`) already existed for `ActiveWorkout`, but `PlanDayDetail` was navigating to `exercise_library` (browse-only, no callback). Fixed by routing to `exercise_picker`.
+- **HistoryDetailScreen hardcoded 'kg' everywhere** — 4 locations. Fixed by adding `UserPreferences` weight unit lookup via Hilt EntryPoint and threading `weightUnitLabel` through `HistoryDetailContent`, `ExerciseCard`, `SetRow`, `MuscleVolumeRow`.
+- **ActiveWorkoutScreen had 5 hardcoded English strings** — content descriptions and button text. Extracted to `strings.xml` with Spanish translations.
+- **AnalyticsScreen had hardcoded "sets · workouts"** — Extracted to bilingual string resource.
+- **RecoveryContract.kt `readinessLabel`** has hardcoded EN labels ("Crushed","Good","OK","Tired","Wrecked") in a data class — needs architecture change to fix (can't use `stringResource` outside Composable). Noted for future fix.
+- **Pattern**: When adding back buttons to screens, use `Icons.AutoMirrored.Filled.ArrowBack` with `stringResource(R.string.common_navigate_back)` for consistency and accessibility.
+
+### 2026-04-13: Duration Scaling Fix (WorkoutPlanGenerator)
+**Bug:** `buildExerciseList()` only added 1 compound + 1 isolation per muscle group — max ~6 exercises regardless of session length. `getMaxExercisesForDuration()` returned up to 10, but the exercise pool was too small.
+**Fix:** 4-phase exercise selection (compound → isolation → accessory → extra compound) fills slots progressively. Finer 8-tier duration scaling (3-10 exercises). `generatePPLULDays()` was ignoring `sessionDurationMinutes` (hardcoded 4/3 sets) — now uses `getBaseSetsForDuration()`.
+**New API:** `adjustDayForDuration()` allows on-the-fly workout adjustment without regenerating the entire plan.
+**UX:** Added `DurationSelector` chip row to `PlanDayDetailScreen` — user taps 15/30/45/60/90/120min and exercises auto-adjust.
+**Volume multiplier:** Verified correct in all 4 generators (BULK=1.2x, CUT=0.8x, MAINTENANCE=1.0x). Was missing in PPLUL — fixed.
+**Templates audit:** 10 curated templates (5/3/1, PPL, Upper/Lower, Full Body, Bro Split, etc.) — all have realistic exercise counts (4-6 per day) appropriate for 45-75min sessions.
