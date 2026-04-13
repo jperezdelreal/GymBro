@@ -3,7 +3,7 @@ name: "Negative - Empty State UI (fresh app with no data)"
 #
 # Tests: Empty state UI across all tabs with fresh app install
 # Preconditions: App launched with clearState (fresh install simulation)
-# Test data: User name "EmptyTest", units kg
+# Test data: User name "EmptyTest", units kg (name stored in preferences, not shown on Profile)
 # Assertions: All tabs (Home, Programs, History, Profile) handle empty state gracefully
 # Cleanup: App state cleared via stopApp
 # Dependencies: None
@@ -100,5 +100,7 @@ onFlowComplete:
 # Screenshot 05: Profile tab with fresh user data
 - takeScreenshot: 05_empty_state_profile
 
-# Verify app handles all empty states gracefully
-- assertVisible: "EmptyTest"
+# Verify app handles empty/not-signed-in state gracefully on Profile
+# Profile shows Firebase Auth display name, NOT the onboarding name.
+# After clearState, user is not signed in — profile header shows fallback text.
+- assertVisible: "No has iniciado sesión|Not signed in|Levantador Anónimo|Anonymous Lifter"

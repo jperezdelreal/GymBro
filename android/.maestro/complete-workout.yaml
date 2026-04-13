@@ -3,7 +3,7 @@ name: "Complete Workout - Full workout to completion and summary"
 #
 # Tests: Full workout lifecycle from start to completion, including persistence verification
 # Preconditions: User has completed onboarding (ensured by ensure-post-onboarding.yaml)
-# Test data: EXERCISE_NAME (Bench Press), WEIGHT (100), REPS (5), 3 sets
+# Test data: EXERCISE_NAME (Barbell Bench Press), WEIGHT (100), REPS (5), 3 sets
 # Assertions: Sets logged correctly with copyTextFrom, workout summary shows, data persists in History and Progress
 # Cleanup: None (workout data persists for history/progress validation)
 # Dependencies: flow/ensure-post-onboarding.yaml
@@ -36,14 +36,19 @@ onFlowStart:
 - assertVisible: "Entrenamiento Activo"
 
 # Add an exercise
-- tapOn: "Añadir Ejercicio"
+- tapOn: "Añadir Ejercicio|Add Exercise"
 - waitForAnimationToEnd:
     timeout: 2000
-- assertVisible: "Elegir Ejercicio"
+- assertVisible: "Elegir Ejercicio|Choose Exercise"
 
-# Pick first available exercise
+# Pick Barbell Bench Press (actual name from exercise seed data)
+- scrollUntilVisible:
+    element:
+      text: "Barbell Bench Press"
+    direction: DOWN
+    timeout: 5000
 - tapOn:
-    text: "Bench Press"
+    text: "Barbell Bench Press"
     index: 0
 - waitForAnimationToEnd:
     timeout: 2000
@@ -140,7 +145,7 @@ onFlowStart:
 - takeScreenshot: 07_complete_workout_persistence_check_history
 
 # Verify workout appears in history (Exercise should be visible)
-- assertVisible: "Bench Press"
+- assertVisible: "Barbell Bench Press"
 # Screenshot 08: Workout appears in history confirming data persistence
 - takeScreenshot: 08_complete_workout_persistence_workout_in_history
 

@@ -97,34 +97,47 @@ onFlowComplete:
 - assertVisible: "Elegir Ejercicio|Choose Exercise"
 
 # Filter by Chest muscle group
-- tapOn: "Pecho|Chest"
+# Use index: 0 to target the filter chip (first match), not exercise card muscle group labels
+- tapOn:
+    text: "Pecho|Chest"
+    index: 0
 - waitForAnimationToEnd:
     timeout: 1000
 # Screenshot 06: Picker filtered by Chest/Pecho muscle group
 - takeScreenshot: 06_browse_library_filter_chest
 
 # Deselect Chest, select Back
-- tapOn: "Pecho|Chest"
+- tapOn:
+    text: "Pecho|Chest"
+    index: 0
 - waitForAnimationToEnd:
     timeout: 500
-- tapOn: "Espalda|Back"
+- tapOn:
+    text: "Espalda|Back"
+    index: 0
 - waitForAnimationToEnd:
     timeout: 1000
 # Screenshot 07: Picker filtered by Back/Espalda muscle group
 - takeScreenshot: 07_browse_library_filter_back
 
 # Deselect Back, select Shoulders
-- tapOn: "Espalda|Back"
+- tapOn:
+    text: "Espalda|Back"
+    index: 0
 - waitForAnimationToEnd:
     timeout: 500
-- tapOn: "Hombros|Shoulders"
+- tapOn:
+    text: "Hombros|Shoulders"
+    index: 0
 - waitForAnimationToEnd:
     timeout: 1000
 # Screenshot 08: Picker filtered by Shoulders/Hombros muscle group
 - takeScreenshot: 08_browse_library_filter_shoulders
 
 # Deselect filter
-- tapOn: "Hombros|Shoulders"
+- tapOn:
+    text: "Hombros|Shoulders"
+    index: 0
 - waitForAnimationToEnd:
     timeout: 1000
 # Screenshot 09: Picker with no filters applied (all exercises shown)
