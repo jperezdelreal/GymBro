@@ -134,16 +134,16 @@ fun PRCelebration(
 private fun formatPRText(pr: PersonalRecord): String {
     return when (pr.type) {
         RecordType.MAX_WEIGHT -> {
-            "${pr.type.emoji} ${pr.exerciseName}: ${pr.value.toInt()} kg"
+            "${pr.type.emoji} ${pr.exerciseName}: ${pr.value.toLong()} kg"
         }
         RecordType.MAX_REPS -> {
             "${pr.type.emoji} ${pr.exerciseName}: ${pr.value.toInt()} reps"
         }
         RecordType.MAX_VOLUME -> {
-            "${pr.type.emoji} ${pr.exerciseName}: ${pr.value.toInt()} kg volume"
+            "${pr.type.emoji} ${pr.exerciseName}: ${pr.value.toLong()} kg volume"
         }
         RecordType.MAX_E1RM -> {
-            "${pr.type.emoji} ${pr.exerciseName}: ${pr.value.toInt()} kg E1RM"
+            "${pr.type.emoji} ${pr.exerciseName}: ${pr.value.toLong()} kg E1RM"
         }
     }
 }

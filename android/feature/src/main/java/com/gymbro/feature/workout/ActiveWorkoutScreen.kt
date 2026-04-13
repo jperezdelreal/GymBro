@@ -555,7 +555,7 @@ private fun WorkoutStatsContent(
         horizontalArrangement = Arrangement.SpaceEvenly,
     ) {
         StatItem(label = stringResource(R.string.common_duration), value = formatDuration(elapsedSeconds), color = AccentCyanStart)
-        StatItem(label = stringResource(R.string.common_volume), value = "${totalVolume.toInt()} $unitLabel", color = AccentGreenStart)
+        StatItem(label = stringResource(R.string.common_volume), value = "${totalVolume.toLong()} $unitLabel", color = AccentGreenStart)
         StatItem(label = stringResource(R.string.workout_sets), value = "$totalSets", color = AccentAmberStart)
     }
 }

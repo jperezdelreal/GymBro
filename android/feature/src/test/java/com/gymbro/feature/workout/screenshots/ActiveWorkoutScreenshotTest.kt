@@ -131,7 +131,7 @@ class ActiveWorkoutScreenshotTest {
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "${state.exercises.size} exercises • ${state.totalSets} sets • ${state.totalVolume.toInt()} kg total",
+                            text = "${state.exercises.size} exercises • ${state.totalSets} sets • ${state.totalVolume.toLong()} kg total",
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }

@@ -101,7 +101,7 @@ class StatsWidget : GlanceAppWidget() {
 
                     StatItem(
                         label = "Volume (kg)",
-                        value = "${totalVolume.toInt()}",
+                        value = "${totalVolume.toLong()}",
                         accentColor = ColorProvider(androidx.compose.ui.graphics.Color(0xFF00D4FF)),
                         modifier = GlanceModifier.defaultWeight()
                     )

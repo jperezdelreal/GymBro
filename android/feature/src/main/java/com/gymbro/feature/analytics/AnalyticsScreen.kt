@@ -672,7 +672,7 @@ private fun formatVolume(volume: Double): String {
     return if (volume >= 1000) {
         String.format("%.1fk", volume / 1000)
     } else {
-        volume.roundToInt().toString()
+        volume.toLong().toString()
     }
 }
 

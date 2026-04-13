@@ -347,7 +347,7 @@ private fun WorkoutCard(
                 ) {
                     StatChip(
                         icon = Icons.Default.FitnessCenter,
-                        label = "${workout.totalVolume.toInt()} ${if (weightUnit == UserPreferences.WeightUnit.LBS) "lb" else "kg"}",
+                        label = "${workout.totalVolume.toLong()} ${if (weightUnit == UserPreferences.WeightUnit.LBS) "lb" else "kg"}",
                         gradientColors = listOf(AccentAmberStart, AccentAmberEnd),
                     )
                 }

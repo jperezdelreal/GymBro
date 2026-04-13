@@ -118,7 +118,7 @@ class HistoryListScreenshotTest {
                                             )
                                         }
                                         Text(
-                                            text = "${workout.totalVolume.toInt()} kg total • ${workout.durationSeconds / 60}m",
+                                            text = "${workout.totalVolume.toLong()} kg total • ${workout.durationSeconds / 60}m",
                                             style = MaterialTheme.typography.bodySmall,
                                         )
                                         if (workout.prCount > 0) {

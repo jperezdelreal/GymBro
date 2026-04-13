@@ -187,7 +187,7 @@ private fun HistoryDetailContent(detail: WorkoutDetail, weightUnitLabel: String 
                     StatCard(
                         icon = Icons.Default.FitnessCenter,
                         label = stringResource(R.string.common_volume),
-                        value = "${detail.totalVolume.toInt()} $weightUnitLabel",
+                        value = "${detail.totalVolume.toLong()} $weightUnitLabel",
                         gradientColors = listOf(AccentGreenStart, AccentGreenEnd),
                         modifier = Modifier.weight(1f),
                     )
@@ -514,7 +514,7 @@ private fun ExerciseCard(exercise: ExerciseDetail, index: Int, weightUnitLabel: 
                         fontWeight = FontWeight.Medium,
                     )
                     Text(
-                        text = "${exercise.totalVolume.toInt()} $weightUnitLabel",
+                        text = "${exercise.totalVolume.toLong()} $weightUnitLabel",
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Bold,
                         color = AccentCyanStart,
@@ -600,7 +600,7 @@ private fun MuscleVolumeRow(muscle: String, volume: Double, weightUnitLabel: Str
             fontWeight = FontWeight.Medium,
         )
         Text(
-            text = "${volume.toInt()} $weightUnitLabel",
+            text = "${volume.toLong()} $weightUnitLabel",
             style = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.Bold,
             color = AccentCyanStart,
