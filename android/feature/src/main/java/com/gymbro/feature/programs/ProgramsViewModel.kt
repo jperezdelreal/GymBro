@@ -2,6 +2,8 @@ package com.gymbro.feature.programs
 
 import androidx.lifecycle.viewModelScope
 import com.gymbro.core.preferences.UserPreferences
+import com.gymbro.core.model.PlannedExercise
+import com.gymbro.core.model.WorkoutDay
 import com.gymbro.core.repository.WorkoutTemplateRepository
 import com.gymbro.core.service.ActivePlanStore
 import com.gymbro.core.service.WorkoutPlanGenerator
@@ -61,6 +63,20 @@ class ProgramsViewModel @Inject constructor(
             is ProgramsEvent.StartWorkoutFromTemplate -> {
                 viewModelScope.launch {
                     templateRepository.updateLastUsed(event.template.id.toString())
+                    val workoutDay = WorkoutDay(
+                        dayNumber = 1,
+                        name = event.template.name,
+                        exercises = event.template.exercises
+                            .sortedBy { it.order }
+                            .map { ex ->
+                                PlannedExercise(
+                                    exerciseName = ex.exerciseName,
+                                    sets = ex.targetSets,
+                                    repsRange = ex.targetReps.toString(),
+                                )
+                            },
+                    )
+                    activePlanStore.setPendingWorkoutDay(workoutDay)
                     _effect.send(ProgramsEffect.NavigateToActiveWorkout(event.template))
                 }
             }

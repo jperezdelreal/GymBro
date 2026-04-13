@@ -25,6 +25,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ShowChart
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.EmojiEvents
@@ -34,12 +35,16 @@ import androidx.compose.material.icons.filled.TrendingUp
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -103,11 +108,12 @@ private val fullDateFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.ME
 
 @Composable
 fun ProgressRoute(
+    onNavigateBack: () -> Unit = {},
     onNavigateToWorkoutDetail: (String) -> Unit = {},
     onNavigateToAnalytics: () -> Unit = {},
     onNavigateToCoach: (String) -> Unit = {},
     onNavigateToActiveWorkout: () -> Unit = {},
-) {
+){
     val viewModel: ProgressViewModel = hiltViewModel()
     val state by viewModel.state.collectAsStateWithLifecycle()
     var showChartTooltip by remember { mutableStateOf(false) }
@@ -139,6 +145,7 @@ fun ProgressRoute(
     ProgressScreen(
         state = state,
         onEvent = viewModel::onEvent,
+        onNavigateBack = onNavigateBack,
         onNavigateToAnalytics = onNavigateToAnalytics,
         onNavigateToActiveWorkout = onNavigateToActiveWorkout,
         showChartTooltip = showChartTooltip,
@@ -152,10 +159,12 @@ fun ProgressRoute(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ProgressScreen(
     state: ProgressState,
     onEvent: (ProgressEvent) -> Unit,
+    onNavigateBack: () -> Unit = {},
     onNavigateToAnalytics: () -> Unit = {},
     onNavigateToActiveWorkout: () -> Unit = {},
     showChartTooltip: Boolean = false,
@@ -172,11 +181,37 @@ private fun ProgressScreen(
         return
     }
 
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = stringResource(R.string.progress_title),
+                        fontWeight = FontWeight.Bold,
+                    )
+                },
+                navigationIcon = {
+                    IconButton(onClick = onNavigateBack) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.action_back),
+                            tint = MaterialTheme.colorScheme.onSurface,
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background,
+                    titleContentColor = MaterialTheme.colorScheme.onBackground,
+                ),
+            )
+        },
+    ) { paddingValues ->
     Box {
         LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background),
+            .background(MaterialTheme.colorScheme.background)
+            .padding(paddingValues),
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
@@ -308,6 +343,7 @@ private fun ProgressScreen(
                 onDismiss = onTooltipDismissed
             )
         }
+    }
     }
 }
 

@@ -418,6 +418,7 @@ fun GymBroNavGraph(
         }
         composable("progress") {
             ProgressRoute(
+                onNavigateBack = { navController.navigateUp() },
                 onNavigateToAnalytics = { navController.navigate("analytics") },
                 onNavigateToCoach = { prompt ->
                     navController.currentBackStackEntry
