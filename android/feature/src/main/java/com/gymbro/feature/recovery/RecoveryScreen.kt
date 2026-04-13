@@ -642,8 +642,9 @@ private fun ManualRecoveryEntryCard(
                             color = Color.White,
                             fontWeight = FontWeight.SemiBold,
                         )
+                        val readinessText = stringResource(manualEntry.readinessLabelRes)
                         Text(
-                            text = "${manualEntry.readinessScore.toInt()}/10 — ${manualEntry.readinessLabel}",
+                            text = "${manualEntry.readinessScore.toInt()}/10 — $readinessText",
                             style = MaterialTheme.typography.bodyMedium,
                             color = OnSurfaceVariant,
                         )

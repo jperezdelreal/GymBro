@@ -98,6 +98,11 @@
     <string name="recovery_title">Recuperación</string>
     <string name="recovery_loading">Cargando datos de recuperación...</string>
     <string name="recovery_readiness_score">Puntuación de Preparación</string>
+    <string name="recovery_readiness_crushed">Destruido</string>
+    <string name="recovery_readiness_good">Bien</string>
+    <string name="recovery_readiness_ok">Regular</string>
+    <string name="recovery_readiness_tired">Cansado</string>
+    <string name="recovery_readiness_wrecked">Destrozado</string>
     <string name="recovery_sleep_label">Sueño</string>
     <string name="recovery_resting_hr_label">FC en Reposo</string>
     <string name="recovery_hrv_label">VFC</string>
@@ -287,6 +292,8 @@
     <string name="analytics_muscle_balance">Balance Muscular</string>
     <string name="analytics_consistency">Consistencia</string>
     <string name="analytics_top_exercises">Ejercicios Principales</string>
+    <string name="analytics_empty_title">Sin análisis aún</string>
+    <string name="analytics_empty_subtitle">Completa tu primer entrenamiento para ver estadísticas</string>
     <string name="analytics_current_streak">Racha Actual</string>
     <string name="analytics_longest_streak">Racha Más Larga</string>
     <string name="analytics_week_singular">semana</string>
@@ -432,6 +439,7 @@
     <string name="history_volume_by_muscle">Volumen por Grupo Muscular</string>
     <string name="history_total_volume">Volumen Total:</string>
     <string name="history_workout_not_found">Entrenamiento no encontrado</string>
+    <string name="history_load_failed">Error al cargar entrenamiento</string>
     <string name="history_today">Hoy</string>
     <string name="history_yesterday">Ayer</string>
 

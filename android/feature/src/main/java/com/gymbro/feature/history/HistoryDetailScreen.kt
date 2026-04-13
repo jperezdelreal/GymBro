@@ -122,11 +122,12 @@ fun HistoryDetailRoute(
                 state.isLoading -> {
                     FullScreenLoading(message = stringResource(R.string.history_loading_workout))
                 }
-                state.error != null -> {
+                state.errorRes != null -> {
+                    val errorMsg = stringResource(state.errorRes!!)
                     EmptyState(
                         icon = Icons.Default.Close,
                         title = stringResource(R.string.common_error),
-                        subtitle = state.error ?: stringResource(R.string.common_unknown_error),
+                        subtitle = errorMsg,
                         actionText = stringResource(R.string.action_retry),
                         onActionClick = { viewModel.onIntent(HistoryDetailIntent.Retry) },
                     )

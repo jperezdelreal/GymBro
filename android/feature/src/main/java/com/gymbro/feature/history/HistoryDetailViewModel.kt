@@ -3,6 +3,7 @@ package com.gymbro.feature.history
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gymbro.core.model.MuscleGroup
+import com.gymbro.core.R
 import com.gymbro.core.repository.ExerciseRepository
 import com.gymbro.core.repository.WorkoutRepository
 import com.gymbro.core.service.PersonalRecordService
@@ -34,13 +35,13 @@ class HistoryDetailViewModel @Inject constructor(
 
     private fun loadWorkout(workoutId: String) {
         viewModelScope.launch {
-            _state.value = HistoryDetailState(isLoading = true, error = null)
+            _state.value = HistoryDetailState(isLoading = true, errorRes = null)
             try {
                 val workout = workoutRepository.getWorkout(workoutId)
                 if (workout == null) {
                     _state.value = HistoryDetailState(
                         isLoading = false,
-                        error = "Workout not found"
+                        errorRes = R.string.history_workout_not_found
                     )
                     return@launch
                 }
@@ -117,13 +118,13 @@ class HistoryDetailViewModel @Inject constructor(
 
                 _state.value = HistoryDetailState(
                     isLoading = false,
-                    error = null,
+                    errorRes = null,
                     workoutDetail = detail
                 )
             } catch (e: Exception) {
                 _state.value = HistoryDetailState(
                     isLoading = false,
-                    error = e.message ?: "Failed to load workout"
+                    errorRes = R.string.history_load_failed
                 )
             }
         }

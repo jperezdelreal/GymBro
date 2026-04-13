@@ -1,5 +1,7 @@
 package com.gymbro.feature.recovery
 
+import androidx.annotation.StringRes
+import com.gymbro.core.R
 import com.gymbro.core.model.RecoveryMetrics
 import com.gymbro.core.model.SleepData
 
@@ -21,14 +23,15 @@ data class ManualRecoveryEntry(
 ) {
     val recoveryScore: Int
         get() = ((sleepHours / 8f) * 0.5f + (readinessScore / 10f) * 0.5f * 100f).toInt().coerceIn(0, 100)
-    
-    val readinessLabel: String
+
+    @get:StringRes
+    val readinessLabelRes: Int
         get() = when {
-            readinessScore >= 9f -> "Crushed"
-            readinessScore >= 7f -> "Good"
-            readinessScore >= 5f -> "OK"
-            readinessScore >= 3f -> "Tired"
-            else -> "Wrecked"
+            readinessScore >= 9f -> R.string.recovery_readiness_crushed
+            readinessScore >= 7f -> R.string.recovery_readiness_good
+            readinessScore >= 5f -> R.string.recovery_readiness_ok
+            readinessScore >= 3f -> R.string.recovery_readiness_tired
+            else -> R.string.recovery_readiness_wrecked
         }
 }
 
