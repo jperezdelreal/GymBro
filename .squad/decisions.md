@@ -2569,3 +2569,164 @@ RPE picker is a tap-to-cycle widget (6→7→8→9→10→clear) rather than dro
 ### Rationale
 
 Heuristics before ML — a well-tuned rule set is more explainable and debuggable than a black-box model. Users can understand "your RPE was low, so we increased weight" far better than "the model predicted you should increase weight."
+
+
+# Consolidated from inbox — Scribe merge 2026-04-13
+
+---
+
+## User Directive: Zero Open Issues — Complete v1.0 Ready
+
+**Captured:** 2026-04-12T01:15:00Z  
+**By:** Copilot (user request)
+
+Do not stop until every open issue is resolved. No exceptions, no excuses. Continue working until zero open issues remain.
+
+---
+
+## User Directive: Mandatory Emulator QA Before Issue Closure
+
+**Captured:** 2026-04-12T08:35:00Z  
+**By:** Copilot (user request)
+
+After fixing all issues, run a full QA pass on the emulator simulating a real first-time user journey. Don't just compile — actually USE the app flow by flow and validate against expected behavior. The team keeps shipping bugs that are obvious on first use. No more "it compiles therefore it works."
+
+---
+
+## User Directive: UX Priorities from Product Research
+
+**Captured:** 2026-04-12T08:32:00Z  
+**By:** Copilot (user request)
+
+### Deprioritized
+- Logging speed: leave as-is for now
+- CSV export: user doesn't see the value
+- Exercise videos/YouTube links: too complex
+- AI Form Analysis: defer to v2
+
+### Key Differentiators (MUST HAVE)
+- Curated program templates (5/3/1, PPL)
+- Editable AI plans
+- Plate calculator
+- Plateau detection UI — show the moat
+- Supersets/circuits support
+- Recovery fallback (manual entry)
+
+### Super Useful
+- Workout streaks
+- 1RM calculator
+
+**Critical note:** Team lacks real gym training knowledge. UX bugs are far more critical than optimization.
+
+---
+
+## User Directive: Zero Tolerance for Hardcodes and Localization Bugs
+
+**Captured:** 2026-04-12T08:25:00Z  
+**By:** Copilot (user request)
+
+No more hardcoded values or broken localization. **Every PR touching UI MUST be verified on a clean emulator install before merging.**
+
+Checklist:
+1. No hardcoded strings — all from `strings.xml`
+2. Bilingual EN+ES complete
+3. No raw template variables
+4. No fake/placeholder data in production
+
+**Why:** Same class of bugs keeps shipping despite multiple review passes. Trust is eroding.
+
+---
+
+## Decision: Synchronous Database Seeding in DI Providers
+
+**Date:** 2025-01-21  
+**Author:** Tank (Backend Dev)  
+**Issue:** #465
+
+Use synchronous seeding in `DatabaseModule.provideDatabase()` with `runBlocking` instead of async callbacks for DI-critical seed data.
+
+Room's async `onCreate()` callback runs fire-and-forget. For exercises that must exist before onboarding, guaranteed synchronous seeding is essential.
+
+**Pros:** Guarantees availability at DI time; no defensive timeouts needed.  
+**Cons:** Blocks app startup ~50-100ms on first install (acceptable).
+
+---
+
+## Decision: Exercise Description Format — Structured Bilingual
+
+**Date:** 2026-04-12  
+**Author:** Trinity (Mobile Dev)  
+**Issue:** #528
+
+All exercise descriptions use JSON with three sections (setup, execution, tips) in English and Spanish. Structured format provides visual hierarchy, guarantees 100% bilingual coverage, and enforces quality.
+
+---
+
+## Decision: AccentGreen Splash Screen
+
+**Date:** 2026-01-XX  
+**Author:** Trinity (Mobile Dev)  
+**Issue:** #468
+
+Use **AccentGreen (#00FF87)** as splash screen background for brand recognition and visual consistency with barbell icon.
+
+---
+
+## Decision: v1.0 Platform Strategy — Android-First Launch
+
+**Date:** 2026-04-13  
+**Author:** Morpheus (Lead)  
+**Status:** Pending Squad Review
+
+**Problem:** Project claims iOS-first, but v1.0 is Android-only (submitted to Play Store). iOS (237 Swift files) is partial and not launch-ready (4-6 weeks to parity).
+
+**Decision:** Android-first launch for v1.0. iOS deferred to v1.1 (timing TBD post-user-feedback).
+
+**Immediate (48h):**
+- Push 2 unpushed Android commits
+- Verify Play Store submission
+- Marketing: "GymBro v1.0 — Android Launch"
+
+**Week 1 Post-Launch:**
+- Monitor Play Store (crashes, ratings, downloads, feedback)
+- Baseline analytics
+
+**v1.1 Planning (Weeks 2-4):**
+- Decide iOS v1.1 vs v2.0 based on user feedback (10%+ reviews = commit iOS)
+- Update README to clarify iOS timeline
+
+**Success Criteria:**
+- Play Store approval within 5 business days
+- <2% crash rate week 1
+- >4.0 star rating (50+ reviews)
+- >50,000 downloads in 4 weeks
+
+---
+
+## Decision: Test Execution Blocked by Build Environment Issues
+
+**Date:** 2026-12-04  
+**Author:** Switch (Tester)  
+**Issue:** #466
+
+Cannot run Android unit tests locally due to Gradle build cache corruption and KSP failures.
+
+**Recommendation:** Use CI (GitHub Actions) for test execution, unit tests on every PR, coverage reporting.
+
+---
+
+## Decision: Test Coverage Gaps for UX Bugs
+
+**Author:** Switch (Tester)  
+**Date:** 2025-07-22
+
+4 critical UX bugs with significant test gaps identified:
+
+1. **PlanDayDetail → ActiveWorkout:** Exercises silently dropped
+2. **Exercise Detail:** Placeholder screen
+3. **Start Workout:** No assertion exercises appear
+4. **Onboarding re-show:** May reappear after relaunch
+
+All gaps have proposed fixes and Maestro test assertions.
+
+

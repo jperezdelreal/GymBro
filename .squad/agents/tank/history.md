@@ -1141,3 +1141,23 @@ Moved seed logic into `DatabaseModule.provideDatabase()` to run synchronously be
 - `android/core/src/main/java/com/gymbro/core/service/WorkoutPlanGenerator.kt` — removed timeout workaround
 
 **PR:** #476
+
+## 2026-04-13T16:12Z — Morpheus: Platform Strategy Discovery (Android-First v1.0)
+
+Morpheus completed comprehensive project state analysis. **Major finding:** v1.0.0 is Android-only (359 commits, 10 weeks) despite README claiming iOS-first. iOS port exists (237 Swift files, 3 packages) but partial and not v1.0-ready.
+
+### Key Decisions for Your Work
+- **Android is v1.0 launch platform** — iOS deferred to v1.1 (market feedback dependent)
+- **v1.1 priorities TBD** — Voice logging, batch import, iPad support, iOS porting (if user demand high)
+- **Team context:** iOS ambiguity now resolved; focus on Android excellence for launch + post-launch support
+
+### Your Implications
+- **Trinity (Mobile):** Polish Android UX post-launch; iOS roadmap skeleton due April 20
+- **Neo (AI):** Validate safety filters for AI coach; plan Whisper API for v1.1
+- **Tank (Backend):** Verify Play Store submission; plan v1.1 backend features
+- **Switch (Testing):** Expand unit test coverage post-v1.0; plan iOS test infrastructure for v1.1
+
+Full details: .squad/decisions/morpheus-v1-platform-strategy.md
+
+---
+
