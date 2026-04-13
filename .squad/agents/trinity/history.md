@@ -723,3 +723,37 @@ Full details: .squad/decisions/morpheus-v1-platform-strategy.md
 **UX:** Added `DurationSelector` chip row to `PlanDayDetailScreen` — user taps 15/30/45/60/90/120min and exercises auto-adjust.
 **Volume multiplier:** Verified correct in all 4 generators (BULK=1.2x, CUT=0.8x, MAINTENANCE=1.0x). Was missing in PPLUL — fixed.
 **Templates audit:** 10 curated templates (5/3/1, PPL, Upper/Lower, Full Body, Bro Split, etc.) — all have realistic exercise counts (4-6 per day) appropriate for 45-75min sessions.
+
+---
+
+### 2026-04-13: Cross-Agent Sprint Summary — QA + Programs (Orchestration Complete)
+
+**Status:** ✅ Complete — All deliverables documented and merged
+
+**QA Audit Results:** 37/40 checks passing (92.5%)
+- **6 bugs fixed:**
+  1. RecoveryScreen crash when HealthKit data unavailable → Added null safety fallback
+  2. ActiveWorkoutScreen memory leak (timer not invalidated on dismiss) → Fixed lifecycle
+  3. HistoryDetailScreen infinite scroll bug → Fixed pagination logic
+  4. GymBroNavGraph transition animation stutter on tab switch → Optimized animation timing
+  5. Strings.xml ES localization (2 entries) → Corrected formatting
+  6. AnalyticsScreen crash on rapid date picker taps → Added debounce
+
+- **3 minor items documented for v1.1:**
+  - Haptic feedback intensity could be user-configurable
+  - Voice-over labels need power-user refinement
+  - Image cache could be more aggressive
+
+**Duration Scaling Architecture Decision:** Merged to decisions.md
+- 4-phase exercise selection (compound → isolation → accessory → extra compound variants)
+- Dynamic scaling 3–10 exercises based on 8-tier duration model
+- New public API: `adjustDayForDuration()` for on-the-fly workout adjustment
+- Duration selector UI added to PlanDayDetailScreen
+- Volume multiplier (BULK/CUT/MAINTENANCE) stacks on top of duration scaling
+
+**Orchestration Logs:** All 3 written and committed
+- 2026-04-13T16-28-switch.md (Maestro fixes)
+- 2026-04-13T16-28-trinity-qa.md (QA audit)
+- 2026-04-13T16-28-trinity-programs.md (Duration scaling)
+- Session log: 2026-04-13T16-28-qa-and-programs.md
+

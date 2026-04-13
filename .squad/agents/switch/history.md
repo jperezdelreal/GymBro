@@ -1257,3 +1257,19 @@ Full details: .squad/decisions/morpheus-v1-platform-strategy.md
 - **Profile screen shows Auth state, not preferences:** The onboarding name is in `userPreferences`, but Profile reads from `AuthService`. Don't assume UI displays match data entry screens
 - **Always trace the full data path:** Reading the YAML alone isn't enough — trace from seed data → repository → ViewModel → Screen to find what text actually renders
 
+---
+
+### 2026-04-13: Cross-Agent Sprint Summary — QA + Programs
+
+**Status:** ✅ Complete — Orchestration logs written, session recorded
+
+**Related work from Trinity:**
+- **QA Audit:** 37/40 checks passing, 6 bugs fixed (RecoveryScreen, ActiveWorkoutScreen, HistoryDetailScreen, GymBroNavGraph, AnalyticsScreen, Spanish strings)
+- **Programs + Duration:** Root cause analysis (buildExerciseList capped at 5 exercises) → 4-phase selection model implemented with dynamic duration scaling (3–10 exercises by duration)
+- **Decision:** trinity-duration-scaling.md merged into decisions.md
+
+**Documentation:**
+- Orchestration logs: 3 files (switch.md, trinity-qa.md, trinity-programs.md)
+- Session log: 2026-04-13T16-28-qa-and-programs.md
+- All squad/ changes staged and ready for commit
+
