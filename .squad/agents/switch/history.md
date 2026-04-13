@@ -1219,3 +1219,41 @@ Full details: .squad/decisions/morpheus-v1-platform-strategy.md
 
 ---
 
+### 2026-04-13: Fixed 3 Broken Maestro E2E Flows
+
+**Context:**
+- Branch: `squad/fix-maestro-broken-flows` from master
+- Task: Fix 3 known broken Maestro flows identified in previous validation runs
+
+**Fixes Applied:**
+
+1. **browse-library.yaml — Muscle group chip selector ambiguity**
+   - **Root cause:** `tapOn: "Pecho|Chest"` matched exercise card muscle group labels (Text showing "Pecho" inside GlassmorphicCard) instead of the filter chip (Text inside GradientFilterChip's Surface). Both the filter chips and exercise cards display the localized muscle group name ("Pecho", "Espalda", "Hombros").
+   - **Fix:** Added `index: 0` with explicit `text:` key to all 8 filter chip taps. The filter chips render before exercise cards in the semantics tree (FlowRow is above LazyColumn in the Column layout), so `index: 0` targets the chip.
+   - **Lines changed:** 6 `tapOn:` calls converted from shorthand to explicit `text:` + `index: 0`
+
+2. **complete-workout.yaml — Exercise name mismatch**
+   - **Root cause:** Flow used `text: "Bench Press"` but actual seed data name is `"Barbell Bench Press"` (exercises-seed.json, line 39). Exercise names are NOT localized — they're stored as-is from the JSON seed.
+   - **Fix:** Changed selector to `"Barbell Bench Press"`, added `scrollUntilVisible` before tap (exercise may not be visible without scrolling in 100+ exercise list), fixed persistence assertion on History tab, added bilingual `"Añadir Ejercicio|Add Exercise"` selector.
+   - **Also fixed:** `assertVisible: "Bench Press"` → `assertVisible: "Barbell Bench Press"` in persistence check
+
+3. **empty-state-screens.yaml — Wrong assertion target**
+   - **Root cause:** `assertVisible: "EmptyTest"` expected the onboarding name on Profile tab. But ProfileScreen shows `state.user?.displayName` from Firebase Auth (via AuthService), NOT the onboarding name stored in `userPreferences`. After `clearState: true`, user is NOT signed in, so Profile header shows "No has iniciado sesión" / "Not signed in" fallback text.
+   - **Fix:** Replaced `assertVisible: "EmptyTest"` with `assertVisible: "No has iniciado sesión|Not signed in|Levantador Anónimo|Anonymous Lifter"` covering both possible auth states.
+
+**Key Code Paths Traced:**
+- `ExerciseLibraryScreen.kt:247` — filter chip text from `group.localizedName()`
+- `ExerciseLibraryScreen.kt:429` — exercise card also shows `exercise.muscleGroup.localizedName()`
+- `DatabaseModule.kt:128` — `name = seed.name` (English, from exercises-seed.json)
+- `ProfileScreen.kt:435-438` — shows `displayName` if signed in, else "No has iniciado sesión"
+- `values-es/strings.xml:661` — `muscle_group_chest` = "Pecho"
+
+**Commit:** e60359f — "test: Fix 3 broken Maestro E2E flows"
+**Files:** 3 modified (browse-library.yaml, complete-workout.yaml, empty-state-screens.yaml), 36 insertions, 16 deletions
+
+**Learnings:**
+- **Localized text appears in MULTIPLE places:** Muscle group names show in both filter chips AND exercise cards — always use `index:` to disambiguate
+- **Exercise names are NOT localized:** They come from exercises-seed.json in English regardless of locale — tests should use exact seed names
+- **Profile screen shows Auth state, not preferences:** The onboarding name is in `userPreferences`, but Profile reads from `AuthService`. Don't assume UI displays match data entry screens
+- **Always trace the full data path:** Reading the YAML alone isn't enough — trace from seed data → repository → ViewModel → Screen to find what text actually renders
+
