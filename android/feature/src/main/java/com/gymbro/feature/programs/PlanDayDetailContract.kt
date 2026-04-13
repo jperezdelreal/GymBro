@@ -10,6 +10,8 @@ data class PlanDayDetailState(
     val planName: String = "",
     val isEditMode: Boolean = false,
     val hasUnsavedChanges: Boolean = false,
+    val sessionDurationMinutes: Int = 60,
+    val isAdjustingDuration: Boolean = false,
 )
 
 sealed interface PlanDayDetailIntent {
@@ -23,6 +25,7 @@ sealed interface PlanDayDetailIntent {
     data object DiscardChanges : PlanDayDetailIntent
     data object AddExercise : PlanDayDetailIntent
     data class ExerciseSelected(val exerciseName: String) : PlanDayDetailIntent
+    data class ChangeDuration(val durationMinutes: Int) : PlanDayDetailIntent
 }
 
 sealed interface PlanDayDetailEffect {

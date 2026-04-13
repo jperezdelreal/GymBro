@@ -31,8 +31,11 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -104,6 +107,7 @@ fun PlanDayDetailRoute(
         onSaveChanges = { viewModel.onIntent(PlanDayDetailIntent.SaveChanges) },
         onDiscardChanges = { viewModel.onIntent(PlanDayDetailIntent.DiscardChanges) },
         onAddExercise = { viewModel.onIntent(PlanDayDetailIntent.AddExercise) },
+        onChangeDuration = { viewModel.onIntent(PlanDayDetailIntent.ChangeDuration(it)) },
     )
 }
 
@@ -121,6 +125,7 @@ private fun PlanDayDetailScreen(
     onSaveChanges: () -> Unit,
     onDiscardChanges: () -> Unit,
     onAddExercise: () -> Unit,
+    onChangeDuration: (Int) -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -203,10 +208,13 @@ private fun PlanDayDetailScreen(
                 PlanDayContent(
                     day = state.workoutDay,
                     isEditMode = state.isEditMode,
+                    sessionDurationMinutes = state.sessionDurationMinutes,
+                    isAdjustingDuration = state.isAdjustingDuration,
                     onStartWorkout = onStartWorkout,
                     onRemoveExercise = onRemoveExercise,
                     onUpdateExercise = onUpdateExercise,
                     onAddExercise = onAddExercise,
+                    onChangeDuration = onChangeDuration,
                     modifier = Modifier.padding(paddingValues),
                 )
             }
@@ -218,10 +226,13 @@ private fun PlanDayDetailScreen(
 private fun PlanDayContent(
     day: WorkoutDay,
     isEditMode: Boolean,
+    sessionDurationMinutes: Int,
+    isAdjustingDuration: Boolean,
     onStartWorkout: () -> Unit,
     onRemoveExercise: (String) -> Unit,
     onUpdateExercise: (PlannedExercise) -> Unit,
     onAddExercise: () -> Unit,
+    onChangeDuration: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val exerciseCount = day.exercises.size
@@ -234,6 +245,16 @@ private fun PlanDayContent(
             .padding(horizontal = 16.dp),
         contentPadding = PaddingValues(vertical = 16.dp),
     ) {
+        // Duration selector
+        item {
+            DurationSelector(
+                currentDuration = sessionDurationMinutes,
+                isLoading = isAdjustingDuration,
+                onDurationChange = onChangeDuration,
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+        }
+
         // Summary header
         item {
             Card(
@@ -595,6 +616,63 @@ private fun EditableExerciseCard(
                     singleLine = true,
                 )
             }
+        }
+    }
+}
+
+private val DURATION_OPTIONS = listOf(15, 30, 45, 60, 90, 120)
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun DurationSelector(
+    currentDuration: Int,
+    isLoading: Boolean,
+    onDurationChange: (Int) -> Unit,
+) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = stringResource(R.string.programs_session_duration_label),
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(bottom = 8.dp),
+        )
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+        ) {
+            DURATION_OPTIONS.forEach { duration ->
+                val isSelected = duration == currentDuration
+                FilterChip(
+                    selected = isSelected,
+                    onClick = {
+                        if (!isLoading && duration != currentDuration) {
+                            onDurationChange(duration)
+                        }
+                    },
+                    label = {
+                        Text(
+                            text = stringResource(R.string.programs_duration_minutes, duration),
+                            style = MaterialTheme.typography.labelSmall,
+                        )
+                    },
+                    enabled = !isLoading,
+                    colors = FilterChipDefaults.filterChipColors(
+                        selectedContainerColor = AccentGreen.copy(alpha = 0.2f),
+                        selectedLabelColor = AccentGreen,
+                    ),
+                    modifier = Modifier.weight(1f),
+                )
+            }
+        }
+
+        if (isLoading) {
+            LinearProgressIndicator(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 4.dp),
+                color = AccentGreen,
+            )
         }
     }
 }
