@@ -19,19 +19,27 @@ class WorkoutPlanGenerator @Inject constructor(
 
     companion object {
         // Time estimation constants (seconds)
-        const val WARMUP_TIME_SECONDS = 300       // 5 min warmup
-        const val COOLDOWN_TIME_SECONDS = 180     // 3 min cooldown
-        const val TRANSITION_TIME_SECONDS = 120   // 2 min between exercises (setup equipment, move)
+        const val WARMUP_TIME_SECONDS = 300       // 5 min general warmup (skill: 5-10 min)
+        const val COOLDOWN_TIME_SECONDS = 180     // 3 min cooldown/stretching
 
-        // Rest time per training goal (seconds)
-        const val REST_TIME_STRENGTH = 180        // 3 min — heavy compounds
-        const val REST_TIME_HYPERTROPHY = 90      // 1.5 min — moderate load
-        const val REST_TIME_ENDURANCE = 45        // 45s — light, high-rep
-        const val REST_TIME_POWER = 240           // 4 min — explosive, full recovery
+        // Transition time by exercise type — compounds need plate loading, rack
+        // setup, safety pins; isolation is just grab dumbbells or adjust a machine
+        const val TRANSITION_TIME_COMPOUND = 150  // 2.5 min — load plates, set rack height
+        const val TRANSITION_TIME_ISOLATION = 60  // 1 min — grab DBs, adjust seat
 
-        // Rep duration (seconds per rep)
-        const val REP_DURATION_COMPOUND = 4       // ~4s/rep for compound movements
-        const val REP_DURATION_ISOLATION = 3      // ~3s/rep for isolation/accessory
+        // Rest time per training goal (seconds) — from training domain skill
+        // Strength/PL: "3-5 minutes between main lifts (full ATP-PC recovery)"
+        const val REST_TIME_STRENGTH = 240        // 4 min — mid-range for heavy compounds
+        // Hypertrophy: "60-90 seconds (metabolic stress accumulation)"
+        const val REST_TIME_HYPERTROPHY = 90      // 90s — upper end, compounds need it
+        // General fitness/toning: "30-60 seconds (keeps heart rate elevated)"
+        const val REST_TIME_ENDURANCE = 45         // 45s — mid-range
+        // Powerlifting main lifts: near-max singles need full ATP-PC recovery
+        const val REST_TIME_POWER = 300            // 5 min — serious PL rest for heavy singles
+
+        // Rep duration (seconds per rep) — accounts for brace, eccentric, grind
+        const val REP_DURATION_COMPOUND = 5       // ~5s/rep — brace → controlled eccentric → drive
+        const val REP_DURATION_ISOLATION = 3      // ~3s/rep — controlled tempo, mind-muscle connection
 
         // Exercise count bounds
         const val MIN_EXERCISES = 3
@@ -85,7 +93,10 @@ class WorkoutPlanGenerator @Inject constructor(
     }
 
     /**
-     * Estimates how long a single exercise takes in seconds, based on:
+     * Estimates how long a single exercise takes in seconds.
+     * Compounds get longer transition time (plate loading, rack setup) and
+     * slower rep cadence (bracing, grinding) than isolation work.
+     *
      *   timePerSet = (reps × repDuration) + restTime
      *   exerciseTime = (sets × timePerSet) + transitionTime
      */
@@ -100,8 +111,12 @@ class WorkoutPlanGenerator @Inject constructor(
             ExerciseCategory.COMPOUND -> REP_DURATION_COMPOUND
             else -> REP_DURATION_ISOLATION
         }
+        val transitionTime = when (category) {
+            ExerciseCategory.COMPOUND -> TRANSITION_TIME_COMPOUND
+            else -> TRANSITION_TIME_ISOLATION
+        }
         val timePerSet = (midReps * repDuration) + restSeconds
-        return (sets * timePerSet) + TRANSITION_TIME_SECONDS
+        return (sets * timePerSet) + transitionTime
     }
 
     /**
@@ -339,9 +354,10 @@ class WorkoutPlanGenerator @Inject constructor(
         volumeMultiplier: Float,
         sessionDurationMinutes: Int,
     ): WorkoutPlan {
-        // General fitness / endurance: 3 sets, higher reps, short rest → most exercises fit
+        // General fitness / endurance: 3 sets, high reps, short rest → most exercises fit
+        // Skill: "12-20 reps, 2-3 sets, moderate intensity"
         val baseSets = 3
-        val workoutDays = generateFullBodyDays(exercises, sets = baseSets, reps = "10-15", rest = REST_TIME_ENDURANCE, sessionDurationMinutes = sessionDurationMinutes, volumeMultiplier = volumeMultiplier)
+        val workoutDays = generateFullBodyDays(exercises, sets = baseSets, reps = "12-20", rest = REST_TIME_ENDURANCE, sessionDurationMinutes = sessionDurationMinutes, volumeMultiplier = volumeMultiplier)
 
         return WorkoutPlan(
             name = "General Fitness Program",
@@ -396,6 +412,7 @@ class WorkoutPlanGenerator @Inject constructor(
         }
 
         // Phase 2: One isolation per target muscle
+        // Skill: "60-90s for accessories" even in BULK, proportionally less rest than compounds
         val isolationNames = mutableSetOf<String>()
         for (muscle in targetMuscles) {
             val isolation = allExercises.firstOrNull {
@@ -406,11 +423,11 @@ class WorkoutPlanGenerator @Inject constructor(
                 isolation,
                 sets = maxOf(sets - 1, 2),
                 repsRange = if (reps.contains("-")) reps else "10-12",
-                restSeconds = maxOf(rest - 30, 45),
+                restSeconds = maxOf((rest * 0.6f).toInt(), 45),
             ))
         }
 
-        // Phase 3: Accessories
+        // Phase 3: Accessories — shortest rest, highest reps, least setup
         val accessoryNames = mutableSetOf<String>()
         for (muscle in targetMuscles) {
             val accessory = allExercises.firstOrNull {
@@ -422,7 +439,7 @@ class WorkoutPlanGenerator @Inject constructor(
                 accessory,
                 sets = maxOf(sets - 1, 2),
                 repsRange = "12-15",
-                restSeconds = maxOf(rest - 45, 30),
+                restSeconds = maxOf((rest * 0.45f).toInt(), 30),
             ))
         }
 
@@ -724,7 +741,7 @@ class WorkoutPlanGenerator @Inject constructor(
             UserPreferences.TrainingGoal.STRENGTH -> Triple(5, "3-5", REST_TIME_STRENGTH)
             UserPreferences.TrainingGoal.POWERLIFTING -> Triple(5, "1-5", REST_TIME_POWER)
             UserPreferences.TrainingGoal.HYPERTROPHY -> Triple(4, "8-12", REST_TIME_HYPERTROPHY)
-            UserPreferences.TrainingGoal.GENERAL_FITNESS -> Triple(3, "10-15", REST_TIME_ENDURANCE)
+            UserPreferences.TrainingGoal.GENERAL_FITNESS -> Triple(3, "12-20", REST_TIME_ENDURANCE)
         }
 
         val workBudget = workTimeBudgetSeconds(newDurationMinutes)
