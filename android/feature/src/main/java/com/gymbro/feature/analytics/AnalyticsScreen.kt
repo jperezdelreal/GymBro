@@ -58,6 +58,7 @@ import com.gymbro.core.service.MuscleGroupDistribution
 import com.gymbro.core.service.TopExercise
 import com.gymbro.core.service.WeeklySummary
 import com.gymbro.core.service.WeeklyVolumeData
+import com.gymbro.feature.common.EmptyState
 import com.gymbro.feature.common.FullScreenLoading
 import java.time.format.DateTimeFormatter
 import kotlin.math.abs
@@ -129,6 +130,22 @@ private fun AnalyticsScreen(
     ) { paddingValues ->
         if (state.isLoading) {
             FullScreenLoading(message = stringResource(R.string.analytics_loading))
+            return@Scaffold
+        }
+
+        val hasData = state.summary != null ||
+            state.volumeData.isNotEmpty() ||
+            state.muscleDistribution.isNotEmpty() ||
+            state.consistency != null ||
+            state.topExercises.isNotEmpty()
+
+        if (!hasData) {
+            EmptyState(
+                icon = Icons.Default.TrendingUp,
+                title = stringResource(R.string.analytics_empty_title),
+                subtitle = stringResource(R.string.analytics_empty_subtitle),
+                modifier = Modifier.padding(paddingValues),
+            )
             return@Scaffold
         }
 

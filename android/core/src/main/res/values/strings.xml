@@ -98,6 +98,11 @@
     <string name="recovery_title">Recovery</string>
     <string name="recovery_loading">Loading recovery data...</string>
     <string name="recovery_readiness_score">Readiness Score</string>
+    <string name="recovery_readiness_crushed">Crushed</string>
+    <string name="recovery_readiness_good">Good</string>
+    <string name="recovery_readiness_ok">OK</string>
+    <string name="recovery_readiness_tired">Tired</string>
+    <string name="recovery_readiness_wrecked">Wrecked</string>
     <string name="recovery_sleep_label">Sleep</string>
     <string name="recovery_resting_hr_label">Resting HR</string>
     <string name="recovery_hrv_label">HRV</string>
@@ -281,6 +286,8 @@
     <string name="analytics_muscle_balance">Muscle Balance</string>
     <string name="analytics_consistency">Consistency</string>
     <string name="analytics_top_exercises">Top Exercises</string>
+    <string name="analytics_empty_title">No analytics yet</string>
+    <string name="analytics_empty_subtitle">Complete your first workout to unlock training insights</string>
     <string name="analytics_current_streak">Current Streak</string>
     <string name="analytics_longest_streak">Longest Streak</string>
     <string name="analytics_week_singular">week</string>
@@ -426,6 +433,7 @@
     <string name="history_volume_by_muscle">Volume by Muscle Group</string>
     <string name="history_total_volume">Total Volume:</string>
     <string name="history_workout_not_found">Workout not found</string>
+    <string name="history_load_failed">Failed to load workout</string>
     <string name="history_today">Today</string>
     <string name="history_yesterday">Yesterday</string>
 

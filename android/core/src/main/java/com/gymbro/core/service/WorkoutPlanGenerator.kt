@@ -17,6 +17,35 @@ class WorkoutPlanGenerator @Inject constructor(
     private val exerciseRepository: ExerciseRepository,
 ) {
 
+    companion object {
+        // Time estimation constants (seconds)
+        const val WARMUP_TIME_SECONDS = 300       // 5 min general warmup (skill: 5-10 min)
+        const val COOLDOWN_TIME_SECONDS = 180     // 3 min cooldown/stretching
+
+        // Transition time by exercise type — compounds need plate loading, rack
+        // setup, safety pins; isolation is just grab dumbbells or adjust a machine
+        const val TRANSITION_TIME_COMPOUND = 150  // 2.5 min — load plates, set rack height
+        const val TRANSITION_TIME_ISOLATION = 60  // 1 min — grab DBs, adjust seat
+
+        // Rest time per training goal (seconds) — from training domain skill
+        // Strength/PL: "3-5 minutes between main lifts (full ATP-PC recovery)"
+        const val REST_TIME_STRENGTH = 240        // 4 min — mid-range for heavy compounds
+        // Hypertrophy: "60-90 seconds (metabolic stress accumulation)"
+        const val REST_TIME_HYPERTROPHY = 90      // 90s — upper end, compounds need it
+        // General fitness/toning: "30-60 seconds (keeps heart rate elevated)"
+        const val REST_TIME_ENDURANCE = 45         // 45s — mid-range
+        // Powerlifting main lifts: near-max singles need full ATP-PC recovery
+        const val REST_TIME_POWER = 300            // 5 min — serious PL rest for heavy singles
+
+        // Rep duration (seconds per rep) — accounts for brace, eccentric, grind
+        const val REP_DURATION_COMPOUND = 5       // ~5s/rep — brace → controlled eccentric → drive
+        const val REP_DURATION_ISOLATION = 3      // ~3s/rep — controlled tempo, mind-muscle connection
+
+        // Exercise count bounds
+        const val MIN_EXERCISES = 3
+        const val MAX_EXERCISES = 12
+    }
+
     suspend fun generatePlan(
         goal: UserPreferences.TrainingGoal,
         experienceLevel: UserPreferences.ExperienceLevel,
@@ -49,29 +78,53 @@ class WorkoutPlanGenerator @Inject constructor(
         }
     }
 
-    private fun getMaxExercisesForDuration(durationMinutes: Int): Int {
-        return when (durationMinutes) {
-            in 0..20 -> 3
-            in 21..30 -> 4
-            in 31..45 -> 5
-            in 46..60 -> 6
-            in 61..75 -> 7
-            in 76..90 -> 8
-            in 91..105 -> 9
-            else -> 10  // 106-120+
+    /**
+     * Parses a rep range string (e.g. "8-12") and returns the midpoint for time estimation.
+     */
+    private fun parseRepsRangeMidpoint(repsRange: String): Int {
+        val parts = repsRange.split("-")
+        return if (parts.size == 2) {
+            val low = parts[0].trim().toIntOrNull() ?: 10
+            val high = parts[1].trim().toIntOrNull() ?: 12
+            (low + high) / 2
+        } else {
+            repsRange.trim().toIntOrNull() ?: 10
         }
     }
 
-    private fun getBaseSetsForDuration(durationMinutes: Int, goalBaseSets: Int): Int {
-        val multiplier = when (durationMinutes) {
-            in 0..20 -> 0.6f    // 2-3 sets for very short sessions
-            in 21..30 -> 0.75f  // 3 sets for 30min
-            in 31..45 -> 0.85f  // Slightly reduced for 45min
-            in 46..60 -> 1.0f   // Keep base sets for 60min (default)
-            in 61..90 -> 1.15f  // Slight bump for 90min
-            else -> 1.3f        // More sets for 120min
+    /**
+     * Estimates how long a single exercise takes in seconds.
+     * Compounds get longer transition time (plate loading, rack setup) and
+     * slower rep cadence (bracing, grinding) than isolation work.
+     *
+     *   timePerSet = (reps × repDuration) + restTime
+     *   exerciseTime = (sets × timePerSet) + transitionTime
+     */
+    private fun estimateExerciseTimeSeconds(
+        category: ExerciseCategory,
+        sets: Int,
+        repsRange: String,
+        restSeconds: Int,
+    ): Int {
+        val midReps = parseRepsRangeMidpoint(repsRange)
+        val repDuration = when (category) {
+            ExerciseCategory.COMPOUND -> REP_DURATION_COMPOUND
+            else -> REP_DURATION_ISOLATION
         }
-        return maxOf(2, (goalBaseSets * multiplier).roundToInt())
+        val transitionTime = when (category) {
+            ExerciseCategory.COMPOUND -> TRANSITION_TIME_COMPOUND
+            else -> TRANSITION_TIME_ISOLATION
+        }
+        val timePerSet = (midReps * repDuration) + restSeconds
+        return (sets * timePerSet) + transitionTime
+    }
+
+    /**
+     * Returns the available work time in seconds after warmup and cooldown.
+     */
+    private fun workTimeBudgetSeconds(sessionDurationMinutes: Int): Int {
+        val totalSeconds = sessionDurationMinutes * 60
+        return maxOf(0, totalSeconds - WARMUP_TIME_SECONDS - COOLDOWN_TIME_SECONDS)
     }
 
     private fun generateStrengthPlan(
@@ -82,12 +135,11 @@ class WorkoutPlanGenerator @Inject constructor(
         volumeMultiplier: Float,
         sessionDurationMinutes: Int,
     ): WorkoutPlan {
-        val baseSets = getBaseSetsForDuration(sessionDurationMinutes, 5)
-        val adjSets = applyVolumeMultiplier(baseSets, volumeMultiplier)
-        val maxExercises = getMaxExercisesForDuration(sessionDurationMinutes)
+        // Strength: 5 sets, heavy compounds, 3-min rest → fewer exercises fit
+        val baseSets = 5
         val workoutDays = when (split) {
-            TrainingSplit.FULL_BODY -> generateFullBodyDays(exercises, sets = adjSets, reps = "5", rest = 180, maxExercises = maxExercises)
-            TrainingSplit.UPPER_LOWER -> generateUpperLowerDays(exercises, sets = adjSets, reps = "5", rest = 180, maxExercises = maxExercises)
+            TrainingSplit.FULL_BODY -> generateFullBodyDays(exercises, sets = baseSets, reps = "3-5", rest = REST_TIME_STRENGTH, sessionDurationMinutes = sessionDurationMinutes, volumeMultiplier = volumeMultiplier)
+            TrainingSplit.UPPER_LOWER -> generateUpperLowerDays(exercises, sets = baseSets, reps = "3-5", rest = REST_TIME_STRENGTH, sessionDurationMinutes = sessionDurationMinutes, volumeMultiplier = volumeMultiplier)
             else -> {
                 listOf(
                     WorkoutDay(
@@ -96,7 +148,8 @@ class WorkoutPlanGenerator @Inject constructor(
                         exercises = buildExerciseList(
                             exercises,
                             listOf(MuscleGroup.CHEST, MuscleGroup.BACK, MuscleGroup.SHOULDERS),
-                            sets = adjSets, reps = "5", rest = 180, maxExercises = maxExercises,
+                            sets = baseSets, reps = "3-5", rest = REST_TIME_STRENGTH,
+                            sessionDurationMinutes = sessionDurationMinutes, volumeMultiplier = volumeMultiplier,
                         ),
                     ),
                     WorkoutDay(
@@ -105,7 +158,8 @@ class WorkoutPlanGenerator @Inject constructor(
                         exercises = buildExerciseList(
                             exercises,
                             listOf(MuscleGroup.QUADRICEPS, MuscleGroup.HAMSTRINGS, MuscleGroup.GLUTES),
-                            sets = adjSets, reps = "5", rest = 180, maxExercises = maxExercises,
+                            sets = baseSets, reps = "3-5", rest = REST_TIME_STRENGTH,
+                            sessionDurationMinutes = sessionDurationMinutes, volumeMultiplier = volumeMultiplier,
                         ),
                     ),
                     WorkoutDay(
@@ -114,7 +168,8 @@ class WorkoutPlanGenerator @Inject constructor(
                         exercises = buildExerciseList(
                             exercises,
                             listOf(MuscleGroup.CHEST, MuscleGroup.BACK, MuscleGroup.QUADRICEPS),
-                            sets = adjSets, reps = "5", rest = 180, maxExercises = maxExercises,
+                            sets = baseSets, reps = "3-5", rest = REST_TIME_STRENGTH,
+                            sessionDurationMinutes = sessionDurationMinutes, volumeMultiplier = volumeMultiplier,
                         ),
                     ),
                 )
@@ -141,15 +196,14 @@ class WorkoutPlanGenerator @Inject constructor(
         volumeMultiplier: Float,
         sessionDurationMinutes: Int,
     ): WorkoutPlan {
-        val baseSets = getBaseSetsForDuration(sessionDurationMinutes, 4)
-        val adjSets = applyVolumeMultiplier(baseSets, volumeMultiplier)
-        val maxExercises = getMaxExercisesForDuration(sessionDurationMinutes)
+        // Hypertrophy: 4 sets, moderate reps, 90s rest → more exercises fit
+        val baseSets = 4
         val workoutDays = when (split) {
-            TrainingSplit.FULL_BODY -> generateFullBodyDays(exercises, sets = adjSets, reps = "8-12", rest = 90, maxExercises = maxExercises)
-            TrainingSplit.UPPER_LOWER -> generateUpperLowerDays(exercises, sets = adjSets, reps = "8-12", rest = 90, maxExercises = maxExercises)
-            TrainingSplit.PPL -> generatePPLDays(exercises, sets = adjSets, reps = "8-12", rest = 90, maxExercises = maxExercises)
-            TrainingSplit.PPLUL -> generatePPLULDays(exercises, volumeMultiplier, maxExercises, sessionDurationMinutes)
-            else -> generatePPLDays(exercises, sets = adjSets, reps = "8-12", rest = 90, maxExercises = maxExercises)
+            TrainingSplit.FULL_BODY -> generateFullBodyDays(exercises, sets = baseSets, reps = "8-12", rest = REST_TIME_HYPERTROPHY, sessionDurationMinutes = sessionDurationMinutes, volumeMultiplier = volumeMultiplier)
+            TrainingSplit.UPPER_LOWER -> generateUpperLowerDays(exercises, sets = baseSets, reps = "8-12", rest = REST_TIME_HYPERTROPHY, sessionDurationMinutes = sessionDurationMinutes, volumeMultiplier = volumeMultiplier)
+            TrainingSplit.PPL -> generatePPLDays(exercises, sets = baseSets, reps = "8-12", rest = REST_TIME_HYPERTROPHY, sessionDurationMinutes = sessionDurationMinutes, volumeMultiplier = volumeMultiplier)
+            TrainingSplit.PPLUL -> generatePPLULDays(exercises, volumeMultiplier, sessionDurationMinutes)
+            else -> generatePPLDays(exercises, sets = baseSets, reps = "8-12", rest = REST_TIME_HYPERTROPHY, sessionDurationMinutes = sessionDurationMinutes, volumeMultiplier = volumeMultiplier)
         }
 
         return WorkoutPlan(
@@ -172,9 +226,8 @@ class WorkoutPlanGenerator @Inject constructor(
         volumeMultiplier: Float,
         sessionDurationMinutes: Int,
     ): WorkoutPlan {
-        val baseSets = getBaseSetsForDuration(sessionDurationMinutes, 5)
-        val adjSets = applyVolumeMultiplier(baseSets, volumeMultiplier)
-        val maxExercises = getMaxExercisesForDuration(sessionDurationMinutes)
+        // Powerlifting: 5 sets, low reps, 4-min rest → fewest exercises
+        val baseSets = 5
         val workoutDays = when (split) {
             TrainingSplit.POWERLIFTING_3DAY -> {
                 listOf(
@@ -184,7 +237,8 @@ class WorkoutPlanGenerator @Inject constructor(
                         exercises = buildExerciseList(
                             exercises,
                             listOf(MuscleGroup.QUADRICEPS, MuscleGroup.HAMSTRINGS, MuscleGroup.GLUTES, MuscleGroup.CORE),
-                            sets = adjSets, reps = "3-5", rest = 240, maxExercises = maxExercises,
+                            sets = baseSets, reps = "1-5", rest = REST_TIME_POWER,
+                            sessionDurationMinutes = sessionDurationMinutes, volumeMultiplier = volumeMultiplier,
                         ),
                     ),
                     WorkoutDay(
@@ -193,7 +247,8 @@ class WorkoutPlanGenerator @Inject constructor(
                         exercises = buildExerciseList(
                             exercises,
                             listOf(MuscleGroup.CHEST, MuscleGroup.TRICEPS, MuscleGroup.SHOULDERS),
-                            sets = adjSets, reps = "3-5", rest = 240, maxExercises = maxExercises,
+                            sets = baseSets, reps = "1-5", rest = REST_TIME_POWER,
+                            sessionDurationMinutes = sessionDurationMinutes, volumeMultiplier = volumeMultiplier,
                         ),
                     ),
                     WorkoutDay(
@@ -202,13 +257,14 @@ class WorkoutPlanGenerator @Inject constructor(
                         exercises = buildExerciseList(
                             exercises,
                             listOf(MuscleGroup.BACK, MuscleGroup.HAMSTRINGS, MuscleGroup.GLUTES),
-                            sets = adjSets, reps = "3-5", rest = 240, maxExercises = maxExercises,
+                            sets = baseSets, reps = "1-5", rest = REST_TIME_POWER,
+                            sessionDurationMinutes = sessionDurationMinutes, volumeMultiplier = volumeMultiplier,
                         ),
                     ),
                 )
             }
             TrainingSplit.UPPER_LOWER -> {
-                val accessorySets = applyVolumeMultiplier(3, volumeMultiplier)
+                val accessorySets = 3
                 listOf(
                     WorkoutDay(
                         dayNumber = 1,
@@ -216,7 +272,8 @@ class WorkoutPlanGenerator @Inject constructor(
                         exercises = buildExerciseList(
                             exercises,
                             listOf(MuscleGroup.CHEST, MuscleGroup.BACK, MuscleGroup.SHOULDERS),
-                            sets = adjSets, reps = "3-5", rest = 240, maxExercises = maxExercises,
+                            sets = baseSets, reps = "1-5", rest = REST_TIME_POWER,
+                            sessionDurationMinutes = sessionDurationMinutes, volumeMultiplier = volumeMultiplier,
                         ),
                     ),
                     WorkoutDay(
@@ -225,7 +282,8 @@ class WorkoutPlanGenerator @Inject constructor(
                         exercises = buildExerciseList(
                             exercises,
                             listOf(MuscleGroup.QUADRICEPS, MuscleGroup.HAMSTRINGS, MuscleGroup.GLUTES),
-                            sets = adjSets, reps = "3-5", rest = 240, maxExercises = maxExercises,
+                            sets = baseSets, reps = "1-5", rest = REST_TIME_POWER,
+                            sessionDurationMinutes = sessionDurationMinutes, volumeMultiplier = volumeMultiplier,
                         ),
                     ),
                     WorkoutDay(
@@ -234,7 +292,8 @@ class WorkoutPlanGenerator @Inject constructor(
                         exercises = buildExerciseList(
                             exercises,
                             listOf(MuscleGroup.CHEST, MuscleGroup.BACK, MuscleGroup.SHOULDERS),
-                            sets = accessorySets, reps = "6-8", rest = 120, maxExercises = maxExercises,
+                            sets = accessorySets, reps = "6-8", rest = 120,
+                            sessionDurationMinutes = sessionDurationMinutes, volumeMultiplier = volumeMultiplier,
                         ),
                     ),
                     WorkoutDay(
@@ -243,7 +302,8 @@ class WorkoutPlanGenerator @Inject constructor(
                         exercises = buildExerciseList(
                             exercises,
                             listOf(MuscleGroup.QUADRICEPS, MuscleGroup.HAMSTRINGS, MuscleGroup.CORE),
-                            sets = accessorySets, reps = "6-8", rest = 120, maxExercises = maxExercises,
+                            sets = accessorySets, reps = "6-8", rest = 120,
+                            sessionDurationMinutes = sessionDurationMinutes, volumeMultiplier = volumeMultiplier,
                         ),
                     ),
                 )
@@ -256,7 +316,8 @@ class WorkoutPlanGenerator @Inject constructor(
                         exercises = buildExerciseList(
                             exercises,
                             listOf(MuscleGroup.QUADRICEPS, MuscleGroup.HAMSTRINGS, MuscleGroup.GLUTES, MuscleGroup.CORE),
-                            sets = adjSets, reps = "3-5", rest = 240, maxExercises = maxExercises,
+                            sets = baseSets, reps = "1-5", rest = REST_TIME_POWER,
+                            sessionDurationMinutes = sessionDurationMinutes, volumeMultiplier = volumeMultiplier,
                         ),
                     ),
                     WorkoutDay(
@@ -265,7 +326,8 @@ class WorkoutPlanGenerator @Inject constructor(
                         exercises = buildExerciseList(
                             exercises,
                             listOf(MuscleGroup.CHEST, MuscleGroup.TRICEPS, MuscleGroup.SHOULDERS),
-                            sets = adjSets, reps = "3-5", rest = 240, maxExercises = maxExercises,
+                            sets = baseSets, reps = "1-5", rest = REST_TIME_POWER,
+                            sessionDurationMinutes = sessionDurationMinutes, volumeMultiplier = volumeMultiplier,
                         ),
                     ),
                 )
@@ -292,10 +354,10 @@ class WorkoutPlanGenerator @Inject constructor(
         volumeMultiplier: Float,
         sessionDurationMinutes: Int,
     ): WorkoutPlan {
-        val baseSets = getBaseSetsForDuration(sessionDurationMinutes, 3)
-        val adjSets = applyVolumeMultiplier(baseSets, volumeMultiplier)
-        val maxExercises = getMaxExercisesForDuration(sessionDurationMinutes)
-        val workoutDays = generateFullBodyDays(exercises, sets = adjSets, reps = "10-12", rest = 90, maxExercises = maxExercises)
+        // General fitness / endurance: 3 sets, high reps, short rest → most exercises fit
+        // Skill: "12-20 reps, 2-3 sets, moderate intensity"
+        val baseSets = 3
+        val workoutDays = generateFullBodyDays(exercises, sets = baseSets, reps = "12-20", rest = REST_TIME_ENDURANCE, sessionDurationMinutes = sessionDurationMinutes, volumeMultiplier = volumeMultiplier)
 
         return WorkoutPlan(
             name = "General Fitness Program",
@@ -309,90 +371,143 @@ class WorkoutPlanGenerator @Inject constructor(
         )
     }
 
+    /**
+     * Builds an exercise list using bottom-up time estimation.
+     * Instead of a rigid exercise count, fills the available session time by
+     * estimating each exercise's duration and accumulating until the budget runs out.
+     * Priority: compounds → isolations → accessories → extra compound variants.
+     * Volume multiplier (BULK/CUT/MAINTENANCE) is applied AFTER exercise selection.
+     */
     private fun buildExerciseList(
         allExercises: List<Exercise>,
         targetMuscles: List<MuscleGroup>,
         sets: Int,
         reps: String,
         rest: Int,
-        maxExercises: Int = 6,
+        sessionDurationMinutes: Int,
+        volumeMultiplier: Float = 1.0f,
     ): List<PlannedExercise> {
+        val workBudget = workTimeBudgetSeconds(sessionDurationMinutes)
         val result = mutableListOf<PlannedExercise>()
         val usedNames = mutableSetOf<String>()
+        var accumulatedTime = 0
 
-        // Phase 1: Add a compound for each target muscle
+        // Build a prioritized candidate pool (compounds → isolations → accessories → extra compounds)
+        data class Candidate(
+            val exercise: Exercise,
+            val sets: Int,
+            val repsRange: String,
+            val restSeconds: Int,
+        )
+
+        val candidates = mutableListOf<Candidate>()
+
+        // Phase 1: One compound per target muscle
         for (muscle in targetMuscles) {
-            if (result.size >= maxExercises) break
             val compound = allExercises.firstOrNull {
                 it.muscleGroup == muscle && it.category == ExerciseCategory.COMPOUND && it.name !in usedNames
             } ?: continue
             usedNames.add(compound.name)
-            result.add(
-                PlannedExercise(
-                    exerciseName = compound.name,
-                    sets = sets,
-                    repsRange = reps,
-                    restSeconds = rest,
-                )
-            )
+            candidates.add(Candidate(compound, sets, reps, rest))
         }
 
-        // Phase 2: Add isolations for each target muscle
+        // Phase 2: One isolation per target muscle
+        // Skill: "60-90s for accessories" even in BULK, proportionally less rest than compounds
+        val isolationNames = mutableSetOf<String>()
         for (muscle in targetMuscles) {
-            if (result.size >= maxExercises) break
             val isolation = allExercises.firstOrNull {
-                it.muscleGroup == muscle && it.category == ExerciseCategory.ISOLATION && it.name !in usedNames
+                it.muscleGroup == muscle && it.category == ExerciseCategory.ISOLATION && it.name !in usedNames && it.name !in isolationNames
             } ?: continue
-            usedNames.add(isolation.name)
-            result.add(
-                PlannedExercise(
-                    exerciseName = isolation.name,
-                    sets = maxOf(sets - 1, 2),
-                    repsRange = if (reps.contains("-")) reps else "10-12",
-                    restSeconds = maxOf(rest - 30, 45),
-                )
+            isolationNames.add(isolation.name)
+            candidates.add(Candidate(
+                isolation,
+                sets = maxOf(sets - 1, 2),
+                repsRange = if (reps.contains("-")) reps else "10-12",
+                restSeconds = maxOf((rest * 0.6f).toInt(), 45),
+            ))
+        }
+
+        // Phase 3: Accessories — shortest rest, highest reps, least setup
+        val accessoryNames = mutableSetOf<String>()
+        for (muscle in targetMuscles) {
+            val accessory = allExercises.firstOrNull {
+                it.muscleGroup == muscle && it.category == ExerciseCategory.ACCESSORY
+                    && it.name !in usedNames && it.name !in isolationNames && it.name !in accessoryNames
+            } ?: continue
+            accessoryNames.add(accessory.name)
+            candidates.add(Candidate(
+                accessory,
+                sets = maxOf(sets - 1, 2),
+                repsRange = "12-15",
+                restSeconds = maxOf((rest * 0.45f).toInt(), 30),
+            ))
+        }
+
+        // Phase 4: Extra compound variants
+        for (muscle in targetMuscles) {
+            val extra = allExercises.firstOrNull {
+                it.muscleGroup == muscle && it.category == ExerciseCategory.COMPOUND
+                    && it.name !in usedNames && it.name !in isolationNames && it.name !in accessoryNames
+            } ?: continue
+            candidates.add(Candidate(
+                extra,
+                sets = maxOf(sets - 1, 2),
+                repsRange = if (reps.contains("-")) reps else "8-10",
+                restSeconds = rest,
+            ))
+        }
+
+        // Accumulate exercises within time budget
+        for (candidate in candidates) {
+            if (result.size >= MAX_EXERCISES) break
+
+            val estimatedTime = estimateExerciseTimeSeconds(
+                candidate.exercise.category, candidate.sets, candidate.repsRange, candidate.restSeconds,
             )
-        }
 
-        // Phase 3: Fill remaining slots with accessory exercises (longer sessions)
-        if (result.size < maxExercises) {
-            for (muscle in targetMuscles) {
-                if (result.size >= maxExercises) break
-                val accessory = allExercises.firstOrNull {
-                    it.muscleGroup == muscle && it.category == ExerciseCategory.ACCESSORY && it.name !in usedNames
-                } ?: continue
-                usedNames.add(accessory.name)
-                result.add(
-                    PlannedExercise(
-                        exerciseName = accessory.name,
-                        sets = maxOf(sets - 1, 2),
-                        repsRange = "12-15",
-                        restSeconds = maxOf(rest - 45, 30),
-                    )
+            if (accumulatedTime + estimatedTime <= workBudget) {
+                result.add(PlannedExercise(
+                    exerciseName = candidate.exercise.name,
+                    sets = candidate.sets,
+                    repsRange = candidate.repsRange,
+                    restSeconds = candidate.restSeconds,
+                ))
+                accumulatedTime += estimatedTime
+            } else if (result.size < MIN_EXERCISES) {
+                // Under minimum — add with reduced sets to keep session viable
+                val reducedSets = maxOf(2, candidate.sets - 1)
+                result.add(PlannedExercise(
+                    exerciseName = candidate.exercise.name,
+                    sets = reducedSets,
+                    repsRange = candidate.repsRange,
+                    restSeconds = candidate.restSeconds,
+                ))
+                accumulatedTime += estimateExerciseTimeSeconds(
+                    candidate.exercise.category, reducedSets, candidate.repsRange, candidate.restSeconds,
                 )
+            } else {
+                // Over budget — try squeezing in one last exercise with fewer sets
+                val reducedSets = maxOf(2, candidate.sets - 1)
+                val reducedTime = estimateExerciseTimeSeconds(
+                    candidate.exercise.category, reducedSets, candidate.repsRange, candidate.restSeconds,
+                )
+                if (accumulatedTime + reducedTime <= workBudget) {
+                    result.add(PlannedExercise(
+                        exerciseName = candidate.exercise.name,
+                        sets = reducedSets,
+                        repsRange = candidate.repsRange,
+                        restSeconds = candidate.restSeconds,
+                    ))
+                    accumulatedTime += reducedTime
+                }
+                break // time budget exhausted
             }
         }
 
-        // Phase 4: Still short? Add second compound variants
-        if (result.size < maxExercises) {
-            for (muscle in targetMuscles) {
-                if (result.size >= maxExercises) break
-                val extra = allExercises.firstOrNull {
-                    it.muscleGroup == muscle && it.category == ExerciseCategory.COMPOUND && it.name !in usedNames
-                } ?: continue
-                usedNames.add(extra.name)
-                result.add(
-                    PlannedExercise(
-                        exerciseName = extra.name,
-                        sets = maxOf(sets - 1, 2),
-                        repsRange = if (reps.contains("-")) reps else "8-10",
-                        restSeconds = rest,
-                    )
-                )
-            }
+        // Apply volume multiplier AFTER base exercise selection
+        return result.map { exercise ->
+            exercise.copy(sets = maxOf(1, (exercise.sets * volumeMultiplier).roundToInt()))
         }
-
-        return result.take(maxExercises)
     }
 
     private fun generateFullBodyDays(
@@ -400,7 +515,8 @@ class WorkoutPlanGenerator @Inject constructor(
         sets: Int,
         reps: String,
         rest: Int,
-        maxExercises: Int = 6,
+        sessionDurationMinutes: Int,
+        volumeMultiplier: Float,
     ): List<WorkoutDay> {
         return listOf(
             WorkoutDay(
@@ -409,7 +525,7 @@ class WorkoutPlanGenerator @Inject constructor(
                 exercises = buildExerciseList(
                     exercises,
                     listOf(MuscleGroup.CHEST, MuscleGroup.BACK, MuscleGroup.QUADRICEPS, MuscleGroup.CORE),
-                    sets, reps, rest, maxExercises,
+                    sets, reps, rest, sessionDurationMinutes, volumeMultiplier,
                 ),
             ),
             WorkoutDay(
@@ -418,7 +534,7 @@ class WorkoutPlanGenerator @Inject constructor(
                 exercises = buildExerciseList(
                     exercises,
                     listOf(MuscleGroup.SHOULDERS, MuscleGroup.BACK, MuscleGroup.HAMSTRINGS, MuscleGroup.CORE),
-                    sets, reps, rest, maxExercises,
+                    sets, reps, rest, sessionDurationMinutes, volumeMultiplier,
                 ),
             ),
             WorkoutDay(
@@ -427,7 +543,7 @@ class WorkoutPlanGenerator @Inject constructor(
                 exercises = buildExerciseList(
                     exercises,
                     listOf(MuscleGroup.CHEST, MuscleGroup.BACK, MuscleGroup.QUADRICEPS, MuscleGroup.BICEPS),
-                    sets, reps, rest, maxExercises,
+                    sets, reps, rest, sessionDurationMinutes, volumeMultiplier,
                 ),
             ),
         )
@@ -438,7 +554,8 @@ class WorkoutPlanGenerator @Inject constructor(
         sets: Int,
         reps: String,
         rest: Int,
-        maxExercises: Int = 6,
+        sessionDurationMinutes: Int,
+        volumeMultiplier: Float,
     ): List<WorkoutDay> {
         return listOf(
             WorkoutDay(
@@ -447,7 +564,7 @@ class WorkoutPlanGenerator @Inject constructor(
                 exercises = buildExerciseList(
                     exercises,
                     listOf(MuscleGroup.CHEST, MuscleGroup.BACK, MuscleGroup.SHOULDERS, MuscleGroup.BICEPS),
-                    sets, reps, rest, maxExercises,
+                    sets, reps, rest, sessionDurationMinutes, volumeMultiplier,
                 ),
             ),
             WorkoutDay(
@@ -456,7 +573,7 @@ class WorkoutPlanGenerator @Inject constructor(
                 exercises = buildExerciseList(
                     exercises,
                     listOf(MuscleGroup.QUADRICEPS, MuscleGroup.HAMSTRINGS, MuscleGroup.GLUTES, MuscleGroup.CALVES),
-                    sets, reps, rest, maxExercises,
+                    sets, reps, rest, sessionDurationMinutes, volumeMultiplier,
                 ),
             ),
             WorkoutDay(
@@ -465,7 +582,7 @@ class WorkoutPlanGenerator @Inject constructor(
                 exercises = buildExerciseList(
                     exercises,
                     listOf(MuscleGroup.CHEST, MuscleGroup.BACK, MuscleGroup.SHOULDERS, MuscleGroup.TRICEPS),
-                    sets, reps, rest, maxExercises,
+                    sets, reps, rest, sessionDurationMinutes, volumeMultiplier,
                 ),
             ),
             WorkoutDay(
@@ -474,7 +591,7 @@ class WorkoutPlanGenerator @Inject constructor(
                 exercises = buildExerciseList(
                     exercises,
                     listOf(MuscleGroup.QUADRICEPS, MuscleGroup.HAMSTRINGS, MuscleGroup.GLUTES, MuscleGroup.CORE),
-                    sets, reps, rest, maxExercises,
+                    sets, reps, rest, sessionDurationMinutes, volumeMultiplier,
                 ),
             ),
         )
@@ -485,7 +602,8 @@ class WorkoutPlanGenerator @Inject constructor(
         sets: Int,
         reps: String,
         rest: Int,
-        maxExercises: Int = 6,
+        sessionDurationMinutes: Int,
+        volumeMultiplier: Float,
     ): List<WorkoutDay> {
         return listOf(
             WorkoutDay(
@@ -494,7 +612,7 @@ class WorkoutPlanGenerator @Inject constructor(
                 exercises = buildExerciseList(
                     exercises,
                     listOf(MuscleGroup.CHEST, MuscleGroup.SHOULDERS, MuscleGroup.TRICEPS),
-                    sets, reps, rest, maxExercises,
+                    sets, reps, rest, sessionDurationMinutes, volumeMultiplier,
                 ),
             ),
             WorkoutDay(
@@ -503,7 +621,7 @@ class WorkoutPlanGenerator @Inject constructor(
                 exercises = buildExerciseList(
                     exercises,
                     listOf(MuscleGroup.BACK, MuscleGroup.BICEPS, MuscleGroup.FOREARMS),
-                    sets, reps, rest, maxExercises,
+                    sets, reps, rest, sessionDurationMinutes, volumeMultiplier,
                 ),
             ),
             WorkoutDay(
@@ -512,7 +630,7 @@ class WorkoutPlanGenerator @Inject constructor(
                 exercises = buildExerciseList(
                     exercises,
                     listOf(MuscleGroup.QUADRICEPS, MuscleGroup.HAMSTRINGS, MuscleGroup.GLUTES, MuscleGroup.CALVES),
-                    sets, reps, rest, maxExercises,
+                    sets, reps, rest, sessionDurationMinutes, volumeMultiplier,
                 ),
             ),
             WorkoutDay(
@@ -521,7 +639,7 @@ class WorkoutPlanGenerator @Inject constructor(
                 exercises = buildExerciseList(
                     exercises,
                     listOf(MuscleGroup.CHEST, MuscleGroup.SHOULDERS, MuscleGroup.TRICEPS),
-                    sets - 1, reps, rest - 30, maxExercises,
+                    sets - 1, reps, rest - 30, sessionDurationMinutes, volumeMultiplier,
                 ),
             ),
             WorkoutDay(
@@ -530,7 +648,7 @@ class WorkoutPlanGenerator @Inject constructor(
                 exercises = buildExerciseList(
                     exercises,
                     listOf(MuscleGroup.BACK, MuscleGroup.BICEPS, MuscleGroup.FOREARMS),
-                    sets - 1, reps, rest - 30, maxExercises,
+                    sets - 1, reps, rest - 30, sessionDurationMinutes, volumeMultiplier,
                 ),
             ),
             WorkoutDay(
@@ -539,17 +657,15 @@ class WorkoutPlanGenerator @Inject constructor(
                 exercises = buildExerciseList(
                     exercises,
                     listOf(MuscleGroup.QUADRICEPS, MuscleGroup.HAMSTRINGS, MuscleGroup.GLUTES, MuscleGroup.CALVES),
-                    sets - 1, reps, rest - 30, maxExercises,
+                    sets - 1, reps, rest - 30, sessionDurationMinutes, volumeMultiplier,
                 ),
             ),
         )
     }
 
-    private fun generatePPLULDays(exercises: List<Exercise>, volumeMultiplier: Float, maxExercises: Int = 6, sessionDurationMinutes: Int = 60): List<WorkoutDay> {
-        val mainBaseSets = getBaseSetsForDuration(sessionDurationMinutes, 4)
-        val secondaryBaseSets = getBaseSetsForDuration(sessionDurationMinutes, 3)
-        val mainSets = applyVolumeMultiplier(mainBaseSets, volumeMultiplier)
-        val secondarySets = applyVolumeMultiplier(secondaryBaseSets, volumeMultiplier)
+    private fun generatePPLULDays(exercises: List<Exercise>, volumeMultiplier: Float, sessionDurationMinutes: Int = 60): List<WorkoutDay> {
+        val mainBaseSets = 4
+        val secondaryBaseSets = 3
         return listOf(
             WorkoutDay(
                 dayNumber = 1,
@@ -557,7 +673,8 @@ class WorkoutPlanGenerator @Inject constructor(
                 exercises = buildExerciseList(
                     exercises,
                     listOf(MuscleGroup.CHEST, MuscleGroup.SHOULDERS, MuscleGroup.TRICEPS),
-                    sets = mainSets, reps = "8-12", rest = 90, maxExercises = maxExercises,
+                    sets = mainBaseSets, reps = "8-12", rest = REST_TIME_HYPERTROPHY,
+                    sessionDurationMinutes = sessionDurationMinutes, volumeMultiplier = volumeMultiplier,
                 ),
             ),
             WorkoutDay(
@@ -566,7 +683,8 @@ class WorkoutPlanGenerator @Inject constructor(
                 exercises = buildExerciseList(
                     exercises,
                     listOf(MuscleGroup.BACK, MuscleGroup.BICEPS, MuscleGroup.FOREARMS),
-                    sets = mainSets, reps = "8-12", rest = 90, maxExercises = maxExercises,
+                    sets = mainBaseSets, reps = "8-12", rest = REST_TIME_HYPERTROPHY,
+                    sessionDurationMinutes = sessionDurationMinutes, volumeMultiplier = volumeMultiplier,
                 ),
             ),
             WorkoutDay(
@@ -575,7 +693,8 @@ class WorkoutPlanGenerator @Inject constructor(
                 exercises = buildExerciseList(
                     exercises,
                     listOf(MuscleGroup.QUADRICEPS, MuscleGroup.HAMSTRINGS, MuscleGroup.GLUTES),
-                    sets = mainSets, reps = "8-12", rest = 90, maxExercises = maxExercises,
+                    sets = mainBaseSets, reps = "8-12", rest = REST_TIME_HYPERTROPHY,
+                    sessionDurationMinutes = sessionDurationMinutes, volumeMultiplier = volumeMultiplier,
                 ),
             ),
             WorkoutDay(
@@ -584,7 +703,8 @@ class WorkoutPlanGenerator @Inject constructor(
                 exercises = buildExerciseList(
                     exercises,
                     listOf(MuscleGroup.CHEST, MuscleGroup.BACK, MuscleGroup.SHOULDERS),
-                    sets = secondarySets, reps = "12-15", rest = 60, maxExercises = maxExercises,
+                    sets = secondaryBaseSets, reps = "12-15", rest = 60,
+                    sessionDurationMinutes = sessionDurationMinutes, volumeMultiplier = volumeMultiplier,
                 ),
             ),
             WorkoutDay(
@@ -593,68 +713,106 @@ class WorkoutPlanGenerator @Inject constructor(
                 exercises = buildExerciseList(
                     exercises,
                     listOf(MuscleGroup.QUADRICEPS, MuscleGroup.HAMSTRINGS, MuscleGroup.CALVES),
-                    sets = secondarySets, reps = "12-15", rest = 60, maxExercises = maxExercises,
+                    sets = secondaryBaseSets, reps = "12-15", rest = 60,
+                    sessionDurationMinutes = sessionDurationMinutes, volumeMultiplier = volumeMultiplier,
                 ),
             ),
         )
     }
 
-    private fun applyVolumeMultiplier(baseSets: Int, multiplier: Float): Int {
-        return maxOf(1, (baseSets * multiplier).roundToInt())
-    }
-
     /**
      * Adjusts a workout day for a new session duration.
-     * Re-scales exercise count and set volume based on available time.
+     * Uses time estimation to re-scale exercise count and set volume.
      */
     suspend fun adjustDayForDuration(
         day: WorkoutDay,
         newDurationMinutes: Int,
         trainingPhase: UserPreferences.TrainingPhase = UserPreferences.TrainingPhase.MAINTENANCE,
+        goal: UserPreferences.TrainingGoal = UserPreferences.TrainingGoal.HYPERTROPHY,
     ): WorkoutDay {
         val volumeMultiplier = when (trainingPhase) {
             UserPreferences.TrainingPhase.BULK -> 1.2f
             UserPreferences.TrainingPhase.CUT -> 0.8f
             UserPreferences.TrainingPhase.MAINTENANCE -> 1.0f
         }
-        val maxExercises = getMaxExercisesForDuration(newDurationMinutes)
-        val baseSets = getBaseSetsForDuration(newDurationMinutes, 4)
-        val adjSets = applyVolumeMultiplier(baseSets, volumeMultiplier)
 
+        // Derive base sets and rest from the goal
+        val (baseSets, defaultReps, defaultRest) = when (goal) {
+            UserPreferences.TrainingGoal.STRENGTH -> Triple(5, "3-5", REST_TIME_STRENGTH)
+            UserPreferences.TrainingGoal.POWERLIFTING -> Triple(5, "1-5", REST_TIME_POWER)
+            UserPreferences.TrainingGoal.HYPERTROPHY -> Triple(4, "8-12", REST_TIME_HYPERTROPHY)
+            UserPreferences.TrainingGoal.GENERAL_FITNESS -> Triple(3, "12-20", REST_TIME_ENDURANCE)
+        }
+
+        val workBudget = workTimeBudgetSeconds(newDurationMinutes)
         val allExercises = exerciseRepository.getAllExercises().first()
 
-        val adjusted = if (day.exercises.size > maxExercises) {
-            day.exercises.take(maxExercises).map { ex ->
-                ex.copy(sets = adjSets)
-            }
-        } else if (day.exercises.size < maxExercises) {
-            val existing = day.exercises.map { ex -> ex.copy(sets = adjSets) }
-            val usedNames = existing.map { it.exerciseName }.toMutableSet()
-            val extras = mutableListOf<PlannedExercise>()
-            val slotsToFill = maxExercises - existing.size
+        // Re-estimate which existing exercises fit in the new time budget
+        val adjusted = mutableListOf<PlannedExercise>()
+        var accumulatedTime = 0
 
+        for (ex in day.exercises) {
+            if (adjusted.size >= MAX_EXERCISES) break
+
+            val category = allExercises.firstOrNull { it.name == ex.exerciseName }?.category
+                ?: ExerciseCategory.COMPOUND
+            val exerciseSets = baseSets
+            val exerciseReps = ex.repsRange.ifBlank { defaultReps }
+            val exerciseRest = if (ex.restSeconds > 0) ex.restSeconds else defaultRest
+
+            val estimatedTime = estimateExerciseTimeSeconds(category, exerciseSets, exerciseReps, exerciseRest)
+
+            if (accumulatedTime + estimatedTime <= workBudget || adjusted.size < MIN_EXERCISES) {
+                val finalSets = if (accumulatedTime + estimatedTime > workBudget) {
+                    maxOf(2, exerciseSets - 1)
+                } else {
+                    exerciseSets
+                }
+                adjusted.add(ex.copy(
+                    sets = maxOf(1, (finalSets * volumeMultiplier).roundToInt()),
+                    restSeconds = exerciseRest,
+                ))
+                accumulatedTime += estimateExerciseTimeSeconds(category, finalSets, exerciseReps, exerciseRest)
+            } else {
+                // Try with reduced sets
+                val reducedSets = maxOf(2, exerciseSets - 1)
+                val reducedTime = estimateExerciseTimeSeconds(category, reducedSets, exerciseReps, exerciseRest)
+                if (accumulatedTime + reducedTime <= workBudget) {
+                    adjusted.add(ex.copy(
+                        sets = maxOf(1, (reducedSets * volumeMultiplier).roundToInt()),
+                        restSeconds = exerciseRest,
+                    ))
+                    accumulatedTime += reducedTime
+                }
+                break
+            }
+        }
+
+        // If new duration is longer and there's time left, add more exercises
+        if (adjusted.size < MAX_EXERCISES && accumulatedTime < workBudget) {
+            val usedNames = adjusted.map { it.exerciseName }.toMutableSet()
             val candidates = allExercises.filter { it.name !in usedNames }
-            val accessories = candidates.filter {
+            val extras = candidates.filter {
                 it.category == ExerciseCategory.ACCESSORY || it.category == ExerciseCategory.ISOLATION
-            }
-            val fallback = candidates.filter { it.category == ExerciseCategory.COMPOUND }
+            } + candidates.filter { it.category == ExerciseCategory.COMPOUND }
 
-            for (ex in (accessories + fallback)) {
-                if (extras.size >= slotsToFill) break
+            for (ex in extras) {
+                if (adjusted.size >= MAX_EXERCISES) break
                 if (ex.name in usedNames) continue
+
+                val extraSets = maxOf(baseSets - 1, 2)
+                val estimatedTime = estimateExerciseTimeSeconds(ex.category, extraSets, defaultReps, defaultRest)
+                if (accumulatedTime + estimatedTime > workBudget) break
+
                 usedNames.add(ex.name)
-                extras.add(
-                    PlannedExercise(
-                        exerciseName = ex.name,
-                        sets = maxOf(adjSets - 1, 2),
-                        repsRange = "10-12",
-                        restSeconds = 60,
-                    )
-                )
+                adjusted.add(PlannedExercise(
+                    exerciseName = ex.name,
+                    sets = maxOf(1, (extraSets * volumeMultiplier).roundToInt()),
+                    repsRange = defaultReps,
+                    restSeconds = defaultRest,
+                ))
+                accumulatedTime += estimatedTime
             }
-            existing + extras
-        } else {
-            day.exercises.map { ex -> ex.copy(sets = adjSets) }
         }
 
         return day.copy(exercises = adjusted)

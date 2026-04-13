@@ -1,10 +1,11 @@
 package com.gymbro.feature.history
 
+import androidx.annotation.StringRes
 import com.gymbro.core.model.MuscleGroup
 
 data class HistoryDetailState(
     val isLoading: Boolean = true,
-    val error: String? = null,
+    @StringRes val errorRes: Int? = null,
     val workoutDetail: WorkoutDetail? = null,
 )
 
