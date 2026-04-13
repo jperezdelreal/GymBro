@@ -731,14 +731,20 @@ Full details: .squad/decisions/morpheus-v1-platform-strategy.md
 - **Pattern learned:** For i18n in data classes/ViewModels (non-Composable scope), use `@StringRes Int` return type. Resolve to string with `stringResource()` at the Composable call site. Smart cast from StateFlow requires `!!` or local val capture.
 
 ### 2026-04-14: Time-Based Duration Scaling (WorkoutPlanGenerator Rework)
-**Problem:** Previous fix used a rigid lookup table (`getMaxExercisesForDuration()`) mapping duration→exercise count. This ignored that rest times, reps, and sets vary by training goal — a 60-min strength session (3-min rest) fits far fewer exercises than a 60-min hypertrophy session (90s rest).
+**Problem:** Previous fix used a rigid lookup table (`getMaxExercisesForDuration()`) mapping duration→exercise count. This ignored that rest times, reps, and sets vary by training goal — a 60-min strength session (4-min rest) fits far fewer exercises than a 60-min hypertrophy session (90s rest).
 **Solution:** Bottom-up time estimation model:
 - `estimateExerciseTimeSeconds()` calculates per-exercise duration: `(sets × (reps × repDuration + restTime)) + transitionTime`
 - `buildExerciseList()` accumulates exercises until time budget exhausted (session - 5min warmup - 3min cooldown)
-- Goal drives base sets (Strength=5, Hypertrophy=4, Endurance=3), rest (180s/90s/45s/240s), and rep duration (4s compound, 3s isolation)
+- Goal drives base sets (Strength=5, Hypertrophy=4, Endurance=3), rest (240s/90s/45s/300s), and rep duration (5s compound, 3s isolation)
 - Volume multiplier (BULK/CUT/MAINTENANCE) applied AFTER exercise selection to not distort time estimation
 - Bounds: MIN_EXERCISES=3 (even for 15min), MAX_EXERCISES=12 (diminishing returns)
 - Last exercise gets reduced sets rather than being dropped
 - All constants in companion object for easy tuning
+**Domain calibration (from Neo's training-domain SKILL.md):**
+- Strength rest=240s (4 min, mid of 3-5 min for ATP-PC recovery), PL=300s (5 min for near-max)
+- Compound rep duration=5s (brace→eccentric→grind), isolation=3s
+- Transition time split: COMPOUND=150s (load plates, set rack), ISOLATION=60s (grab DBs)
+- Isolation/accessory rest uses proportional scaling (0.6×/0.45×) not flat deduction — prevents absurd 210s curls in strength context
+- General fitness reps: "12-20" per skill file (not "10-15")
 **Callers updated:** `adjustDayForDuration()` now takes `goal` parameter; `PlanDayDetailViewModel` passes actual goal from preferences.
-**Result:** A 60-min strength session now yields ~4 exercises (heavy, 3-min rest), while a 60-min hypertrophy session yields ~6-7 (moderate, 90s rest). Matches real-world training.
+**Result:** A 60-min strength session yields ~4 exercises (heavy, 4-min rest), 60-min hypertrophy ~6-7 (moderate, 90s rest), 60-min general fitness ~8+ (short rest, high reps). Matches real gym sessions.
