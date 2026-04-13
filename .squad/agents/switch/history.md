@@ -1132,6 +1132,61 @@ Identified 5 untested critical paths:
 
 ## Learnings
 
+### 2026-04-13: Five-Workout Journey E2E — Full Pass (489 steps, 0 failures)
+
+**Context:**
+- Comprehensive Maestro E2E test simulating a demanding first-time user over 5 complete workouts
+- Clean install (clearState), full 9-page onboarding wizard, all 4 bottom nav tabs, exercise library browsing, data persistence verification
+- All exercises with realistic intermediate lifter weights (kg)
+
+**Test Flow:**
+1. **Onboarding** (9 pages): Welcome → Goal (Hypertrophy) → Experience (Intermediate) → Training Phase (Bulk) → Session Duration (60min) → Frequency (4 days) → Track → Progress → Get Started (kg + name)
+2. **Tab Exploration**: Home, History (empty), Profile (Account/Settings), Programs
+3. **Workout 1**: Barbell Bench Press 3×(70kg×10, 70kg×9, 70kg×8) → History verification
+4. **Workout 2**: Barbell Squat 3×(85kg×8, 85kg×7, 85kg×6) → Exercise library browsing (search "curl", filter "Chest")
+5. **Workout 3**: Overhead Press 3×(45kg×10, 45kg×9, 45kg×8) → History detail, Profile settings
+6. **Data Persistence**: stopApp → launchApp → verify no onboarding, history intact
+7. **Workout 4**: Conventional Deadlift 3×(100kg×6, 100kg×5, 100kg×5) → Programs check
+8. **Workout 5**: Barbell Bench Press PROGRESSION 3×(75kg×8, 75kg×7, 75kg×6) → Final all-tab verification
+
+**Result: 489 COMPLETED, 16 WARNED (optional), 0 FAILED — EXIT CODE 0 ✅**
+
+**Key Learnings:**
+
+1. **App shows ENGLISH text, not Spanish** — Despite es-ES emulator locale, `clearState: true` resets app locale. ALL selectors need bilingual regex `"Spanish|English"` or English-only.
+
+2. **Onboarding has 9 pages (not 4)** — The wizard uses "Next/Siguiente" buttons, not swipe. After frequency (page 5), there are 3 more "Next" taps before "Get Started" (page 8).
+
+3. **Onboarding button text is "Let's Go"** — Not "¡Vamos!" (the UTF-8 workaround with coordinates is no longer needed). Direct text tap `"Let's Go|Vamos|Comenzar"` works.
+
+4. **hideKeyboard works in onboarding** — No back-press dialog issue in onboarding context. Use for keyboard dismissal before tapping buttons.
+
+5. **Exercise picker title changed to "Pick Exercise"** — Not "Choose Exercise" or "Elegir Ejercicio". Use trilingual regex.
+
+6. **Workout summary title is "Workout Complete!"** — With exclamation mark. Not "Workout Completed" or "Entrenamiento Completado".
+
+7. **History screen doesn't show exercise names** — Shows date, duration, exercise count, volume, muscle group tags. Assert on "Today|Hoy" instead.
+
+8. **Profile screen redesigned** — Sections: "Progress & Stats", "Account" (Sign in), "Settings". No more "Cuenta", "Acerca de", "Preferencias de Entrenamiento".
+
+9. **Search bar text matches exercise regex** — Searching "deadlift" then tapping `".*Deadlift.*"` hits the SEARCH BAR first (index 0). Use specific exercise name like "Conventional Deadlift" instead.
+
+10. **stopApp/launchApp to discard empty workouts** — Cleanest way to exit a workout without exercises. The X close button coordinates are unreliable.
+
+11. **"Seguir entrenando" not found** — Rest timer skip button is just "Skip" or "Saltar Descanso", no "Continue Training" option visible. The optional pattern handles this gracefully.
+
+**🐛 BUG FOUND — Volume Integer Overflow (CRITICAL):**
+- **Location:** Workout summary screen and History screen
+- **Symptom:** Volume shows 2,147,483,647 kg (Integer.MAX_VALUE = 2^31 - 1)
+- **Expected:** ~1,890 kg for 70kg × 27 reps
+- **Reproduction:** Complete any workout with realistic weights (e.g., Bench Press 70kg × 3 sets)
+- **Root cause:** Likely integer overflow in volume calculation — possibly weight stored in grams (70,000) multiplied by reps without Long type
+- **Impact:** All workout summaries and history entries show wildly incorrect volume
+- **Severity:** HIGH — core metric is completely wrong
+
+**File:** `android/.maestro/five-workout-journey.yaml` (~1200 lines)
+**Screens Visited:** Onboarding (9 pages), Home, Programs, History, History Detail, Profile, Settings, Active Workout, Exercise Picker, Workout Summary — all 4 bottom nav tabs
+
 ### 2025-07-22: Bug-Catching Tests for UX Bugs (Jose's Report)
 
 **Context:** Jose identified 4 critical UX bugs. Wrote tests to prove they exist and catch regressions.

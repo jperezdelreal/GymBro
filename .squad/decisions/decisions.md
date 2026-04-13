@@ -968,6 +968,168 @@ iOS architecture already has ACWR and TSB (Training Stress Balance) patterns in 
 | Volume accumulation | 4+ weeks | Helms et al. (2018): Optimal deload frequency |
 | Deload volume | 60-70% of normal | Schoenfeld & Grgic (2020): Volume reduction > intensity |
 
+---
+
+## 2026-04-14T14-30-switch-e2e-bugs: Maestro E2E Five-Workout Journey Bug Report
+
+**Bug Report by:** Switch (Tester)  
+**Date:** 2026-04-14  
+**Status:** CRITICAL — Documented, awaiting fix  
+
+### 🐛 BUG: Volume Integer Overflow (CRITICAL SEVERITY)
+
+**Severity:** HIGH — Blocks production launch  
+**Found by:** Switch (Maestro E2E five-workout-journey.yaml)  
+**Reproducible:** 100% — occurs on every workout completion  
+
+#### Symptom
+Workout summary screen and History screen show **2,147,483,647 kg** as the total volume. This is `Integer.MAX_VALUE` (2^31 - 1), a classic integer overflow.
+
+#### Expected Behavior
+For Bench Press 70kg × (10 + 9 + 8) = 70 × 27 = **1,890 kg**
+
+#### Reproduction Steps
+1. Complete onboarding (any settings)
+2. Start a workout via FAB
+3. Add Barbell Bench Press
+4. Log 3 sets: 70kg×10, 70kg×9, 70kg×8
+5. Tap "Finish Workout"
+6. Observe Volume on summary screen → shows 2,147,483,647 kg
+7. Go to History → same overflow value on workout card
+
+#### Root Cause Hypothesis
+The weight is likely stored internally in a smaller unit (milligrams or grams?) and the multiplication `weight_grams × reps × sets` overflows a 32-bit integer. For example:
+- 70 kg = 70,000 g
+- 70,000 × 10 = 700,000 per set
+- Accumulated across sets with potential multiplication cascading
+
+Or the volume calculation uses `Int` instead of `Long` somewhere in the data pipeline.
+
+#### Impact
+- **Every workout** shows incorrect total volume
+- **History cards** display absurd volume numbers
+- **Progress/Analytics** may be polluted with overflow values
+- **User trust** — a lifter seeing 2 billion kg volume would immediately question data accuracy
+
+#### Screenshots
+- `j15_workout1_summary.png` — First confirmation of overflow
+- `j16_history_1workout.png` — Overflow visible in history card
+
+#### Recommendation (Fix Strategy)
+1. Search for `Int` type usage in volume calculation (likely in `ActiveWorkoutViewModel`, `WorkoutSummaryScreen`, or repository layer)
+2. Change to `Long` or `Double` for volume fields
+3. Add unit tests for volume calculation with realistic weights
+4. Verify historical data isn't corrupted by the overflow
+
+### ℹ️ INFO: App Shows English Despite es-ES Emulator Locale
+
+**Severity:** LOW (cosmetic / i18n configuration)
+
+When launched with `clearState: true`, the app displays all text in English even though the emulator is configured for es-ES locale. This suggests the app's language selection is tied to app-level preferences (cleared by `clearState`) rather than system locale.
+
+**Impact:** Maestro flows that use Spanish-only text selectors will fail after a clean install. All selectors need bilingual regex patterns.
+
+### ℹ️ INFO: Profile Screen Redesigned
+
+**Severity:** INFO (test maintenance)
+
+The Profile screen no longer shows "Cuenta", "Preferencias de Entrenamiento", "Acerca de", "Versión 1.0" sections. New layout:
+- "Not signed in" header with stats (Workouts, Active Days, Streak)
+- "Talk to AI Coach" button
+- "Progress & Stats" section (Progress, Analytics)
+- "Account" section (Sign in)
+- "Settings" section
+
+Multiple existing Maestro flows have stale assertions for the old profile layout.
+
+---
+
+## 2026-04-14T13-45-trinity-time-estimation: Bottom-Up Time Estimation for Workout Plan Generation
+
+**Decision by:** Trinity (Mobile Dev)  
+**Date:** 2026-04-14  
+**Status:** Implemented & Validated ✅  
+
+### Context
+
+WorkoutPlanGenerator used a rigid lookup table to map session duration → exercise count. This produced identical exercise counts regardless of training goal, which is incorrect — strength training with 3-min rest periods fits far fewer exercises than hypertrophy with 90s rest in the same session length.
+
+### Decision
+
+Replace the lookup table with a bottom-up time estimation model. Each exercise's duration is calculated from its physical parameters:
+
+```
+exerciseTime = (sets × (reps × repDuration + restTime)) + transitionTime
+```
+
+The generator accumulates exercises until the time budget (session − warmup − cooldown) is exhausted.
+
+### Constants (tunable — calibrated against training-domain SKILL.md)
+
+| Constant | Value | Source | Rationale |
+|---|---|---|---|
+| WARMUP_TIME_SECONDS | 300 (5 min) | Skill: "5-10 min general warmup" | Low end; specific warmup is per-exercise |
+| COOLDOWN_TIME_SECONDS | 180 (3 min) | Skill: static stretching post-workout | Minimum viable cooldown |
+| TRANSITION_TIME_COMPOUND | 150 (2.5 min) | Real-world | Load plates, set rack height, safety pins |
+| TRANSITION_TIME_ISOLATION | 60 (1 min) | Real-world | Grab dumbbells, adjust machine seat |
+| REST_TIME_STRENGTH | 240s (4 min) | Skill: "3-5 min (full ATP-PC recovery)" | Mid-range; serious lifters need this |
+| REST_TIME_HYPERTROPHY | 90s | Skill: "60-90s (metabolic stress)" | Upper end; compounds need it |
+| REST_TIME_ENDURANCE | 45s | Skill: "30-60s (keeps HR elevated)" | Mid-range |
+| REST_TIME_POWER | 300s (5 min) | Skill: "3-5 min" + near-max recovery needs | Full ATP-PC for PL singles |
+| REP_DURATION_COMPOUND | 5s/rep | Skill: TUT 30-60s → 5×5s=25s + rest | Accounts for brace, eccentric, grind |
+| REP_DURATION_ISOLATION | 3s/rep | Skill: TUT 30-60s → 12×3s=36s ✓ | Controlled tempo, MMC focus |
+| MIN_EXERCISES | 3 | Practical | Even 15-min sessions get 3 exercises |
+| MAX_EXERCISES | 12 | Practical | Diminishing returns beyond this |
+
+### Rest Scaling for Isolation/Accessories
+
+Flat deductions (e.g., "rest - 30") produce unrealistic results for high-rest goals:
+- Strength 240 - 30 = **210s curls** ← absurd
+- Power 300 - 45 = **255s cable flies** ← nobody does this
+
+**Solution:** Proportional scaling:
+- Isolation: `max(rest × 0.60, 45)` → Str: 144s, Hyp: 54s, Gen: 45s
+- Accessory: `max(rest × 0.45, 30)` → Str: 108s, Hyp: 40s, Gen: 30s
+
+Validated against skill: "60-90s for accessories" in BULK matches hyp accessory=40-45s range.
+
+### Goal-Specific Base Sets
+
+| Goal | Base Sets | Typical Rep Range |
+|---|---|---|
+| Strength | 5 | 3-5 |
+| Powerlifting | 5 | 1-5 |
+| Hypertrophy | 4 | 8-12 |
+| General Fitness | 3 | 10-15 |
+
+### Implications
+
+- **Volume multiplier** (BULK 1.2x / CUT 0.8x / MAINTENANCE 1.0x) is applied AFTER exercise selection to avoid distorting the time budget
+- `adjustDayForDuration()` now requires a `goal` parameter for accurate re-estimation
+- A 60-min strength session yields ~4 exercises; a 60-min hypertrophy session yields ~6-7
+- Constants are in a companion object — easy to tune without touching algorithm logic
+
+---
+
+## 2026-04-13T17-01-user-directive: Duration Scaling Calculation (Not Rigid Lookup)
+
+**Directive by:** Copilot (via user request)  
+**Date:** 2026-04-13  
+**Status:** Implemented ✅  
+
+**Summary:** La duración del workout NO puede ser una tabla rígida (15min=3 ejercicios, 60min=5, etc.). Debe calcularse bottom-up considerando:
+- Tiempo estimado por serie (depende de reps)
+- Descanso entre series (varía según objetivo: fuerza=más, hipertrofia=menos)
+- Número de series por ejercicio
+- Tiempo de transición/setup entre ejercicios
+- Todo esto depende del objetivo y programa del usuario
+
+El generador debe sumar tiempos estimados y añadir/quitar ejercicios hasta llenar el tiempo disponible, no usar un lookup table.
+
+**Rationale:** User request — el approach anterior era demasiado simplista y no refleja la realidad del entrenamiento.
+
+**Implementation:** See decision 2026-04-14T13-45-trinity-time-estimation for complete algorithm, constants, and validation.
+
 ### State Machine Logic
 
 ```swift
