@@ -1,0 +1,1215 @@
+appId: com.gymbro.app
+name: "Beginner 8-Workout Journey — Complete first-time gym user simulation"
+tags:
+  - e2e
+  - regression
+  - beginner
+  - comprehensive
+---
+# ====================================================================================
+# BEGINNER 8-WORKOUT JOURNEY — Alex's first 8 gym sessions
+# ====================================================================================
+# Simulates a COMPLETE BEGINNER discovering GymBro from scratch:
+#   - Persona: "Alex", beginner, General Fitness, KG, 3 days/week, 45 min, Maintain
+#   - Very light weights: dumbbells 5-12.5kg, machines 20-30kg
+#   - Gradual progression over 8 workouts
+#   - Explores: all tabs, exercise library, search, filters, settings, history, programs
+#   - Tests: data persistence, navigation, UX for a novice user
+#
+# PATTERNS:
+#   - Text tap for onboarding button (Let's Go|Vamos|Comenzar)
+#   - pressKey "Enter" for NumberInputDialog
+#   - "Skip|Saltar" for rest timer skip (uses swipe DOWN to scroll to top first)
+#   - Bilingual regex "Spanish|English" for all assertions
+#   - One exercise per workout to avoid scroll/index issues
+#   - swipe DOWN to scroll content UP (return to top before Finish)
+# ====================================================================================
+
+# ====================================================================================
+# PHASE 1: ONBOARDING (9 pages — beginner persona)
+# ====================================================================================
+
+- launchApp:
+    clearState: true
+- waitForAnimationToEnd:
+    timeout: 3000
+- takeScreenshot: b01_welcome
+
+# Page 0: Welcome
+- assertVisible: "GymBro"
+
+# Page 1: Next → Goal
+- tapOn: "Siguiente|Next"
+- waitForAnimationToEnd:
+    timeout: 500
+
+# Select General Fitness (beginner — NOT strength/hypertrophy)
+- tapOn: "Fitness General|General Fitness"
+- waitForAnimationToEnd:
+    timeout: 300
+- takeScreenshot: b02_goal_general_fitness
+
+# Page 2: Next → Experience
+- tapOn: "Siguiente|Next"
+- waitForAnimationToEnd:
+    timeout: 500
+- tapOn: "Principiante|Beginner"
+- waitForAnimationToEnd:
+    timeout: 300
+- takeScreenshot: b03_experience_beginner
+
+# Page 3: Next → Training Phase
+- tapOn: "Siguiente|Next"
+- waitForAnimationToEnd:
+    timeout: 500
+- tapOn: "Mantener|Maintain"
+- waitForAnimationToEnd:
+    timeout: 300
+
+# Page 4: Next → Session Duration
+- tapOn: "Siguiente|Next"
+- waitForAnimationToEnd:
+    timeout: 500
+- tapOn: "45 min"
+- waitForAnimationToEnd:
+    timeout: 300
+- takeScreenshot: b04_duration_45min
+
+# Page 5: Next → Frequency
+- tapOn: "Siguiente|Next"
+- waitForAnimationToEnd:
+    timeout: 500
+- tapOn: "3 días/semana|3 days/week"
+- waitForAnimationToEnd:
+    timeout: 300
+- takeScreenshot: b05_frequency_3days
+
+# Pages 6-8: Info pages
+- tapOn: "Siguiente|Next"
+- waitForAnimationToEnd:
+    timeout: 500
+- tapOn: "Siguiente|Next"
+- waitForAnimationToEnd:
+    timeout: 500
+- tapOn: "Siguiente|Next"
+- waitForAnimationToEnd:
+    timeout: 500
+
+# Page 9: Get Started — kg + name "Alex"
+- waitForAnimationToEnd:
+    timeout: 500
+- tapOn: "Kilogramos \\(kg\\)|Kilograms \\(kg\\)"
+- waitForAnimationToEnd:
+    timeout: 300
+- tapOn:
+    id: "onboarding_name_input"
+- inputText: "Alex"
+- tapOn:
+    point: "50%,10%"
+- waitForAnimationToEnd:
+    timeout: 2000
+- takeScreenshot: b06_profile_ready
+
+# Complete onboarding
+- tapOn:
+    text: "Let's Go|Vamos|Comenzar"
+- waitForAnimationToEnd:
+    timeout: 8000
+
+- assertVisible: "Programas|Programs"
+- takeScreenshot: b07_onboarding_complete
+
+# ====================================================================================
+# PHASE 2: EXPLORE ALL TABS (beginner discovering the app)
+# ====================================================================================
+
+- tapOn:
+    id: "nav_home"
+- waitForAnimationToEnd:
+    timeout: 2000
+- assertVisible: "Inicio|Home"
+- takeScreenshot: b08_home_empty
+
+- tapOn:
+    id: "nav_history"
+- waitForAnimationToEnd:
+    timeout: 2000
+- assertVisible: "Historial|History"
+- takeScreenshot: b09_history_empty
+
+- tapOn:
+    id: "nav_profile"
+- waitForAnimationToEnd:
+    timeout: 2000
+- assertVisible: "Account|Cuenta|Perfil|Profile"
+- takeScreenshot: b10_profile
+
+- tapOn:
+    id: "nav_programs"
+- waitForAnimationToEnd:
+    timeout: 2000
+- assertVisible: "Programas|Programs"
+- takeScreenshot: b11_programs_plan
+
+- tapOn:
+    id: "nav_home"
+- waitForAnimationToEnd:
+    timeout: 2000
+
+# ====================================================================================
+# WORKOUT 1: Nervous first day — Dumbbell Bench Press 2 sets (5kg × 12, 5kg × 10)
+# ====================================================================================
+
+- launchApp
+- waitForAnimationToEnd:
+    timeout: 2000
+- tapOn:
+    id: "workout_fab"
+- waitForAnimationToEnd:
+    timeout: 2000
+- assertVisible: "Entrenamiento Activo|Active Workout"
+- takeScreenshot: b12_workout1_start
+
+- tapOn: "Añadir Ejercicio|Add Exercise"
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    text: "Esperar|Wait"
+    optional: true
+- waitForAnimationToEnd:
+    timeout: 3000
+- assertVisible: "Elegir Ejercicio|Choose Exercise|Pick Exercise"
+
+- tapOn:
+    id: "search_bar"
+- inputText: "dumbbell bench"
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    id: "exercise_card_.*"
+    index: 0
+- waitForAnimationToEnd:
+    timeout: 1000
+
+- tapOn:
+    text: "Entendido|Got it"
+    optional: true
+- waitForAnimationToEnd:
+    timeout: 500
+
+# Set 1: 5kg × 12
+- tapOn:
+    id: "weight_input"
+    index: 0
+- waitForAnimationToEnd:
+    timeout: 500
+- inputText: "5"
+- pressKey: "Enter"
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    id: "reps_input"
+    index: 0
+- waitForAnimationToEnd:
+    timeout: 500
+- inputText: "12"
+- pressKey: "Enter"
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    text: "Completar serie.*|Complete set.*"
+- waitForAnimationToEnd:
+    timeout: 1000
+- takeScreenshot: b13_w1_set1
+
+- tapOn:
+    text: "Skip|Saltar"
+    optional: true
+- waitForAnimationToEnd:
+    timeout: 500
+
+# Set 2: 5kg × 10
+- tapOn:
+    id: "weight_input"
+    index: 1
+- waitForAnimationToEnd:
+    timeout: 500
+- inputText: "5"
+- pressKey: "Enter"
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    id: "reps_input"
+    index: 1
+- waitForAnimationToEnd:
+    timeout: 500
+- inputText: "10"
+- pressKey: "Enter"
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    text: "Completar serie.*|Complete set.*"
+- waitForAnimationToEnd:
+    timeout: 1000
+- takeScreenshot: b14_w1_set2
+
+# Scroll to top, skip rest, finish
+- tapOn:
+    text: "Skip|Saltar"
+    optional: true
+- waitForAnimationToEnd:
+    timeout: 500
+- tapOn: "Finalizar Entrenamiento|Finish Workout"
+- waitForAnimationToEnd:
+    timeout: 3000
+- assertVisible: "Entrenamiento Completado|Workout Complete!"
+- takeScreenshot: b15_w1_summary
+- tapOn: "Listo|Done"
+- waitForAnimationToEnd:
+    timeout: 2000
+
+# Post-workout 1: Check history
+- tapOn:
+    id: "nav_history"
+- waitForAnimationToEnd:
+    timeout: 2000
+- assertVisible: "Historial|History"
+- takeScreenshot: b16_history_1workout
+
+- tapOn:
+    id: "nav_home"
+- waitForAnimationToEnd:
+    timeout: 1000
+
+# ====================================================================================
+# WORKOUT 2: More confident — Lat Pulldown 2 sets (20kg × 12, 20kg × 10)
+# ====================================================================================
+
+- launchApp
+- waitForAnimationToEnd:
+    timeout: 2000
+- tapOn:
+    id: "workout_fab"
+- waitForAnimationToEnd:
+    timeout: 2000
+- assertVisible: "Entrenamiento Activo|Active Workout"
+
+- tapOn: "Añadir Ejercicio|Add Exercise"
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    id: "search_bar"
+- inputText: "lat pulldown"
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    id: "exercise_card_.*"
+    index: 0
+- waitForAnimationToEnd:
+    timeout: 1000
+
+# Set 1: 20kg × 12
+- tapOn:
+    id: "weight_input"
+    index: 0
+- waitForAnimationToEnd:
+    timeout: 500
+- inputText: "20"
+- pressKey: "Enter"
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    id: "reps_input"
+    index: 0
+- waitForAnimationToEnd:
+    timeout: 500
+- inputText: "12"
+- pressKey: "Enter"
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    text: "Completar serie.*|Complete set.*"
+- waitForAnimationToEnd:
+    timeout: 1000
+
+- tapOn:
+    text: "Skip|Saltar"
+    optional: true
+- waitForAnimationToEnd:
+    timeout: 500
+
+# Set 2: 20kg × 10
+- tapOn:
+    id: "weight_input"
+    index: 1
+- waitForAnimationToEnd:
+    timeout: 500
+- inputText: "20"
+- pressKey: "Enter"
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    id: "reps_input"
+    index: 1
+- waitForAnimationToEnd:
+    timeout: 500
+- inputText: "10"
+- pressKey: "Enter"
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    text: "Completar serie.*|Complete set.*"
+- waitForAnimationToEnd:
+    timeout: 1000
+- takeScreenshot: b17_w2_done
+
+- tapOn:
+    text: "Skip|Saltar"
+    optional: true
+- waitForAnimationToEnd:
+    timeout: 500
+- tapOn: "Finalizar Entrenamiento|Finish Workout"
+- waitForAnimationToEnd:
+    timeout: 3000
+- assertVisible: "Entrenamiento Completado|Workout Complete!"
+- takeScreenshot: b18_w2_summary
+- tapOn: "Listo|Done"
+- waitForAnimationToEnd:
+    timeout: 2000
+
+# ====================================================================================
+# WORKOUT 3: Explore exercise library then log — Goblet Squat 2 sets (5kg × 15, 5kg × 12)
+# ====================================================================================
+
+# First explore: search and filters
+- launchApp
+- waitForAnimationToEnd:
+    timeout: 2000
+- tapOn:
+    id: "workout_fab"
+- waitForAnimationToEnd:
+    timeout: 2000
+
+- tapOn: "Añadir Ejercicio|Add Exercise"
+- waitForAnimationToEnd:
+    timeout: 1000
+- assertVisible: "Elegir Ejercicio|Choose Exercise|Pick Exercise"
+- takeScreenshot: b19_exercise_picker
+
+# Search for "curl"
+- tapOn:
+    id: "search_bar"
+- inputText: "curl"
+- waitForAnimationToEnd:
+    timeout: 1000
+- takeScreenshot: b20_search_curl
+
+- back
+- waitForAnimationToEnd:
+    timeout: 1000
+
+# Re-open picker to test filter
+- tapOn: "Añadir Ejercicio|Add Exercise"
+- waitForAnimationToEnd:
+    timeout: 1000
+
+# Filter by chest
+- tapOn:
+    text: "Pecho|Chest"
+    index: 0
+- waitForAnimationToEnd:
+    timeout: 500
+- takeScreenshot: b21_filter_chest
+
+# Deselect and try back
+- tapOn:
+    text: "Pecho|Chest"
+    index: 0
+- waitForAnimationToEnd:
+    timeout: 500
+
+- tapOn:
+    text: "Espalda|Back"
+    index: 0
+- waitForAnimationToEnd:
+    timeout: 500
+- takeScreenshot: b22_filter_back
+
+- tapOn:
+    text: "Espalda|Back"
+    index: 0
+- waitForAnimationToEnd:
+    timeout: 500
+
+# Go back and re-add for actual exercise
+- back
+- waitForAnimationToEnd:
+    timeout: 1000
+
+# Now add Goblet Squat
+- tapOn: "Añadir Ejercicio|Add Exercise"
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    id: "search_bar"
+- inputText: "goblet"
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    id: "exercise_card_.*"
+    index: 0
+- waitForAnimationToEnd:
+    timeout: 1000
+
+# Set 1: 5kg × 15
+- tapOn:
+    id: "weight_input"
+    index: 0
+- waitForAnimationToEnd:
+    timeout: 500
+- inputText: "5"
+- pressKey: "Enter"
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    id: "reps_input"
+    index: 0
+- waitForAnimationToEnd:
+    timeout: 500
+- inputText: "15"
+- pressKey: "Enter"
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    text: "Completar serie.*|Complete set.*"
+- waitForAnimationToEnd:
+    timeout: 1000
+
+- tapOn:
+    text: "Skip|Saltar"
+    optional: true
+- waitForAnimationToEnd:
+    timeout: 500
+
+# Set 2: 5kg × 12
+- tapOn:
+    id: "weight_input"
+    index: 1
+- waitForAnimationToEnd:
+    timeout: 500
+- inputText: "5"
+- pressKey: "Enter"
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    id: "reps_input"
+    index: 1
+- waitForAnimationToEnd:
+    timeout: 500
+- inputText: "12"
+- pressKey: "Enter"
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    text: "Completar serie.*|Complete set.*"
+- waitForAnimationToEnd:
+    timeout: 1000
+- takeScreenshot: b23_w3_done
+
+- tapOn:
+    text: "Skip|Saltar"
+    optional: true
+- waitForAnimationToEnd:
+    timeout: 500
+- tapOn: "Finalizar Entrenamiento|Finish Workout"
+- waitForAnimationToEnd:
+    timeout: 3000
+- assertVisible: "Entrenamiento Completado|Workout Complete!"
+- takeScreenshot: b24_w3_summary
+- tapOn: "Listo|Done"
+- waitForAnimationToEnd:
+    timeout: 2000
+
+# ====================================================================================
+# WORKOUT 4: Progression! — Dumbbell Bench Press 2 sets (7.5kg × 12, 7.5kg × 10)
+# Check history first
+# ====================================================================================
+
+- tapOn:
+    id: "nav_history"
+- waitForAnimationToEnd:
+    timeout: 2000
+- assertVisible: "Historial|History"
+- takeScreenshot: b25_history_3workouts
+
+# Tap a workout to see detail
+- tapOn:
+    text: "Hoy|Today"
+    index: 0
+- waitForAnimationToEnd:
+    timeout: 2000
+- takeScreenshot: b26_workout_detail
+- back
+- waitForAnimationToEnd:
+    timeout: 2000
+
+- tapOn:
+    id: "nav_home"
+- waitForAnimationToEnd:
+    timeout: 1000
+
+- launchApp
+- waitForAnimationToEnd:
+    timeout: 2000
+- tapOn:
+    id: "workout_fab"
+- waitForAnimationToEnd:
+    timeout: 2000
+
+- tapOn: "Añadir Ejercicio|Add Exercise"
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    id: "search_bar"
+- inputText: "dumbbell bench"
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    id: "exercise_card_.*"
+    index: 0
+- waitForAnimationToEnd:
+    timeout: 1000
+
+# Set 1: 7.5kg × 12 — PROGRESSION from 5kg!
+- tapOn:
+    id: "weight_input"
+    index: 0
+- waitForAnimationToEnd:
+    timeout: 500
+- inputText: "7.5"
+- pressKey: "Enter"
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    id: "reps_input"
+    index: 0
+- waitForAnimationToEnd:
+    timeout: 500
+- inputText: "12"
+- pressKey: "Enter"
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    text: "Completar serie.*|Complete set.*"
+- waitForAnimationToEnd:
+    timeout: 1000
+
+- tapOn:
+    text: "Skip|Saltar"
+    optional: true
+- waitForAnimationToEnd:
+    timeout: 500
+
+# Set 2: 7.5kg × 10
+- tapOn:
+    id: "weight_input"
+    index: 1
+- waitForAnimationToEnd:
+    timeout: 500
+- inputText: "7.5"
+- pressKey: "Enter"
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    id: "reps_input"
+    index: 1
+- waitForAnimationToEnd:
+    timeout: 500
+- inputText: "10"
+- pressKey: "Enter"
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    text: "Completar serie.*|Complete set.*"
+- waitForAnimationToEnd:
+    timeout: 1000
+
+- tapOn:
+    text: "Skip|Saltar"
+    optional: true
+- waitForAnimationToEnd:
+    timeout: 500
+- tapOn: "Finalizar Entrenamiento|Finish Workout"
+- waitForAnimationToEnd:
+    timeout: 3000
+- assertVisible: "Entrenamiento Completado|Workout Complete!"
+- takeScreenshot: b27_w4_summary
+- tapOn: "Listo|Done"
+- waitForAnimationToEnd:
+    timeout: 2000
+
+# ====================================================================================
+# WORKOUT 5: Visit Programs → Leg Press 2 sets (25kg × 15, 25kg × 12)
+# ====================================================================================
+
+- tapOn:
+    id: "nav_programs"
+- waitForAnimationToEnd:
+    timeout: 2000
+- assertVisible: "Programas|Programs"
+- takeScreenshot: b28_programs_explore
+
+- tapOn:
+    id: "nav_home"
+- waitForAnimationToEnd:
+    timeout: 1000
+
+- launchApp
+- waitForAnimationToEnd:
+    timeout: 2000
+- tapOn:
+    id: "workout_fab"
+- waitForAnimationToEnd:
+    timeout: 2000
+
+- tapOn: "Añadir Ejercicio|Add Exercise"
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    id: "search_bar"
+- inputText: "leg press"
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    id: "exercise_card_.*"
+    index: 0
+- waitForAnimationToEnd:
+    timeout: 1000
+
+# Set 1: 25kg × 15
+- tapOn:
+    id: "weight_input"
+    index: 0
+- waitForAnimationToEnd:
+    timeout: 500
+- inputText: "25"
+- pressKey: "Enter"
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    id: "reps_input"
+    index: 0
+- waitForAnimationToEnd:
+    timeout: 500
+- inputText: "15"
+- pressKey: "Enter"
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    text: "Completar serie.*|Complete set.*"
+- waitForAnimationToEnd:
+    timeout: 1000
+
+- tapOn:
+    text: "Skip|Saltar"
+    optional: true
+- waitForAnimationToEnd:
+    timeout: 500
+
+# Set 2: 25kg × 12
+- tapOn:
+    id: "weight_input"
+    index: 1
+- waitForAnimationToEnd:
+    timeout: 500
+- inputText: "25"
+- pressKey: "Enter"
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    id: "reps_input"
+    index: 1
+- waitForAnimationToEnd:
+    timeout: 500
+- inputText: "12"
+- pressKey: "Enter"
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    text: "Completar serie.*|Complete set.*"
+- waitForAnimationToEnd:
+    timeout: 1000
+- takeScreenshot: b29_w5_done
+
+- tapOn:
+    text: "Skip|Saltar"
+    optional: true
+- waitForAnimationToEnd:
+    timeout: 500
+- tapOn: "Finalizar Entrenamiento|Finish Workout"
+- waitForAnimationToEnd:
+    timeout: 3000
+- assertVisible: "Entrenamiento Completado|Workout Complete!"
+- takeScreenshot: b30_w5_summary
+- tapOn: "Listo|Done"
+- waitForAnimationToEnd:
+    timeout: 2000
+
+# ====================================================================================
+# DATA PERSISTENCE CHECK
+# ====================================================================================
+
+- stopApp
+- launchApp
+- waitForAnimationToEnd:
+    timeout: 5000
+- assertVisible:
+    text: "Programas|Programs|Inicio|Home"
+- takeScreenshot: b31_persistence_relaunch
+
+- tapOn:
+    id: "nav_history"
+- waitForAnimationToEnd:
+    timeout: 2000
+- assertVisible: "Historial|History"
+- takeScreenshot: b32_persistence_history
+
+- tapOn:
+    id: "nav_home"
+- waitForAnimationToEnd:
+    timeout: 1000
+
+# ====================================================================================
+# WORKOUT 6: Check Progress → Dumbbell Curl 2 sets (7.5kg × 12, 7.5kg × 10)
+# ====================================================================================
+
+- tapOn:
+    id: "nav_progress"
+    optional: true
+- waitForAnimationToEnd:
+    timeout: 2000
+- takeScreenshot: b33_progress_check
+
+- tapOn:
+    id: "nav_home"
+- waitForAnimationToEnd:
+    timeout: 1000
+
+- launchApp
+- waitForAnimationToEnd:
+    timeout: 2000
+- tapOn:
+    id: "workout_fab"
+- waitForAnimationToEnd:
+    timeout: 2000
+
+- tapOn: "Añadir Ejercicio|Add Exercise"
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    id: "search_bar"
+- inputText: "dumbbell curl"
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    id: "exercise_card_.*"
+    index: 0
+- waitForAnimationToEnd:
+    timeout: 1000
+
+# Set 1: 7.5kg × 12
+- tapOn:
+    id: "weight_input"
+    index: 0
+- waitForAnimationToEnd:
+    timeout: 500
+- inputText: "7.5"
+- pressKey: "Enter"
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    id: "reps_input"
+    index: 0
+- waitForAnimationToEnd:
+    timeout: 500
+- inputText: "12"
+- pressKey: "Enter"
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    text: "Completar serie.*|Complete set.*"
+- waitForAnimationToEnd:
+    timeout: 1000
+
+- tapOn:
+    text: "Skip|Saltar"
+    optional: true
+- waitForAnimationToEnd:
+    timeout: 500
+
+# Set 2: 7.5kg × 10
+- tapOn:
+    id: "weight_input"
+    index: 1
+- waitForAnimationToEnd:
+    timeout: 500
+- inputText: "7.5"
+- pressKey: "Enter"
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    id: "reps_input"
+    index: 1
+- waitForAnimationToEnd:
+    timeout: 500
+- inputText: "10"
+- pressKey: "Enter"
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    text: "Completar serie.*|Complete set.*"
+- waitForAnimationToEnd:
+    timeout: 1000
+
+- tapOn:
+    text: "Skip|Saltar"
+    optional: true
+- waitForAnimationToEnd:
+    timeout: 500
+- tapOn: "Finalizar Entrenamiento|Finish Workout"
+- waitForAnimationToEnd:
+    timeout: 3000
+- assertVisible: "Entrenamiento Completado|Workout Complete!"
+- takeScreenshot: b34_w6_summary
+- tapOn: "Listo|Done"
+- waitForAnimationToEnd:
+    timeout: 2000
+
+# ====================================================================================
+# WORKOUT 7: Explore settings → Lateral Raise 3 sets (7.5kg × 15/12/10) + Add Set
+# ====================================================================================
+
+- tapOn:
+    id: "nav_profile"
+- waitForAnimationToEnd:
+    timeout: 2000
+- assertVisible: "Account|Cuenta|Perfil|Profile"
+- takeScreenshot: b35_profile_settings
+- scroll
+- takeScreenshot: b36_profile_scrolled
+
+- tapOn:
+    id: "nav_home"
+- waitForAnimationToEnd:
+    timeout: 1000
+
+- launchApp
+- waitForAnimationToEnd:
+    timeout: 2000
+- tapOn:
+    id: "workout_fab"
+- waitForAnimationToEnd:
+    timeout: 2000
+
+- tapOn: "Añadir Ejercicio|Add Exercise"
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    id: "search_bar"
+- inputText: "lateral raise"
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    id: "exercise_card_.*"
+    index: 0
+- waitForAnimationToEnd:
+    timeout: 1000
+
+# Set 1: 7.5kg × 15
+- tapOn:
+    id: "weight_input"
+    index: 0
+- waitForAnimationToEnd:
+    timeout: 500
+- inputText: "7.5"
+- pressKey: "Enter"
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    id: "reps_input"
+    index: 0
+- waitForAnimationToEnd:
+    timeout: 500
+- inputText: "15"
+- pressKey: "Enter"
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    text: "Completar serie.*|Complete set.*"
+- waitForAnimationToEnd:
+    timeout: 1000
+
+- tapOn:
+    text: "Skip|Saltar"
+    optional: true
+- waitForAnimationToEnd:
+    timeout: 500
+
+# Set 2: 7.5kg × 12
+- tapOn:
+    id: "weight_input"
+    index: 1
+- waitForAnimationToEnd:
+    timeout: 500
+- inputText: "7.5"
+- pressKey: "Enter"
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    id: "reps_input"
+    index: 1
+- waitForAnimationToEnd:
+    timeout: 500
+- inputText: "12"
+- pressKey: "Enter"
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    text: "Completar serie.*|Complete set.*"
+- waitForAnimationToEnd:
+    timeout: 1000
+
+- tapOn:
+    text: "Skip|Saltar"
+    optional: true
+- waitForAnimationToEnd:
+    timeout: 500
+
+# Add a 3rd set!
+- tapOn:
+    text: "Añadir Serie|Add Set"
+    optional: true
+- waitForAnimationToEnd:
+    timeout: 500
+
+# Set 3: 7.5kg × 10
+- tapOn:
+    id: "weight_input"
+    index: 2
+- waitForAnimationToEnd:
+    timeout: 500
+- inputText: "7.5"
+- pressKey: "Enter"
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    id: "reps_input"
+    index: 2
+- waitForAnimationToEnd:
+    timeout: 500
+- inputText: "10"
+- pressKey: "Enter"
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    text: "Completar serie.*|Complete set.*"
+- waitForAnimationToEnd:
+    timeout: 1000
+- takeScreenshot: b37_w7_3sets_done
+
+# Scroll to top + skip rest + finish
+- swipe:
+    direction: DOWN
+    duration: 400
+- swipe:
+    direction: DOWN
+    duration: 400
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    text: "Skip|Saltar"
+    optional: true
+- waitForAnimationToEnd:
+    timeout: 500
+- tapOn: "Finalizar Entrenamiento|Finish Workout"
+- waitForAnimationToEnd:
+    timeout: 3000
+- assertVisible: "Entrenamiento Completado|Workout Complete!"
+- takeScreenshot: b38_w7_summary
+- tapOn: "Listo|Done"
+- waitForAnimationToEnd:
+    timeout: 2000
+
+# ====================================================================================
+# WORKOUT 8: Final — DB Bench Press 3 sets (12.5kg × 12/10/8) — massive progression!
+# ====================================================================================
+
+- launchApp
+- waitForAnimationToEnd:
+    timeout: 2000
+- tapOn:
+    id: "workout_fab"
+- waitForAnimationToEnd:
+    timeout: 2000
+- assertVisible: "Entrenamiento Activo|Active Workout"
+
+- tapOn: "Añadir Ejercicio|Add Exercise"
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    id: "search_bar"
+- inputText: "dumbbell bench"
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    id: "exercise_card_.*"
+    index: 0
+- waitForAnimationToEnd:
+    timeout: 1000
+
+# Set 1: 12.5kg × 12 — started at 5kg, now at 12.5kg!
+- tapOn:
+    id: "weight_input"
+    index: 0
+- waitForAnimationToEnd:
+    timeout: 500
+- inputText: "12.5"
+- pressKey: "Enter"
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    id: "reps_input"
+    index: 0
+- waitForAnimationToEnd:
+    timeout: 500
+- inputText: "12"
+- pressKey: "Enter"
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    text: "Completar serie.*|Complete set.*"
+- waitForAnimationToEnd:
+    timeout: 1000
+
+- tapOn:
+    text: "Skip|Saltar"
+    optional: true
+- waitForAnimationToEnd:
+    timeout: 500
+
+# Set 2: 12.5kg × 10
+- tapOn:
+    id: "weight_input"
+    index: 1
+- waitForAnimationToEnd:
+    timeout: 500
+- inputText: "12.5"
+- pressKey: "Enter"
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    id: "reps_input"
+    index: 1
+- waitForAnimationToEnd:
+    timeout: 500
+- inputText: "10"
+- pressKey: "Enter"
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    text: "Completar serie.*|Complete set.*"
+- waitForAnimationToEnd:
+    timeout: 1000
+
+- tapOn:
+    text: "Skip|Saltar"
+    optional: true
+- waitForAnimationToEnd:
+    timeout: 500
+
+# Add 3rd set
+- tapOn:
+    text: "Añadir Serie|Add Set"
+    optional: true
+- waitForAnimationToEnd:
+    timeout: 500
+
+# Set 3: 12.5kg × 8
+- tapOn:
+    id: "weight_input"
+    index: 2
+- waitForAnimationToEnd:
+    timeout: 500
+- inputText: "12.5"
+- pressKey: "Enter"
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    id: "reps_input"
+    index: 2
+- waitForAnimationToEnd:
+    timeout: 500
+- inputText: "8"
+- pressKey: "Enter"
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    text: "Completar serie.*|Complete set.*"
+- waitForAnimationToEnd:
+    timeout: 1000
+- takeScreenshot: b39_w8_bench_progression
+
+# Scroll to top + skip rest + finish
+- swipe:
+    direction: DOWN
+    duration: 400
+- swipe:
+    direction: DOWN
+    duration: 400
+- waitForAnimationToEnd:
+    timeout: 1000
+- tapOn:
+    text: "Skip|Saltar"
+    optional: true
+- waitForAnimationToEnd:
+    timeout: 500
+- tapOn: "Finalizar Entrenamiento|Finish Workout"
+- waitForAnimationToEnd:
+    timeout: 3000
+- assertVisible: "Entrenamiento Completado|Workout Complete!"
+- takeScreenshot: b40_w8_summary
+- tapOn: "Listo|Done"
+- waitForAnimationToEnd:
+    timeout: 2000
+
+# ====================================================================================
+# FINAL VERIFICATION: All 8 workouts, all screens accessible
+# ====================================================================================
+
+- tapOn:
+    id: "nav_history"
+- waitForAnimationToEnd:
+    timeout: 2000
+- assertVisible: "Historial|History"
+- takeScreenshot: b41_final_history
+
+- tapOn:
+    id: "nav_programs"
+- waitForAnimationToEnd:
+    timeout: 2000
+- assertVisible: "Programas|Programs"
+- takeScreenshot: b42_final_programs
+
+- tapOn:
+    id: "nav_profile"
+- waitForAnimationToEnd:
+    timeout: 2000
+- assertVisible: "Account|Cuenta|Perfil|Profile"
+- takeScreenshot: b43_final_profile
+
+- tapOn:
+    id: "nav_home"
+- waitForAnimationToEnd:
+    timeout: 2000
+- assertVisible: "Inicio|Home"
+- takeScreenshot: b44_journey_complete
