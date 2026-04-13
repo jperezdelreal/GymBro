@@ -94,8 +94,9 @@ class PlanDayDetailViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val phase = userPreferences.trainingPhase.first()
+                val goal = userPreferences.trainingGoal.first()
                 val adjustedDay = workoutPlanGenerator.adjustDayForDuration(
-                    currentDay, durationMinutes, phase,
+                    currentDay, durationMinutes, phase, goal,
                 )
 
                 val plan = activePlanStore.getPlan()
