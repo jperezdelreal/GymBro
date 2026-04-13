@@ -337,6 +337,8 @@
     <string name="programs_rest_seconds">Rest (s)</string>
     <string name="programs_remove_exercise">Remove</string>
     <string name="programs_add_exercise">Add Exercise</string>
+    <string name="programs_session_duration_label">Session Duration</string>
+    <string name="programs_duration_minutes" formatted="false">%dmin</string>
     <string name="programs_swap_up">Move Up</string>
     <string name="programs_swap_down">Move Down</string>
 

@@ -4,12 +4,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gymbro.core.model.PlannedExercise
 import com.gymbro.core.model.WorkoutDay
+import com.gymbro.core.preferences.UserPreferences
 import com.gymbro.core.service.ActivePlanStore
+import com.gymbro.core.service.WorkoutPlanGenerator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -18,6 +21,8 @@ import javax.inject.Inject
 @HiltViewModel
 class PlanDayDetailViewModel @Inject constructor(
     private val activePlanStore: ActivePlanStore,
+    private val workoutPlanGenerator: WorkoutPlanGenerator,
+    private val userPreferences: UserPreferences,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(PlanDayDetailState())
@@ -43,6 +48,7 @@ class PlanDayDetailViewModel @Inject constructor(
             is PlanDayDetailIntent.DiscardChanges -> discardChanges()
             is PlanDayDetailIntent.AddExercise -> addExercise()
             is PlanDayDetailIntent.ExerciseSelected -> addSelectedExercise(intent.exerciseName)
+            is PlanDayDetailIntent.ChangeDuration -> changeDuration(intent.durationMinutes)
         }
     }
 
@@ -69,12 +75,49 @@ class PlanDayDetailViewModel @Inject constructor(
         }
 
         originalWorkoutDay = workoutDay
-        _state.value = PlanDayDetailState(
-            isLoading = false,
-            error = null,
-            workoutDay = workoutDay,
-            planName = plan.name,
-        )
+        viewModelScope.launch {
+            val duration = userPreferences.sessionDurationMinutes.first()
+            _state.value = PlanDayDetailState(
+                isLoading = false,
+                error = null,
+                workoutDay = workoutDay,
+                planName = plan.name,
+                sessionDurationMinutes = duration,
+            )
+        }
+    }
+
+    private fun changeDuration(durationMinutes: Int) {
+        val currentDay = _state.value.workoutDay ?: return
+        _state.update { it.copy(isAdjustingDuration = true, sessionDurationMinutes = durationMinutes) }
+
+        viewModelScope.launch {
+            try {
+                val phase = userPreferences.trainingPhase.first()
+                val adjustedDay = workoutPlanGenerator.adjustDayForDuration(
+                    currentDay, durationMinutes, phase,
+                )
+
+                val plan = activePlanStore.getPlan()
+                if (plan != null) {
+                    val updatedDays = plan.workoutDays.map { day ->
+                        if (day.dayNumber == currentDayNumber) adjustedDay else day
+                    }
+                    activePlanStore.setPlan(plan.copy(workoutDays = updatedDays).markAsModified())
+                }
+
+                originalWorkoutDay = adjustedDay
+                _state.update {
+                    it.copy(
+                        workoutDay = adjustedDay,
+                        isAdjustingDuration = false,
+                        hasUnsavedChanges = false,
+                    )
+                }
+            } catch (_: Exception) {
+                _state.update { it.copy(isAdjustingDuration = false) }
+            }
+        }
     }
 
     private fun toggleEditMode() {
