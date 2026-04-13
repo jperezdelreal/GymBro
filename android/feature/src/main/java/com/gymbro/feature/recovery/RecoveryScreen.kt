@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Bedtime
 import androidx.compose.material.icons.filled.DirectionsWalk
 import androidx.compose.material.icons.filled.Favorite
@@ -80,6 +81,7 @@ private val SurfaceDark = Color(0xFF121212)
 
 @Composable
 fun RecoveryRoute(
+    onNavigateBack: () -> Unit = {},
     onRequestPermissions: () -> Unit = {},
     viewModel: RecoveryViewModel = hiltViewModel(),
 ) {
@@ -97,6 +99,7 @@ fun RecoveryRoute(
     RecoveryScreen(
         state = state,
         onEvent = viewModel::onEvent,
+        onNavigateBack = onNavigateBack,
     )
 }
 
@@ -104,6 +107,7 @@ fun RecoveryRoute(
 internal fun RecoveryScreen(
     state: RecoveryState,
     onEvent: (RecoveryEvent) -> Unit,
+    onNavigateBack: () -> Unit = {},
 ) {
     Column(
         modifier = Modifier
@@ -118,13 +122,24 @@ internal fun RecoveryScreen(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(
-                text = stringResource(R.string.recovery_title),
-                style = MaterialTheme.typography.headlineMedium,
-                color = Color.White,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.semantics { heading() }
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                IconButton(onClick = onNavigateBack) {
+                    Icon(
+                        Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = stringResource(R.string.common_navigate_back),
+                        tint = Color.White,
+                    )
+                }
+                Text(
+                    text = stringResource(R.string.recovery_title),
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.semantics { heading() }
+                )
+            }
             if (state.permissionsGranted) {
                 IconButton(onClick = { onEvent(RecoveryEvent.RefreshData) }) {
                     Icon(

@@ -337,6 +337,8 @@
     <string name="programs_rest_seconds">Rest (s)</string>
     <string name="programs_remove_exercise">Remove</string>
     <string name="programs_add_exercise">Add Exercise</string>
+    <string name="programs_session_duration_label">Session Duration</string>
+    <string name="programs_duration_minutes" formatted="false">%dmin</string>
     <string name="programs_swap_up">Move Up</string>
     <string name="programs_swap_down">Move Down</string>
 
@@ -854,4 +856,12 @@
     <string name="exercise_detail_tips">Tips</string>
     <string name="exercise_detail_set_format">%1$d × %2$.1f kg</string>
     <string name="exercise_detail_set_format_with_rpe">%1$d × %2$.1f kg @ RPE %3$.1f</string>
+
+    <!-- QA Audit: Hardcoded string fixes -->
+    <string name="content_desc_warmup_info">Warmup info</string>
+    <string name="content_desc_decrease">Decrease</string>
+    <string name="content_desc_increase">Increase</string>
+    <string name="action_got_it">Got it</string>
+    <string name="exercise_detail_set_label" formatted="false">Set %d: %s</string>
+    <string name="analytics_exercise_stats" formatted="false">%d sets • %d workouts</string>
 </resources>

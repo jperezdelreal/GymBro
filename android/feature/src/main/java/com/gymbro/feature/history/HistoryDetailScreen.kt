@@ -53,6 +53,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gymbro.core.R
 import com.gymbro.core.ui.localizedName
 import com.gymbro.feature.common.EmptyState
@@ -81,6 +82,18 @@ fun HistoryDetailRoute(
     viewModel: HistoryDetailViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsState()
+
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val userPreferences = remember {
+        dagger.hilt.android.EntryPointAccessors.fromApplication(
+            context.applicationContext,
+            HistoryDetailPreferencesEntryPoint::class.java
+        ).userPreferences()
+    }
+    val weightUnit by userPreferences.weightUnit.collectAsStateWithLifecycle(
+        initialValue = com.gymbro.core.preferences.UserPreferences.WeightUnit.KG
+    )
+    val weightUnitLabel = if (weightUnit == com.gymbro.core.preferences.UserPreferences.WeightUnit.LBS) "lb" else "kg"
 
     LaunchedEffect(workoutId) {
         viewModel.onIntent(HistoryDetailIntent.LoadWorkout(workoutId))
@@ -120,7 +133,7 @@ fun HistoryDetailRoute(
                 }
                 state.workoutDetail != null -> {
                     state.workoutDetail?.also { detail ->
-                        HistoryDetailContent(detail = detail)
+                        HistoryDetailContent(detail = detail, weightUnitLabel = weightUnitLabel)
                     }
                 }
             }
@@ -128,8 +141,14 @@ fun HistoryDetailRoute(
     }
 }
 
+@dagger.hilt.EntryPoint
+@dagger.hilt.InstallIn(dagger.hilt.components.SingletonComponent::class)
+interface HistoryDetailPreferencesEntryPoint {
+    fun userPreferences(): com.gymbro.core.preferences.UserPreferences
+}
+
 @Composable
-private fun HistoryDetailContent(detail: WorkoutDetail) {
+private fun HistoryDetailContent(detail: WorkoutDetail, weightUnitLabel: String = "kg") {
     var itemIndex = 0
     
     LazyColumn(
@@ -167,7 +186,7 @@ private fun HistoryDetailContent(detail: WorkoutDetail) {
                     StatCard(
                         icon = Icons.Default.FitnessCenter,
                         label = stringResource(R.string.common_volume),
-                        value = "${detail.totalVolume.toInt()} kg",
+                        value = "${detail.totalVolume.toInt()} $weightUnitLabel",
                         gradientColors = listOf(AccentGreenStart, AccentGreenEnd),
                         modifier = Modifier.weight(1f),
                     )
@@ -244,7 +263,7 @@ private fun HistoryDetailContent(detail: WorkoutDetail) {
 
         itemsIndexed(detail.exercises) { exerciseIndex, exercise ->
             val currentIndex = itemIndex++
-            ExerciseCard(exercise = exercise, index = currentIndex)
+            ExerciseCard(exercise = exercise, index = currentIndex, weightUnitLabel = weightUnitLabel)
         }
 
         if (detail.volumeByMuscleGroup.isNotEmpty()) {
@@ -270,7 +289,7 @@ private fun HistoryDetailContent(detail: WorkoutDetail) {
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             detail.volumeByMuscleGroup.entries.sortedByDescending { it.value }.forEach { (muscle, volume) ->
-                                MuscleVolumeRow(muscle = muscle.localizedName(), volume = volume)
+                                MuscleVolumeRow(muscle = muscle.localizedName(), volume = volume, weightUnitLabel = weightUnitLabel)
                             }
                         }
                     }
@@ -408,7 +427,7 @@ private fun StatCard(
 }
 
 @Composable
-private fun ExerciseCard(exercise: ExerciseDetail, index: Int) {
+private fun ExerciseCard(exercise: ExerciseDetail, index: Int, weightUnitLabel: String = "kg") {
     var visible by remember { mutableStateOf(false) }
     
     LaunchedEffect(Unit) {
@@ -468,7 +487,7 @@ private fun ExerciseCard(exercise: ExerciseDetail, index: Int) {
 
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     exercise.sets.forEach { set ->
-                        SetRow(set = set)
+                        SetRow(set = set, weightUnitLabel = weightUnitLabel)
                     }
                 }
 
@@ -494,7 +513,7 @@ private fun ExerciseCard(exercise: ExerciseDetail, index: Int) {
                         fontWeight = FontWeight.Medium,
                     )
                     Text(
-                        text = "${exercise.totalVolume.toInt()} kg",
+                        text = "${exercise.totalVolume.toInt()} $weightUnitLabel",
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Bold,
                         color = AccentCyanStart,
@@ -506,7 +525,7 @@ private fun ExerciseCard(exercise: ExerciseDetail, index: Int) {
 }
 
 @Composable
-private fun SetRow(set: SetDetail) {
+private fun SetRow(set: SetDetail, weightUnitLabel: String = "kg") {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -527,7 +546,7 @@ private fun SetRow(set: SetDetail) {
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = "${set.weight} kg × ${set.reps}",
+                text = "${set.weight} $weightUnitLabel × ${set.reps}",
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
@@ -556,7 +575,7 @@ private fun SetRow(set: SetDetail) {
 }
 
 @Composable
-private fun MuscleVolumeRow(muscle: String, volume: Double) {
+private fun MuscleVolumeRow(muscle: String, volume: Double, weightUnitLabel: String = "kg") {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -580,7 +599,7 @@ private fun MuscleVolumeRow(muscle: String, volume: Double) {
             fontWeight = FontWeight.Medium,
         )
         Text(
-            text = "${volume.toInt()} kg",
+            text = "${volume.toInt()} $weightUnitLabel",
             style = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.Bold,
             color = AccentCyanStart,

@@ -1015,7 +1015,7 @@ private fun SetRow(
                     ) {
                         Icon(
                             Icons.Default.Info,
-                            contentDescription = "Warmup info",
+                            contentDescription = stringResource(R.string.content_desc_warmup_info),
                             tint = AccentAmberStart.copy(alpha = 0.6f),
                             modifier = Modifier.size(12.dp),
                         )
@@ -1418,7 +1418,7 @@ private fun NumberInputDialog(
                     ) {
                         Icon(
                             Icons.Default.Remove,
-                            contentDescription = "Decrease",
+                            contentDescription = stringResource(R.string.content_desc_decrease),
                             modifier = Modifier.size(32.dp),
                         )
                     }
@@ -1481,7 +1481,7 @@ private fun NumberInputDialog(
                     ) {
                         Icon(
                             Icons.Default.Add,
-                            contentDescription = "Increase",
+                            contentDescription = stringResource(R.string.content_desc_increase),
                             modifier = Modifier.size(32.dp),
                         )
                     }
@@ -1539,7 +1539,7 @@ private fun InfoTooltipDialog(
         confirmButton = {
             TextButton(onClick = onDismiss) {
                 Text(
-                    "Got it",
+                    stringResource(R.string.action_got_it),
                     color = AccentGreenStart,
                     fontWeight = FontWeight.Bold,
                 )
@@ -1772,7 +1772,7 @@ private fun HistorySessionCard(
             }
             
             Text(
-                text = "Set ${index + 1}: $setInfo",
+                text = stringResource(R.string.exercise_detail_set_label, index + 1, setInfo),
                 style = MaterialTheme.typography.bodyMedium,
                 color = Color.White.copy(alpha = 0.85f),
                 modifier = Modifier.padding(vertical = 2.dp),

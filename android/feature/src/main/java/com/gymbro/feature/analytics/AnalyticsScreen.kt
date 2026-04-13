@@ -636,7 +636,7 @@ private fun TopExerciseRow(exercise: TopExercise) {
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "${exercise.totalSets} sets • ${exercise.frequency} workouts",
+                    text = stringResource(R.string.analytics_exercise_stats, exercise.totalSets, exercise.frequency),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )

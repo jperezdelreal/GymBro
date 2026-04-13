@@ -343,6 +343,8 @@
     <string name="programs_rest_seconds">Descanso (s)</string>
     <string name="programs_remove_exercise">Eliminar</string>
     <string name="programs_add_exercise">Agregar Ejercicio</string>
+    <string name="programs_session_duration_label">Duración de la Sesión</string>
+    <string name="programs_duration_minutes" formatted="false">%dmin</string>
     <string name="programs_swap_up">Subir</string>
     <string name="programs_swap_down">Bajar</string>
 
@@ -860,4 +862,12 @@
     <string name="exercise_detail_tips">Consejos</string>
     <string name="exercise_detail_set_format">%1$d × %2$.1f kg</string>
     <string name="exercise_detail_set_format_with_rpe">%1$d × %2$.1f kg @ RPE %3$.1f</string>
+
+    <!-- QA Audit: Correcciones de strings hardcoded -->
+    <string name="content_desc_warmup_info">Info de calentamiento</string>
+    <string name="content_desc_decrease">Disminuir</string>
+    <string name="content_desc_increase">Aumentar</string>
+    <string name="action_got_it">Entendido</string>
+    <string name="exercise_detail_set_label" formatted="false">Serie %d: %s</string>
+    <string name="analytics_exercise_stats" formatted="false">%d series • %d entrenamientos</string>
 </resources>

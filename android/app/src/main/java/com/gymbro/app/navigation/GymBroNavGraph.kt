@@ -437,7 +437,9 @@ fun GymBroNavGraph(
             )
         }
         composable("recovery") {
-            RecoveryRoute()
+            RecoveryRoute(
+                onNavigateBack = { navController.popBackStack() },
+            )
         }
         composable("programs") {
             ProgramsRoute(
@@ -483,9 +485,7 @@ fun GymBroNavGraph(
                 onNavigateBack = { navController.popBackStack() },
                 onNavigateToActiveWorkout = { navController.navigate("active_workout") },
                 onNavigateToExercisePicker = { _ ->
-                    // For now, just navigate to exercise library
-                    // TODO: Implement exercise picker with callback
-                    navController.navigate("exercise_library")
+                    navController.navigate("exercise_picker")
                 },
             )
         }
