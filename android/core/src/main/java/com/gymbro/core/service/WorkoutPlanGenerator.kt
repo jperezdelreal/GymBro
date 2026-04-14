@@ -49,6 +49,19 @@ class WorkoutPlanGenerator @Inject constructor(
         const val MIN_EXERCISES = 3
         const val MAX_EXERCISES = 12
 
+        // Exercise suitability denylist — excludes exercises inappropriate for AI-generated plans
+        // Issue #558: Back Lever, Band Dislocates appeared in hypertrophy plans
+        // These are specialized skill/mobility exercises, not general training movements
+        private val UNSUITABLE_FOR_PLANS = setOf(
+            "Back Lever",
+            "Front Lever",
+            "Planche",
+            "Handstand Push-Up",
+            "Muscle-Up",
+            "Band Dislocate",
+            "Band Pull-Apart"
+        )
+
         /**
          * Estimates how long a single exercise takes in seconds.
          */
@@ -454,7 +467,8 @@ class WorkoutPlanGenerator @Inject constructor(
         // Phase 1: One compound per target muscle
         for (muscle in targetMuscles) {
             val compound = allExercises.firstOrNull {
-                it.muscleGroup == muscle && it.category == ExerciseCategory.COMPOUND && it.name !in usedNames
+                it.muscleGroup == muscle && it.category == ExerciseCategory.COMPOUND 
+                    && it.name !in usedNames && it.name !in UNSUITABLE_FOR_PLANS
             } ?: continue
             usedNames.add(compound.name)
             candidates.add(Candidate(compound, sets, reps, rest))
@@ -465,7 +479,8 @@ class WorkoutPlanGenerator @Inject constructor(
         val isolationNames = mutableSetOf<String>()
         for (muscle in targetMuscles) {
             val isolation = allExercises.firstOrNull {
-                it.muscleGroup == muscle && it.category == ExerciseCategory.ISOLATION && it.name !in usedNames && it.name !in isolationNames
+                it.muscleGroup == muscle && it.category == ExerciseCategory.ISOLATION 
+                    && it.name !in usedNames && it.name !in isolationNames && it.name !in UNSUITABLE_FOR_PLANS
             } ?: continue
             isolationNames.add(isolation.name)
             candidates.add(Candidate(
@@ -482,6 +497,7 @@ class WorkoutPlanGenerator @Inject constructor(
             val accessory = allExercises.firstOrNull {
                 it.muscleGroup == muscle && it.category == ExerciseCategory.ACCESSORY
                     && it.name !in usedNames && it.name !in isolationNames && it.name !in accessoryNames
+                    && it.name !in UNSUITABLE_FOR_PLANS
             } ?: continue
             accessoryNames.add(accessory.name)
             candidates.add(Candidate(
@@ -497,6 +513,7 @@ class WorkoutPlanGenerator @Inject constructor(
             val extra = allExercises.firstOrNull {
                 it.muscleGroup == muscle && it.category == ExerciseCategory.COMPOUND
                     && it.name !in usedNames && it.name !in isolationNames && it.name !in accessoryNames
+                    && it.name !in UNSUITABLE_FOR_PLANS
             } ?: continue
             candidates.add(Candidate(
                 extra,
