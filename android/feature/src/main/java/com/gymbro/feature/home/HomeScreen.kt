@@ -55,6 +55,7 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
@@ -487,7 +488,7 @@ private fun TodayWorkoutCard(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 InfoChip(
-                    label = stringResource(R.string.programs_exercises_count, todayWorkout.exercises.size),
+                    label = pluralStringResource(R.plurals.exercises_count, todayWorkout.exercises.size, todayWorkout.exercises.size),
                     color = AccentCyan,
                 )
                 InfoChip(
@@ -675,7 +676,7 @@ private fun RecentWorkoutCard(
                 ) {
                     StatLabel(
                         icon = Icons.Default.FitnessCenter,
-                        text = stringResource(R.string.home_exercises_count, workout.exerciseCount),
+                        text = pluralStringResource(R.plurals.exercises_count, workout.exerciseCount, workout.exerciseCount),
                     )
                     StatLabel(
                         icon = Icons.Default.Timer,
@@ -864,7 +865,7 @@ private fun WeeklyStreakCard(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = stringResource(R.string.home_weekly_streak, weeklyStreak),
+                        text = pluralStringResource(R.plurals.weeks_count, weeklyStreak, weeklyStreak),
                         style = MaterialTheme.typography.titleMedium.copy(
                             fontWeight = FontWeight.Bold,
                         ),

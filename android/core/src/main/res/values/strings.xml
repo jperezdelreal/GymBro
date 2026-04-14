@@ -922,6 +922,32 @@
     <string name="progress_chart_rpe_warning">⚠️ Rising effort — consider a deload</string>
     <string name="progress_chart_section_title">Exercise Progression</string>
 
+    <!-- Plurals (#559) -->
+    <plurals name="exercises_count">
+        <item quantity="one">%d exercise</item>
+        <item quantity="other">%d exercises</item>
+    </plurals>
+    <plurals name="weeks_count">
+        <item quantity="one">%d week</item>
+        <item quantity="other">%d weeks</item>
+    </plurals>
+    <plurals name="sets_count">
+        <item quantity="one">%d set</item>
+        <item quantity="other">%d sets</item>
+    </plurals>
+
+    <!-- Template Localization (#561) -->
+    <string name="template_starting_strength_day_a_name">Starting Strength 5×5 - Day A</string>
+    <string name="template_starting_strength_day_a_desc">Classic beginner strength program: Squat, Bench, Row. Linear progression, 3 days/week.</string>
+    <string name="template_starting_strength_day_b_name">Starting Strength 5×5 - Day B</string>
+    <string name="template_starting_strength_day_b_desc">Alternate day: Squat, Overhead Press, Deadlift. Alternate with Day A.</string>
+    <string name="template_full_body_day_1_name">Full Body - Day 1</string>
+    <string name="template_full_body_day_1_desc">Complete body workout hitting all major movement patterns. Squat + horizontal press focus.</string>
+    <string name="template_full_body_day_2_name">Full Body - Day 2</string>
+    <string name="template_full_body_day_2_desc">Full body with deadlift + vertical press/pull emphasis. Alternate with Day 1.</string>
+    <string name="template_full_body_day_3_name">Full Body - Day 3</string>
+    <string name="template_full_body_day_3_desc">Full body focusing on single-leg work, pulling variations, and core stability.</string>
+
     <!-- Exercise Replace (#546) -->
     <string name="active_workout_replace_exercise">Replace exercise</string>
 
