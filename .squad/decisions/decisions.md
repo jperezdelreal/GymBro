@@ -1139,6 +1139,149 @@ if highSeverityTriggers >= 2:
 else if highSeverityTriggers == 1:
     state = .overreaching  // Deload recommended
     urgency = .recommended
+
+---
+
+## 2026-04-14T10-14: Session Retrospective — Quality Gate Failure
+
+**Reporter:** Copilot (via Copilot)  
+**Date:** 2026-04-14  
+**Status:** Lesson Learned  
+
+**Issue:** Features #548-#553 were compiled and merged but NOT verified in the emulator. Quality gate failed:
+1. Superseries: UI not discoverable
+2. Home full exercise list + swap day: changes invisible
+3. i18n translations: still showing English
+4. Drag & drop: only arrow buttons, no drag gesture
+
+**Root Cause:** "Compile = Done" assumption. No verification step before merge.
+
+**Decision:** Enforce verification gate for all future features.
+- Work ONE feature at a time
+- Verify each feature visually in emulator BEFORE moving to next
+- User confirmation required before closing issue
+- No merge without visual proof
+
+**Why:** Prevent repeating this pattern. Quality is not byte-counted; it's verified.
+
+---
+
+## 2026-04-14: Exercise Selection and Validation Logic — Neo
+
+**Author:** Neo (AI/ML Engineer)  
+**Date:** 2026-04-14  
+**Issues:** #558, #560, #562  
+**PR:** #564
+
+### Exercise Suitability Filtering (#558)
+
+**Problem:** AI plan generator selected inappropriate exercises — Back Lever, Band Dislocates appeared in hypertrophy plans.
+
+**Decision:** Add generator-side denylist (`UNSUITABLE_FOR_PLANS`) instead of modifying seed data.
+
+**Rationale:**
+- Exercises ARE valid for library (users CAN manually add them)
+- Just inappropriate for AI-generated plans
+- Denylist keeps seed data clean
+- Allows future per-goal filtering
+
+**Implementation:**
+```kotlin
+private val UNSUITABLE_FOR_PLANS = setOf(
+    "Back Lever", "Front Lever", "Planche",  // Gymnastics skills
+    "Handstand Push-Up", "Muscle-Up",         // Advanced calisthenics
+    "Band Dislocate", "Band Pull-Apart"       // Warmup/mobility
+)
+```
+
+### Bodyweight Exercise Default Weight (#560)
+
+**Problem:** Users had to enter weight for Pull-Up, Push-Up, Dip.
+
+**Decision:** Check BOTH equipment tag AND exercise name pattern. Default to 0kg for true unloaded bodyweight.
+
+**Implementation:**
+```kotlin
+private fun isTrueBodyweightExercise(exercise: Exercise): Boolean {
+    val bodyweightNames = setOf(
+        "Pull-Up", "Chin-Up", "Push-Up", "Dip", 
+        "Sit-Up", "Crunch", "Plank", "Jumping Jack", 
+        "Burpee", "Mountain Climber", "Air Squat"
+    )
+    return exercise.equipment == Equipment.BODYWEIGHT 
+        && bodyweightNames.any { exercise.name.contains(it, ignoreCase = true) }
+        && !exercise.name.contains("Weighted", ignoreCase = true)
+}
+```
+
+### Weight Sanity Validation (#562)
+
+**Problem:** No plausibility check — 250kg Dumbbell Farmer's March accepted.
+
+**Decision:** Soft warning (confirmation dialog), not hard reject. Category-based limits.
+
+**Thresholds:**
+- COMPOUND: 300kg
+- ISOLATION: 100kg
+- ACCESSORY: 60kg
+- CARDIO: 40kg
+
+**Rationale:** Elite powerlifters DO squat >300kg. Category-based is more accurate than global limits.
+
+---
+
+## 2026-04-14: Localization Fixes — Trinity
+
+**Author:** Trinity (Mobile Dev)  
+**Date:** 2026-04-14  
+**Issues:** #559, #561  
+**PR:** #565
+
+### Plural Grammar (#559)
+
+**Problem:** Spanish showed "1 semanas", "1 ejercicios" (incorrect plurals).
+
+**Decision:** Use Android `<plurals>` resources for language-aware quantity handling.
+
+**Applied to:** exercises_count, weeks_count, sets_count, home_plateau_stagnation, home_plateau_regression.
+
+### Template Localization (#561)
+
+**Problem:** Workout template names/descriptions hardcoded in English in `WorkoutTemplateRepositoryImpl.kt`.
+
+**Decision:** Inject Context, use string resources for all 11 built-in templates (EN + ES).
+
+**Migration:** Existing users keep English templates. New users/cleared data get localized templates. No migration needed.
+
+---
+
+## 2026-04-14: Edit Past Workout Data — Tank
+
+**Author:** Tank (Backend Dev)  
+**Date:** 2026-04-14  
+**Issue:** #563  
+**PR:** #566
+
+### Architecture
+
+**Data Flow:**
+User taps set → EditSetDialog → User edits → onSave callback → UpdateSet intent → ViewModel.updateSet() → Repository.updateSet() → Room DB update (REPLACE) → Auto-reload → UI refreshes
+
+**Features:**
+- ✅ Offline-first (Room DB only)
+- ✅ Preserves metadata (exerciseId, workoutId, completedAt, isWarmup)
+- ✅ Updates only weight, reps, RPE
+- ✅ Respects weight unit preference
+- ⚠️ No undo (future enhancement)
+- ⚠️ No input validation (future enhancement)
+
+### Testing Checklist
+1. Edit set, verify volume recalculates
+2. Edit PRs, verify badges update
+3. Offline editing (airplane mode)
+4. kg vs lb unit preference
+5. Warmup vs working sets
+6. Cancel dialog (no changes saved)
 else if moderateTriggers > 0:
     state = .overreaching
     urgency = .recommended
