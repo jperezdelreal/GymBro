@@ -327,6 +327,18 @@ class WorkoutRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun clearAllInProgressWorkouts() {
+        val result = retryWithBackoff {
+            runCatchingAsResult { workoutDao.clearAllInProgressWorkouts() }
+        }
+        when (result) {
+            is AppResult.Success -> Unit
+            is AppResult.Error -> {
+                Log.e(TAG, "Failed to clear all in-progress workouts: ${result.error.message}")
+            }
+        }
+    }
+
     override suspend fun getTotalCompletedWorkoutsCount(): Int {
         val result = retryWithBackoff {
             runCatchingAsResult { workoutDao.getTotalCompletedWorkoutsCount() }

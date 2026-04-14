@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.gymbro.core.ui.theme.AccentGreenEnd
@@ -34,6 +35,7 @@ fun GradientButton(
     modifier: Modifier = Modifier,
     gradientColors: List<Color> = listOf(AccentGreenStart, AccentGreenEnd),
     enabled: Boolean = true,
+    testTag: String? = null,
 ) {
     val haptic = LocalHapticFeedback.current
     var isPressed by remember { mutableStateOf(false) }
@@ -62,7 +64,7 @@ fun GradientButton(
                 haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                 onClick()
             },
-            modifier = Modifier,
+            modifier = if (testTag != null) Modifier.testTag(testTag) else Modifier,
             enabled = enabled,
             shape = RoundedCornerShape(12.dp),
             colors = ButtonDefaults.buttonColors(

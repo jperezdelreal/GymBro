@@ -169,18 +169,10 @@ class ActiveWorkoutViewModel @Inject constructor(
                     )
                 }
             }
-            // Auto-create superset groups from plan's supersetGroupId
-            val supersetMap = mutableMapOf<String, MutableList<Int>>()
-            pendingDay.exercises.forEachIndexed { index, planned ->
-                val groupId = planned.supersetGroupId ?: return@forEachIndexed
-                supersetMap.getOrPut(groupId) { mutableListOf() }.add(index)
-            }
-            val validGroups = supersetMap.filter { it.value.size >= 2 }
-            if (validGroups.isNotEmpty()) {
-                _state.update { current ->
-                    current.copy(supersetGroups = validGroups)
-                }
-            }
+            // BUG-007 fix: Don't auto-create superset groups from plan data.
+            // Users should manually group exercises during the workout via the
+            // superset selection UI. Auto-grouping was confusing because it showed
+            // "Superserie" labels on exercises users never explicitly grouped.
         }
     }
 
@@ -868,10 +860,8 @@ class ActiveWorkoutViewModel @Inject constructor(
                 }
             }
         ) {
-            val inProgress = workoutRepository.getInProgressWorkout()
-            if (inProgress != null) {
-                workoutRepository.clearInProgressWorkout(inProgress.workoutId)
-            }
+            // BUG-004 fix: Clear ALL stale in-progress data, not just one entry
+            workoutRepository.clearAllInProgressWorkouts()
             startWorkout()
         }
     }

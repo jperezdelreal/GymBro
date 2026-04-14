@@ -25,6 +25,7 @@ interface WorkoutRepository {
     suspend fun saveInProgressWorkout(inProgressWorkout: com.gymbro.core.model.InProgressWorkout)
     suspend fun getInProgressWorkout(): com.gymbro.core.model.InProgressWorkout?
     suspend fun clearInProgressWorkout(workoutId: String)
+    suspend fun clearAllInProgressWorkouts()
     
     suspend fun getTotalCompletedWorkoutsCount(): Int
     suspend fun getActiveDaysCount(): Int
