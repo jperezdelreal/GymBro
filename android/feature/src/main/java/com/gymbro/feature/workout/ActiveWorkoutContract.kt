@@ -111,6 +111,8 @@ sealed interface ActiveWorkoutEvent {
     data class ShowExerciseDetail(val exercise: Exercise) : ActiveWorkoutEvent
     data object DismissExerciseDetail : ActiveWorkoutEvent
     data object DismissPrCelebration : ActiveWorkoutEvent
+    data class MoveExerciseUp(val exerciseIndex: Int) : ActiveWorkoutEvent
+    data class MoveExerciseDown(val exerciseIndex: Int) : ActiveWorkoutEvent
 }
 
 sealed interface ActiveWorkoutEffect {
