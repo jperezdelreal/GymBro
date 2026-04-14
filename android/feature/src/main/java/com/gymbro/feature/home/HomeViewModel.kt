@@ -48,10 +48,9 @@ class HomeViewModel @Inject constructor(
                 if (plan == null) {
                     _state.update { it.copy(showNoPlanDialog = true) }
                 } else {
-                    val dayIndex = (java.time.LocalDate.now().dayOfWeek.value - 1) % plan.workoutDays.size
-                    val todayWorkout = plan.workoutDays.getOrNull(dayIndex)
-                    if (todayWorkout != null) {
-                        activePlanStore.setPendingWorkoutDay(todayWorkout)
+                    val currentWorkout = _state.value.todayWorkout
+                    if (currentWorkout != null) {
+                        activePlanStore.setPendingWorkoutDay(currentWorkout)
                     }
                     viewModelScope.launch {
                         _effect.send(HomeEffect.NavigateToActiveWorkout)
@@ -119,6 +118,20 @@ class HomeViewModel @Inject constructor(
                     _effect.send(HomeEffect.NavigateToCoachWithContext(context))
                 }
             }
+            is HomeEvent.SwapDay -> {
+                val plan = _state.value.activePlan ?: return
+                if (plan.workoutDays.size <= 1) return
+                val defaultIndex = (java.time.LocalDate.now().dayOfWeek.value - 1) % plan.workoutDays.size
+                val currentIndex = _state.value.selectedDayIndex ?: defaultIndex
+                val nextIndex = (currentIndex + 1) % plan.workoutDays.size
+                val nextWorkout = plan.workoutDays[nextIndex]
+                _state.update {
+                    it.copy(
+                        selectedDayIndex = nextIndex,
+                        todayWorkout = nextWorkout,
+                    )
+                }
+            }
         }
     }
 
@@ -126,12 +139,18 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             activePlanStore.activePlan.collect { plan ->
                 if (plan != null) {
-                    val dayIndex = (java.time.LocalDate.now().dayOfWeek.value - 1) % plan.workoutDays.size
+                    val override = _state.value.selectedDayIndex
+                    val dayIndex = if (override != null && override < plan.workoutDays.size) {
+                        override
+                    } else {
+                        (java.time.LocalDate.now().dayOfWeek.value - 1) % plan.workoutDays.size
+                    }
                     val todayWorkout = plan.workoutDays.getOrNull(dayIndex)
                     _state.update {
                         it.copy(
                             activePlan = plan,
                             todayWorkout = todayWorkout,
+                            selectedDayIndex = if (override != null && override >= plan.workoutDays.size) null else override,
                         )
                     }
                 } else {
@@ -139,6 +158,7 @@ class HomeViewModel @Inject constructor(
                         it.copy(
                             activePlan = null,
                             todayWorkout = null,
+                            selectedDayIndex = null,
                         )
                     }
                 }

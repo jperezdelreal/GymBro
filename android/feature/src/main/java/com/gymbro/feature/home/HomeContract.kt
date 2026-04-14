@@ -8,6 +8,7 @@ import com.gymbro.core.model.PlateauAlert
 data class HomeState(
     val activePlan: WorkoutPlan? = null,
     val todayWorkout: WorkoutDay? = null,
+    val selectedDayIndex: Int? = null,
     val recentWorkouts: List<RecentWorkoutItem> = emptyList(),
     val isLoading: Boolean = true,
     val isGeneratingPlan: Boolean = false,
@@ -52,6 +53,7 @@ sealed interface HomeEvent {
     data object DismissMilestoneBanner : HomeEvent
     data class DismissPlateauAlert(val exerciseId: String) : HomeEvent
     data class OpenCoachForPlateau(val alert: PlateauAlert) : HomeEvent
+    data object SwapDay : HomeEvent
 }
 
 sealed interface HomeEffect {
