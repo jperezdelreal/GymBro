@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- App Name -->
     <string name="app_name">GymBro</string>
@@ -894,4 +894,18 @@
     <string name="settings_reset_tooltips">Restablecer Tutoriales</string>
     <string name="settings_reset_tooltips_subtitle">Mostrar las guías de entrenamiento de nuevo</string>
     <string name="settings_tooltips_reset_done">Los tutoriales se han restablecido</string>
+
+    <!-- Exercise Progression Charts (#542, #543) -->
+    <string name="progress_chart_title" formatted="false">Progresión: %s</string>
+    <string name="progress_chart_weight">Peso</string>
+    <string name="progress_chart_volume">Volumen</string>
+    <string name="progress_chart_1m">1M</string>
+    <string name="progress_chart_3m">3M</string>
+    <string name="progress_chart_6m">6M</string>
+    <string name="progress_chart_all">Todo</string>
+    <string name="progress_chart_no_data">Datos insuficientes para este rango</string>
+    <string name="progress_chart_single_session">Solo 1 sesión registrada</string>
+    <string name="progress_chart_volume_value" formatted="false">Volumen: %s %s</string>
+    <string name="progress_chart_rpe_warning">⚠️ Esfuerzo creciente — considera un deload</string>
+    <string name="progress_chart_section_title">Progresión de Ejercicio</string>
 </resources>

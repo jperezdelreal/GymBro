@@ -332,6 +332,23 @@ private fun ProgressScreen(
                     }
                 }
             }
+
+            // Exercise Progression Chart with RPE trends (#542, #543)
+            if (state.exerciseProgressData.isNotEmpty() && state.selectedExerciseName.isNotEmpty()) {
+                item {
+                    SectionHeader(
+                        title = stringResource(R.string.progress_chart_section_title),
+                        icon = "📉",
+                    )
+                }
+                item {
+                    ExerciseProgressChart(
+                        dataPoints = state.exerciseProgressData,
+                        exerciseName = state.selectedExerciseName,
+                        useKg = state.useKg,
+                    )
+                }
+            }
         }
     }
 
