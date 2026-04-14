@@ -624,6 +624,7 @@
     <string name="home_todays_workout">Today\'s Workout</string>
     <string name="home_start">Start</string>
     <string name="home_view_all_programs">View all programs →</string>
+    <string name="home_change_day">Change day</string>
     <string name="home_create_program_title">Create Your First Program</string>
     <string name="home_create_program_subtitle">Get a personalized training plan based on your goals</string>
     <string name="home_recent_workouts">Recent Workouts</string>

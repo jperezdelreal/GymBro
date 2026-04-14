@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
@@ -191,6 +192,8 @@ fun HomeScreen(
                         TodayWorkoutCard(
                             plan = state.activePlan,
                             todayWorkout = state.todayWorkout,
+                            canSwapDay = state.activePlan.workoutDays.size > 1,
+                            onSwapDay = { onEvent(HomeEvent.SwapDay) },
                             onStartWorkout = {
                                 onEvent(HomeEvent.StartTodayWorkout(state.todayWorkout.dayNumber))
                             },
@@ -385,6 +388,8 @@ private fun QuickStartCard(
 private fun TodayWorkoutCard(
     plan: WorkoutPlan,
     todayWorkout: WorkoutDay,
+    canSwapDay: Boolean = false,
+    onSwapDay: () -> Unit = {},
     onStartWorkout: () -> Unit,
     onViewPrograms: () -> Unit,
 ) {
@@ -491,10 +496,39 @@ private fun TodayWorkoutCard(
                 )
             }
 
-            // Show first 3 exercises as preview
+            // Swap day button
+            if (canSwapDay) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(8.dp))
+                        .clickable(onClick = {
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            onSwapDay()
+                        })
+                        .padding(vertical = 4.dp, horizontal = 2.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(
+                        Icons.Default.SwapHoriz,
+                        contentDescription = stringResource(R.string.home_change_day),
+                        modifier = Modifier.size(18.dp),
+                        tint = AccentCyan,
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = stringResource(R.string.home_change_day),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = AccentCyan,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                }
+            }
+
+            // Exercise list
             if (todayWorkout.exercises.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(12.dp))
-                todayWorkout.exercises.take(3).forEach { exercise ->
+                todayWorkout.exercises.forEach { exercise ->
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -514,17 +548,6 @@ private fun TodayWorkoutCard(
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
-                }
-                if (todayWorkout.exercises.size > 3) {
-                    Text(
-                        text = stringResource(
-                            R.string.programs_more_exercises,
-                            todayWorkout.exercises.size - 3,
-                        ),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(start = 22.dp, top = 2.dp),
-                    )
                 }
             }
 
