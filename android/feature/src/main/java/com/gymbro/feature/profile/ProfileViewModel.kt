@@ -45,6 +45,7 @@ class ProfileViewModel @Inject constructor(
             is ProfileEvent.SignOut -> signOut()
             is ProfileEvent.SyncNow -> syncNow()
             is ProfileEvent.ToggleAutoSync -> toggleAutoSync(event.enabled)
+            is ProfileEvent.Refresh -> loadWorkoutStats()
         }
     }
 
