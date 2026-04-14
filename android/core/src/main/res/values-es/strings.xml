@@ -545,6 +545,10 @@
     <string name="active_workout_superset_tap_ungroup">Toca para desagrupar superserie</string>
     <string name="active_workout_move_up">Mover ejercicio arriba</string>
     <string name="active_workout_move_down">Mover ejercicio abajo</string>
+    <string name="active_workout_drag_handle">Arrastra para reordenar</string>
+    <string name="active_workout_exercise_options">Opciones del ejercicio</string>
+    <string name="active_workout_add_to_superset">Agregar a superserie</string>
+    <string name="active_workout_superset_selection_hint">Selecciona 2+ ejercicios, luego toca Agrupar</string>
     
     <!-- Progression Suggestions -->
     <string name="progression_last" formatted="false">Anterior: %s × %d</string>

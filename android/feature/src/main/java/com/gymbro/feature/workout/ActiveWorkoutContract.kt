@@ -117,6 +117,7 @@ sealed interface ActiveWorkoutEvent {
     data class SetTargetDuration(val minutes: Int) : ActiveWorkoutEvent
     data class MoveExerciseUp(val exerciseIndex: Int) : ActiveWorkoutEvent
     data class MoveExerciseDown(val exerciseIndex: Int) : ActiveWorkoutEvent
+    data class ReorderExercise(val fromIndex: Int, val toIndex: Int) : ActiveWorkoutEvent
 }
 
 sealed interface ActiveWorkoutEffect {

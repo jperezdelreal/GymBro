@@ -3,6 +3,7 @@ package com.gymbro.feature.workout
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -15,6 +16,7 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,16 +42,21 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.DragHandle
 import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Link
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.SmartToy
 import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -68,6 +75,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -78,7 +86,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -495,8 +505,23 @@ fun ActiveWorkoutScreen(
                     } else null
                     val isSelected = state.selectedExercises.contains(exerciseIndex)
                     val isFirstInGroup = supersetGroup != null && exerciseIndex == supersetGroup.value.first()
+                    val haptic = LocalHapticFeedback.current
+                    var isDragging by remember { mutableStateOf(false) }
+                    var dragOffsetY by remember { mutableFloatStateOf(0f) }
                     
-                    Column {
+                    Column(
+                        modifier = Modifier
+                            .graphicsLayer {
+                                translationY = dragOffsetY
+                                if (isDragging) {
+                                    shadowElevation = 8f
+                                    scaleX = 1.02f
+                                    scaleY = 1.02f
+                                    alpha = 0.9f
+                                }
+                            }
+                            .animateContentSize()
+                    ) {
                         // Superset header — tappable to ungroup
                         if (isFirstInGroup && supersetGroup != null) {
                             Row(
@@ -526,8 +551,47 @@ fun ActiveWorkoutScreen(
                         
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.Start
+                            horizontalArrangement = Arrangement.Start,
+                            verticalAlignment = Alignment.CenterVertically,
                         ) {
+                            // Drag handle (#550)
+                            Icon(
+                                Icons.Default.DragHandle,
+                                contentDescription = stringResource(R.string.active_workout_drag_handle),
+                                tint = Color.White.copy(alpha = 0.35f),
+                                modifier = Modifier
+                                    .size(24.dp)
+                                    .pointerInput(exerciseIndex) {
+                                        detectDragGesturesAfterLongPress(
+                                            onDragStart = {
+                                                isDragging = true
+                                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                            },
+                                            onDrag = { change, dragAmount ->
+                                                change.consume()
+                                                dragOffsetY += dragAmount.y
+                                            },
+                                            onDragEnd = {
+                                                val itemHeight = 200f
+                                                val movedBy = (dragOffsetY / itemHeight).toInt()
+                                                val targetIndex = (exerciseIndex + movedBy)
+                                                    .coerceIn(0, state.exercises.size - 1)
+                                                if (targetIndex != exerciseIndex) {
+                                                    onEvent(ActiveWorkoutEvent.ReorderExercise(exerciseIndex, targetIndex))
+                                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                                }
+                                                isDragging = false
+                                                dragOffsetY = 0f
+                                            },
+                                            onDragCancel = {
+                                                isDragging = false
+                                                dragOffsetY = 0f
+                                            },
+                                        )
+                                    },
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+
                             // Accent bracket connecting superset exercises
                             if (supersetGroup != null) {
                                 Box(
@@ -557,7 +621,6 @@ fun ActiveWorkoutScreen(
                             GlassmorphicCard(
                                 modifier = Modifier
                                     .weight(1f)
-                                    .clickable { onEvent(ActiveWorkoutEvent.ToggleExerciseSelection(exerciseIndex)) }
                                     .border(
                                         width = if (isSelected) 2.dp else 0.dp,
                                         color = if (isSelected) AccentGreenStart else Color.Transparent,
@@ -584,6 +647,7 @@ fun ActiveWorkoutScreen(
                                         exerciseUi = exerciseUi,
                                         exerciseIndex = exerciseIndex,
                                         exerciseCount = state.exercises.size,
+                                        isInSuperset = supersetGroup != null,
                                         onEvent = onEvent,
                                         voiceRecognitionService = voiceRecognitionService,
                                         defaultWeightUnit = defaultWeightUnit,
@@ -591,6 +655,21 @@ fun ActiveWorkoutScreen(
                                 }
                             }
                         }
+                    }
+                }
+                
+                // Superset selection hint (#551)
+                if (state.selectedExercises.size == 1) {
+                    item {
+                        Text(
+                            text = stringResource(R.string.active_workout_superset_selection_hint),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = AccentGreenStart.copy(alpha = 0.7f),
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp),
+                        )
                     }
                 }
                 
@@ -1053,12 +1132,14 @@ private fun ExerciseCardContent(
     exerciseUi: WorkoutExerciseUi,
     exerciseIndex: Int,
     exerciseCount: Int,
+    isInSuperset: Boolean = false,
     onEvent: (ActiveWorkoutEvent) -> Unit,
     voiceRecognitionService: com.gymbro.core.voice.VoiceRecognitionService,
     defaultWeightUnit: com.gymbro.core.preferences.UserPreferences.WeightUnit,
 ) {
     val haptic = LocalHapticFeedback.current
     var voiceToast by remember { mutableStateOf<String?>(null) }
+    var showOverflowMenu by remember { mutableStateOf(false) }
     val weightPlaceholder = exerciseUi.beginnerWeightHint?.let {
         stringResource(R.string.beginner_weight_hint, it)
     }
@@ -1096,37 +1177,6 @@ private fun ExerciseCardContent(
                     )
                     .semantics { heading() },
             )
-            // Reorder buttons
-            IconButton(
-                onClick = {
-                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                    onEvent(ActiveWorkoutEvent.MoveExerciseUp(exerciseIndex))
-                },
-                enabled = exerciseIndex > 0,
-                modifier = Modifier.size(36.dp),
-            ) {
-                Icon(
-                    Icons.Default.KeyboardArrowUp,
-                    contentDescription = stringResource(R.string.active_workout_move_up),
-                    tint = if (exerciseIndex > 0) Color.White.copy(alpha = 0.6f) else Color.White.copy(alpha = 0.15f),
-                    modifier = Modifier.size(20.dp),
-                )
-            }
-            IconButton(
-                onClick = {
-                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                    onEvent(ActiveWorkoutEvent.MoveExerciseDown(exerciseIndex))
-                },
-                enabled = exerciseIndex < exerciseCount - 1,
-                modifier = Modifier.size(36.dp),
-            ) {
-                Icon(
-                    Icons.Default.KeyboardArrowDown,
-                    contentDescription = stringResource(R.string.active_workout_move_down),
-                    tint = if (exerciseIndex < exerciseCount - 1) Color.White.copy(alpha = 0.6f) else Color.White.copy(alpha = 0.15f),
-                    modifier = Modifier.size(20.dp),
-                )
-            }
             // Voice input — auto-fills the first incomplete set
             VoiceInputButton(
                 voiceRecognitionService = voiceRecognitionService,
@@ -1156,34 +1206,88 @@ private fun ExerciseCardContent(
                     voiceToast = errorMsg
                 },
             )
-            // Replace exercise (#546)
-            IconButton(
-                onClick = { 
-                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                    onEvent(ActiveWorkoutEvent.ReplaceExercise(exerciseIndex)) 
-                },
-                modifier = Modifier.size(36.dp),
-            ) {
-                Icon(
-                    Icons.Default.SwapHoriz,
-                    contentDescription = stringResource(R.string.active_workout_replace_exercise),
-                    tint = Color.White.copy(alpha = 0.4f),
-                    modifier = Modifier.size(18.dp),
-                )
-            }
-            IconButton(
-                onClick = { 
-                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                    onEvent(ActiveWorkoutEvent.RemoveExercise(exerciseIndex)) 
-                },
-                modifier = Modifier.size(48.dp),
-            ) {
-                Icon(
-                    Icons.Default.Delete,
-                    contentDescription = stringResource(R.string.active_workout_remove_exercise),
-                    tint = Color.White.copy(alpha = 0.4f),
-                    modifier = Modifier.size(18.dp),
-                )
+            // Overflow menu (#550/#551) — replaces arrow buttons with compact menu
+            Box {
+                IconButton(
+                    onClick = { showOverflowMenu = true },
+                    modifier = Modifier.size(36.dp),
+                ) {
+                    Icon(
+                        Icons.Default.MoreVert,
+                        contentDescription = stringResource(R.string.active_workout_exercise_options),
+                        tint = Color.White.copy(alpha = 0.5f),
+                        modifier = Modifier.size(20.dp),
+                    )
+                }
+                DropdownMenu(
+                    expanded = showOverflowMenu,
+                    onDismissRequest = { showOverflowMenu = false },
+                ) {
+                    // Move up (accessibility fallback for drag)
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.active_workout_move_up)) },
+                        onClick = {
+                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            onEvent(ActiveWorkoutEvent.MoveExerciseUp(exerciseIndex))
+                            showOverflowMenu = false
+                        },
+                        leadingIcon = {
+                            Icon(Icons.Default.KeyboardArrowUp, contentDescription = null, modifier = Modifier.size(20.dp))
+                        },
+                        enabled = exerciseIndex > 0,
+                    )
+                    // Move down (accessibility fallback for drag)
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.active_workout_move_down)) },
+                        onClick = {
+                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            onEvent(ActiveWorkoutEvent.MoveExerciseDown(exerciseIndex))
+                            showOverflowMenu = false
+                        },
+                        leadingIcon = {
+                            Icon(Icons.Default.KeyboardArrowDown, contentDescription = null, modifier = Modifier.size(20.dp))
+                        },
+                        enabled = exerciseIndex < exerciseCount - 1,
+                    )
+                    // Add to superset (#551) — discoverable entry point
+                    if (!isInSuperset) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.active_workout_add_to_superset)) },
+                            onClick = {
+                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                onEvent(ActiveWorkoutEvent.ToggleExerciseSelection(exerciseIndex))
+                                showOverflowMenu = false
+                            },
+                            leadingIcon = {
+                                Icon(Icons.Default.Link, contentDescription = null, modifier = Modifier.size(20.dp))
+                            },
+                        )
+                    }
+                    // Replace exercise
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.active_workout_replace_exercise)) },
+                        onClick = {
+                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            onEvent(ActiveWorkoutEvent.ReplaceExercise(exerciseIndex))
+                            showOverflowMenu = false
+                        },
+                        leadingIcon = {
+                            Icon(Icons.Default.SwapHoriz, contentDescription = null, modifier = Modifier.size(20.dp))
+                        },
+                    )
+                    // Remove exercise
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.active_workout_remove_exercise)) },
+                        onClick = {
+                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            onEvent(ActiveWorkoutEvent.RemoveExercise(exerciseIndex))
+                            showOverflowMenu = false
+                        },
+                        leadingIcon = {
+                            Icon(Icons.Default.Delete, contentDescription = null, modifier = Modifier.size(20.dp))
+                        },
+                    )
+                }
             }
         }
 
