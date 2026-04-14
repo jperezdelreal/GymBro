@@ -488,57 +488,104 @@ fun ActiveWorkoutScreen(
                     key = { index, ex -> "${ex.exercise.id}_$index" },
                 ) { exerciseIndex, exerciseUi ->
                     val supersetGroup = state.supersetGroups.entries.firstOrNull { exerciseIndex in it.value }
-                    val supersetLabel = if (supersetGroup != null) {
-                        val position = supersetGroup.value.indexOf(exerciseIndex)
-                        val letter = 'A' + (supersetGroup.value.first() / 26)
-                        "$letter${position + 1}"
+                    val supersetPosition = if (supersetGroup != null) {
+                        val position = supersetGroup.value.indexOf(exerciseIndex) + 1
+                        val total = supersetGroup.value.size
+                        position to total
                     } else null
                     val isSelected = state.selectedExercises.contains(exerciseIndex)
+                    val isFirstInGroup = supersetGroup != null && exerciseIndex == supersetGroup.value.first()
                     
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Start
-                    ) {
-                        if (supersetGroup != null) {
-                            Box(
+                    Column {
+                        // Superset header — tappable to ungroup
+                        if (isFirstInGroup && supersetGroup != null) {
+                            Row(
                                 modifier = Modifier
-                                    .width(4.dp)
-                                    .height(120.dp)
-                                    .background(
-                                        AccentGreenStart,
-                                        shape = if (exerciseIndex == supersetGroup.value.first() && exerciseIndex == supersetGroup.value.last()) {
-                                            RoundedCornerShape(4.dp)
-                                        } else if (exerciseIndex == supersetGroup.value.first()) {
-                                            RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp)
-                                        } else if (exerciseIndex == supersetGroup.value.last()) {
-                                            RoundedCornerShape(bottomStart = 4.dp, bottomEnd = 4.dp)
-                                        } else {
-                                            RoundedCornerShape(0.dp)
-                                        }
-                                    )
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(AccentGreenStart.copy(alpha = 0.1f))
+                                    .clickable { onEvent(ActiveWorkoutEvent.UnlinkSuperset(supersetGroup.key)) }
+                                    .padding(horizontal = 12.dp, vertical = 6.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.active_workout_superset_label),
+                                    style = MaterialTheme.typography.labelMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = AccentGreenStart,
+                                )
+                                Text(
+                                    text = stringResource(R.string.active_workout_ungroup_superset),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = AccentGreenStart.copy(alpha = 0.7f),
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(4.dp))
                         }
                         
-                        GlassmorphicCard(
-                            modifier = Modifier
-                                .weight(1f)
-                                .clickable { onEvent(ActiveWorkoutEvent.ToggleExerciseSelection(exerciseIndex)) }
-                                .border(
-                                    width = if (isSelected) 2.dp else 0.dp,
-                                    color = if (isSelected) AccentGreenStart else Color.Transparent,
-                                    shape = RoundedCornerShape(12.dp)
-                                ),
-                            accentColor = getMuscleGroupColor(exerciseUi.exercise.muscleGroup),
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Start
                         ) {
-                            Column {
-                                if (supersetLabel != null) {
-                                    Text(
-                                        text = supersetLabel,
-                                        style = MaterialTheme.typography.labelSmall,
-                                        fontWeight = FontWeight.Bold,
-                                        color = AccentGreenStart,
-                                        modifier = Modifier.padding(start = 16.dp, top = 8.dp)
+                            // Accent bracket connecting superset exercises
+                            if (supersetGroup != null) {
+                                Box(
+                                    modifier = Modifier
+                                        .width(4.dp)
+                                        .height(120.dp)
+                                        .background(
+                                            AccentGreenStart,
+                                            shape = if (exerciseIndex == supersetGroup.value.first() && exerciseIndex == supersetGroup.value.last()) {
+                                                RoundedCornerShape(4.dp)
+                                            } else if (exerciseIndex == supersetGroup.value.first()) {
+                                                RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp)
+                                            } else if (exerciseIndex == supersetGroup.value.last()) {
+                                                RoundedCornerShape(bottomStart = 4.dp, bottomEnd = 4.dp)
+                                            } else {
+                                                RoundedCornerShape(0.dp)
+                                            }
+                                        )
+                                        .clickable { onEvent(ActiveWorkoutEvent.UnlinkSuperset(supersetGroup.key)) }
+                                        .semantics {
+                                            contentDescription = context.getString(R.string.active_workout_superset_tap_ungroup)
+                                        }
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                            }
+                            
+                            GlassmorphicCard(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .clickable { onEvent(ActiveWorkoutEvent.ToggleExerciseSelection(exerciseIndex)) }
+                                    .border(
+                                        width = if (isSelected) 2.dp else 0.dp,
+                                        color = if (isSelected) AccentGreenStart else Color.Transparent,
+                                        shape = RoundedCornerShape(12.dp)
+                                    ),
+                                accentColor = getMuscleGroupColor(exerciseUi.exercise.muscleGroup),
+                            ) {
+                                Column {
+                                    // Position indicator: "Superset 1/2"
+                                    if (supersetPosition != null) {
+                                        Text(
+                                            text = stringResource(
+                                                R.string.active_workout_superset_position,
+                                                supersetPosition.first,
+                                                supersetPosition.second,
+                                            ),
+                                            style = MaterialTheme.typography.labelSmall,
+                                            fontWeight = FontWeight.Bold,
+                                            color = AccentGreenStart,
+                                            modifier = Modifier.padding(start = 16.dp, top = 8.dp)
+                                        )
+                                    }
+                                    ExerciseCardContent(
+                                        exerciseUi = exerciseUi,
+                                        exerciseIndex = exerciseIndex,
+                                        onEvent = onEvent,
+                                        voiceRecognitionService = voiceRecognitionService,
+                                        defaultWeightUnit = defaultWeightUnit,
                                     )
                                 }
                                 ExerciseCardContent(
