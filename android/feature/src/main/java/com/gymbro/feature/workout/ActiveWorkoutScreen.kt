@@ -648,6 +648,7 @@ fun ActiveWorkoutScreen(
                                         exerciseIndex = exerciseIndex,
                                         exerciseCount = state.exercises.size,
                                         isInSuperset = supersetGroup != null,
+                                        isSelected = isSelected,
                                         onEvent = onEvent,
                                         voiceRecognitionService = voiceRecognitionService,
                                         defaultWeightUnit = defaultWeightUnit,
@@ -1133,6 +1134,7 @@ private fun ExerciseCardContent(
     exerciseIndex: Int,
     exerciseCount: Int,
     isInSuperset: Boolean = false,
+    isSelected: Boolean = false,
     onEvent: (ActiveWorkoutEvent) -> Unit,
     voiceRecognitionService: com.gymbro.core.voice.VoiceRecognitionService,
     defaultWeightUnit: com.gymbro.core.preferences.UserPreferences.WeightUnit,
@@ -1206,6 +1208,23 @@ private fun ExerciseCardContent(
                     voiceToast = errorMsg
                 },
             )
+            // Superset link button — visible entry point for creating supersets
+            if (!isInSuperset) {
+                IconButton(
+                    onClick = {
+                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                        onEvent(ActiveWorkoutEvent.ToggleExerciseSelection(exerciseIndex))
+                    },
+                    modifier = Modifier.size(36.dp),
+                ) {
+                    Icon(
+                        Icons.Default.Link,
+                        contentDescription = stringResource(R.string.active_workout_add_to_superset),
+                        tint = if (isSelected) AccentGreenStart else Color.White.copy(alpha = 0.5f),
+                        modifier = Modifier.size(20.dp),
+                    )
+                }
+            }
             // Overflow menu (#550/#551) — replaces arrow buttons with compact menu
             Box {
                 IconButton(
