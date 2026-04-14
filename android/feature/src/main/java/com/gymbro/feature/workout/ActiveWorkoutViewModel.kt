@@ -389,6 +389,9 @@ class ActiveWorkoutViewModel @Inject constructor(
 
             updateSetField(exerciseIndex, setIndex) { it.copy(isCompleted = true) }
 
+            // Auto-fill carry-forward: pre-fill subsequent empty sets with this set's weight/reps
+            carryForwardToNextSets(exerciseIndex, setUi.weight, setUi.reps)
+
             // Check for new PRs after this set
             checkForNewPR(exerciseUi, weightKg, reps, exerciseIndex, setIndex)
 
@@ -414,6 +417,34 @@ class ActiveWorkoutViewModel @Inject constructor(
             
             if (shouldStartTimer) {
                 startRestTimer()
+            }
+        }
+    }
+
+    /**
+     * Intra-session carry-forward: after completing a set, pre-fill subsequent
+     * incomplete sets of the same exercise with the just-used weight and reps.
+     * Different from SmartDefaults (which uses previous session data).
+     */
+    private fun carryForwardToNextSets(exerciseIndex: Int, weight: String, reps: String) {
+        _state.update { current ->
+            val exercises = current.exercises.toMutableList()
+            if (exerciseIndex !in exercises.indices) return@update current
+            val exerciseUi = exercises[exerciseIndex]
+            val sets = exerciseUi.sets.toMutableList()
+            var changed = false
+            for (i in sets.indices) {
+                val s = sets[i]
+                if (!s.isCompleted && s.weight.isEmpty()) {
+                    sets[i] = s.copy(weight = weight, reps = if (s.reps.isEmpty()) reps else s.reps)
+                    changed = true
+                }
+            }
+            if (changed) {
+                exercises[exerciseIndex] = exerciseUi.copy(sets = sets)
+                current.copy(exercises = exercises)
+            } else {
+                current
             }
         }
     }

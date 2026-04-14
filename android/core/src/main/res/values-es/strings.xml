@@ -539,6 +539,10 @@
     <string name="active_workout_create_superset">Vincular como Superserie</string>
     <string name="active_workout_unlink_superset">Desvincular Superserie</string>
     <string name="active_workout_superset_rest">Descanso después de superserie</string>
+    <string name="active_workout_superset_label">Superserie</string>
+    <string name="active_workout_superset_position" formatted="false">Superserie %d/%d</string>
+    <string name="active_workout_ungroup_superset">Desagrupar</string>
+    <string name="active_workout_superset_tap_ungroup">Toca para desagrupar superserie</string>
     
     <!-- Progression Suggestions -->
     <string name="progression_last" formatted="false">Anterior: %s × %d</string>
