@@ -86,6 +86,7 @@ private data class InstructionsSeed(
 @Serializable
 private data class ExerciseSeed(
     val name: String,
+    val nameEs: String? = null,
     val category: String,
     val equipment: String,
     val instructions: kotlinx.serialization.json.JsonElement,
@@ -125,7 +126,7 @@ private fun loadExercisesFromAssets(context: Context): List<ExerciseEntity> {
         
         ExerciseEntity(
             id = UUID.nameUUIDFromBytes(seed.name.toByteArray()).toString(),
-            name = seed.name,
+            name = if (isSpanish && seed.nameEs != null) seed.nameEs else seed.name,
             muscleGroup = primaryMuscleGroup,
             category = seed.category.uppercase(),
             equipment = seed.equipment.uppercase(),

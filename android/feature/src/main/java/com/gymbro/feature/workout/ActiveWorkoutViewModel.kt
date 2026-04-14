@@ -169,6 +169,18 @@ class ActiveWorkoutViewModel @Inject constructor(
                     )
                 }
             }
+            // Auto-create superset groups from plan's supersetGroupId
+            val supersetMap = mutableMapOf<String, MutableList<Int>>()
+            pendingDay.exercises.forEachIndexed { index, planned ->
+                val groupId = planned.supersetGroupId ?: return@forEachIndexed
+                supersetMap.getOrPut(groupId) { mutableListOf() }.add(index)
+            }
+            val validGroups = supersetMap.filter { it.value.size >= 2 }
+            if (validGroups.isNotEmpty()) {
+                _state.update { current ->
+                    current.copy(supersetGroups = validGroups)
+                }
+            }
         }
     }
 

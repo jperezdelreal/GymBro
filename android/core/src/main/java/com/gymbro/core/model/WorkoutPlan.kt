@@ -43,4 +43,5 @@ data class PlannedExercise(
     val sets: Int,
     val repsRange: String,
     val restSeconds: Int = 90,
+    val supersetGroupId: String? = null,
 )

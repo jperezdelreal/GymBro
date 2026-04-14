@@ -101,6 +101,42 @@ class WorkoutPlanGenerator @Inject constructor(
         },
     )
 
+    private val antagonistPairs = mapOf(
+        MuscleGroup.CHEST to MuscleGroup.BACK,
+        MuscleGroup.BACK to MuscleGroup.CHEST,
+        MuscleGroup.BICEPS to MuscleGroup.TRICEPS,
+        MuscleGroup.TRICEPS to MuscleGroup.BICEPS,
+        MuscleGroup.QUADRICEPS to MuscleGroup.HAMSTRINGS,
+        MuscleGroup.HAMSTRINGS to MuscleGroup.QUADRICEPS,
+    )
+
+    private fun markSupersets(
+        exercises: List<PlannedExercise>,
+        muscleMap: Map<String, MuscleGroup>,
+    ): List<PlannedExercise> {
+        if (exercises.size < 2) return exercises
+        val result = exercises.toMutableList()
+        val used = mutableSetOf<Int>()
+        for (i in result.indices) {
+            if (i in used) continue
+            val muscle = muscleMap[result[i].exerciseName] ?: continue
+            val antagonist = antagonistPairs[muscle] ?: continue
+            for (j in (i + 1) until result.size) {
+                if (j in used) continue
+                val otherMuscle = muscleMap[result[j].exerciseName] ?: continue
+                if (otherMuscle == antagonist) {
+                    val groupId = java.util.UUID.randomUUID().toString()
+                    result[i] = result[i].copy(supersetGroupId = groupId)
+                    result[j] = result[j].copy(supersetGroupId = groupId)
+                    used.add(i)
+                    used.add(j)
+                    break
+                }
+            }
+        }
+        return result
+    }
+
     suspend fun generatePlan(
         goal: UserPreferences.TrainingGoal,
         experienceLevel: UserPreferences.ExperienceLevel,
@@ -117,7 +153,7 @@ class WorkoutPlanGenerator @Inject constructor(
             UserPreferences.TrainingPhase.MAINTENANCE -> 1.0f
         }
 
-        return when (goal) {
+        val plan = when (goal) {
             UserPreferences.TrainingGoal.STRENGTH -> generateStrengthPlan(
                 allExercises, experienceLevel, daysPerWeek, split, volumeMultiplier, sessionDurationMinutes
             )
@@ -131,6 +167,13 @@ class WorkoutPlanGenerator @Inject constructor(
                 allExercises, experienceLevel, daysPerWeek, split, volumeMultiplier, sessionDurationMinutes
             )
         }
+        // Mark antagonist exercise pairs as supersets
+        val muscleMap = allExercises.associate { it.name to it.muscleGroup }
+        return plan.copy(
+            workoutDays = plan.workoutDays.map { day ->
+                day.copy(exercises = markSupersets(day.exercises, muscleMap))
+            },
+        )
     }
 
     private fun generateStrengthPlan(
