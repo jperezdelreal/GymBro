@@ -1,5 +1,7 @@
 package com.gymbro.core.service
 
+import android.content.Context
+import com.gymbro.core.R
 import com.gymbro.core.model.Exercise
 import com.gymbro.core.model.ExerciseCategory
 import com.gymbro.core.model.MuscleGroup
@@ -9,11 +11,13 @@ import com.gymbro.core.model.WorkoutDay
 import com.gymbro.core.model.WorkoutPlan
 import com.gymbro.core.preferences.UserPreferences
 import com.gymbro.core.repository.ExerciseRepository
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlin.math.roundToInt
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 class WorkoutPlanGenerator @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val exerciseRepository: ExerciseRepository,
 ) {
 
@@ -87,6 +91,16 @@ class WorkoutPlanGenerator @Inject constructor(
         }
     }
 
+    private fun splitName(split: TrainingSplit): String = context.getString(
+        when (split) {
+            TrainingSplit.FULL_BODY -> R.string.gen_split_full_body
+            TrainingSplit.UPPER_LOWER -> R.string.gen_split_upper_lower
+            TrainingSplit.PPL -> R.string.gen_split_ppl
+            TrainingSplit.PPLUL -> R.string.gen_split_pplul
+            TrainingSplit.POWERLIFTING_3DAY -> R.string.gen_split_powerlifting_3day
+        },
+    )
+
     suspend fun generatePlan(
         goal: UserPreferences.TrainingGoal,
         experienceLevel: UserPreferences.ExperienceLevel,
@@ -136,7 +150,7 @@ class WorkoutPlanGenerator @Inject constructor(
                 listOf(
                     WorkoutDay(
                         dayNumber = 1,
-                        name = "Upper Body",
+                        name = context.getString(R.string.gen_day_upper_body),
                         exercises = buildExerciseList(
                             exercises,
                             listOf(MuscleGroup.CHEST, MuscleGroup.BACK, MuscleGroup.SHOULDERS),
@@ -146,7 +160,7 @@ class WorkoutPlanGenerator @Inject constructor(
                     ),
                     WorkoutDay(
                         dayNumber = 2,
-                        name = "Lower Body",
+                        name = context.getString(R.string.gen_day_lower_body),
                         exercises = buildExerciseList(
                             exercises,
                             listOf(MuscleGroup.QUADRICEPS, MuscleGroup.HAMSTRINGS, MuscleGroup.GLUTES),
@@ -156,7 +170,7 @@ class WorkoutPlanGenerator @Inject constructor(
                     ),
                     WorkoutDay(
                         dayNumber = 3,
-                        name = "Full Body",
+                        name = context.getString(R.string.gen_day_full_body),
                         exercises = buildExerciseList(
                             exercises,
                             listOf(MuscleGroup.CHEST, MuscleGroup.BACK, MuscleGroup.QUADRICEPS),
@@ -169,8 +183,8 @@ class WorkoutPlanGenerator @Inject constructor(
         }
 
         return WorkoutPlan(
-            name = "Strength Building Program",
-            description = "Focus on progressive overload with compound movements. 5x5 protocol for major lifts. Using ${split.displayName} split for $daysPerWeek days/week.",
+            name = context.getString(R.string.gen_plan_strength),
+            description = context.getString(R.string.gen_plan_strength_desc, splitName(split), daysPerWeek),
             goal = UserPreferences.TrainingGoal.STRENGTH,
             experienceLevel = experienceLevel,
             daysPerWeek = daysPerWeek,
@@ -199,8 +213,8 @@ class WorkoutPlanGenerator @Inject constructor(
         }
 
         return WorkoutPlan(
-            name = "Hypertrophy Program",
-            description = "${split.displayName} split focused on muscle growth. Higher volume, moderate intensity for $daysPerWeek days/week.",
+            name = context.getString(R.string.gen_plan_hypertrophy),
+            description = context.getString(R.string.gen_plan_hypertrophy_desc, splitName(split), daysPerWeek),
             goal = UserPreferences.TrainingGoal.HYPERTROPHY,
             experienceLevel = experienceLevel,
             daysPerWeek = daysPerWeek,
@@ -225,7 +239,7 @@ class WorkoutPlanGenerator @Inject constructor(
                 listOf(
                     WorkoutDay(
                         dayNumber = 1,
-                        name = "Squat Day",
+                        name = context.getString(R.string.gen_day_squat),
                         exercises = buildExerciseList(
                             exercises,
                             listOf(MuscleGroup.QUADRICEPS, MuscleGroup.HAMSTRINGS, MuscleGroup.GLUTES, MuscleGroup.CORE),
@@ -235,7 +249,7 @@ class WorkoutPlanGenerator @Inject constructor(
                     ),
                     WorkoutDay(
                         dayNumber = 2,
-                        name = "Bench Day",
+                        name = context.getString(R.string.gen_day_bench),
                         exercises = buildExerciseList(
                             exercises,
                             listOf(MuscleGroup.CHEST, MuscleGroup.TRICEPS, MuscleGroup.SHOULDERS),
@@ -245,7 +259,7 @@ class WorkoutPlanGenerator @Inject constructor(
                     ),
                     WorkoutDay(
                         dayNumber = 3,
-                        name = "Deadlift Day",
+                        name = context.getString(R.string.gen_day_deadlift),
                         exercises = buildExerciseList(
                             exercises,
                             listOf(MuscleGroup.BACK, MuscleGroup.HAMSTRINGS, MuscleGroup.GLUTES),
@@ -260,7 +274,7 @@ class WorkoutPlanGenerator @Inject constructor(
                 listOf(
                     WorkoutDay(
                         dayNumber = 1,
-                        name = "Upper Power",
+                        name = context.getString(R.string.gen_day_upper_power),
                         exercises = buildExerciseList(
                             exercises,
                             listOf(MuscleGroup.CHEST, MuscleGroup.BACK, MuscleGroup.SHOULDERS),
@@ -270,7 +284,7 @@ class WorkoutPlanGenerator @Inject constructor(
                     ),
                     WorkoutDay(
                         dayNumber = 2,
-                        name = "Lower Power",
+                        name = context.getString(R.string.gen_day_lower_power),
                         exercises = buildExerciseList(
                             exercises,
                             listOf(MuscleGroup.QUADRICEPS, MuscleGroup.HAMSTRINGS, MuscleGroup.GLUTES),
@@ -280,7 +294,7 @@ class WorkoutPlanGenerator @Inject constructor(
                     ),
                     WorkoutDay(
                         dayNumber = 3,
-                        name = "Upper Accessories",
+                        name = context.getString(R.string.gen_day_upper_accessories),
                         exercises = buildExerciseList(
                             exercises,
                             listOf(MuscleGroup.CHEST, MuscleGroup.BACK, MuscleGroup.SHOULDERS),
@@ -290,7 +304,7 @@ class WorkoutPlanGenerator @Inject constructor(
                     ),
                     WorkoutDay(
                         dayNumber = 4,
-                        name = "Lower Accessories",
+                        name = context.getString(R.string.gen_day_lower_accessories),
                         exercises = buildExerciseList(
                             exercises,
                             listOf(MuscleGroup.QUADRICEPS, MuscleGroup.HAMSTRINGS, MuscleGroup.CORE),
@@ -304,7 +318,7 @@ class WorkoutPlanGenerator @Inject constructor(
                 listOf(
                     WorkoutDay(
                         dayNumber = 1,
-                        name = "Squat Day",
+                        name = context.getString(R.string.gen_day_squat),
                         exercises = buildExerciseList(
                             exercises,
                             listOf(MuscleGroup.QUADRICEPS, MuscleGroup.HAMSTRINGS, MuscleGroup.GLUTES, MuscleGroup.CORE),
@@ -314,7 +328,7 @@ class WorkoutPlanGenerator @Inject constructor(
                     ),
                     WorkoutDay(
                         dayNumber = 2,
-                        name = "Bench Day",
+                        name = context.getString(R.string.gen_day_bench),
                         exercises = buildExerciseList(
                             exercises,
                             listOf(MuscleGroup.CHEST, MuscleGroup.TRICEPS, MuscleGroup.SHOULDERS),
@@ -327,8 +341,8 @@ class WorkoutPlanGenerator @Inject constructor(
         }
 
         return WorkoutPlan(
-            name = "Powerlifting Program",
-            description = "Focus on the big three: squat, bench press, and deadlift. Low reps, high intensity using ${split.displayName} split.",
+            name = context.getString(R.string.gen_plan_powerlifting),
+            description = context.getString(R.string.gen_plan_powerlifting_desc, splitName(split)),
             goal = UserPreferences.TrainingGoal.POWERLIFTING,
             experienceLevel = experienceLevel,
             daysPerWeek = daysPerWeek,
@@ -352,8 +366,8 @@ class WorkoutPlanGenerator @Inject constructor(
         val workoutDays = generateFullBodyDays(exercises, sets = baseSets, reps = "12-20", rest = REST_TIME_ENDURANCE, sessionDurationMinutes = sessionDurationMinutes, volumeMultiplier = volumeMultiplier)
 
         return WorkoutPlan(
-            name = "General Fitness Program",
-            description = "Balanced full-body workouts for overall fitness and health. ${split.displayName} approach for $daysPerWeek days/week.",
+            name = context.getString(R.string.gen_plan_general),
+            description = context.getString(R.string.gen_plan_general_desc, splitName(split), daysPerWeek),
             goal = UserPreferences.TrainingGoal.GENERAL_FITNESS,
             experienceLevel = experienceLevel,
             daysPerWeek = daysPerWeek,
@@ -513,7 +527,7 @@ class WorkoutPlanGenerator @Inject constructor(
         return listOf(
             WorkoutDay(
                 dayNumber = 1,
-                name = "Full Body A",
+                name = context.getString(R.string.gen_day_full_body_a),
                 exercises = buildExerciseList(
                     exercises,
                     listOf(MuscleGroup.CHEST, MuscleGroup.BACK, MuscleGroup.QUADRICEPS, MuscleGroup.CORE),
@@ -522,7 +536,7 @@ class WorkoutPlanGenerator @Inject constructor(
             ),
             WorkoutDay(
                 dayNumber = 2,
-                name = "Full Body B",
+                name = context.getString(R.string.gen_day_full_body_b),
                 exercises = buildExerciseList(
                     exercises,
                     listOf(MuscleGroup.SHOULDERS, MuscleGroup.BACK, MuscleGroup.HAMSTRINGS, MuscleGroup.CORE),
@@ -531,7 +545,7 @@ class WorkoutPlanGenerator @Inject constructor(
             ),
             WorkoutDay(
                 dayNumber = 3,
-                name = "Full Body C",
+                name = context.getString(R.string.gen_day_full_body_c),
                 exercises = buildExerciseList(
                     exercises,
                     listOf(MuscleGroup.CHEST, MuscleGroup.BACK, MuscleGroup.QUADRICEPS, MuscleGroup.BICEPS),
@@ -552,7 +566,7 @@ class WorkoutPlanGenerator @Inject constructor(
         return listOf(
             WorkoutDay(
                 dayNumber = 1,
-                name = "Upper A",
+                name = context.getString(R.string.gen_day_upper_a),
                 exercises = buildExerciseList(
                     exercises,
                     listOf(MuscleGroup.CHEST, MuscleGroup.BACK, MuscleGroup.SHOULDERS, MuscleGroup.BICEPS),
@@ -561,7 +575,7 @@ class WorkoutPlanGenerator @Inject constructor(
             ),
             WorkoutDay(
                 dayNumber = 2,
-                name = "Lower A",
+                name = context.getString(R.string.gen_day_lower_a),
                 exercises = buildExerciseList(
                     exercises,
                     listOf(MuscleGroup.QUADRICEPS, MuscleGroup.HAMSTRINGS, MuscleGroup.GLUTES, MuscleGroup.CALVES),
@@ -570,7 +584,7 @@ class WorkoutPlanGenerator @Inject constructor(
             ),
             WorkoutDay(
                 dayNumber = 3,
-                name = "Upper B",
+                name = context.getString(R.string.gen_day_upper_b),
                 exercises = buildExerciseList(
                     exercises,
                     listOf(MuscleGroup.CHEST, MuscleGroup.BACK, MuscleGroup.SHOULDERS, MuscleGroup.TRICEPS),
@@ -579,7 +593,7 @@ class WorkoutPlanGenerator @Inject constructor(
             ),
             WorkoutDay(
                 dayNumber = 4,
-                name = "Lower B",
+                name = context.getString(R.string.gen_day_lower_b),
                 exercises = buildExerciseList(
                     exercises,
                     listOf(MuscleGroup.QUADRICEPS, MuscleGroup.HAMSTRINGS, MuscleGroup.GLUTES, MuscleGroup.CORE),
@@ -600,7 +614,7 @@ class WorkoutPlanGenerator @Inject constructor(
         return listOf(
             WorkoutDay(
                 dayNumber = 1,
-                name = "Push A",
+                name = context.getString(R.string.gen_day_push_a),
                 exercises = buildExerciseList(
                     exercises,
                     listOf(MuscleGroup.CHEST, MuscleGroup.SHOULDERS, MuscleGroup.TRICEPS),
@@ -609,7 +623,7 @@ class WorkoutPlanGenerator @Inject constructor(
             ),
             WorkoutDay(
                 dayNumber = 2,
-                name = "Pull A",
+                name = context.getString(R.string.gen_day_pull_a),
                 exercises = buildExerciseList(
                     exercises,
                     listOf(MuscleGroup.BACK, MuscleGroup.BICEPS, MuscleGroup.FOREARMS),
@@ -618,7 +632,7 @@ class WorkoutPlanGenerator @Inject constructor(
             ),
             WorkoutDay(
                 dayNumber = 3,
-                name = "Legs A",
+                name = context.getString(R.string.gen_day_legs_a),
                 exercises = buildExerciseList(
                     exercises,
                     listOf(MuscleGroup.QUADRICEPS, MuscleGroup.HAMSTRINGS, MuscleGroup.GLUTES, MuscleGroup.CALVES),
@@ -627,7 +641,7 @@ class WorkoutPlanGenerator @Inject constructor(
             ),
             WorkoutDay(
                 dayNumber = 4,
-                name = "Push B",
+                name = context.getString(R.string.gen_day_push_b),
                 exercises = buildExerciseList(
                     exercises,
                     listOf(MuscleGroup.CHEST, MuscleGroup.SHOULDERS, MuscleGroup.TRICEPS),
@@ -636,7 +650,7 @@ class WorkoutPlanGenerator @Inject constructor(
             ),
             WorkoutDay(
                 dayNumber = 5,
-                name = "Pull B",
+                name = context.getString(R.string.gen_day_pull_b),
                 exercises = buildExerciseList(
                     exercises,
                     listOf(MuscleGroup.BACK, MuscleGroup.BICEPS, MuscleGroup.FOREARMS),
@@ -645,7 +659,7 @@ class WorkoutPlanGenerator @Inject constructor(
             ),
             WorkoutDay(
                 dayNumber = 6,
-                name = "Legs B",
+                name = context.getString(R.string.gen_day_legs_b),
                 exercises = buildExerciseList(
                     exercises,
                     listOf(MuscleGroup.QUADRICEPS, MuscleGroup.HAMSTRINGS, MuscleGroup.GLUTES, MuscleGroup.CALVES),
@@ -661,7 +675,7 @@ class WorkoutPlanGenerator @Inject constructor(
         return listOf(
             WorkoutDay(
                 dayNumber = 1,
-                name = "Push",
+                name = context.getString(R.string.gen_day_push),
                 exercises = buildExerciseList(
                     exercises,
                     listOf(MuscleGroup.CHEST, MuscleGroup.SHOULDERS, MuscleGroup.TRICEPS),
@@ -671,7 +685,7 @@ class WorkoutPlanGenerator @Inject constructor(
             ),
             WorkoutDay(
                 dayNumber = 2,
-                name = "Pull",
+                name = context.getString(R.string.gen_day_pull),
                 exercises = buildExerciseList(
                     exercises,
                     listOf(MuscleGroup.BACK, MuscleGroup.BICEPS, MuscleGroup.FOREARMS),
@@ -681,7 +695,7 @@ class WorkoutPlanGenerator @Inject constructor(
             ),
             WorkoutDay(
                 dayNumber = 3,
-                name = "Legs",
+                name = context.getString(R.string.gen_day_legs),
                 exercises = buildExerciseList(
                     exercises,
                     listOf(MuscleGroup.QUADRICEPS, MuscleGroup.HAMSTRINGS, MuscleGroup.GLUTES),
@@ -691,7 +705,7 @@ class WorkoutPlanGenerator @Inject constructor(
             ),
             WorkoutDay(
                 dayNumber = 4,
-                name = "Upper",
+                name = context.getString(R.string.gen_day_upper),
                 exercises = buildExerciseList(
                     exercises,
                     listOf(MuscleGroup.CHEST, MuscleGroup.BACK, MuscleGroup.SHOULDERS),
@@ -701,7 +715,7 @@ class WorkoutPlanGenerator @Inject constructor(
             ),
             WorkoutDay(
                 dayNumber = 5,
-                name = "Lower",
+                name = context.getString(R.string.gen_day_lower),
                 exercises = buildExerciseList(
                     exercises,
                     listOf(MuscleGroup.QUADRICEPS, MuscleGroup.HAMSTRINGS, MuscleGroup.CALVES),

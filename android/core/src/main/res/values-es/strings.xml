@@ -925,4 +925,47 @@
     <!-- Duration Target (#545) -->
     <string name="active_workout_remaining" formatted="false">%dm restantes</string>
     <string name="active_workout_overtime">Tiempo extra</string>
+
+    <!-- Generated plan names and day names (#556) -->
+    <string name="gen_plan_strength">Programa de Fuerza</string>
+    <string name="gen_plan_hypertrophy">Programa de Hipertrofia</string>
+    <string name="gen_plan_powerlifting">Programa de Powerlifting</string>
+    <string name="gen_plan_general">Programa de Fitness General</string>
+    <string name="gen_plan_strength_desc" formatted="false">Enfoque en sobrecarga progresiva con movimientos compuestos. Protocolo 5×5 para levantamientos principales. Usando rutina %1$s para %2$d días/semana.</string>
+    <string name="gen_plan_hypertrophy_desc" formatted="false">Rutina %1$s enfocada en crecimiento muscular. Mayor volumen, intensidad moderada para %2$d días/semana.</string>
+    <string name="gen_plan_powerlifting_desc" formatted="false">Enfoque en los tres grandes: sentadilla, press de banca y peso muerto. Pocas repeticiones, alta intensidad usando rutina %1$s.</string>
+    <string name="gen_plan_general_desc" formatted="false">Entrenamientos equilibrados de cuerpo completo para salud y fitness general. Enfoque %1$s para %2$d días/semana.</string>
+    <string name="gen_split_full_body">Cuerpo Completo</string>
+    <string name="gen_split_upper_lower">Tren Superior/Inferior</string>
+    <string name="gen_split_ppl">Empuje/Jalón/Piernas</string>
+    <string name="gen_split_pplul">PPL + Tren Superior/Inferior</string>
+    <string name="gen_split_powerlifting_3day">Powerlifting 3 Días</string>
+    <string name="gen_day_upper_body">Tren Superior</string>
+    <string name="gen_day_lower_body">Tren Inferior</string>
+    <string name="gen_day_full_body">Cuerpo Completo</string>
+    <string name="gen_day_squat">Día de Sentadilla</string>
+    <string name="gen_day_bench">Día de Press Banca</string>
+    <string name="gen_day_deadlift">Día de Peso Muerto</string>
+    <string name="gen_day_upper_power">Tren Superior Fuerza</string>
+    <string name="gen_day_lower_power">Tren Inferior Fuerza</string>
+    <string name="gen_day_upper_accessories">Tren Superior Accesorios</string>
+    <string name="gen_day_lower_accessories">Tren Inferior Accesorios</string>
+    <string name="gen_day_full_body_a">Cuerpo Completo A</string>
+    <string name="gen_day_full_body_b">Cuerpo Completo B</string>
+    <string name="gen_day_full_body_c">Cuerpo Completo C</string>
+    <string name="gen_day_upper_a">Tren Superior A</string>
+    <string name="gen_day_lower_a">Tren Inferior A</string>
+    <string name="gen_day_upper_b">Tren Superior B</string>
+    <string name="gen_day_lower_b">Tren Inferior B</string>
+    <string name="gen_day_push_a">Empuje A</string>
+    <string name="gen_day_pull_a">Jalón A</string>
+    <string name="gen_day_legs_a">Piernas A</string>
+    <string name="gen_day_push_b">Empuje B</string>
+    <string name="gen_day_pull_b">Jalón B</string>
+    <string name="gen_day_legs_b">Piernas B</string>
+    <string name="gen_day_push">Empuje</string>
+    <string name="gen_day_pull">Jalón</string>
+    <string name="gen_day_legs">Piernas</string>
+    <string name="gen_day_upper">Tren Superior</string>
+    <string name="gen_day_lower">Tren Inferior</string>
 </resources>
