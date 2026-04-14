@@ -2,6 +2,7 @@ package com.gymbro.core.service
 
 import android.util.Log
 import com.gymbro.core.database.dao.WorkoutDao
+import com.gymbro.core.model.MuscleGroup
 import com.gymbro.core.repository.ExerciseRepository
 import java.time.Instant
 import java.time.LocalDate
@@ -19,7 +20,7 @@ data class WeeklyVolumeData(
 )
 
 data class MuscleGroupDistribution(
-    val muscleGroup: String,
+    val muscleGroup: MuscleGroup,
     val volumePercentage: Double,
     val totalVolume: Double,
     val setCount: Int,
@@ -107,7 +108,7 @@ class AnalyticsService @Inject constructor(
             .mapNotNull { (exerciseId, exerciseSets) ->
                 val exercise = exerciseRepository.getExerciseById(exerciseId)
                 exercise?.let { 
-                    it.muscleGroup.displayName to exerciseSets.sumOf { s -> s.weight * s.reps }
+                    it.muscleGroup to exerciseSets.sumOf { s -> s.weight * s.reps }
                 }
             }
             .groupBy({ it.first }, { it.second })
@@ -123,7 +124,7 @@ class AnalyticsService @Inject constructor(
                 volumePercentage = (volume / totalVolume) * 100,
                 totalVolume = volume,
                 setCount = sets.count { s ->
-                    exerciseRepository.getExerciseById(s.exerciseId)?.muscleGroup?.displayName == muscleGroup
+                    exerciseRepository.getExerciseById(s.exerciseId)?.muscleGroup == muscleGroup
                 },
             )
         }.sortedByDescending { it.totalVolume }

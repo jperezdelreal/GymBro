@@ -77,6 +77,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -1137,7 +1139,7 @@ private fun PrCelebrationOverlay(
                     }
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = pr.recordType,
+                        text = pr.recordType.localizedName(),
                         style = MaterialTheme.typography.labelMedium,
                         color = prGold.copy(alpha = 0.8f),
                         fontWeight = FontWeight.Bold,
@@ -1857,7 +1859,9 @@ private fun NumberInputDialog(
     onConfirm: () -> Unit,
 ) {
     val haptic = LocalHapticFeedback.current
-    var currentValue by remember(value) { mutableStateOf(value) }
+    var currentValue by remember(value) {
+        mutableStateOf(TextFieldValue(text = value, selection = TextRange(0, value.length)))
+    }
     val focusRequester = remember { FocusRequester() }
 
     LaunchedEffect(Unit) {
@@ -1880,7 +1884,7 @@ private fun NumberInputDialog(
             ) {
                 // Large number display
                 Text(
-                    text = if (currentValue.isEmpty()) "0" else currentValue,
+                    text = if (currentValue.text.isEmpty()) "0" else currentValue.text,
                     style = MaterialTheme.typography.displayLarge,
                     fontWeight = FontWeight.Bold,
                     color = AccentGreenStart,
@@ -1897,13 +1901,14 @@ private fun NumberInputDialog(
                     OutlinedButton(
                         onClick = {
                             haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                            val current = currentValue.toDoubleOrNull() ?: 0.0
+                            val current = currentValue.text.toDoubleOrNull() ?: 0.0
                             val newValue = (current - stepSize).coerceAtLeast(0.0)
-                            currentValue = if (stepSize >= 1.0) {
+                            val newText = if (stepSize >= 1.0) {
                                 newValue.toInt().toString()
                             } else {
                                 String.format("%.1f", newValue)
                             }
+                            currentValue = TextFieldValue(text = newText, selection = TextRange(newText.length))
                         },
                         modifier = Modifier.size(72.dp),
                         shape = CircleShape,
@@ -1922,7 +1927,7 @@ private fun NumberInputDialog(
                     TextField(
                         value = currentValue,
                         onValueChange = { input ->
-                            if (input.isEmpty() || input.matches(Regex("^\\d*\\.?\\d*$"))) {
+                            if (input.text.isEmpty() || input.text.matches(Regex("^\\d*\\.?\\d*$"))) {
                                 currentValue = input
                             }
                         },
@@ -1942,7 +1947,7 @@ private fun NumberInputDialog(
                         ),
                         keyboardActions = KeyboardActions(
                             onDone = {
-                                onValueChange(currentValue)
+                                onValueChange(currentValue.text)
                                 onConfirm()
                             },
                         ),
@@ -1960,13 +1965,14 @@ private fun NumberInputDialog(
                     OutlinedButton(
                         onClick = {
                             haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                            val current = currentValue.toDoubleOrNull() ?: 0.0
+                            val current = currentValue.text.toDoubleOrNull() ?: 0.0
                             val newValue = current + stepSize
-                            currentValue = if (stepSize >= 1.0) {
+                            val newText = if (stepSize >= 1.0) {
                                 newValue.toInt().toString()
                             } else {
                                 String.format("%.1f", newValue)
                             }
+                            currentValue = TextFieldValue(text = newText, selection = TextRange(newText.length))
                         },
                         modifier = Modifier.size(72.dp),
                         shape = CircleShape,
@@ -1986,7 +1992,7 @@ private fun NumberInputDialog(
         confirmButton = {
             TextButton(
                 onClick = {
-                    onValueChange(currentValue)
+                    onValueChange(currentValue.text)
                     onConfirm()
                 },
             ) {

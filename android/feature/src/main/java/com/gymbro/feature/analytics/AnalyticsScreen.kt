@@ -54,7 +54,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gymbro.core.R
 import com.gymbro.core.service.ConsistencyMetrics
+import com.gymbro.core.model.MuscleGroup
 import com.gymbro.core.service.MuscleGroupDistribution
+import com.gymbro.core.ui.localizedName
 import com.gymbro.core.service.TopExercise
 import com.gymbro.core.service.WeeklySummary
 import com.gymbro.core.service.WeeklyVolumeData
@@ -474,7 +476,7 @@ private fun PieChart(distribution: List<MuscleGroupDistribution>) {
 
 @Composable
 private fun MuscleDistributionRow(
-    muscleGroup: String,
+    muscleGroup: MuscleGroup,
     percentage: Double,
     color: Color,
 ) {
@@ -489,7 +491,7 @@ private fun MuscleDistributionRow(
         )
         Spacer(modifier = Modifier.width(8.dp))
         Text(
-            text = muscleGroup,
+            text = muscleGroup.localizedName(),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onBackground,
             modifier = Modifier.weight(1f),
