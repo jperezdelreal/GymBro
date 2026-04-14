@@ -928,6 +928,32 @@
     <string name="progress_chart_rpe_warning">⚠️ Esfuerzo creciente — considera un deload</string>
     <string name="progress_chart_section_title">Progresión de Ejercicio</string>
 
+    <!-- Plurals (#559) -->
+    <plurals name="exercises_count">
+        <item quantity="one">%d ejercicio</item>
+        <item quantity="other">%d ejercicios</item>
+    </plurals>
+    <plurals name="weeks_count">
+        <item quantity="one">%d semana</item>
+        <item quantity="other">%d semanas</item>
+    </plurals>
+    <plurals name="sets_count">
+        <item quantity="one">%d set</item>
+        <item quantity="other">%d sets</item>
+    </plurals>
+
+    <!-- Template Localization (#561) -->
+    <string name="template_starting_strength_day_a_name">Fuerza Inicial 5×5 - Día A</string>
+    <string name="template_starting_strength_day_a_desc">Programa clásico de fuerza para principiantes: Sentadilla, Press Banca, Remo. Progresión lineal, 3 días/semana.</string>
+    <string name="template_starting_strength_day_b_name">Fuerza Inicial 5×5 - Día B</string>
+    <string name="template_starting_strength_day_b_desc">Día alternativo: Sentadilla, Press Militar, Peso Muerto. Alternar con Día A.</string>
+    <string name="template_full_body_day_1_name">Cuerpo Completo - Día 1</string>
+    <string name="template_full_body_day_1_desc">Entrenamiento de cuerpo completo con todos los patrones de movimiento principales. Enfoque en sentadilla + press horizontal.</string>
+    <string name="template_full_body_day_2_name">Cuerpo Completo - Día 2</string>
+    <string name="template_full_body_day_2_desc">Cuerpo completo con énfasis en peso muerto + press/pull vertical. Alternar con Día 1.</string>
+    <string name="template_full_body_day_3_name">Cuerpo Completo - Día 3</string>
+    <string name="template_full_body_day_3_desc">Cuerpo completo enfocado en trabajo unilateral, variaciones de jalón y estabilidad del core.</string>
+
     <!-- Exercise Replace (#546) -->
     <string name="active_workout_replace_exercise">Reemplazar ejercicio</string>
 

@@ -66,6 +66,7 @@ import com.gymbro.feature.common.EmptyState
 import com.gymbro.feature.common.FullScreenLoading
 import com.gymbro.feature.common.ObserveErrors
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.pluralStringResource
 import com.gymbro.core.R
 import java.time.Instant
 import java.time.ZoneId
@@ -314,7 +315,7 @@ private fun TemplateCard(
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 InfoChip(
-                    label = stringResource(R.string.programs_exercises_count, template.exercises.size),
+                    label = pluralStringResource(R.plurals.exercises_count, template.exercises.size, template.exercises.size),
                     color = AccentCyan,
                 )
                 
@@ -528,7 +529,7 @@ private fun ActivePlanCard(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 InfoChip(
-                    label = stringResource(R.string.programs_weeks_count, plan.weeks),
+                    label = pluralStringResource(R.plurals.weeks_count, plan.weeks, plan.weeks),
                     color = AccentCyan,
                 )
                 InfoChip(

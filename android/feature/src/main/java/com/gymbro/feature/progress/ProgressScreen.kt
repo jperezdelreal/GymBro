@@ -72,6 +72,7 @@ import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
@@ -756,7 +757,7 @@ private fun WorkoutHistoryRow(
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     StatChip(
                         icon = Icons.Default.FitnessCenter,
-                        text = stringResource(R.string.progress_exercises_count, item.exerciseCount),
+                        text = pluralStringResource(R.plurals.exercises_count, item.exerciseCount, item.exerciseCount),
                     )
                     StatChip(
                         icon = Icons.AutoMirrored.Filled.ShowChart,

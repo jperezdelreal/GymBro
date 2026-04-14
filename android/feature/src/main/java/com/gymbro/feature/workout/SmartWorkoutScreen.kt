@@ -40,6 +40,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gymbro.core.model.Exercise
@@ -301,7 +302,7 @@ private fun ExerciseCard(exercise: SuggestedExerciseUi) {
                 }
                 Column(horizontalAlignment = Alignment.End) {
                     Text(
-                        text = stringResource(R.string.smart_workout_sets_count, exercise.targetSets),
+                        text = pluralStringResource(R.plurals.sets_count, exercise.targetSets, exercise.targetSets),
                         style = MaterialTheme.typography.bodyMedium,
                         color = Color.White.copy(alpha = 0.7f),
                     )
