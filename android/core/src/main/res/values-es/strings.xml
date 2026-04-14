@@ -894,4 +894,11 @@
     <string name="settings_reset_tooltips">Restablecer Tutoriales</string>
     <string name="settings_reset_tooltips_subtitle">Mostrar las guías de entrenamiento de nuevo</string>
     <string name="settings_tooltips_reset_done">Los tutoriales se han restablecido</string>
+
+    <!-- Exercise Replace (#546) -->
+    <string name="active_workout_replace_exercise">Reemplazar ejercicio</string>
+
+    <!-- Duration Target (#545) -->
+    <string name="active_workout_remaining" formatted="false">%dm restantes</string>
+    <string name="active_workout_overtime">Tiempo extra</string>
 </resources>

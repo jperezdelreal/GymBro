@@ -29,19 +29,8 @@ fun GlassmorphicCard(
     } else {
         modifier.fillMaxWidth()
     }
-    
-    Card(
-        modifier = cardModifier,
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = GlassOverlay,
-        ),
-        border = BorderStroke(1.dp, GlassBorder),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 0.dp,
-        ),
-        onClick = onClick ?: {}
-    ) {
+
+    val cardContent: @Composable () -> Unit = {
         Column {
             if (accentColor != null) {
                 Box(
@@ -58,5 +47,24 @@ fun GlassmorphicCard(
                 content()
             }
         }
+    }
+
+    if (onClick != null) {
+        Card(
+            modifier = cardModifier,
+            shape = RoundedCornerShape(20.dp),
+            colors = CardDefaults.cardColors(containerColor = GlassOverlay),
+            border = BorderStroke(1.dp, GlassBorder),
+            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+            onClick = onClick,
+        ) { cardContent() }
+    } else {
+        Card(
+            modifier = cardModifier,
+            shape = RoundedCornerShape(20.dp),
+            colors = CardDefaults.cardColors(containerColor = GlassOverlay),
+            border = BorderStroke(1.dp, GlassBorder),
+            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        ) { cardContent() }
     }
 }

@@ -188,7 +188,14 @@ class ActiveWorkoutViewModel @Inject constructor(
                     _effect.send(ActiveWorkoutEffect.ShowExercisePicker)
                 }
             }
-            is ActiveWorkoutEvent.ExercisePicked -> addExercise(event.exercise)
+            is ActiveWorkoutEvent.ExercisePicked -> {
+                val replacingIndex = _state.value.replacingExerciseIndex
+                if (replacingIndex != null) {
+                    replaceExercise(replacingIndex, event.exercise)
+                } else {
+                    addExercise(event.exercise)
+                }
+            }
             is ActiveWorkoutEvent.AddSet -> addSet(event.exerciseIndex)
             is ActiveWorkoutEvent.UpdateSetWeight -> updateSetField(event.exerciseIndex, event.setIndex) {
                 it.copy(weight = event.weight)
@@ -206,6 +213,12 @@ class ActiveWorkoutViewModel @Inject constructor(
             is ActiveWorkoutEvent.QuickCompleteSet -> completeSet(event.exerciseIndex, event.setIndex)
             is ActiveWorkoutEvent.RemoveSet -> removeSet(event.exerciseIndex, event.setIndex)
             is ActiveWorkoutEvent.RemoveExercise -> removeExercise(event.exerciseIndex)
+            is ActiveWorkoutEvent.ReplaceExercise -> {
+                _state.update { it.copy(replacingExerciseIndex = event.exerciseIndex) }
+                viewModelScope.launch {
+                    _effect.send(ActiveWorkoutEffect.ShowExercisePicker)
+                }
+            }
             is ActiveWorkoutEvent.VoiceInput -> {
                 updateSetField(event.exerciseIndex, event.setIndex) {
                     val updated = it.copy(weight = event.weight, reps = event.reps)
@@ -226,6 +239,7 @@ class ActiveWorkoutViewModel @Inject constructor(
             is ActiveWorkoutEvent.ShowExerciseDetail -> showExerciseDetail(event.exercise)
             is ActiveWorkoutEvent.DismissExerciseDetail -> _state.update { it.copy(exerciseDetailSheet = null) }
             is ActiveWorkoutEvent.DismissPrCelebration -> _state.update { it.copy(prCelebration = null) }
+            is ActiveWorkoutEvent.SetTargetDuration -> _state.update { it.copy(targetDurationMinutes = event.minutes) }
         }
     }
     
@@ -315,6 +329,28 @@ class ActiveWorkoutViewModel @Inject constructor(
                     beginnerWeightHint = defaults.beginnerSuggestion,
                 )
                 current.copy(exercises = current.exercises + newExercise)
+            }
+            autoSaveState()
+        }
+    }
+
+    private fun replaceExercise(exerciseIndex: Int, newExercise: Exercise) {
+        safeLaunch {
+            _state.update { current ->
+                if (exerciseIndex !in current.exercises.indices) {
+                    return@update current.copy(replacingExerciseIndex = null)
+                }
+                val exercises = current.exercises.toMutableList()
+                val oldExerciseUi = exercises[exerciseIndex]
+                exercises[exerciseIndex] = oldExerciseUi.copy(
+                    exercise = newExercise,
+                    progressionSuggestion = null,
+                    beginnerWeightHint = null,
+                )
+                current.copy(
+                    exercises = exercises,
+                    replacingExerciseIndex = null,
+                )
             }
             autoSaveState()
         }

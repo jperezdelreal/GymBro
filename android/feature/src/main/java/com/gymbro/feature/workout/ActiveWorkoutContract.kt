@@ -22,6 +22,8 @@ data class ActiveWorkoutState(
     val selectedExercises: Set<Int> = emptySet(),
     val exerciseDetailSheet: ExerciseDetailSheetState? = null,
     val prCelebration: PrCelebrationUi? = null,
+    val replacingExerciseIndex: Int? = null,
+    val targetDurationMinutes: Int = 60,
 )
 
 data class ExerciseDetailSheetState(
@@ -94,6 +96,7 @@ sealed interface ActiveWorkoutEvent {
     data class QuickCompleteSet(val exerciseIndex: Int, val setIndex: Int) : ActiveWorkoutEvent
     data class RemoveSet(val exerciseIndex: Int, val setIndex: Int) : ActiveWorkoutEvent
     data class RemoveExercise(val exerciseIndex: Int) : ActiveWorkoutEvent
+    data class ReplaceExercise(val exerciseIndex: Int) : ActiveWorkoutEvent
     data class VoiceInput(val exerciseIndex: Int, val setIndex: Int, val weight: String, val reps: String, val rpe: String = "") : ActiveWorkoutEvent
     data object StartRestTimer : ActiveWorkoutEvent
     data object SkipRestTimer : ActiveWorkoutEvent
@@ -111,6 +114,7 @@ sealed interface ActiveWorkoutEvent {
     data class ShowExerciseDetail(val exercise: Exercise) : ActiveWorkoutEvent
     data object DismissExerciseDetail : ActiveWorkoutEvent
     data object DismissPrCelebration : ActiveWorkoutEvent
+    data class SetTargetDuration(val minutes: Int) : ActiveWorkoutEvent
 }
 
 sealed interface ActiveWorkoutEffect {
