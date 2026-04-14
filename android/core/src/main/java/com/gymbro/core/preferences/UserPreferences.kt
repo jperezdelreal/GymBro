@@ -218,6 +218,23 @@ class UserPreferences @Inject constructor(
         }
     }
 
+    suspend fun resetAllTooltips() {
+        val tooltipKeys = listOf(
+            "tooltip_first_weight",
+            "tooltip_first_set_complete",
+            "tooltip_rpe",
+            "tooltip_rest_timer",
+            "tooltip_add_set",
+            "tooltip_finish",
+            "active_workout_complete_set",
+        )
+        dataStore.edit { preferences ->
+            tooltipKeys.forEach { key ->
+                preferences.remove(booleanPreferencesKey("tooltip_shown_$key"))
+            }
+        }
+    }
+
     val manualSleepHours: Flow<Int> = dataStore.data.map { preferences ->
         preferences[MANUAL_SLEEP_HOURS] ?: 7
     }

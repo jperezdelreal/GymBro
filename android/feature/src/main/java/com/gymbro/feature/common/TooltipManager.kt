@@ -21,4 +21,8 @@ class TooltipManager @Inject constructor(
     suspend fun markShown(id: String) {
         userPreferences.markTooltipShown(id)
     }
+
+    suspend fun resetAll() {
+        userPreferences.resetAllTooltips()
+    }
 }

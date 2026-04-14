@@ -4,11 +4,13 @@ import com.gymbro.core.database.dao.WorkoutDao
 import com.gymbro.core.error.AppResult
 import com.gymbro.core.error.retryWithBackoff
 import com.gymbro.core.error.runCatchingAsResult
+import com.gymbro.core.model.Exercise
 import javax.inject.Inject
 
 class SmartDefaultsService @Inject constructor(
     private val workoutDao: WorkoutDao,
     private val progressionEngine: ProgressionEngine,
+    private val beginnerDefaultsService: BeginnerDefaultsService,
 ) {
     
     suspend fun getDefaultWeight(exerciseId: String): Double? {
@@ -41,6 +43,7 @@ class SmartDefaultsService @Inject constructor(
         val weight: Double?,
         val reps: Int?,
         val progressionReason: ProgressionEngine.ProgressionReason? = null,
+        val beginnerSuggestion: String? = null,
     )
     
     suspend fun getDefaults(exerciseId: String): SmartDefaults {
@@ -60,5 +63,28 @@ class SmartDefaultsService @Inject constructor(
             is AppResult.Success -> result.data
             is AppResult.Error -> SmartDefaults(null, null)
         }
+    }
+
+    /**
+     * Fallback chain: History-based defaults → BeginnerDefaults → empty.
+     * Returns beginnerSuggestion as placeholder text when no history exists.
+     */
+    suspend fun getDefaultsWithFallback(exerciseId: String, exercise: Exercise): SmartDefaults {
+        val historyDefaults = getDefaults(exerciseId)
+        if (historyDefaults.weight != null) return historyDefaults
+
+        val beginner = try {
+            beginnerDefaultsService.getDefault(
+                exerciseName = exercise.name,
+                category = exercise.category,
+                equipment = exercise.equipment,
+            )
+        } catch (_: Exception) {
+            null
+        }
+
+        return historyDefaults.copy(
+            beginnerSuggestion = beginner?.let { "${it.suggestedWeightKg.toInt()} kg" },
+        )
     }
 }

@@ -246,11 +246,13 @@ fun ActiveWorkoutRoute(
             }
         },
         onFirstSetCompletedTooltipDismissed = {
+            showFirstSetCompletedTooltip = false
             viewModel.viewModelScope.launch {
                 viewModel.tooltipManager.markShown("tooltip_first_set_complete")
             }
         },
         onFinishTooltipDismissed = {
+            showFinishTooltip = false
             viewModel.viewModelScope.launch {
                 viewModel.tooltipManager.markShown("tooltip_finish")
             }
@@ -568,10 +570,7 @@ fun ActiveWorkoutScreen(
                 message = stringResource(R.string.tooltip_first_set_completed),
                 position = TooltipPosition.TOP_CENTER,
                 offsetY = 200,
-                onDismiss = {
-                    showFirstSetCompletedTooltip = false
-                    onFirstSetCompletedTooltipDismissed()
-                }
+                onDismiss = onFirstSetCompletedTooltipDismissed
             )
         }
 
@@ -580,10 +579,7 @@ fun ActiveWorkoutScreen(
                 message = stringResource(R.string.tooltip_finish_workout),
                 position = TooltipPosition.BOTTOM_CENTER,
                 offsetY = -100,
-                onDismiss = {
-                    showFinishTooltip = false
-                    onFinishTooltipDismissed()
-                }
+                onDismiss = onFinishTooltipDismissed
             )
         }
 

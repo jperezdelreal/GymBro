@@ -30,6 +30,7 @@ sealed interface SettingsEvent {
     data object SendFeedback : SettingsEvent
     data object ViewLicenses : SettingsEvent
     data object NavigateBack : SettingsEvent
+    data object ResetTooltips : SettingsEvent
 }
 
 sealed interface SettingsEffect {

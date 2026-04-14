@@ -32,6 +32,7 @@ import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -260,6 +261,17 @@ internal fun SettingsScreen(
                         subtitle = stringResource(R.string.settings_redo_setup_subtitle),
                         iconTint = AccentGreen,
                         onClick = { showRedoSetupDialog = true },
+                    )
+                    SettingsDivider()
+                    SettingsRow(
+                        icon = Icons.Default.School,
+                        title = stringResource(R.string.settings_reset_tooltips),
+                        subtitle = stringResource(R.string.settings_reset_tooltips_subtitle),
+                        iconTint = AccentGreen,
+                        onClick = {
+                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            onEvent(SettingsEvent.ResetTooltips)
+                        },
                     )
                     SettingsDivider()
                     SettingsRow(

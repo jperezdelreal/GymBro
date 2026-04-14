@@ -9,6 +9,7 @@ import com.gymbro.core.R
 import com.gymbro.core.preferences.UserPreferences
 import com.gymbro.core.preferences.UserPreferences.TrainingPhase
 import com.gymbro.core.preferences.UserPreferences.WeightUnit
+import com.gymbro.feature.common.TooltipManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.channels.Channel
@@ -26,6 +27,7 @@ class SettingsViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val userPreferences: UserPreferences,
     private val reminderScheduler: ReminderScheduler,
+    private val tooltipManager: TooltipManager,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SettingsState())
@@ -109,6 +111,7 @@ class SettingsViewModel @Inject constructor(
             is SettingsEvent.SendFeedback -> sendFeedback()
             is SettingsEvent.ViewLicenses -> viewLicenses()
             is SettingsEvent.NavigateBack -> navigateBack()
+            is SettingsEvent.ResetTooltips -> resetTooltips()
         }
     }
 
@@ -182,6 +185,13 @@ class SettingsViewModel @Inject constructor(
     private fun viewLicenses() {
         viewModelScope.launch {
             _effects.send(SettingsEffect.ShowMessage(context.getString(R.string.settings_licenses_shown)))
+        }
+    }
+
+    private fun resetTooltips() {
+        viewModelScope.launch {
+            tooltipManager.resetAll()
+            _effects.send(SettingsEffect.ShowMessage(context.getString(R.string.settings_tooltips_reset_done)))
         }
     }
 
