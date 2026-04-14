@@ -2,6 +2,8 @@ package com.gymbro.feature.progress
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.gymbro.core.preferences.UserPreferences
+import com.gymbro.core.repository.ExerciseProgressRepository
 import com.gymbro.core.repository.ExerciseRepository
 import com.gymbro.core.service.PersonalRecordService
 import com.gymbro.core.service.PlateauDetectionService
@@ -11,6 +13,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -20,7 +23,9 @@ import javax.inject.Inject
 class ProgressViewModel @Inject constructor(
     private val prService: PersonalRecordService,
     private val exerciseRepository: ExerciseRepository,
+    private val exerciseProgressRepository: ExerciseProgressRepository,
     private val plateauDetectionService: PlateauDetectionService,
+    private val userPreferences: UserPreferences,
     val tooltipManager: TooltipManager,
 ) : ViewModel() {
 
@@ -66,6 +71,8 @@ class ProgressViewModel @Inject constructor(
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
 
+            val useKg = userPreferences.weightUnit.first() == UserPreferences.WeightUnit.KG
+
             val history = prService.getWorkoutHistory()
             val exerciseIds = prService.getExerciseIdsWithHistory()
 
@@ -85,6 +92,15 @@ class ProgressViewModel @Inject constructor(
             val chartData = if (selectedId != null) {
                 prService.getE1RMHistory(selectedId)
             } else emptyList()
+
+            // Load exercise progression data
+            val progressData = if (selectedId != null) {
+                exerciseProgressRepository.getExerciseProgressData(selectedId).first()
+            } else emptyList()
+
+            val selectedName = if (selectedId != null) {
+                exerciseOptions.find { it.id == selectedId }?.name ?: ""
+            } else ""
 
             val plateauAlerts = plateauDetectionService.detectAllPlateaus(
                 exerciseOptions.map { it.id to it.name }
@@ -158,6 +174,8 @@ class ProgressViewModel @Inject constructor(
                     exerciseOptions = exerciseOptions,
                     selectedExerciseId = selectedId,
                     chartData = chartData,
+                    exerciseProgressData = progressData,
+                    selectedExerciseName = selectedName,
                     plateauAlerts = plateauAlerts,
                     totalVolume = totalVolume,
                     workoutsThisWeek = workoutsCount,
@@ -166,6 +184,7 @@ class ProgressViewModel @Inject constructor(
                     volumeChangePercent = volumeChangePercent,
                     topExercises = topExercises,
                     recentPRsWithDetails = recentPRsWithDetails,
+                    useKg = useKg,
                     isLoading = false,
                 )
             }
@@ -209,9 +228,14 @@ class ProgressViewModel @Inject constructor(
                 prService.getPersonalRecords(exerciseId, exercise.name)
             } else emptyList()
 
+            val progressData = exerciseProgressRepository.getExerciseProgressData(exerciseId).first()
+            val exerciseName = exercise?.name ?: ""
+
             _state.update {
                 it.copy(
                     chartData = chartData,
+                    exerciseProgressData = progressData,
+                    selectedExerciseName = exerciseName,
                     personalRecords = it.personalRecords
                         .filter { pr -> pr.exerciseId != exerciseId } + records,
                 )

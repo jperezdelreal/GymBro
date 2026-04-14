@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- App Name -->
     <string name="app_name">GymBro</string>
@@ -536,6 +536,8 @@
     <string name="active_workout_superset_label">Superset</string>
     <string name="active_workout_ungroup_superset">Ungroup</string>
     <string name="active_workout_superset_tap_ungroup">Tap to ungroup superset</string>
+    <string name="active_workout_move_up">Move exercise up</string>
+    <string name="active_workout_move_down">Move exercise down</string>
     <string name="active_workout_superset_position" formatted="false">%s-%d</string>
     
     <!-- Progression Suggestions -->
@@ -892,6 +894,20 @@
     <string name="settings_reset_tooltips">Reset Tutorials</string>
     <string name="settings_reset_tooltips_subtitle">Show workout guidance tips again</string>
     <string name="settings_tooltips_reset_done">Tutorials have been reset</string>
+
+    <!-- Exercise Progression Charts (#542, #543) -->
+    <string name="progress_chart_title" formatted="false">Progression: %s</string>
+    <string name="progress_chart_weight">Weight</string>
+    <string name="progress_chart_volume">Volume</string>
+    <string name="progress_chart_1m">1M</string>
+    <string name="progress_chart_3m">3M</string>
+    <string name="progress_chart_6m">6M</string>
+    <string name="progress_chart_all">All</string>
+    <string name="progress_chart_no_data">Not enough data for this range</string>
+    <string name="progress_chart_single_session">Only 1 session recorded</string>
+    <string name="progress_chart_volume_value" formatted="false">Volume: %s %s</string>
+    <string name="progress_chart_rpe_warning">⚠️ Rising effort — consider a deload</string>
+    <string name="progress_chart_section_title">Exercise Progression</string>
 
     <!-- Exercise Replace (#546) -->
     <string name="active_workout_replace_exercise">Replace exercise</string>

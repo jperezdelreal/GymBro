@@ -1,6 +1,7 @@
 package com.gymbro.feature.progress
 
 import com.gymbro.core.model.E1RMDataPoint
+import com.gymbro.core.model.ExerciseProgressPoint
 import com.gymbro.core.model.PersonalRecord
 import com.gymbro.core.model.PlateauAlert
 import com.gymbro.core.model.WorkoutHistoryItem
@@ -17,6 +18,8 @@ data class ProgressState(
     val exerciseOptions: List<ExerciseOption> = emptyList(),
     val selectedExerciseId: String? = null,
     val chartData: List<E1RMDataPoint> = emptyList(),
+    val exerciseProgressData: List<ExerciseProgressPoint> = emptyList(),
+    val selectedExerciseName: String = "",
     val plateauAlerts: List<PlateauAlert> = emptyList(),
     val isLoading: Boolean = true,
     val totalVolume: Double = 0.0,
@@ -28,6 +31,7 @@ data class ProgressState(
     val topExercises: List<TopExercise> = emptyList(),
     val workoutFrequencyGoal: Int = 5,
     val recentPRsWithDetails: List<PersonalRecord> = emptyList(),
+    val useKg: Boolean = true,
 )
 
 data class WeeklyVolume(

@@ -583,19 +583,12 @@ fun ActiveWorkoutScreen(
                                     ExerciseCardContent(
                                         exerciseUi = exerciseUi,
                                         exerciseIndex = exerciseIndex,
+                                        exerciseCount = state.exercises.size,
                                         onEvent = onEvent,
                                         voiceRecognitionService = voiceRecognitionService,
                                         defaultWeightUnit = defaultWeightUnit,
                                     )
                                 }
-                                ExerciseCardContent(
-                                    exerciseUi = exerciseUi,
-                                    exerciseIndex = exerciseIndex,
-                                    exerciseCount = state.exercises.size,
-                                    onEvent = onEvent,
-                                    voiceRecognitionService = voiceRecognitionService,
-                                    defaultWeightUnit = defaultWeightUnit,
-                                )
                             }
                         }
                     }
