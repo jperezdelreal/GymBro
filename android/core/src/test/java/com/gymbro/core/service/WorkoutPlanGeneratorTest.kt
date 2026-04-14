@@ -1,10 +1,13 @@
 package com.gymbro.core.service
 
+import android.content.Context
+import com.gymbro.core.R
 import com.gymbro.core.TestFixtures
 import com.gymbro.core.model.TrainingSplit
 import com.gymbro.core.preferences.UserPreferences
 import com.gymbro.core.repository.ExerciseRepository
 import io.mockk.coEvery
+import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -16,13 +19,74 @@ class WorkoutPlanGeneratorTest {
 
     private lateinit var exerciseRepository: ExerciseRepository
     private lateinit var generator: WorkoutPlanGenerator
+    private lateinit var context: Context
 
     @Before
     fun setup() {
         exerciseRepository = mockk()
-        generator = WorkoutPlanGenerator(exerciseRepository)
+        context = mockk()
+
+        // Return the resource name as the string value for testing
+        every { context.getString(any()) } answers {
+            val resId = firstArg<Int>()
+            stringResources[resId] ?: "unknown_$resId"
+        }
+        every { context.getString(any(), *anyVararg()) } answers {
+            val resId = firstArg<Int>()
+            val base = stringResources[resId] ?: "unknown_$resId"
+            val args = args.drop(1).toTypedArray()
+            if (args.isNotEmpty()) String.format(base, *args) else base
+        }
+
+        generator = WorkoutPlanGenerator(context, exerciseRepository)
         
         coEvery { exerciseRepository.getAllExercises() } returns flowOf(TestFixtures.exercises)
+    }
+
+    companion object {
+        private val stringResources = mapOf(
+            R.string.gen_plan_strength to "Strength Building Program",
+            R.string.gen_plan_hypertrophy to "Hypertrophy Program",
+            R.string.gen_plan_powerlifting to "Powerlifting Program",
+            R.string.gen_plan_general to "General Fitness Program",
+            R.string.gen_plan_strength_desc to "Focus on progressive overload. Using %1\$s split for %2\$d days/week.",
+            R.string.gen_plan_hypertrophy_desc to "%1\$s split focused on muscle growth for %2\$d days/week.",
+            R.string.gen_plan_powerlifting_desc to "Focus on the big three using %1\$s split.",
+            R.string.gen_plan_general_desc to "Balanced full-body workouts. %1\$s approach for %2\$d days/week.",
+            R.string.gen_split_full_body to "Full Body",
+            R.string.gen_split_upper_lower to "Upper/Lower",
+            R.string.gen_split_ppl to "Push/Pull/Legs",
+            R.string.gen_split_pplul to "PPL + Upper/Lower",
+            R.string.gen_split_powerlifting_3day to "Powerlifting 3-Day",
+            R.string.gen_day_upper_body to "Upper Body",
+            R.string.gen_day_lower_body to "Lower Body",
+            R.string.gen_day_full_body to "Full Body",
+            R.string.gen_day_squat to "Squat Day",
+            R.string.gen_day_bench to "Bench Day",
+            R.string.gen_day_deadlift to "Deadlift Day",
+            R.string.gen_day_upper_power to "Upper Power",
+            R.string.gen_day_lower_power to "Lower Power",
+            R.string.gen_day_upper_accessories to "Upper Accessories",
+            R.string.gen_day_lower_accessories to "Lower Accessories",
+            R.string.gen_day_full_body_a to "Full Body A",
+            R.string.gen_day_full_body_b to "Full Body B",
+            R.string.gen_day_full_body_c to "Full Body C",
+            R.string.gen_day_upper_a to "Upper A",
+            R.string.gen_day_lower_a to "Lower A",
+            R.string.gen_day_upper_b to "Upper B",
+            R.string.gen_day_lower_b to "Lower B",
+            R.string.gen_day_push_a to "Push A",
+            R.string.gen_day_pull_a to "Pull A",
+            R.string.gen_day_legs_a to "Legs A",
+            R.string.gen_day_push_b to "Push B",
+            R.string.gen_day_pull_b to "Pull B",
+            R.string.gen_day_legs_b to "Legs B",
+            R.string.gen_day_push to "Push",
+            R.string.gen_day_pull to "Pull",
+            R.string.gen_day_legs to "Legs",
+            R.string.gen_day_upper to "Upper",
+            R.string.gen_day_lower to "Lower",
+        )
     }
 
     @Test
