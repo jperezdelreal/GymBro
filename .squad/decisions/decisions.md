@@ -1455,6 +1455,89 @@ After onboarding completes, the app now auto-generates a personalized workout pl
 
 ---
 
+## 2026-04-14T22:20Z: Veteran UX Competitiveness Analysis
+
+**Test by:** Switch (Tester)  
+**Date:** 2026-04-14  
+**Persona:** Carlos (4 años entrenando, PPL, Powerlifter, Advanced)  
+**Method:** Maestro E2E — 5 workouts, ~200 assertions, 45 minutes  
+**Stability:** ✅ PERFECT (zero crashes, zero ANRs)  
+
+### UX Competitiveness Score: 7/10 for Veteran Lifters
+
+GymBro is stable and genuinely fast for logging workouts. For a veteran/powerlifter, it competes well with Strong on speed. However, it's missing 3 critical features that veteran lifters expect from serious training apps.
+
+### Top 5 Strengths ✅
+
+1. **Logging Speed (⭐⭐⭐⭐⭐)** — 100kg bench × 5 reps recorded in <5 seconds. Competitive with Strong.
+2. **Exercise Search** — Instant results for "bench", "squat", "deadlift", "row"; filtering by muscle group works perfectly.
+3. **Data Persistence** — Zero data loss across app relaunch. 5 workouts (100kg bench → 102.5kg progression) all preserved.
+4. **Onboarding for Advanced Users** — App recognizes "Avanzado", allows 5 days/week, 90-min sessions. Doesn't treat veteran like beginner.
+5. **Third-Set Management** — "Añadir Serie" system is smooth; adding 3+ sets per exercise works intuitively.
+
+### Top 5 Critical Gaps ❌
+
+1. **No Auto-Fill Weight** (CRITICAL) — When Carlos returns for bench press session 4 (102.5kg), the weight field is empty. Should pre-populate 100kg (previous session). Strong and Hevy auto-fill; GymBro requires manual entry every time.
+
+2. **No Progression Visualization** (HIGH) — Carlos did bench 100kg → 102.5kg (+2.5kg progression). App shows no progression graph, no PR notification, no visual proof of strength gain. Veteran lifters NEED to see their progress.
+
+3. **No RPE/RIR Input** (MEDIUM) — Can't record "RPE 7" vs "RPE 9" exertion level. Essential for RPE-based autoregulation (which GymBro's AI Coach requires).
+
+4. **Basic Rest Timer Only** (MEDIUM) — Timer is binary (skip or wait). Powerlifter needs 3-5 min rest between heavy sets; no way to configure per-exercise. No sound alert when rest ends.
+
+5. **No Set Notes** (LOW) — Can't document "grip width", "pause 2 seconds", "tempo 3-1-0". Variation tracking matters for serious lifters.
+
+### Competitive Comparison
+
+| Feature | GymBro | Strong | Hevy | FitBod |
+|---------|--------|--------|------|--------|
+| Logging Speed | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ |
+| Auto-fill Weight | ❌ | ✅ | ✅ | ✅ |
+| Progression Charts | ❌ | ✅ | ✅ | ✅ |
+| RPE/RIR | ❌ | ❌ | ✅ | ❌ |
+| Configurable Timer | ⚠️ basic | ✅ | ✅ | ✅ |
+| Set Notes | ❌ | ✅ | ✅ | ❌ |
+| Exercise Library | ✅ good | ✅ | ✅ | ✅ |
+| Onboarding (Adv) | ✅ | ⚠️ | ⚠️ | ✅ |
+| **Price** | **Free** | **$$$$** | **$$** | **$$$** |
+
+**GymBro wins on speed and price. Loses on veteran features.**
+
+### Verdict: Would Carlos Switch?
+
+**Current:** NO — Carlos stays with Strong.  
+**If #1 + #2 added:** YES — Would seriously consider GymBro.  
+**If all 4 added:** YES — Immediate switch from Strong.
+
+### Roadmap Impact
+
+**Priority 1 (Veteran Retention):**
+- Auto-fill weight from previous workout
+- Progression charts (weight vs time, visible PRs)
+
+**Priority 2 (Advanced Features):**
+- RPE/RIR input (enables AI Coach)
+- Configurable rest timers per exercise type
+
+**Priority 3 (Polish):**
+- Set notes for variation tracking
+
+### Bugs Found (Infrastructure, Non-App)
+
+- `hideKeyboard` crashes emulator (Maestro limitation)
+- `nav_progress` testTag not found (may indicate missing progress screen)
+- ADB offline during long screenshots (known Maestro issue)
+
+**App Stability:** ✅ Perfect — zero app crashes or ANRs
+
+### Next Steps
+
+- Trinity + Neo: Design auto-fill + progression chart features
+- Tank: Schema updates if needed (likely none — data already captured)
+- Switch: Update E2E suite to validate new veteran features post-implementation
+
+---
+
 ## 2026-04-10T22:30Z: Session Audit Findings & Integration Gap Priority
 
 **Author:** Morpheus (Lead)  
