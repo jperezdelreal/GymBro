@@ -142,7 +142,7 @@ class ActiveWorkoutViewModel @Inject constructor(
                     muscleGroup = MuscleGroup.FULL_BODY,
                 )
                 val defaults = try {
-                    smartDefaultsService.getDefaults(exercise.id.toString())
+                    smartDefaultsService.getDefaultsWithFallback(exercise.id.toString(), exercise)
                 } catch (_: Exception) {
                     null
                 }
@@ -162,6 +162,7 @@ class ActiveWorkoutViewModel @Inject constructor(
                             exercise = exercise,
                             sets = sets,
                             progressionSuggestion = progressionSuggestion,
+                            beginnerWeightHint = defaults?.beginnerSuggestion,
                         ),
                     )
                 }
@@ -224,6 +225,7 @@ class ActiveWorkoutViewModel @Inject constructor(
             is ActiveWorkoutEvent.UnlinkSuperset -> unlinkSuperset(event.groupId)
             is ActiveWorkoutEvent.ShowExerciseDetail -> showExerciseDetail(event.exercise)
             is ActiveWorkoutEvent.DismissExerciseDetail -> _state.update { it.copy(exerciseDetailSheet = null) }
+            is ActiveWorkoutEvent.DismissPrCelebration -> _state.update { it.copy(prCelebration = null) }
         }
     }
     
@@ -296,7 +298,7 @@ class ActiveWorkoutViewModel @Inject constructor(
 
     private fun addExercise(exercise: Exercise) {
         safeLaunch {
-            val defaults = smartDefaultsService.getDefaults(exercise.id.toString())
+            val defaults = smartDefaultsService.getDefaultsWithFallback(exercise.id.toString(), exercise)
             val progressionSuggestion = getProgressionSuggestionUi(exercise.id.toString())
             _state.update { current ->
                 val newExercise = WorkoutExerciseUi(
@@ -310,6 +312,7 @@ class ActiveWorkoutViewModel @Inject constructor(
                         ),
                     ),
                     progressionSuggestion = progressionSuggestion,
+                    beginnerWeightHint = defaults.beginnerSuggestion,
                 )
                 current.copy(exercises = current.exercises + newExercise)
             }
@@ -386,6 +389,9 @@ class ActiveWorkoutViewModel @Inject constructor(
 
             updateSetField(exerciseIndex, setIndex) { it.copy(isCompleted = true) }
 
+            // Check for new PRs after this set
+            checkForNewPR(exerciseUi, weightKg, reps, exerciseIndex, setIndex)
+
             // Auto-add next set if all current sets are completed (max 5)
             val updatedExercise = _state.value.exercises.getOrNull(exerciseIndex)
             if (updatedExercise != null &&
@@ -409,6 +415,58 @@ class ActiveWorkoutViewModel @Inject constructor(
             if (shouldStartTimer) {
                 startRestTimer()
             }
+        }
+    }
+
+    private suspend fun checkForNewPR(
+        exerciseUi: WorkoutExerciseUi,
+        weightKg: Double,
+        reps: Int,
+        exerciseIndex: Int,
+        setIndex: Int,
+    ) {
+        try {
+            val prs = personalRecordService.getPersonalRecords(
+                exerciseId = exerciseUi.exercise.id.toString(),
+                exerciseName = exerciseUi.exercise.name,
+            )
+            val newPR = prs.firstOrNull { pr ->
+                val prev = pr.previousValue
+                prev != null && prev < pr.value
+            }
+            if (newPR != null) {
+                updateSetField(exerciseIndex, setIndex) { it.copy(isPR = true) }
+                val valueStr = if (newPR.value == newPR.value.toLong().toDouble()) {
+                    newPR.value.toLong().toString()
+                } else {
+                    String.format("%.1f", newPR.value)
+                }
+                val prevStr = newPR.previousValue?.let { prev ->
+                    if (prev == prev.toLong().toDouble()) prev.toLong().toString()
+                    else String.format("%.1f", prev)
+                }
+                val weightStr = if (weightKg == weightKg.toLong().toDouble()) {
+                    weightKg.toLong().toString()
+                } else {
+                    String.format("%.1f", weightKg)
+                }
+                _state.update {
+                    it.copy(
+                        prCelebration = PrCelebrationUi(
+                            exerciseName = exerciseUi.exercise.name,
+                            recordType = newPR.type.displayName,
+                            value = "$weightStr kg",
+                            reps = reps.toString(),
+                            previousValue = prevStr,
+                        )
+                    )
+                }
+                // Auto-dismiss after 4 seconds
+                delay(4000)
+                _state.update { it.copy(prCelebration = null) }
+            }
+        } catch (_: Exception) {
+            // Non-critical — don't interrupt workout flow
         }
     }
 

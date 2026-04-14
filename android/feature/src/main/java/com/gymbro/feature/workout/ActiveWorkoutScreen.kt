@@ -144,9 +144,27 @@ fun ActiveWorkoutRoute(
     val state = viewModel.state.collectAsStateWithLifecycle()
     val context = androidx.compose.ui.platform.LocalContext.current
     var showCompleteSetTooltip by remember { mutableStateOf(false) }
+    var showFirstSetCompletedTooltip by remember { mutableStateOf(false) }
+    var showFinishTooltip by remember { mutableStateOf(false) }
     
     LaunchedEffect(Unit) {
         showCompleteSetTooltip = viewModel.tooltipManager.shouldShow("active_workout_complete_set")
+    }
+
+    // Show tooltip when first set is completed
+    val firstSetCompleted = state.value.totalSets >= 1
+    LaunchedEffect(firstSetCompleted) {
+        if (firstSetCompleted && viewModel.tooltipManager.shouldShow("tooltip_first_set_complete")) {
+            showFirstSetCompletedTooltip = true
+        }
+    }
+
+    // Show finish tooltip when user has ≥3 completed sets
+    val canFinish = state.value.totalSets >= 3
+    LaunchedEffect(canFinish) {
+        if (canFinish && viewModel.tooltipManager.shouldShow("tooltip_finish")) {
+            showFinishTooltip = true
+        }
     }
     
     // Get services from Hilt through entry point
@@ -219,10 +237,22 @@ fun ActiveWorkoutRoute(
         voiceRecognitionService = voiceRecognitionService,
         defaultWeightUnit = weightUnit.value,
         showCompleteSetTooltip = showCompleteSetTooltip,
+        showFirstSetCompletedTooltip = showFirstSetCompletedTooltip,
+        showFinishTooltip = showFinishTooltip,
         onTooltipDismissed = {
             showCompleteSetTooltip = false
             viewModel.viewModelScope.launch {
                 viewModel.tooltipManager.markShown("active_workout_complete_set")
+            }
+        },
+        onFirstSetCompletedTooltipDismissed = {
+            viewModel.viewModelScope.launch {
+                viewModel.tooltipManager.markShown("tooltip_first_set_complete")
+            }
+        },
+        onFinishTooltipDismissed = {
+            viewModel.viewModelScope.launch {
+                viewModel.tooltipManager.markShown("tooltip_finish")
             }
         },
         onNavigateToCoach = onNavigateToCoach,
@@ -250,7 +280,11 @@ fun ActiveWorkoutScreen(
     voiceRecognitionService: VoiceRecognitionService,
     defaultWeightUnit: UserPreferences.WeightUnit,
     showCompleteSetTooltip: Boolean = false,
+    showFirstSetCompletedTooltip: Boolean = false,
+    showFinishTooltip: Boolean = false,
     onTooltipDismissed: () -> Unit = {},
+    onFirstSetCompletedTooltipDismissed: () -> Unit = {},
+    onFinishTooltipDismissed: () -> Unit = {},
     onNavigateToCoach: () -> Unit = {},
     onDiscardWorkout: () -> Unit = {},
 ) {
@@ -327,18 +361,16 @@ fun ActiveWorkoutScreen(
             )
         },
         bottomBar = {
-            if (!state.isRestTimerActive) {
-                FinishWorkoutButton(
-                    enabled = state.totalSets > 0 && !state.isCompleting,
-                    completedExercises = state.exercises.count { ex -> ex.sets.any { it.isCompleted } },
-                    onClick = { onEvent(ActiveWorkoutEvent.CompleteWorkout) },
-                )
-            }
+            FinishWorkoutButton(
+                enabled = state.totalSets > 0 && !state.isCompleting,
+                completedExercises = state.exercises.count { ex -> ex.sets.any { it.isCompleted } },
+                onClick = { onEvent(ActiveWorkoutEvent.CompleteWorkout) },
+            )
         },
         floatingActionButton = {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier.padding(bottom = if (!state.isRestTimerActive) 16.dp else 0.dp)
+                modifier = Modifier.padding(bottom = 16.dp)
             ) {
                 // AI Coach FAB
                 FloatingActionButton(
@@ -530,6 +562,36 @@ fun ActiveWorkoutScreen(
                 onDismiss = onTooltipDismissed
             )
         }
+
+        if (showFirstSetCompletedTooltip) {
+            TooltipOverlay(
+                message = stringResource(R.string.tooltip_first_set_completed),
+                position = TooltipPosition.TOP_CENTER,
+                offsetY = 200,
+                onDismiss = {
+                    showFirstSetCompletedTooltip = false
+                    onFirstSetCompletedTooltipDismissed()
+                }
+            )
+        }
+
+        if (showFinishTooltip) {
+            TooltipOverlay(
+                message = stringResource(R.string.tooltip_finish_workout),
+                position = TooltipPosition.BOTTOM_CENTER,
+                offsetY = -100,
+                onDismiss = {
+                    showFinishTooltip = false
+                    onFinishTooltipDismissed()
+                }
+            )
+        }
+
+        // PR Celebration Overlay (#538)
+        PrCelebrationOverlay(
+            celebration = state.prCelebration,
+            onDismiss = { onEvent(ActiveWorkoutEvent.DismissPrCelebration) },
+        )
 
         // Exercise Detail Bottom Sheet
         state.exerciseDetailSheet?.let { detailState ->
@@ -775,6 +837,99 @@ private fun FinishWorkoutButton(
 }
 
 @Composable
+private fun PrCelebrationOverlay(
+    celebration: PrCelebrationUi?,
+    onDismiss: () -> Unit,
+) {
+    val haptic = LocalHapticFeedback.current
+
+    // Triple haptic burst when celebration appears
+    LaunchedEffect(celebration) {
+        if (celebration != null) {
+            repeat(3) {
+                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                kotlinx.coroutines.delay(150)
+            }
+        }
+    }
+
+    AnimatedVisibility(
+        visible = celebration != null,
+        enter = fadeIn(animationSpec = tween(400)) + slideInVertically(
+            initialOffsetY = { -it },
+            animationSpec = tween(500),
+        ),
+        exit = fadeOut(animationSpec = tween(300)) + slideOutVertically(
+            targetOffsetY = { -it },
+            animationSpec = tween(400),
+        ),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp, vertical = 80.dp),
+    ) {
+        celebration?.let { pr ->
+            val prGold = Color(0xFFFFD700)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(
+                                prGold.copy(alpha = 0.25f),
+                                Color(0xFF1C1C1E).copy(alpha = 0.95f),
+                            )
+                        )
+                    )
+                    .border(2.dp, prGold.copy(alpha = 0.6f), RoundedCornerShape(16.dp))
+                    .clickable { onDismiss() }
+                    .padding(20.dp),
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Text(
+                        text = stringResource(R.string.pr_celebration_title),
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Black,
+                        color = prGold,
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = stringResource(
+                            R.string.pr_celebration_detail,
+                            pr.exerciseName,
+                            pr.value,
+                            pr.reps,
+                        ),
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color.White,
+                        textAlign = TextAlign.Center,
+                    )
+                    pr.previousValue?.let { prev ->
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = stringResource(R.string.pr_celebration_previous, prev),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Color.White.copy(alpha = 0.6f),
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = pr.recordType,
+                        style = MaterialTheme.typography.labelMedium,
+                        color = prGold.copy(alpha = 0.8f),
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
 private fun ExerciseCardContent(
     exerciseUi: WorkoutExerciseUi,
     exerciseIndex: Int,
@@ -784,6 +939,9 @@ private fun ExerciseCardContent(
 ) {
     val haptic = LocalHapticFeedback.current
     var voiceToast by remember { mutableStateOf<String?>(null) }
+    val weightPlaceholder = exerciseUi.beginnerWeightHint?.let {
+        stringResource(R.string.beginner_weight_hint, it)
+    }
 
     // Auto-dismiss voice feedback after a delay
     LaunchedEffect(voiceToast) {
@@ -924,6 +1082,7 @@ private fun ExerciseCardContent(
                 exerciseIndex = exerciseIndex,
                 setIndex = setIndex,
                 onEvent = onEvent,
+                weightPlaceholder = weightPlaceholder,
             )
             if (setIndex < exerciseUi.sets.lastIndex) {
                 Spacer(modifier = Modifier.height(8.dp))
@@ -959,6 +1118,7 @@ private fun SetRow(
     exerciseIndex: Int,
     setIndex: Int,
     onEvent: (ActiveWorkoutEvent) -> Unit,
+    weightPlaceholder: String? = null,
 ) {
     val haptic = LocalHapticFeedback.current
     val completedDescription = stringResource(R.string.active_workout_set_completed, setUi.setNumber)
@@ -1037,6 +1197,7 @@ private fun SetRow(
             enabled = !setUi.isCompleted,
             onClick = { if (!setUi.isCompleted) showWeightDialog = true },
             modifier = Modifier.weight(1f).testTag("weight_input"),
+            placeholder = weightPlaceholder,
         )
 
         Spacer(modifier = Modifier.width(8.dp))
@@ -1090,20 +1251,32 @@ private fun SetRow(
 
         // Complete button
         if (setUi.isCompleted) {
-            Box(
-                modifier = Modifier
-                    .size(56.dp)
-                    .clip(CircleShape)
-                    .background(Brush.horizontalGradient(listOf(AccentGreenStart, AccentGreenEnd)))
-                    .semantics { contentDescription = completedDescription },
-                contentAlignment = Alignment.Center,
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.width(56.dp),
+                horizontalArrangement = Arrangement.Center,
             ) {
-                Icon(
-                    Icons.Default.Check,
-                    contentDescription = null,
-                    tint = Color.White,
-                    modifier = Modifier.size(24.dp),
-                )
+                if (setUi.isPR) {
+                    Text(
+                        text = stringResource(R.string.pr_celebration_badge),
+                        fontSize = 14.sp,
+                    )
+                }
+                Box(
+                    modifier = Modifier
+                        .size(if (setUi.isPR) 28.dp else 56.dp)
+                        .clip(CircleShape)
+                        .background(Brush.horizontalGradient(listOf(AccentGreenStart, AccentGreenEnd)))
+                        .semantics { contentDescription = completedDescription },
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(
+                        Icons.Default.Check,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(if (setUi.isPR) 16.dp else 24.dp),
+                    )
+                }
             }
         } else {
             Box(
@@ -1179,6 +1352,7 @@ private fun ClickableNumberField(
     enabled: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    placeholder: String? = null,
 ) {
     Box(
         modifier = modifier
@@ -1191,15 +1365,27 @@ private fun ClickableNumberField(
             .clickable(enabled = enabled, onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
-        Text(
-            text = if (value.isEmpty()) "—" else value,
-            style = MaterialTheme.typography.titleMedium.copy(
-                textAlign = TextAlign.Center,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 20.sp,
-                color = if (enabled) Color.White else Color.White.copy(alpha = 0.5f),
-            ),
-        )
+        if (value.isEmpty() && !placeholder.isNullOrEmpty()) {
+            Text(
+                text = placeholder,
+                style = MaterialTheme.typography.bodySmall.copy(
+                    textAlign = TextAlign.Center,
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 12.sp,
+                    color = AccentGreenStart.copy(alpha = 0.5f),
+                ),
+            )
+        } else {
+            Text(
+                text = if (value.isEmpty()) "—" else value,
+                style = MaterialTheme.typography.titleMedium.copy(
+                    textAlign = TextAlign.Center,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 20.sp,
+                    color = if (enabled) Color.White else Color.White.copy(alpha = 0.5f),
+                ),
+            )
+        }
     }
 }
 

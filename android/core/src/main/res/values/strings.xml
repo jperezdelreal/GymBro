@@ -872,4 +872,20 @@
     <string name="action_got_it">Got it</string>
     <string name="exercise_detail_set_label" formatted="false">Set %d: %s</string>
     <string name="analytics_exercise_stats" formatted="false">%d sets • %d workouts</string>
+
+    <!-- PR Celebration (#538) -->
+    <string name="pr_celebration_title">🎉 New Personal Record!</string>
+    <string name="pr_celebration_detail" formatted="false">%s: %s × %s</string>
+    <string name="pr_celebration_previous">Previous: %s</string>
+    <string name="pr_celebration_badge">🏆</string>
+
+    <!-- Beginner Defaults (#537) -->
+    <string name="beginner_weight_hint" formatted="false">Suggested: %s</string>
+
+    <!-- Contextual Tooltips (#540) -->
+    <string name="tooltip_first_set_completed">Well done! The rest timer has started. Rest up or skip it.</string>
+    <string name="tooltip_finish_workout">Done? Tap here to save your workout.</string>
+    <string name="settings_reset_tooltips">Reset Tutorials</string>
+    <string name="settings_reset_tooltips_subtitle">Show workout guidance tips again</string>
+    <string name="settings_tooltips_reset_done">Tutorials have been reset</string>
 </resources>

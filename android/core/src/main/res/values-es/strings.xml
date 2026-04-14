@@ -878,4 +878,20 @@
     <string name="action_got_it">Entendido</string>
     <string name="exercise_detail_set_label" formatted="false">Serie %d: %s</string>
     <string name="analytics_exercise_stats" formatted="false">%d series • %d entrenamientos</string>
+
+    <!-- PR Celebration (#538) -->
+    <string name="pr_celebration_title">🎉 ¡Nuevo Récord Personal!</string>
+    <string name="pr_celebration_detail" formatted="false">%s: %s × %s</string>
+    <string name="pr_celebration_previous">Anterior: %s</string>
+    <string name="pr_celebration_badge">🏆</string>
+
+    <!-- Beginner Defaults (#537) -->
+    <string name="beginner_weight_hint" formatted="false">Sugerido: %s</string>
+
+    <!-- Contextual Tooltips (#540) -->
+    <string name="tooltip_first_set_completed">¡Bien hecho! El temporizador de descanso ha empezado. Descansa o sáltalo.</string>
+    <string name="tooltip_finish_workout">¿Has terminado? Pulsa aquí para guardar tu entrenamiento.</string>
+    <string name="settings_reset_tooltips">Restablecer Tutoriales</string>
+    <string name="settings_reset_tooltips_subtitle">Mostrar las guías de entrenamiento de nuevo</string>
+    <string name="settings_tooltips_reset_done">Los tutoriales se han restablecido</string>
 </resources>

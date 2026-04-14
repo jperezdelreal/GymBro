@@ -21,6 +21,7 @@ data class ActiveWorkoutState(
     val supersetGroups: Map<String, List<Int>> = emptyMap(),
     val selectedExercises: Set<Int> = emptySet(),
     val exerciseDetailSheet: ExerciseDetailSheetState? = null,
+    val prCelebration: PrCelebrationUi? = null,
 )
 
 data class ExerciseDetailSheetState(
@@ -51,6 +52,7 @@ data class WorkoutExerciseUi(
     val exercise: Exercise,
     val sets: List<WorkoutSetUi> = emptyList(),
     val progressionSuggestion: ProgressionSuggestionUi? = null,
+    val beginnerWeightHint: String? = null,
 )
 
 data class ProgressionSuggestionUi(
@@ -61,6 +63,14 @@ data class ProgressionSuggestionUi(
     val reason: ProgressionEngine.ProgressionReason,
 )
 
+data class PrCelebrationUi(
+    val exerciseName: String,
+    val recordType: String,
+    val value: String,
+    val reps: String,
+    val previousValue: String?,
+)
+
 data class WorkoutSetUi(
     val id: String,
     val setNumber: Int,
@@ -69,6 +79,7 @@ data class WorkoutSetUi(
     val rpe: String = "",
     val isWarmup: Boolean = false,
     val isCompleted: Boolean = false,
+    val isPR: Boolean = false,
 )
 
 sealed interface ActiveWorkoutEvent {
@@ -99,6 +110,7 @@ sealed interface ActiveWorkoutEvent {
     data class UnlinkSuperset(val groupId: String) : ActiveWorkoutEvent
     data class ShowExerciseDetail(val exercise: Exercise) : ActiveWorkoutEvent
     data object DismissExerciseDetail : ActiveWorkoutEvent
+    data object DismissPrCelebration : ActiveWorkoutEvent
 }
 
 sealed interface ActiveWorkoutEffect {
