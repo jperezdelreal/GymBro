@@ -55,6 +55,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
@@ -273,12 +274,12 @@ private fun PlanDayContent(
                     SummaryItem(
                         label = stringResource(R.string.programs_exercises_label),
                         value = exerciseCount.toString(),
-                        contentDesc = stringResource(R.string.programs_exercises_count_desc, exerciseCount),
+                        contentDesc = pluralStringResource(R.plurals.exercises_count, exerciseCount, exerciseCount),
                     )
                     SummaryItem(
                         label = stringResource(R.string.programs_total_sets_label),
                         value = totalSets.toString(),
-                        contentDesc = stringResource(R.string.programs_total_sets_desc, totalSets),
+                        contentDesc = pluralStringResource(R.plurals.sets_count, totalSets, totalSets),
                     )
                 }
             }

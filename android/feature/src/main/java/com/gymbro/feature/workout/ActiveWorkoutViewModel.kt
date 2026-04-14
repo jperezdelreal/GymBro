@@ -433,6 +433,34 @@ class ActiveWorkoutViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Issue #560: Checks if an exercise is truly bodyweight (no external load).
+     * WARNING: Some exercises like "Weighted Pull-Up" are tagged BODYWEIGHT in seed data but ARE loaded.
+     * We check both equipment AND exercise name patterns.
+     */
+    private fun isTrueBodyweightExercise(exercise: Exercise): Boolean {
+        val bodyweightNames = setOf(
+            "Pull-Up", "Chin-Up", "Push-Up", "Dip", "Sit-Up", "Crunch",
+            "Plank", "Jumping Jack", "Burpee", "Mountain Climber", "Air Squat"
+        )
+        return exercise.equipment == com.gymbro.core.model.Equipment.BODYWEIGHT 
+            && bodyweightNames.any { exercise.name.contains(it, ignoreCase = true) }
+            && !exercise.name.contains("Weighted", ignoreCase = true)
+    }
+
+    /**
+     * Issue #562: Returns plausible max weight (kg) for an exercise category.
+     * Used for soft validation warnings, not hard limits.
+     */
+    private fun getPlausibleMaxWeight(category: ExerciseCategory): Double {
+        return when (category) {
+            ExerciseCategory.COMPOUND -> 300.0    // Heavy barbell lifts (squat, deadlift)
+            ExerciseCategory.ISOLATION -> 100.0   // Single-joint movements (curls, extensions)
+            ExerciseCategory.ACCESSORY -> 60.0    // Light accessories (lateral raises, face pulls)
+            ExerciseCategory.CARDIO -> 40.0       // Loaded cardio (weighted vest, sled)
+        }
+    }
+
     private fun completeSet(exerciseIndex: Int, setIndex: Int) {
         val currentState = _state.value
         val workoutId = currentState.workoutId ?: return
@@ -444,7 +472,14 @@ class ActiveWorkoutViewModel @Inject constructor(
 
         if (setUi.isCompleted) return
 
-        val weightKg = setUi.weight.toDoubleOrNull()
+        // Issue #560: Default to 0 for true bodyweight exercises (Pull-Up, Push-Up, Dip, etc.)
+        val weightInput = if (setUi.weight.isBlank() && isTrueBodyweightExercise(exerciseUi.exercise)) {
+            "0"
+        } else {
+            setUi.weight
+        }
+
+        val weightKg = weightInput.toDoubleOrNull()
         if (weightKg == null) {
             _state.update { it.copy(errorMessage = "Please enter a valid weight before completing the set") }
             return
@@ -452,6 +487,16 @@ class ActiveWorkoutViewModel @Inject constructor(
         val reps = setUi.reps.toIntOrNull()
         if (reps == null) {
             _state.update { it.copy(errorMessage = "Please enter valid reps before completing the set") }
+            return
+        }
+
+        // Issue #562: Soft validation warning for implausible weights
+        // Don't reject, just warn — user may legitimately be logging exceptional lifts
+        val maxPlausible = getPlausibleMaxWeight(exerciseUi.exercise.category)
+        if (weightKg > maxPlausible && !setUi.isWarmup) {
+            _state.update { 
+                it.copy(errorMessage = "⚠️ ${weightKg}kg seems high for ${exerciseUi.exercise.name} (${exerciseUi.exercise.category.displayName}). Typical max: ${maxPlausible.toInt()}kg. Double-check before continuing.")
+            }
             return
         }
 
@@ -478,7 +523,7 @@ class ActiveWorkoutViewModel @Inject constructor(
             updateSetField(exerciseIndex, setIndex) { it.copy(isCompleted = true) }
 
             // Auto-fill carry-forward: pre-fill subsequent empty sets with this set's weight/reps
-            carryForwardToNextSets(exerciseIndex, setUi.weight, setUi.reps)
+            carryForwardToNextSets(exerciseIndex, weightInput, setUi.reps)
 
             // Check for new PRs after this set
             checkForNewPR(exerciseUi, weightKg, reps, exerciseIndex, setIndex)

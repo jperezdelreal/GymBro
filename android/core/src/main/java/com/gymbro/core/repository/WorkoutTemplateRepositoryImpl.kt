@@ -1,5 +1,6 @@
 package com.gymbro.core.repository
 
+import android.content.Context
 import android.util.Log
 import com.gymbro.core.database.dao.WorkoutTemplateDao
 import com.gymbro.core.database.dao.WorkoutTemplateWithExercises
@@ -11,6 +12,7 @@ import com.gymbro.core.error.runCatchingAsResult
 import com.gymbro.core.model.MuscleGroup
 import com.gymbro.core.model.TemplateExercise
 import com.gymbro.core.model.WorkoutTemplate
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
@@ -20,6 +22,7 @@ import java.util.UUID
 import javax.inject.Inject
 
 class WorkoutTemplateRepositoryImpl @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val templateDao: WorkoutTemplateDao,
     private val exerciseRepository: ExerciseRepository,
 ) : WorkoutTemplateRepository {
@@ -159,8 +162,8 @@ class WorkoutTemplateRepositoryImpl @Inject constructor(
 
                 if (ss5x5DayA.isNotEmpty()) {
                     saveTemplate(WorkoutTemplate(
-                        name = "Starting Strength 5×5 - Day A",
-                        description = "Classic beginner strength program: Squat, Bench, Row. Linear progression, 3 days/week.",
+                        name = context.getString(com.gymbro.core.R.string.template_starting_strength_day_a_name),
+                        description = context.getString(com.gymbro.core.R.string.template_starting_strength_day_a_desc),
                         exercises = ss5x5DayA,
                         isBuiltIn = true,
                     ))
@@ -184,8 +187,8 @@ class WorkoutTemplateRepositoryImpl @Inject constructor(
 
                 if (ss5x5DayB.isNotEmpty()) {
                     saveTemplate(WorkoutTemplate(
-                        name = "Starting Strength 5×5 - Day B",
-                        description = "Alternate day: Squat, Overhead Press, Deadlift. Alternate with Day A.",
+                        name = context.getString(com.gymbro.core.R.string.template_starting_strength_day_b_name),
+                        description = context.getString(com.gymbro.core.R.string.template_starting_strength_day_b_desc),
                         exercises = ss5x5DayB,
                         isBuiltIn = true,
                     ))
@@ -472,8 +475,8 @@ class WorkoutTemplateRepositoryImpl @Inject constructor(
 
                 if (fullBodyDay1.isNotEmpty()) {
                     saveTemplate(WorkoutTemplate(
-                        name = "Full Body - Day 1",
-                        description = "Complete body workout hitting all major movement patterns. Squat + horizontal press focus.",
+                        name = context.getString(com.gymbro.core.R.string.template_full_body_day_1_name),
+                        description = context.getString(com.gymbro.core.R.string.template_full_body_day_1_desc),
                         exercises = fullBodyDay1,
                         isBuiltIn = true,
                     ))
@@ -509,8 +512,8 @@ class WorkoutTemplateRepositoryImpl @Inject constructor(
 
                 if (fullBodyDay2.isNotEmpty()) {
                     saveTemplate(WorkoutTemplate(
-                        name = "Full Body - Day 2",
-                        description = "Full body with deadlift + vertical press/pull emphasis. Alternate with Day 1.",
+                        name = context.getString(com.gymbro.core.R.string.template_full_body_day_2_name),
+                        description = context.getString(com.gymbro.core.R.string.template_full_body_day_2_desc),
                         exercises = fullBodyDay2,
                         isBuiltIn = true,
                     ))
@@ -546,8 +549,8 @@ class WorkoutTemplateRepositoryImpl @Inject constructor(
 
                 if (fullBodyDay3.isNotEmpty()) {
                     saveTemplate(WorkoutTemplate(
-                        name = "Full Body - Day 3",
-                        description = "Full body variation workout with dumbbell emphasis and unilateral work.",
+                        name = context.getString(com.gymbro.core.R.string.template_full_body_day_3_name),
+                        description = context.getString(com.gymbro.core.R.string.template_full_body_day_3_desc),
                         exercises = fullBodyDay3,
                         isBuiltIn = true,
                     ))

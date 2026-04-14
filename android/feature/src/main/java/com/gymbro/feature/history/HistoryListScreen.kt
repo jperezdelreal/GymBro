@@ -45,6 +45,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -336,7 +337,7 @@ private fun WorkoutCard(
                     )
                     StatChip(
                         icon = Icons.Default.FitnessCenter,
-                        label = stringResource(R.string.history_exercises_count, workout.exerciseCount),
+                        label = pluralStringResource(R.plurals.exercises_count, workout.exerciseCount, workout.exerciseCount),
                         gradientColors = listOf(AccentGreenStart, AccentGreenEnd),
                     )
                 }
@@ -385,7 +386,7 @@ private fun getRelativeTime(workoutDate: LocalDate): String {
         daysBetween == 1L -> stringResource(R.string.history_yesterday)
         daysBetween < 7 -> stringResource(R.string.history_days_ago, daysBetween.toInt())
         daysBetween < 14 -> stringResource(R.string.history_one_week_ago)
-        daysBetween < 30 -> stringResource(R.string.history_weeks_ago, (daysBetween / 7).toInt())
+        daysBetween < 30 -> pluralStringResource(R.plurals.weeks_count, (daysBetween / 7).toInt(), (daysBetween / 7).toInt())
         else -> stringResource(R.string.history_months_ago, (daysBetween / 30).toInt())
     }
 }

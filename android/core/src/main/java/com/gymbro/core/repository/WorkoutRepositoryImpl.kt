@@ -93,6 +93,27 @@ class WorkoutRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun updateSet(setId: String, weight: Double, reps: Int, rpe: Double?) {
+        val result = retryWithBackoff {
+            runCatchingAsResult {
+                val existingSet = workoutDao.getSetById(setId) ?: throw Exception("Set not found")
+                val updatedSet = existingSet.copy(
+                    weight = weight,
+                    reps = reps,
+                    rpe = rpe
+                )
+                workoutDao.updateSet(updatedSet)
+            }
+        }
+        when (result) {
+            is AppResult.Success -> Unit
+            is AppResult.Error -> {
+                Log.e(TAG, "Failed to update set $setId: ${result.error.message}")
+                throw Exception(result.error.message)
+            }
+        }
+    }
+
     override suspend fun completeWorkout(workoutId: String, durationSeconds: Long, notes: String) {
         val result = retryWithBackoff {
             runCatchingAsResult {

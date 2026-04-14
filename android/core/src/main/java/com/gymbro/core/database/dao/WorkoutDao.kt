@@ -40,6 +40,9 @@ interface WorkoutDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertSets(sets: List<WorkoutSetEntity>)
 
+    @Update
+    suspend fun updateSet(set: WorkoutSetEntity)
+
     @Query("DELETE FROM workout_sets WHERE id = :setId")
     suspend fun deleteSet(setId: String)
 
@@ -89,6 +92,9 @@ interface WorkoutDao {
 
     @Query("SELECT * FROM workout_sets WHERE workoutId = :workoutId")
     suspend fun getSetsForWorkout(workoutId: String): List<WorkoutSetEntity>
+
+    @Query("SELECT * FROM workout_sets WHERE id = :setId")
+    suspend fun getSetById(setId: String): WorkoutSetEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun saveInProgressWorkout(inProgressWorkout: com.gymbro.core.database.entity.InProgressWorkoutEntity)
