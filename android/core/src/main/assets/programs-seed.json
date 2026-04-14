@@ -146,7 +146,8 @@
               }
             ]
           }
-        ]
+        ],
+        "dayDescriptionEs": "Principal: Sentadilla con barra, Suplementario: 5x10 BBB Sentadilla, Accesorios: Prensa de piernas + Rueda abdominal"
       },
       {
         "dayNumber": 2,
@@ -285,7 +286,8 @@
               }
             ]
           }
-        ]
+        ],
+        "dayDescriptionEs": "Principal: Press de banca, Suplementario: 5x10 BBB Banca, Accesorios: Remo con mancuerna + Extensiones de tríceps"
       },
       {
         "dayNumber": 3,
@@ -424,7 +426,8 @@
               }
             ]
           }
-        ]
+        ],
+        "dayDescriptionEs": "Principal: Peso muerto, Suplementario: 5x10 BBB Peso muerto, Accesorios: Sentadilla búlgara + Elevación de piernas colgado"
       },
       {
         "dayNumber": 4,
@@ -563,9 +566,11 @@
               }
             ]
           }
-        ]
+        ],
+        "dayDescriptionEs": "Principal: Press militar, Suplementario: 5x10 BBB Press militar, Accesorios: Dominadas supinas + Elevaciones laterales"
       }
-    ]
+    ],
+    "programDescriptionEs": "Programa clásico de fuerza de 4 semanas con levantamientos principales a porcentajes prescritos y accesorios Boring But Big. Diseñado para levantadores intermedios-avanzados que buscan ganancias constantes de fuerza. Split de 4 días con levantamiento principal + trabajo suplementario 5x10 + accesorios."
   },
   {
     "name": "PPL - Hypertrophy Focus",
@@ -635,7 +640,8 @@
               }
             ]
           }
-        ]
+        ],
+        "dayDescriptionEs": "Press de banca pesado, trabajo inclinado, press por encima de la cabeza, tríceps"
       },
       {
         "dayNumber": 2,
@@ -695,7 +701,8 @@
               }
             ]
           }
-        ]
+        ],
+        "dayDescriptionEs": "Peso muerto, remos, jalones, bíceps"
       },
       {
         "dayNumber": 3,
@@ -755,7 +762,8 @@
               }
             ]
           }
-        ]
+        ],
+        "dayDescriptionEs": "Sentadillas pesadas, aislamiento de cuádriceps, isquiotibiales, pantorrillas"
       },
       {
         "dayNumber": 4,
@@ -815,7 +823,8 @@
               }
             ]
           }
-        ]
+        ],
+        "dayDescriptionEs": "Press militar, press con mancuernas, aperturas, deltoides posterior, tríceps"
       },
       {
         "dayNumber": 5,
@@ -875,7 +884,8 @@
               }
             ]
           }
-        ]
+        ],
+        "dayDescriptionEs": "Dominadas, remos en polea, deltoides posterior, bíceps"
       },
       {
         "dayNumber": 6,
@@ -935,9 +945,11 @@
               }
             ]
           }
-        ]
+        ],
+        "dayDescriptionEs": "Sentadilla frontal, peso muerto rumano, zancadas, pantorrillas"
       }
-    ]
+    ],
+    "programDescriptionEs": "Split Push/Pull/Legs de 6 días optimizado para crecimiento muscular. Progresión lineal en compuestos, accesorios enfocados en volumen. Ideal para levantadores intermedios en fase de crecimiento con buena capacidad de recuperación."
   },
   {
     "name": "GZCL Method - Linear Periodization",
@@ -991,7 +1003,8 @@
               }
             ]
           }
-        ]
+        ],
+        "dayDescriptionEs": "T1: Sentadilla, T2: Press banca, T3: Accesorios"
       },
       {
         "dayNumber": 2,
@@ -1035,7 +1048,8 @@
               }
             ]
           }
-        ]
+        ],
+        "dayDescriptionEs": "T1: Press banca, T2: Sentadilla, T3: Accesorios"
       },
       {
         "dayNumber": 3,
@@ -1079,7 +1093,8 @@
               }
             ]
           }
-        ]
+        ],
+        "dayDescriptionEs": "T1: Peso muerto, T2: Press militar, T3: Accesorios"
       },
       {
         "dayNumber": 4,
@@ -1123,9 +1138,11 @@
               }
             ]
           }
-        ]
+        ],
+        "dayDescriptionEs": "T1: Press militar, T2: Peso muerto, T3: Accesorios"
       }
-    ]
+    ],
+    "programDescriptionEs": "Estructura T1/T2/T3 basada en evidencia. T1 = compuestos pesados (85%+), T2 = compuestos moderados (65-85%), T3 = accesorios de altas repeticiones. Esquemas de repeticiones autorregulados. Split de 4 días tren superior/inferior."
   },
   {
     "name": "Starting Strength - Linear Progression",
@@ -1171,7 +1188,8 @@
               }
             ]
           }
-        ]
+        ],
+        "dayDescriptionEs": "Sentadilla, Press, Peso muerto"
       },
       {
         "dayNumber": 2,
@@ -1207,9 +1225,11 @@
               }
             ]
           }
-        ]
+        ],
+        "dayDescriptionEs": "Sentadilla, Press banca, Peso muerto"
       }
-    ]
+    ],
+    "programDescriptionEs": "Programa clásico de progresión lineal para principiantes. 3 días/semana con entrenamientos alternos A/B. Enfoque en los 5 levantamientos principales con progresión rápida. Ideal para novatos con menos de 1 año de experiencia."
   },
   {
     "name": "Upper/Lower 4-Day Split",
@@ -1279,7 +1299,8 @@
               }
             ]
           }
-        ]
+        ],
+        "dayDescriptionEs": "Empuje y tirón pesado (rango de 4-6 repeticiones)"
       },
       {
         "dayNumber": 2,
@@ -1331,7 +1352,8 @@
               }
             ]
           }
-        ]
+        ],
+        "dayDescriptionEs": "Sentadillas y peso muerto pesado (rango de 4-6 repeticiones)"
       },
       {
         "dayNumber": 3,
@@ -1391,7 +1413,8 @@
               }
             ]
           }
-        ]
+        ],
+        "dayDescriptionEs": "Volumen de empuje y tirón (rango de 8-12 repeticiones)"
       },
       {
         "dayNumber": 4,
@@ -1451,9 +1474,11 @@
               }
             ]
           }
-        ]
+        ],
+        "dayDescriptionEs": "Volumen de piernas (rango de 10-15 repeticiones)"
       }
-    ]
+    ],
+    "programDescriptionEs": "Split equilibrado de 4 días con 2 días de tren superior y 2 de inferior. Mezcla de trabajo de fuerza e hipertrofia. Ideal para levantadores intermedios que quieren flexibilidad y desarrollo equilibrado."
   },
   {
     "name": "Full Body 3x - Strength & Size",
@@ -1515,7 +1540,8 @@
               }
             ]
           }
-        ]
+        ],
+        "dayDescriptionEs": "Sentadilla pesada, press banca moderado, variación ligera de peso muerto"
       },
       {
         "dayNumber": 2,
@@ -1567,7 +1593,8 @@
               }
             ]
           }
-        ]
+        ],
+        "dayDescriptionEs": "Press banca pesado, peso muerto moderado, variación ligera de sentadilla"
       },
       {
         "dayNumber": 3,
@@ -1619,9 +1646,11 @@
               }
             ]
           }
-        ]
+        ],
+        "dayDescriptionEs": "Peso muerto pesado, sentadilla moderada, variación ligera de press banca"
       }
-    ]
+    ],
+    "programDescriptionEs": "Split de cuerpo completo de 3 días con enfoque en compuestos. Cada sesión entrena todos los grupos musculares principales. Ideal para intermedios con días de entrenamiento limitados que quieren desarrollo equilibrado."
   },
   {
     "name": "nSuns 5/3/1 LP",
@@ -1675,7 +1704,8 @@
               }
             ]
           }
-        ]
+        ],
+        "dayDescriptionEs": "T1: Press de banca (9 series), T2: Press militar (8 series), Accesorios: Pecho/Tríceps"
       },
       {
         "dayNumber": 2,
@@ -1719,7 +1749,8 @@
               }
             ]
           }
-        ]
+        ],
+        "dayDescriptionEs": "T1: Sentadilla (9 series), T2: Peso muerto sumo (8 series), Accesorios: Piernas/Core"
       },
       {
         "dayNumber": 3,
@@ -1763,7 +1794,8 @@
               }
             ]
           }
-        ]
+        ],
+        "dayDescriptionEs": "T1: Press militar (9 series), T2: Press inclinado (8 series), Accesorios: Hombros/Espalda"
       },
       {
         "dayNumber": 4,
@@ -1807,9 +1839,11 @@
               }
             ]
           }
-        ]
+        ],
+        "dayDescriptionEs": "T1: Peso muerto (9 series), T2: Sentadilla frontal (8 series), Accesorios: Espalda/Piernas"
       }
-    ]
+    ],
+    "programDescriptionEs": "Progresión lineal 5/3/1 de alto volumen con 9 series de levantamiento principal T1 (pirámide 5/3/1+) y 8 series de levantamiento secundario T2. Split de 4 días optimizado para ganancias rápidas de fuerza."
   },
   {
     "name": "PHUL - Power Hypertrophy Upper Lower",
@@ -1879,7 +1913,8 @@
               }
             ]
           }
-        ]
+        ],
+        "dayDescriptionEs": "Compuestos pesados de tren superior: press banca, remo, press militar. Enfoque en fuerza con rango de 3-5 repeticiones."
       },
       {
         "dayNumber": 2,
@@ -1931,7 +1966,8 @@
               }
             ]
           }
-        ]
+        ],
+        "dayDescriptionEs": "Compuestos pesados de tren inferior: sentadilla, peso muerto. Enfoque en fuerza con rango de 3-5 repeticiones."
       },
       {
         "dayNumber": 3,
@@ -1999,7 +2035,8 @@
               }
             ]
           }
-        ]
+        ],
+        "dayDescriptionEs": "Alto volumen tren superior: enfoque en rango de 8-12 repeticiones para crecimiento muscular. Más ejercicios, menos descanso."
       },
       {
         "dayNumber": 4,
@@ -2059,8 +2096,10 @@
               }
             ]
           }
-        ]
+        ],
+        "dayDescriptionEs": "Alto volumen tren inferior: enfoque en rango de 8-15 repeticiones para tamaño de piernas. Énfasis en cuádriceps e isquiotibiales."
       }
-    ]
+    ],
+    "programDescriptionEs": "Split de 4 días tren superior/inferior combinando entrenamiento de potencia (fuerza) e hipertrofia. Días 1-2 enfocados en compuestos pesados (3-5 reps), Días 3-4 enfatizan volumen y construcción muscular (8-12 reps). Ideal para fuerza y tamaño equilibrados."
   }
 ]

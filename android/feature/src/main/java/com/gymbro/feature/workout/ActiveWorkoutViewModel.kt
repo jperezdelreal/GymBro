@@ -3,6 +3,7 @@ package com.gymbro.feature.workout
 import androidx.lifecycle.viewModelScope
 import com.gymbro.core.error.toUserMessage
 import com.gymbro.core.model.Exercise
+import com.gymbro.core.model.ExerciseCategory
 import com.gymbro.core.model.ExerciseSet
 import com.gymbro.core.model.MuscleGroup
 import com.gymbro.core.repository.ExerciseRepository
@@ -11,6 +12,7 @@ import com.gymbro.core.service.ActivePlanStore
 import com.gymbro.core.service.RpeTrendService
 import com.gymbro.core.service.PersonalRecordService
 import com.gymbro.core.service.SmartDefaultsService
+import com.gymbro.core.service.WorkoutPlanGenerator
 import com.gymbro.feature.common.BaseViewModel
 import com.gymbro.feature.common.TooltipManager
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -185,7 +187,7 @@ class ActiveWorkoutViewModel @Inject constructor(
             is ActiveWorkoutEvent.StartNewWorkout -> startNewWorkout()
             is ActiveWorkoutEvent.AddExerciseClicked -> {
                 viewModelScope.launch {
-                    _effect.send(ActiveWorkoutEffect.ShowExercisePicker)
+                    _effect.send(ActiveWorkoutEffect.ShowExercisePicker())
                 }
             }
             is ActiveWorkoutEvent.ExercisePicked -> {
@@ -214,9 +216,10 @@ class ActiveWorkoutViewModel @Inject constructor(
             is ActiveWorkoutEvent.RemoveSet -> removeSet(event.exerciseIndex, event.setIndex)
             is ActiveWorkoutEvent.RemoveExercise -> removeExercise(event.exerciseIndex)
             is ActiveWorkoutEvent.ReplaceExercise -> {
+                val muscleGroup = _state.value.exercises.getOrNull(event.exerciseIndex)?.exercise?.muscleGroup
                 _state.update { it.copy(replacingExerciseIndex = event.exerciseIndex) }
                 viewModelScope.launch {
-                    _effect.send(ActiveWorkoutEffect.ShowExercisePicker)
+                    _effect.send(ActiveWorkoutEffect.ShowExercisePicker(filterMuscleGroup = muscleGroup))
                 }
             }
             is ActiveWorkoutEvent.VoiceInput -> {
@@ -239,7 +242,7 @@ class ActiveWorkoutViewModel @Inject constructor(
             is ActiveWorkoutEvent.ShowExerciseDetail -> showExerciseDetail(event.exercise)
             is ActiveWorkoutEvent.DismissExerciseDetail -> _state.update { it.copy(exerciseDetailSheet = null) }
             is ActiveWorkoutEvent.DismissPrCelebration -> _state.update { it.copy(prCelebration = null) }
-            is ActiveWorkoutEvent.SetTargetDuration -> _state.update { it.copy(targetDurationMinutes = event.minutes) }
+            is ActiveWorkoutEvent.SetTargetDuration -> adjustExercisesForDuration(event.minutes)
             is ActiveWorkoutEvent.MoveExerciseUp -> moveExercise(event.exerciseIndex, event.exerciseIndex - 1)
             is ActiveWorkoutEvent.MoveExerciseDown -> moveExercise(event.exerciseIndex, event.exerciseIndex + 1)
         }
@@ -356,6 +359,32 @@ class ActiveWorkoutViewModel @Inject constructor(
             }
             autoSaveState()
         }
+    }
+
+    private fun adjustExercisesForDuration(minutes: Int) {
+        _state.update { current ->
+            val exercises = current.exercises
+            if (exercises.isEmpty()) return@update current.copy(targetDurationMinutes = minutes)
+
+            val budgetSeconds = WorkoutPlanGenerator.workTimeBudgetSeconds(minutes)
+            var accumulated = 0
+            var fitCount = 0
+            for (ex in exercises) {
+                val sets = ex.sets.size.coerceAtLeast(1)
+                val time = WorkoutPlanGenerator.estimateExerciseTimeSeconds(ex.exercise.category, sets)
+                if (accumulated + time > budgetSeconds && fitCount >= WorkoutPlanGenerator.MIN_EXERCISES) break
+                accumulated += time
+                fitCount++
+            }
+            fitCount = fitCount.coerceIn(WorkoutPlanGenerator.MIN_EXERCISES, exercises.size)
+
+            val trimmed = exercises.take(fitCount)
+            current.copy(
+                exercises = trimmed,
+                targetDurationMinutes = minutes,
+            )
+        }
+        autoSaveState()
     }
 
     private fun addSet(exerciseIndex: Int) {

@@ -25,6 +25,9 @@ class ProgramTemplateRepositoryImpl @Inject constructor(
     private val _templates = MutableStateFlow<List<ProgramTemplate>>(emptyList())
     private var isInitialized = false
 
+    private val isSpanish: Boolean
+        get() = context.resources.configuration.locales[0].language == "es"
+
     override fun observeAllTemplates(): Flow<List<ProgramTemplate>> {
         return _templates.asStateFlow()
     }
@@ -59,11 +62,12 @@ class ProgramTemplateRepositoryImpl @Inject constructor(
     }
 
     private suspend fun loadTemplatesFromAssets() {
+        val useSpanish = isSpanish
         val result = retryWithBackoff {
             runCatchingAsResult {
                 val jsonString = context.assets.open("programs-seed.json").bufferedReader().use { it.readText() }
                 val dtos = json.decodeFromString<List<ProgramTemplateDto>>(jsonString)
-                dtos.map { it.toDomain() }
+                dtos.map { it.toDomain(useSpanish) }
             }
         }
         when (result) {

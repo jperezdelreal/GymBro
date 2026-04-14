@@ -300,8 +300,13 @@ fun GymBroNavGraph(
             } else null
 
             ActiveWorkoutRoute(
-                onNavigateToExercisePicker = {
-                    navController.navigate("exercise_picker")
+                onNavigateToExercisePicker = { muscleGroup ->
+                    val route = if (muscleGroup != null) {
+                        "exercise_picker?muscleGroup=${muscleGroup.name}"
+                    } else {
+                        "exercise_picker"
+                    }
+                    navController.navigate(route)
                 },
                 onNavigateToSummary = { duration, volume, sets, exercises, prs ->
                     workoutResultStore.setPersonalRecords(prs)
@@ -335,7 +340,20 @@ fun GymBroNavGraph(
                 },
             )
         }
-        composable("exercise_picker") {
+        composable(
+            route = "exercise_picker?muscleGroup={muscleGroup}",
+            arguments = listOf(
+                navArgument("muscleGroup") {
+                    type = NavType.StringType
+                    nullable = true
+                    defaultValue = null
+                },
+            ),
+        ) { backStackEntry ->
+            val muscleGroupName = backStackEntry.arguments?.getString("muscleGroup")
+            val filterMuscleGroup = muscleGroupName?.let { name ->
+                MuscleGroup.entries.find { it.name == name }
+            }
             ExerciseLibraryRoute(
                 onNavigateToDetail = { },
                 onExercisePicked = { exercise ->
@@ -360,6 +378,7 @@ fun GymBroNavGraph(
                     navController.popBackStack()
                 },
                 isPickerMode = true,
+                initialMuscleGroupFilter = filterMuscleGroup,
             )
         }
         composable(

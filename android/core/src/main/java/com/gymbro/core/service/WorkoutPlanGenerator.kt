@@ -44,6 +44,47 @@ class WorkoutPlanGenerator @Inject constructor(
         // Exercise count bounds
         const val MIN_EXERCISES = 3
         const val MAX_EXERCISES = 12
+
+        /**
+         * Estimates how long a single exercise takes in seconds.
+         */
+        fun estimateExerciseTimeSeconds(
+            category: ExerciseCategory,
+            sets: Int,
+            repsRange: String = "10",
+            restSeconds: Int = REST_TIME_HYPERTROPHY,
+        ): Int {
+            val midReps = parseRepsRangeMidpoint(repsRange)
+            val repDuration = when (category) {
+                ExerciseCategory.COMPOUND -> REP_DURATION_COMPOUND
+                else -> REP_DURATION_ISOLATION
+            }
+            val transitionTime = when (category) {
+                ExerciseCategory.COMPOUND -> TRANSITION_TIME_COMPOUND
+                else -> TRANSITION_TIME_ISOLATION
+            }
+            val timePerSet = (midReps * repDuration) + restSeconds
+            return (sets * timePerSet) + transitionTime
+        }
+
+        /**
+         * Returns the available work time in seconds after warmup and cooldown.
+         */
+        fun workTimeBudgetSeconds(sessionDurationMinutes: Int): Int {
+            val totalSeconds = sessionDurationMinutes * 60
+            return maxOf(0, totalSeconds - WARMUP_TIME_SECONDS - COOLDOWN_TIME_SECONDS)
+        }
+
+        private fun parseRepsRangeMidpoint(repsRange: String): Int {
+            val parts = repsRange.split("-")
+            return if (parts.size == 2) {
+                val low = parts[0].trim().toIntOrNull() ?: 10
+                val high = parts[1].trim().toIntOrNull() ?: 12
+                (low + high) / 2
+            } else {
+                repsRange.trim().toIntOrNull() ?: 10
+            }
+        }
     }
 
     suspend fun generatePlan(
@@ -76,55 +117,6 @@ class WorkoutPlanGenerator @Inject constructor(
                 allExercises, experienceLevel, daysPerWeek, split, volumeMultiplier, sessionDurationMinutes
             )
         }
-    }
-
-    /**
-     * Parses a rep range string (e.g. "8-12") and returns the midpoint for time estimation.
-     */
-    private fun parseRepsRangeMidpoint(repsRange: String): Int {
-        val parts = repsRange.split("-")
-        return if (parts.size == 2) {
-            val low = parts[0].trim().toIntOrNull() ?: 10
-            val high = parts[1].trim().toIntOrNull() ?: 12
-            (low + high) / 2
-        } else {
-            repsRange.trim().toIntOrNull() ?: 10
-        }
-    }
-
-    /**
-     * Estimates how long a single exercise takes in seconds.
-     * Compounds get longer transition time (plate loading, rack setup) and
-     * slower rep cadence (bracing, grinding) than isolation work.
-     *
-     *   timePerSet = (reps × repDuration) + restTime
-     *   exerciseTime = (sets × timePerSet) + transitionTime
-     */
-    private fun estimateExerciseTimeSeconds(
-        category: ExerciseCategory,
-        sets: Int,
-        repsRange: String,
-        restSeconds: Int,
-    ): Int {
-        val midReps = parseRepsRangeMidpoint(repsRange)
-        val repDuration = when (category) {
-            ExerciseCategory.COMPOUND -> REP_DURATION_COMPOUND
-            else -> REP_DURATION_ISOLATION
-        }
-        val transitionTime = when (category) {
-            ExerciseCategory.COMPOUND -> TRANSITION_TIME_COMPOUND
-            else -> TRANSITION_TIME_ISOLATION
-        }
-        val timePerSet = (midReps * repDuration) + restSeconds
-        return (sets * timePerSet) + transitionTime
-    }
-
-    /**
-     * Returns the available work time in seconds after warmup and cooldown.
-     */
-    private fun workTimeBudgetSeconds(sessionDurationMinutes: Int): Int {
-        val totalSeconds = sessionDurationMinutes * 60
-        return maxOf(0, totalSeconds - WARMUP_TIME_SECONDS - COOLDOWN_TIME_SECONDS)
     }
 
     private fun generateStrengthPlan(

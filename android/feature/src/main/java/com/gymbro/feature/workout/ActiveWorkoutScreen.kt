@@ -138,7 +138,7 @@ private fun getMuscleGroupColor(muscleGroup: MuscleGroup): Color {
 @Composable
 fun ActiveWorkoutRoute(
     viewModel: ActiveWorkoutViewModel = hiltViewModel(),
-    onNavigateToExercisePicker: () -> Unit = {},
+    onNavigateToExercisePicker: (MuscleGroup?) -> Unit = {},
     onNavigateToSummary: (Long, Double, Int, Int, List<com.gymbro.core.model.PersonalRecord>) -> Unit = { _, _, _, _, _ -> },
     onNavigateBack: () -> Unit = {},
     onNavigateToCoach: () -> Unit = {},
@@ -197,7 +197,7 @@ fun ActiveWorkoutRoute(
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
             when (effect) {
-                is ActiveWorkoutEffect.ShowExercisePicker -> onNavigateToExercisePicker()
+                is ActiveWorkoutEffect.ShowExercisePicker -> onNavigateToExercisePicker(effect.filterMuscleGroup)
                 is ActiveWorkoutEffect.NavigateToSummary -> onNavigateToSummary(
                     effect.durationSeconds,
                     effect.totalVolume,

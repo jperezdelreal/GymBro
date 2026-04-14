@@ -97,6 +97,7 @@ fun ExerciseLibraryRoute(
     onNavigateBack: () -> Unit = {},
     onExercisePicked: ((Exercise) -> Unit)? = null,
     isPickerMode: Boolean = false,
+    initialMuscleGroupFilter: MuscleGroup? = null,
     sharedTransitionScope: SharedTransitionScope? = null,
     animatedContentScope: AnimatedVisibilityScope? = null,
 ) {
@@ -107,6 +108,13 @@ fun ExerciseLibraryRoute(
         errorFlow = viewModel.errorEvents,
         snackbarHostState = snackbarHostState
     )
+
+    // Auto-apply muscle group filter when provided (e.g. exercise replacement)
+    LaunchedEffect(initialMuscleGroupFilter) {
+        if (initialMuscleGroupFilter != null) {
+            viewModel.onEvent(ExerciseLibraryEvent.MuscleGroupSelected(initialMuscleGroupFilter))
+        }
+    }
 
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->

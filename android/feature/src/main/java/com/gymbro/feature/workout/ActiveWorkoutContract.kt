@@ -1,6 +1,7 @@
 package com.gymbro.feature.workout
 
 import com.gymbro.core.model.Exercise
+import com.gymbro.core.model.MuscleGroup
 import com.gymbro.core.model.PersonalRecord
 import com.gymbro.core.service.ProgressionEngine
 
@@ -120,7 +121,7 @@ sealed interface ActiveWorkoutEvent {
 }
 
 sealed interface ActiveWorkoutEffect {
-    data object ShowExercisePicker : ActiveWorkoutEffect
+    data class ShowExercisePicker(val filterMuscleGroup: MuscleGroup? = null) : ActiveWorkoutEffect
     data class NavigateToSummary(
         val durationSeconds: Long,
         val totalVolume: Double,

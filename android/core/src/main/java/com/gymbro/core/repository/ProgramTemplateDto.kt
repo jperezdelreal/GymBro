@@ -10,14 +10,16 @@ internal data class ProgramTemplateDto(
     val name: String,
     @SerialName("programDescription")
     val description: String,
+    @SerialName("programDescriptionEs")
+    val descriptionEs: String? = null,
     val durationWeeks: Int?,
     val frequencyPerWeek: Int,
     val periodizationType: String,
     val targetAudience: String,
-    val primaryGoal: String,
+    val primaryGoal: String = "GENERAL_FITNESS",
     val expectedOutcome: String,
     val progressionScheme: String,
-    val authorCredit: String,
+    val authorCredit: String = "",
     val days: List<ProgramDayDto>,
 )
 
@@ -27,6 +29,8 @@ internal data class ProgramDayDto(
     val name: String,
     @SerialName("dayDescription")
     val description: String,
+    @SerialName("dayDescriptionEs")
+    val descriptionEs: String? = null,
     val weekVariations: List<WeekVariationDto>,
 )
 
@@ -46,11 +50,11 @@ internal data class ProgramExerciseDto(
     val notes: String,
 )
 
-internal fun ProgramTemplateDto.toDomain(): ProgramTemplate {
+internal fun ProgramTemplateDto.toDomain(isSpanish: Boolean = false): ProgramTemplate {
     return ProgramTemplate(
         id = UUID.randomUUID(),
         name = name,
-        description = description,
+        description = if (isSpanish && descriptionEs != null) descriptionEs else description,
         durationWeeks = durationWeeks,
         frequencyPerWeek = frequencyPerWeek,
         periodizationType = parsePeriodizationType(periodizationType),
@@ -59,16 +63,16 @@ internal fun ProgramTemplateDto.toDomain(): ProgramTemplate {
         expectedOutcome = expectedOutcome,
         progressionScheme = progressionScheme,
         authorCredit = authorCredit,
-        days = days.map { it.toDomain() },
+        days = days.map { it.toDomain(isSpanish) },
         isBuiltIn = true,
     )
 }
 
-internal fun ProgramDayDto.toDomain(): ProgramDay {
+internal fun ProgramDayDto.toDomain(isSpanish: Boolean = false): ProgramDay {
     return ProgramDay(
         dayNumber = dayNumber,
         name = name,
-        description = description,
+        description = if (isSpanish && descriptionEs != null) descriptionEs else description,
         weekVariations = weekVariations.map { it.toDomain() },
     )
 }
