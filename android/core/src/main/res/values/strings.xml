@@ -533,6 +533,10 @@
     <string name="active_workout_create_superset">Link as Superset</string>
     <string name="active_workout_unlink_superset">Unlink Superset</string>
     <string name="active_workout_superset_rest">Rest after superset</string>
+    <string name="active_workout_superset_label">Superset</string>
+    <string name="active_workout_ungroup_superset">Ungroup</string>
+    <string name="active_workout_superset_tap_ungroup">Tap to ungroup superset</string>
+    <string name="active_workout_superset_position" formatted="false">%s-%d</string>
     
     <!-- Progression Suggestions -->
     <string name="progression_last" formatted="false">Last: %s × %d</string>
@@ -902,4 +906,11 @@
     <string name="progress_chart_volume_value" formatted="false">Volume: %s %s</string>
     <string name="progress_chart_rpe_warning">⚠️ Rising effort — consider a deload</string>
     <string name="progress_chart_section_title">Exercise Progression</string>
+
+    <!-- Exercise Replace (#546) -->
+    <string name="active_workout_replace_exercise">Replace exercise</string>
+
+    <!-- Duration Target (#545) -->
+    <string name="active_workout_remaining" formatted="false">%dm left</string>
+    <string name="active_workout_overtime">Overtime</string>
 </resources>

@@ -908,4 +908,11 @@
     <string name="progress_chart_volume_value" formatted="false">Volumen: %s %s</string>
     <string name="progress_chart_rpe_warning">⚠️ Esfuerzo creciente — considera un deload</string>
     <string name="progress_chart_section_title">Progresión de Ejercicio</string>
+
+    <!-- Exercise Replace (#546) -->
+    <string name="active_workout_replace_exercise">Reemplazar ejercicio</string>
+
+    <!-- Duration Target (#545) -->
+    <string name="active_workout_remaining" formatted="false">%dm restantes</string>
+    <string name="active_workout_overtime">Tiempo extra</string>
 </resources>

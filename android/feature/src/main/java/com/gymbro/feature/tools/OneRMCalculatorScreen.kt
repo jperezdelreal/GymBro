@@ -375,9 +375,10 @@ private fun getPercentageColor(percentage: Int): Color {
 private fun calculateOneRM(weight: Double, reps: Int): Double {
     if (weight <= 0 || reps <= 0) return 0.0
     if (reps == 1) return weight
-    
-    // Epley formula: 1RM = weight × (1 + reps/30)
-    return weight * (1 + reps / 30.0)
+    if (reps >= 37) return 0.0
+
+    // Brzycki formula: 1RM = weight × (36 / (37 - reps))
+    return weight * (36.0 / (37 - reps))
 }
 
 @Composable
