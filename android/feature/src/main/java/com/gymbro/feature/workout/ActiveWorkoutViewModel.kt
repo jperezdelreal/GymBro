@@ -245,6 +245,7 @@ class ActiveWorkoutViewModel @Inject constructor(
             is ActiveWorkoutEvent.SetTargetDuration -> adjustExercisesForDuration(event.minutes)
             is ActiveWorkoutEvent.MoveExerciseUp -> moveExercise(event.exerciseIndex, event.exerciseIndex - 1)
             is ActiveWorkoutEvent.MoveExerciseDown -> moveExercise(event.exerciseIndex, event.exerciseIndex + 1)
+            is ActiveWorkoutEvent.ReorderExercise -> moveExercise(event.fromIndex, event.toIndex)
         }
     }
     
