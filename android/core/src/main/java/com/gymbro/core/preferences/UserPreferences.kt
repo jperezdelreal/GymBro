@@ -40,6 +40,7 @@ class UserPreferences @Inject constructor(
         val MANUAL_MUSCLE_SORENESS = intPreferencesKey("manual_muscle_soreness")
         val MANUAL_ENERGY_LEVEL = intPreferencesKey("manual_energy_level")
         val THEME_PREFERENCE = stringPreferencesKey("theme_preference")
+        val ACTIVE_PLAN_JSON = stringPreferencesKey("active_plan_json")
     }
 
     enum class WeightUnit {
@@ -199,6 +200,20 @@ class UserPreferences @Inject constructor(
     suspend fun setThemePreference(theme: ThemePreference) {
         dataStore.edit { preferences ->
             preferences[THEME_PREFERENCE] = theme.name
+        }
+    }
+
+    val activePlanJson: Flow<String?> = dataStore.data.map { preferences ->
+        preferences[ACTIVE_PLAN_JSON]
+    }
+
+    suspend fun setActivePlanJson(json: String?) {
+        dataStore.edit { preferences ->
+            if (json != null) {
+                preferences[ACTIVE_PLAN_JSON] = json
+            } else {
+                preferences.remove(ACTIVE_PLAN_JSON)
+            }
         }
     }
 

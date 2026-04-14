@@ -20,6 +20,7 @@ sealed interface ProfileEvent {
     data object SignIn : ProfileEvent
     data object SignOut : ProfileEvent
     data object SyncNow : ProfileEvent
+    data object Refresh : ProfileEvent
     data class ToggleAutoSync(val enabled: Boolean) : ProfileEvent
 }
 

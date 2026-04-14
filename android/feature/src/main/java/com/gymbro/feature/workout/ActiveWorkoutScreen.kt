@@ -363,6 +363,31 @@ fun ActiveWorkoutScreen(
                 },
             )
         }
+
+        // Issue #562: Weight sanity check confirmation dialog
+        val weightWarning = state.weightWarning
+        if (weightWarning != null) {
+            AlertDialog(
+                onDismissRequest = { onEvent(ActiveWorkoutEvent.DismissWeightWarning) },
+                title = { Text("⚠️ Peso inusual") },
+                text = {
+                    Text(
+                        "El peso ingresado (${weightWarning.weight.toInt()}kg) parece inusual para ${weightWarning.exerciseName}. " +
+                        "Máximo típico: ${weightWarning.maxPlausible}kg. ¿Continuar?"
+                    )
+                },
+                confirmButton = {
+                    TextButton(onClick = { onEvent(ActiveWorkoutEvent.ConfirmWeightWarning) }) {
+                        Text("Sí")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { onEvent(ActiveWorkoutEvent.DismissWeightWarning) }) {
+                        Text("No")
+                    }
+                },
+            )
+        }
         
         Scaffold(
         topBar = {

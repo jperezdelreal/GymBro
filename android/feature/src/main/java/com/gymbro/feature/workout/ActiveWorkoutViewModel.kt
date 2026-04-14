@@ -169,18 +169,10 @@ class ActiveWorkoutViewModel @Inject constructor(
                     )
                 }
             }
-            // Auto-create superset groups from plan's supersetGroupId
-            val supersetMap = mutableMapOf<String, MutableList<Int>>()
-            pendingDay.exercises.forEachIndexed { index, planned ->
-                val groupId = planned.supersetGroupId ?: return@forEachIndexed
-                supersetMap.getOrPut(groupId) { mutableListOf() }.add(index)
-            }
-            val validGroups = supersetMap.filter { it.value.size >= 2 }
-            if (validGroups.isNotEmpty()) {
-                _state.update { current ->
-                    current.copy(supersetGroups = validGroups)
-                }
-            }
+            // BUG-007 fix: Don't auto-create superset groups from plan data.
+            // Users should manually group exercises during the workout via the
+            // superset selection UI. Auto-grouping was confusing because it showed
+            // "Superserie" labels on exercises users never explicitly grouped.
         }
     }
 
@@ -254,6 +246,8 @@ class ActiveWorkoutViewModel @Inject constructor(
             is ActiveWorkoutEvent.ShowExerciseDetail -> showExerciseDetail(event.exercise)
             is ActiveWorkoutEvent.DismissExerciseDetail -> _state.update { it.copy(exerciseDetailSheet = null) }
             is ActiveWorkoutEvent.DismissPrCelebration -> _state.update { it.copy(prCelebration = null) }
+            is ActiveWorkoutEvent.ConfirmWeightWarning -> confirmWeightWarning()
+            is ActiveWorkoutEvent.DismissWeightWarning -> _state.update { it.copy(weightWarning = null) }
             is ActiveWorkoutEvent.SetTargetDuration -> adjustExercisesForDuration(event.minutes)
             is ActiveWorkoutEvent.MoveExerciseUp -> moveExercise(event.exerciseIndex, event.exerciseIndex - 1)
             is ActiveWorkoutEvent.MoveExerciseDown -> moveExercise(event.exerciseIndex, event.exerciseIndex + 1)
@@ -491,14 +485,63 @@ class ActiveWorkoutViewModel @Inject constructor(
         }
 
         // Issue #562: Soft validation warning for implausible weights
-        // Don't reject, just warn — user may legitimately be logging exceptional lifts
+        // Show confirmation dialog — user may legitimately be logging exceptional lifts
         val maxPlausible = getPlausibleMaxWeight(exerciseUi.exercise.category)
         if (weightKg > maxPlausible && !setUi.isWarmup) {
-            _state.update { 
-                it.copy(errorMessage = "⚠️ ${weightKg}kg seems high for ${exerciseUi.exercise.name} (${exerciseUi.exercise.category.displayName}). Typical max: ${maxPlausible.toInt()}kg. Double-check before continuing.")
+            _state.update {
+                it.copy(weightWarning = WeightWarningState(
+                    exerciseIndex = exerciseIndex,
+                    setIndex = setIndex,
+                    weight = weightKg,
+                    exerciseName = exerciseUi.exercise.name,
+                    maxPlausible = maxPlausible.toInt(),
+                ))
             }
             return
         }
+
+        saveCompletedSet(exerciseIndex, setIndex, weightKg, reps, weightInput)
+    }
+
+    /**
+     * Issue #562: Confirms a weight warning and proceeds to save the set.
+     */
+    private fun confirmWeightWarning() {
+        val warning = _state.value.weightWarning ?: return
+        _state.update { it.copy(weightWarning = null) }
+
+        val currentState = _state.value
+        val exercises = currentState.exercises
+        if (warning.exerciseIndex !in exercises.indices) return
+        val exerciseUi = exercises[warning.exerciseIndex]
+        if (warning.setIndex !in exerciseUi.sets.indices) return
+        val setUi = exerciseUi.sets[warning.setIndex]
+        if (setUi.isCompleted) return
+
+        val weightInput = setUi.weight.ifBlank { warning.weight.toString() }
+        val reps = setUi.reps.toIntOrNull() ?: return
+
+        saveCompletedSet(warning.exerciseIndex, warning.setIndex, warning.weight, reps, weightInput)
+    }
+
+    /**
+     * Persists a completed set to the repository and triggers post-save actions
+     * (carry-forward, PR check, auto-add, rest timer).
+     */
+    private fun saveCompletedSet(
+        exerciseIndex: Int,
+        setIndex: Int,
+        weightKg: Double,
+        reps: Int,
+        weightInput: String,
+    ) {
+        val currentState = _state.value
+        val workoutId = currentState.workoutId ?: return
+        val exercises = currentState.exercises
+        if (exerciseIndex !in exercises.indices) return
+        val exerciseUi = exercises[exerciseIndex]
+        if (setIndex !in exerciseUi.sets.indices) return
+        val setUi = exerciseUi.sets[setIndex]
 
         safeLaunch(
             onError = { error ->
@@ -868,10 +911,8 @@ class ActiveWorkoutViewModel @Inject constructor(
                 }
             }
         ) {
-            val inProgress = workoutRepository.getInProgressWorkout()
-            if (inProgress != null) {
-                workoutRepository.clearInProgressWorkout(inProgress.workoutId)
-            }
+            // BUG-004 fix: Clear ALL stale in-progress data, not just one entry
+            workoutRepository.clearAllInProgressWorkouts()
             startWorkout()
         }
     }

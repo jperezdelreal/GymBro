@@ -426,8 +426,8 @@ private fun GetStartedPage(
             enabled = !isGeneratingPlan,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp)
-                .testTag("onboarding_start"),
+                .height(56.dp),
+            testTag = "onboarding_start",
         )
     }
 }

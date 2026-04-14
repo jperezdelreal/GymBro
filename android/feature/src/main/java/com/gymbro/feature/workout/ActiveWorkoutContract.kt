@@ -26,6 +26,7 @@ data class ActiveWorkoutState(
     val prCelebration: PrCelebrationUi? = null,
     val replacingExerciseIndex: Int? = null,
     val targetDurationMinutes: Int = 60,
+    val weightWarning: WeightWarningState? = null,
 )
 
 data class ExerciseDetailSheetState(
@@ -75,6 +76,14 @@ data class PrCelebrationUi(
     val previousValue: String?,
 )
 
+data class WeightWarningState(
+    val exerciseIndex: Int,
+    val setIndex: Int,
+    val weight: Double,
+    val exerciseName: String,
+    val maxPlausible: Int,
+)
+
 data class WorkoutSetUi(
     val id: String,
     val setNumber: Int,
@@ -116,6 +125,8 @@ sealed interface ActiveWorkoutEvent {
     data class ShowExerciseDetail(val exercise: Exercise) : ActiveWorkoutEvent
     data object DismissExerciseDetail : ActiveWorkoutEvent
     data object DismissPrCelebration : ActiveWorkoutEvent
+    data object ConfirmWeightWarning : ActiveWorkoutEvent
+    data object DismissWeightWarning : ActiveWorkoutEvent
     data class SetTargetDuration(val minutes: Int) : ActiveWorkoutEvent
     data class MoveExerciseUp(val exerciseIndex: Int) : ActiveWorkoutEvent
     data class MoveExerciseDown(val exerciseIndex: Int) : ActiveWorkoutEvent
