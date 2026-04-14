@@ -16,7 +16,7 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -558,11 +558,12 @@ fun ActiveWorkoutScreen(
                             Icon(
                                 Icons.Default.DragHandle,
                                 contentDescription = stringResource(R.string.active_workout_drag_handle),
-                                tint = Color.White.copy(alpha = 0.35f),
+                                tint = Color.White.copy(alpha = 0.7f),
                                 modifier = Modifier
-                                    .size(24.dp)
+                                    .size(48.dp)
+                                    .padding(12.dp)
                                     .pointerInput(exerciseIndex) {
-                                        detectDragGesturesAfterLongPress(
+                                        detectDragGestures(
                                             onDragStart = {
                                                 isDragging = true
                                                 haptic.performHapticFeedback(HapticFeedbackType.LongPress)
