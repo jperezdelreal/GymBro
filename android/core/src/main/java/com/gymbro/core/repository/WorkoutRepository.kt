@@ -14,6 +14,7 @@ interface WorkoutRepository {
     suspend fun startWorkout(): Workout
     suspend fun addSet(workoutId: String, set: ExerciseSet)
     suspend fun removeSet(setId: String)
+    suspend fun updateSet(setId: String, weight: Double, reps: Int, rpe: Double?)
     suspend fun completeWorkout(workoutId: String, durationSeconds: Long, notes: String)
     suspend fun getWorkout(workoutId: String): Workout?
     fun observeWorkout(workoutId: String): Flow<Workout?>

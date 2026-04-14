@@ -30,6 +30,32 @@ class HistoryDetailViewModel @Inject constructor(
             is HistoryDetailIntent.Retry -> {
                 state.value.workoutDetail?.workoutId?.let { loadWorkout(it) }
             }
+            is HistoryDetailIntent.StartEditingSet -> {
+                _state.value = _state.value.copy(
+                    editingSetId = intent.setId,
+                    editWeight = intent.weight.toString(),
+                    editReps = intent.reps.toString(),
+                    editRpe = intent.rpe?.toString() ?: ""
+                )
+            }
+            is HistoryDetailIntent.CancelEditing -> {
+                _state.value = _state.value.copy(
+                    editingSetId = null,
+                    editWeight = "",
+                    editReps = "",
+                    editRpe = ""
+                )
+            }
+            is HistoryDetailIntent.UpdateWeight -> {
+                _state.value = _state.value.copy(editWeight = intent.weight)
+            }
+            is HistoryDetailIntent.UpdateReps -> {
+                _state.value = _state.value.copy(editReps = intent.reps)
+            }
+            is HistoryDetailIntent.UpdateRpe -> {
+                _state.value = _state.value.copy(editRpe = intent.rpe)
+            }
+            is HistoryDetailIntent.SaveEdit -> saveEdit()
         }
     }
 
@@ -79,6 +105,7 @@ class HistoryDetailViewModel @Inject constructor(
                             .sortedBy { it.completedAt }
                             .mapIndexed { index, set ->
                                 SetDetail(
+                                    setId = set.id.toString(),
                                     setNumber = index + 1,
                                     weight = set.weightKg,
                                     reps = set.reps,
@@ -126,6 +153,32 @@ class HistoryDetailViewModel @Inject constructor(
                     isLoading = false,
                     errorRes = R.string.history_load_failed
                 )
+            }
+        }
+    }
+
+    private fun saveEdit() {
+        viewModelScope.launch {
+            val currentState = _state.value
+            val setId = currentState.editingSetId ?: return@launch
+            
+            val weight = currentState.editWeight.toDoubleOrNull() ?: return@launch
+            val reps = currentState.editReps.toIntOrNull() ?: return@launch
+            val rpe = currentState.editRpe.toDoubleOrNull()
+            
+            try {
+                workoutRepository.updateSet(setId, weight, reps, rpe)
+                
+                _state.value = _state.value.copy(
+                    editingSetId = null,
+                    editWeight = "",
+                    editReps = "",
+                    editRpe = ""
+                )
+                
+                currentState.workoutDetail?.workoutId?.let { loadWorkout(it) }
+            } catch (e: Exception) {
+                // Handle error - could add error state
             }
         }
     }

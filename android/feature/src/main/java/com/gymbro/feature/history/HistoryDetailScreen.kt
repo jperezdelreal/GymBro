@@ -134,7 +134,22 @@ fun HistoryDetailRoute(
                 }
                 state.workoutDetail != null -> {
                     state.workoutDetail?.also { detail ->
-                        HistoryDetailContent(detail = detail, weightUnitLabel = weightUnitLabel)
+                        HistoryDetailContent(
+                            detail = detail,
+                            weightUnitLabel = weightUnitLabel,
+                            editingSetId = state.editingSetId,
+                            editWeight = state.editWeight,
+                            editReps = state.editReps,
+                            editRpe = state.editRpe,
+                            onEditSet = { setId, weight, reps, rpe ->
+                                viewModel.onIntent(HistoryDetailIntent.StartEditingSet(setId, weight, reps, rpe))
+                            },
+                            onCancelEdit = { viewModel.onIntent(HistoryDetailIntent.CancelEditing) },
+                            onSaveEdit = { viewModel.onIntent(HistoryDetailIntent.SaveEdit) },
+                            onWeightChange = { viewModel.onIntent(HistoryDetailIntent.UpdateWeight(it)) },
+                            onRepsChange = { viewModel.onIntent(HistoryDetailIntent.UpdateReps(it)) },
+                            onRpeChange = { viewModel.onIntent(HistoryDetailIntent.UpdateRpe(it)) },
+                        )
                     }
                 }
             }
@@ -149,7 +164,20 @@ interface HistoryDetailPreferencesEntryPoint {
 }
 
 @Composable
-private fun HistoryDetailContent(detail: WorkoutDetail, weightUnitLabel: String = "kg") {
+private fun HistoryDetailContent(
+    detail: WorkoutDetail,
+    weightUnitLabel: String = "kg",
+    editingSetId: String? = null,
+    editWeight: String = "",
+    editReps: String = "",
+    editRpe: String = "",
+    onEditSet: (String, Double, Int, Double?) -> Unit = { _, _, _, _ -> },
+    onCancelEdit: () -> Unit = {},
+    onSaveEdit: () -> Unit = {},
+    onWeightChange: (String) -> Unit = {},
+    onRepsChange: (String) -> Unit = {},
+    onRpeChange: (String) -> Unit = {},
+) {
     var itemIndex = 0
     
     LazyColumn(
@@ -264,7 +292,21 @@ private fun HistoryDetailContent(detail: WorkoutDetail, weightUnitLabel: String 
 
         itemsIndexed(detail.exercises) { exerciseIndex, exercise ->
             val currentIndex = itemIndex++
-            ExerciseCard(exercise = exercise, index = currentIndex, weightUnitLabel = weightUnitLabel)
+            ExerciseCard(
+                exercise = exercise,
+                index = currentIndex,
+                weightUnitLabel = weightUnitLabel,
+                editingSetId = editingSetId,
+                editWeight = editWeight,
+                editReps = editReps,
+                editRpe = editRpe,
+                onEditSet = onEditSet,
+                onCancelEdit = onCancelEdit,
+                onSaveEdit = onSaveEdit,
+                onWeightChange = onWeightChange,
+                onRepsChange = onRepsChange,
+                onRpeChange = onRpeChange,
+            )
         }
 
         if (detail.volumeByMuscleGroup.isNotEmpty()) {
@@ -428,7 +470,21 @@ private fun StatCard(
 }
 
 @Composable
-private fun ExerciseCard(exercise: ExerciseDetail, index: Int, weightUnitLabel: String = "kg") {
+private fun ExerciseCard(
+    exercise: ExerciseDetail,
+    index: Int,
+    weightUnitLabel: String = "kg",
+    editingSetId: String? = null,
+    editWeight: String = "",
+    editReps: String = "",
+    editRpe: String = "",
+    onEditSet: (String, Double, Int, Double?) -> Unit = { _, _, _, _ -> },
+    onCancelEdit: () -> Unit = {},
+    onSaveEdit: () -> Unit = {},
+    onWeightChange: (String) -> Unit = {},
+    onRepsChange: (String) -> Unit = {},
+    onRpeChange: (String) -> Unit = {},
+) {
     var visible by remember { mutableStateOf(false) }
     
     LaunchedEffect(Unit) {
@@ -488,7 +544,20 @@ private fun ExerciseCard(exercise: ExerciseDetail, index: Int, weightUnitLabel: 
 
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     exercise.sets.forEach { set ->
-                        SetRow(set = set, weightUnitLabel = weightUnitLabel)
+                        SetRow(
+                            set = set,
+                            weightUnitLabel = weightUnitLabel,
+                            isEditing = editingSetId == set.setId,
+                            editWeight = editWeight,
+                            editReps = editReps,
+                            editRpe = editRpe,
+                            onEditClick = { onEditSet(set.setId, set.weight, set.reps, set.rpe) },
+                            onCancelEdit = onCancelEdit,
+                            onSaveEdit = onSaveEdit,
+                            onWeightChange = onWeightChange,
+                            onRepsChange = onRepsChange,
+                            onRpeChange = onRpeChange,
+                        )
                     }
                 }
 
@@ -526,7 +595,48 @@ private fun ExerciseCard(exercise: ExerciseDetail, index: Int, weightUnitLabel: 
 }
 
 @Composable
-private fun SetRow(set: SetDetail, weightUnitLabel: String = "kg") {
+private fun SetRow(
+    set: SetDetail,
+    weightUnitLabel: String = "kg",
+    isEditing: Boolean = false,
+    editWeight: String = "",
+    editReps: String = "",
+    editRpe: String = "",
+    onEditClick: () -> Unit = {},
+    onCancelEdit: () -> Unit = {},
+    onSaveEdit: () -> Unit = {},
+    onWeightChange: (String) -> Unit = {},
+    onRepsChange: (String) -> Unit = {},
+    onRpeChange: (String) -> Unit = {},
+) {
+    if (isEditing) {
+        EditSetRow(
+            set = set,
+            weightUnitLabel = weightUnitLabel,
+            editWeight = editWeight,
+            editReps = editReps,
+            editRpe = editRpe,
+            onCancelEdit = onCancelEdit,
+            onSaveEdit = onSaveEdit,
+            onWeightChange = onWeightChange,
+            onRepsChange = onRepsChange,
+            onRpeChange = onRpeChange,
+        )
+    } else {
+        ViewSetRow(
+            set = set,
+            weightUnitLabel = weightUnitLabel,
+            onEditClick = onEditClick,
+        )
+    }
+}
+
+@Composable
+private fun ViewSetRow(
+    set: SetDetail,
+    weightUnitLabel: String = "kg",
+    onEditClick: () -> Unit = {},
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -546,12 +656,14 @@ private fun SetRow(set: SetDetail, weightUnitLabel: String = "kg") {
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(
-                text = "${set.weight} $weightUnitLabel × ${set.reps}",
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Bold,
-                color = Color.White,
-            )
+            androidx.compose.material3.TextButton(onClick = onEditClick) {
+                Text(
+                    text = "${set.weight.toLong()} $weightUnitLabel × ${set.reps}",
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White,
+                )
+            }
             if (set.rpe != null) {
                 Box(
                     modifier = Modifier
@@ -570,6 +682,112 @@ private fun SetRow(set: SetDetail, weightUnitLabel: String = "kg") {
                         fontWeight = FontWeight.Bold,
                     )
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun EditSetRow(
+    set: SetDetail,
+    weightUnitLabel: String = "kg",
+    editWeight: String = "",
+    editReps: String = "",
+    editRpe: String = "",
+    onCancelEdit: () -> Unit = {},
+    onSaveEdit: () -> Unit = {},
+    onWeightChange: (String) -> Unit = {},
+    onRepsChange: (String) -> Unit = {},
+    onRpeChange: (String) -> Unit = {},
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(10.dp))
+            .background(AccentGreenStart.copy(alpha = 0.1f))
+            .padding(14.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        Text(
+            text = stringResource(R.string.history_set_number, set.setNumber),
+            style = MaterialTheme.typography.bodyLarge,
+            color = Color.White.copy(alpha = 0.7f),
+            fontWeight = FontWeight.Medium,
+        )
+        
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            androidx.compose.material3.OutlinedTextField(
+                value = editWeight,
+                onValueChange = onWeightChange,
+                label = { Text("Weight ($weightUnitLabel)") },
+                modifier = Modifier.weight(1f),
+                singleLine = true,
+                colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = Color.White,
+                    unfocusedTextColor = Color.White,
+                    focusedBorderColor = AccentGreenStart,
+                    unfocusedBorderColor = Color.White.copy(alpha = 0.5f),
+                    focusedLabelColor = AccentGreenStart,
+                    unfocusedLabelColor = Color.White.copy(alpha = 0.7f),
+                ),
+            )
+            
+            androidx.compose.material3.OutlinedTextField(
+                value = editReps,
+                onValueChange = onRepsChange,
+                label = { Text("Reps") },
+                modifier = Modifier.weight(1f),
+                singleLine = true,
+                colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = Color.White,
+                    unfocusedTextColor = Color.White,
+                    focusedBorderColor = AccentGreenStart,
+                    unfocusedBorderColor = Color.White.copy(alpha = 0.5f),
+                    focusedLabelColor = AccentGreenStart,
+                    unfocusedLabelColor = Color.White.copy(alpha = 0.7f),
+                ),
+            )
+            
+            androidx.compose.material3.OutlinedTextField(
+                value = editRpe,
+                onValueChange = onRpeChange,
+                label = { Text("RPE") },
+                modifier = Modifier.weight(1f),
+                singleLine = true,
+                colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = Color.White,
+                    unfocusedTextColor = Color.White,
+                    focusedBorderColor = AccentGreenStart,
+                    unfocusedBorderColor = Color.White.copy(alpha = 0.5f),
+                    focusedLabelColor = AccentGreenStart,
+                    unfocusedLabelColor = Color.White.copy(alpha = 0.7f),
+                ),
+            )
+        }
+        
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            androidx.compose.material3.TextButton(
+                onClick = onCancelEdit,
+                modifier = Modifier.weight(1f),
+            ) {
+                Text("Cancel", color = Color.White.copy(alpha = 0.7f))
+            }
+            
+            androidx.compose.material3.Button(
+                onClick = onSaveEdit,
+                modifier = Modifier.weight(1f),
+                colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                    containerColor = AccentGreenStart,
+                    contentColor = Color.White,
+                ),
+            ) {
+                Text("Save")
             }
         }
     }
