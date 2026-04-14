@@ -3,6 +3,7 @@ package com.gymbro.feature.workout
 import com.gymbro.core.model.Exercise
 import com.gymbro.core.model.MuscleGroup
 import com.gymbro.core.model.PersonalRecord
+import com.gymbro.core.model.RecordType
 import com.gymbro.core.service.ProgressionEngine
 
 data class ActiveWorkoutState(
@@ -68,7 +69,7 @@ data class ProgressionSuggestionUi(
 
 data class PrCelebrationUi(
     val exerciseName: String,
-    val recordType: String,
+    val recordType: RecordType,
     val value: String,
     val reps: String,
     val previousValue: String?,

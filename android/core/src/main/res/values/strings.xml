@@ -482,6 +482,10 @@
     <!-- Celebration -->
     <string name="celebration_new_pr">NEW PR!</string>
     <string name="celebration_tap_to_continue">Tap to continue</string>
+    <string name="pr_format_weight">%1$s %2$s: %3$s kg</string>
+    <string name="pr_format_reps">%1$s %2$s: %3$s reps</string>
+    <string name="pr_format_volume">%1$s %2$s: %3$s kg volume</string>
+    <string name="pr_format_e1rm">%1$s %2$s: %3$s kg E1RM</string>
     <string name="celebration_streak_7">One week of consistency — you\'re building serious momentum!</string>
     <string name="celebration_streak_30">One month strong — you\'re unstoppable!</string>
     <string name="celebration_streak_default">Keep the fire burning!</string>

@@ -251,4 +251,8 @@
     <string name="home_create_program_subtitle">Obtén un plan de entrenamiento personalizado basado en tus objetivos</string>
     <string name="home_recent_workouts">Entrenamientos Recientes</string>
     <string name="home_exercises_count">%d ejercicios</string>
+
+    <!-- Workout Validation Errors -->
+    <string name="error_invalid_weight">Ingresa un peso válido antes de completar la serie</string>
+    <string name="error_invalid_reps">Ingresa repeticiones válidas antes de completar la serie</string>
 </resources>

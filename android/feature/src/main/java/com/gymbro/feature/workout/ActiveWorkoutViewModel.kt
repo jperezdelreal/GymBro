@@ -444,8 +444,16 @@ class ActiveWorkoutViewModel @Inject constructor(
 
         if (setUi.isCompleted) return
 
-        val weightKg = setUi.weight.toDoubleOrNull() ?: return
-        val reps = setUi.reps.toIntOrNull() ?: return
+        val weightKg = setUi.weight.toDoubleOrNull()
+        if (weightKg == null) {
+            _state.update { it.copy(errorMessage = "Please enter a valid weight before completing the set") }
+            return
+        }
+        val reps = setUi.reps.toIntOrNull()
+        if (reps == null) {
+            _state.update { it.copy(errorMessage = "Please enter valid reps before completing the set") }
+            return
+        }
 
         safeLaunch(
             onError = { error ->
@@ -565,7 +573,7 @@ class ActiveWorkoutViewModel @Inject constructor(
                     it.copy(
                         prCelebration = PrCelebrationUi(
                             exerciseName = exerciseUi.exercise.name,
-                            recordType = newPR.type.displayName,
+                            recordType = newPR.type,
                             value = "$weightStr kg",
                             reps = reps.toString(),
                             previousValue = prevStr,
@@ -708,7 +716,9 @@ class ActiveWorkoutViewModel @Inject constructor(
             timerJob?.cancel()
             restTimerJob?.cancel()
 
-            val exerciseCount = currentState.exercises.size
+            val exerciseCount = currentState.exercises.count { ex ->
+                ex.sets.any { it.isCompleted && !it.isWarmup }
+            }
             
             // Check for PRs
             val allPRs = mutableListOf<com.gymbro.core.model.PersonalRecord>()

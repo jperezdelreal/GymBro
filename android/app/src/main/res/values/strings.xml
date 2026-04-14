@@ -251,4 +251,8 @@
     <string name="home_create_program_subtitle">Get a personalized training plan based on your goals</string>
     <string name="home_recent_workouts">Recent Workouts</string>
     <string name="home_exercises_count">%d exercises</string>
+
+    <!-- Workout Validation Errors -->
+    <string name="error_invalid_weight">Please enter a valid weight before completing the set</string>
+    <string name="error_invalid_reps">Please enter valid reps before completing the set</string>
 </resources>

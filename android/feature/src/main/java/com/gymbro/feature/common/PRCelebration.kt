@@ -29,6 +29,8 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import com.gymbro.core.R
 import com.gymbro.core.model.PersonalRecord
 import com.gymbro.core.model.RecordType
 import kotlinx.coroutines.delay
@@ -102,7 +104,7 @@ fun PRCelebration(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "NEW PR!",
+                text = stringResource(R.string.celebration_new_pr),
                 style = MaterialTheme.typography.headlineLarge,
                 fontWeight = FontWeight.Bold,
                 color = AccentGreen,
@@ -123,7 +125,7 @@ fun PRCelebration(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Tap to continue",
+                text = stringResource(R.string.celebration_tap_to_continue),
                 style = MaterialTheme.typography.labelMedium,
                 color = Color.White.copy(alpha = 0.5f),
             )
@@ -131,19 +133,20 @@ fun PRCelebration(
     }
 }
 
+@Composable
 private fun formatPRText(pr: PersonalRecord): String {
     return when (pr.type) {
         RecordType.MAX_WEIGHT -> {
-            "${pr.type.emoji} ${pr.exerciseName}: ${pr.value.toLong()} kg"
+            stringResource(R.string.pr_format_weight, pr.type.emoji, pr.exerciseName, pr.value.toLong().toString())
         }
         RecordType.MAX_REPS -> {
-            "${pr.type.emoji} ${pr.exerciseName}: ${pr.value.toInt()} reps"
+            stringResource(R.string.pr_format_reps, pr.type.emoji, pr.exerciseName, pr.value.toInt().toString())
         }
         RecordType.MAX_VOLUME -> {
-            "${pr.type.emoji} ${pr.exerciseName}: ${pr.value.toLong()} kg volume"
+            stringResource(R.string.pr_format_volume, pr.type.emoji, pr.exerciseName, pr.value.toLong().toString())
         }
         RecordType.MAX_E1RM -> {
-            "${pr.type.emoji} ${pr.exerciseName}: ${pr.value.toLong()} kg E1RM"
+            stringResource(R.string.pr_format_e1rm, pr.type.emoji, pr.exerciseName, pr.value.toLong().toString())
         }
     }
 }

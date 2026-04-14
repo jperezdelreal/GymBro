@@ -486,8 +486,12 @@
     <string name="message_licenses">Se mostrarán las licencias</string>
 
     <!-- Celebration -->
-    <string name="celebration_new_pr">¡NUEVO PR!</string>
+    <string name="celebration_new_pr">¡NUEVO RÉCORD!</string>
     <string name="celebration_tap_to_continue">Toca para continuar</string>
+    <string name="pr_format_weight">%1$s %2$s: %3$s kg</string>
+    <string name="pr_format_reps">%1$s %2$s: %3$s reps</string>
+    <string name="pr_format_volume">%1$s %2$s: %3$s kg volumen</string>
+    <string name="pr_format_e1rm">%1$s %2$s: %3$s kg 1RM est.</string>
     <string name="celebration_streak_7">Una semana de consistencia — ¡estás construyendo un impulso serio!</string>
     <string name="celebration_streak_30">Un mes fuerte — ¡eres imparable!</string>
     <string name="celebration_streak_default">¡Mantén el fuego ardiendo!</string>
