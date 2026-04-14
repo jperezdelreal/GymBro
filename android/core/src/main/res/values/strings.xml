@@ -715,6 +715,10 @@
 
     <!-- Discard Workout Dialog -->
     <string name="discard_workout_title">Discard Workout?</string>
+    <string name="resume_workout_title">Previous Workout Found</string>
+    <string name="resume_workout_message">You have an unfinished workout. Would you like to resume it or start a new one?</string>
+    <string name="resume_workout_resume">Resume</string>
+    <string name="resume_workout_start_new">Start New</string>
     <string name="discard_workout_message">All progress will be lost.</string>
     <string name="discard_workout_confirm">Discard</string>
     <string name="discard_workout_cancel">Keep Training</string>

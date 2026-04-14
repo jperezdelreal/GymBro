@@ -94,7 +94,7 @@ class ActiveWorkoutViewModel @Inject constructor(
             }
         ) {
             val workout = workoutRepository.startWorkout()
-            _state.update { it.copy(workoutId = workout.id.toString(), isLoading = false, errorMessage = null) }
+            _state.update { it.copy(workoutId = workout.id.toString(), isLoading = false, hasInProgressWorkout = false, errorMessage = null) }
             startElapsedTimer()
             loadPendingWorkoutDay()
         }

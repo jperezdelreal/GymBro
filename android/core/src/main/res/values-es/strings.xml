@@ -721,6 +721,10 @@
 
     <!-- Discard Workout Dialog -->
     <string name="discard_workout_title">¿Descartar entrenamiento?</string>
+    <string name="resume_workout_title">Entrenamiento anterior encontrado</string>
+    <string name="resume_workout_message">Tienes un entrenamiento sin terminar. ¿Quieres continuar o iniciar uno nuevo?</string>
+    <string name="resume_workout_resume">Continuar</string>
+    <string name="resume_workout_start_new">Iniciar Nuevo</string>
     <string name="discard_workout_message">Se perderá todo el progreso.</string>
     <string name="discard_workout_confirm">Descartar</string>
     <string name="discard_workout_cancel">Seguir entrenando</string>

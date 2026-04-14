@@ -308,6 +308,25 @@ fun ActiveWorkoutScreen(
         return
     }
 
+    if (state.hasInProgressWorkout) {
+        AlertDialog(
+            onDismissRequest = { },
+            title = { Text(stringResource(R.string.resume_workout_title)) },
+            text = { Text(stringResource(R.string.resume_workout_message)) },
+            confirmButton = {
+                TextButton(onClick = { onEvent(ActiveWorkoutEvent.ResumeWorkout) }) {
+                    Text(stringResource(R.string.resume_workout_resume))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { onEvent(ActiveWorkoutEvent.StartNewWorkout) }) {
+                    Text(stringResource(R.string.resume_workout_start_new))
+                }
+            },
+        )
+        return
+    }
+
     Box {
         val haptic = LocalHapticFeedback.current
         val context = androidx.compose.ui.platform.LocalContext.current
