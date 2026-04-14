@@ -115,6 +115,8 @@ sealed interface ActiveWorkoutEvent {
     data object DismissExerciseDetail : ActiveWorkoutEvent
     data object DismissPrCelebration : ActiveWorkoutEvent
     data class SetTargetDuration(val minutes: Int) : ActiveWorkoutEvent
+    data class MoveExerciseUp(val exerciseIndex: Int) : ActiveWorkoutEvent
+    data class MoveExerciseDown(val exerciseIndex: Int) : ActiveWorkoutEvent
 }
 
 sealed interface ActiveWorkoutEffect {

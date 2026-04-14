@@ -42,6 +42,8 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.SmartToy
@@ -298,6 +300,7 @@ fun ActiveWorkoutScreen(
 
     Box {
         val haptic = LocalHapticFeedback.current
+        val context = androidx.compose.ui.platform.LocalContext.current
         var showDiscardDialog by remember { mutableStateOf(false) }
 
         BackHandler { showDiscardDialog = true }
@@ -541,6 +544,7 @@ fun ActiveWorkoutScreen(
                                 ExerciseCardContent(
                                     exerciseUi = exerciseUi,
                                     exerciseIndex = exerciseIndex,
+                                    exerciseCount = state.exercises.size,
                                     onEvent = onEvent,
                                     voiceRecognitionService = voiceRecognitionService,
                                     defaultWeightUnit = defaultWeightUnit,
@@ -1008,6 +1012,7 @@ private fun PrCelebrationOverlay(
 private fun ExerciseCardContent(
     exerciseUi: WorkoutExerciseUi,
     exerciseIndex: Int,
+    exerciseCount: Int,
     onEvent: (ActiveWorkoutEvent) -> Unit,
     voiceRecognitionService: com.gymbro.core.voice.VoiceRecognitionService,
     defaultWeightUnit: com.gymbro.core.preferences.UserPreferences.WeightUnit,
@@ -1051,6 +1056,37 @@ private fun ExerciseCardContent(
                     )
                     .semantics { heading() },
             )
+            // Reorder buttons
+            IconButton(
+                onClick = {
+                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    onEvent(ActiveWorkoutEvent.MoveExerciseUp(exerciseIndex))
+                },
+                enabled = exerciseIndex > 0,
+                modifier = Modifier.size(36.dp),
+            ) {
+                Icon(
+                    Icons.Default.KeyboardArrowUp,
+                    contentDescription = stringResource(R.string.active_workout_move_up),
+                    tint = if (exerciseIndex > 0) Color.White.copy(alpha = 0.6f) else Color.White.copy(alpha = 0.15f),
+                    modifier = Modifier.size(20.dp),
+                )
+            }
+            IconButton(
+                onClick = {
+                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    onEvent(ActiveWorkoutEvent.MoveExerciseDown(exerciseIndex))
+                },
+                enabled = exerciseIndex < exerciseCount - 1,
+                modifier = Modifier.size(36.dp),
+            ) {
+                Icon(
+                    Icons.Default.KeyboardArrowDown,
+                    contentDescription = stringResource(R.string.active_workout_move_down),
+                    tint = if (exerciseIndex < exerciseCount - 1) Color.White.copy(alpha = 0.6f) else Color.White.copy(alpha = 0.15f),
+                    modifier = Modifier.size(20.dp),
+                )
+            }
             // Voice input — auto-fills the first incomplete set
             VoiceInputButton(
                 voiceRecognitionService = voiceRecognitionService,
