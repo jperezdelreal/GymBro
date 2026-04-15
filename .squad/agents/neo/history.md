@@ -81,6 +81,18 @@
 - Navigation uses savedStateHandle pattern for passing data across nav graph boundaries (cleaner than URL encoding)
 - Spanish translations updated for all new strings (emulator runs es-ES locale)
 
+### 2026-04-07: Equipment-Based Exercise Prioritization in WorkoutPlanGenerator
+**Implemented goal-aware equipment sorting for exercise selection:**
+- Added `equipmentPriority()` scoring function: strength/powerlifting favors barbell→dumbbell→cable, hypertrophy follows same order (ROM/isolation benefit from DBs), general fitness favors bodyweight→dumbbell→machine
+- Replaced all four `firstOrNull` exercise selection phases in `buildExerciseList` with `sortedBy { equipmentPriority(...) }.firstOrNull()` — now picks the most suitable equipment type per goal
+- Threaded `goal: TrainingGoal` parameter through `buildExerciseList`, `generateFullBodyDays`, `generateUpperLowerDays`, `generatePPLDays`, `generatePPLULDays`, and the extras section in `adjustDayForDuration`
+- All 4 plan generators (`generateStrengthPlan`, `generateHypertrophyPlan`, `generatePowerliftingPlan`, `generateGeneralFitnessPlan`) now pass their correct goal to every `buildExerciseList` call
+
+**Key learnings:**
+- Exercise seed order in the JSON determines `firstOrNull` output — without explicit sorting, bodyweight exercises appeared in strength plans because they happened to be listed first
+- Default parameter values (`goal = HYPERTROPHY`) maintain backward compatibility for any future call sites
+- The `adjustDayForDuration` extras section also needed sorting — it adds new exercises when session time increases and previously picked in arbitrary order
+
 
 ### 2026-04-06: Data Models from Tank (Scaffold & Models)  
 **Why this matters for Neo's AI work:**
