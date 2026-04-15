@@ -58,7 +58,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -435,49 +434,13 @@ fun ActiveWorkoutScreen(
             )
         },
         bottomBar = {
-            FinishWorkoutButton(
-                enabled = state.totalSets > 0 && !state.isCompleting,
+            UnifiedBottomBar(
+                finishEnabled = state.totalSets > 0 && !state.isCompleting,
                 completedExercises = state.exercises.count { ex -> ex.sets.any { it.isCompleted } },
-                onClick = { onEvent(ActiveWorkoutEvent.CompleteWorkout) },
+                onFinishClick = { onEvent(ActiveWorkoutEvent.CompleteWorkout) },
+                onCoachClick = onNavigateToCoach,
+                onAddExerciseClick = { onEvent(ActiveWorkoutEvent.AddExerciseClicked) },
             )
-        },
-        floatingActionButton = {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier.padding(bottom = 16.dp)
-            ) {
-                // AI Coach FAB
-                FloatingActionButton(
-                    onClick = { 
-                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                        onNavigateToCoach()
-                    },
-                    containerColor = Color(0xFF1E1E1E),
-                    contentColor = Color(0xFF00FF87),
-                ) {
-                    Icon(
-                        Icons.Default.SmartToy, 
-                        contentDescription = stringResource(R.string.active_workout_coach_fab)
-                    )
-                }
-                
-                // Add Exercise FAB
-                FloatingActionButton(
-                    onClick = { 
-                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                        onEvent(ActiveWorkoutEvent.AddExerciseClicked) 
-                    },
-                    containerColor = Color.Transparent,
-                    modifier = Modifier.drawBehind {
-                        val gradient = Brush.horizontalGradient(
-                            colors = listOf(AccentGreenStart, AccentGreenEnd)
-                        )
-                        drawCircle(gradient)
-                    }
-                ) {
-                    Icon(Icons.Default.Add, contentDescription = stringResource(R.string.active_workout_add_exercise), tint = Color.White)
-                }
-            }
         },
         containerColor = Background,
     ) { innerPadding ->
@@ -723,8 +686,8 @@ fun ActiveWorkoutScreen(
                     }
                 }
 
-                // Bottom spacer for FAB
-                item { Spacer(modifier = Modifier.height(80.dp)) }
+                // Bottom spacer for unified bottom bar
+                item { Spacer(modifier = Modifier.height(100.dp)) }
             }
         }
     }
@@ -1068,14 +1031,16 @@ private fun RestTimerSheetContent(
 }
 
 @Composable
-private fun FinishWorkoutButton(
-    enabled: Boolean,
+private fun UnifiedBottomBar(
+    finishEnabled: Boolean,
     completedExercises: Int,
-    onClick: () -> Unit,
+    onFinishClick: () -> Unit,
+    onCoachClick: () -> Unit,
+    onAddExerciseClick: () -> Unit,
 ) {
     val haptic = LocalHapticFeedback.current
     val shouldGlow = completedExercises >= 3
-    
+
     val infiniteTransition = rememberInfiniteTransition(label = "finish_glow")
     val glowAlpha by infiniteTransition.animateFloat(
         initialValue = if (shouldGlow) 0.3f else 0f,
@@ -1087,31 +1052,70 @@ private fun FinishWorkoutButton(
         label = "finish_glow_alpha"
     )
 
-    Box(
+    Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp)
-            .drawBehind {
-                if (shouldGlow) {
-                    val gradient = Brush.radialGradient(
-                        colors = listOf(
-                            AccentGreenStart.copy(alpha = glowAlpha * 0.3f),
-                            Color.Transparent
-                        )
-                    )
-                    drawCircle(gradient, radius = size.width)
-                }
-            }
+            .background(Color(0xFF1C1C1E))
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        GradientButton(
-            text = stringResource(R.string.workout_finish),
+        // AI Coach button
+        IconButton(
             onClick = {
-                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                onClick()
+                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                onCoachClick()
             },
-            enabled = enabled,
-            modifier = Modifier.fillMaxWidth(),
-        )
+            modifier = Modifier.size(48.dp),
+        ) {
+            Icon(
+                Icons.Default.SmartToy,
+                contentDescription = stringResource(R.string.active_workout_coach_fab),
+                tint = Color(0xFF00FF87),
+            )
+        }
+
+        // Finish workout button — fills remaining space
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .drawBehind {
+                    if (shouldGlow) {
+                        val gradient = Brush.radialGradient(
+                            colors = listOf(
+                                AccentGreenStart.copy(alpha = glowAlpha * 0.3f),
+                                Color.Transparent
+                            )
+                        )
+                        drawCircle(gradient, radius = size.width)
+                    }
+                }
+        ) {
+            GradientButton(
+                text = stringResource(R.string.workout_finish),
+                onClick = {
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    onFinishClick()
+                },
+                enabled = finishEnabled,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+
+        // Add Exercise button
+        IconButton(
+            onClick = {
+                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                onAddExerciseClick()
+            },
+            modifier = Modifier.size(48.dp),
+        ) {
+            Icon(
+                Icons.Default.Add,
+                contentDescription = stringResource(R.string.active_workout_add_exercise),
+                tint = AccentGreenStart,
+            )
+        }
     }
 }
 
