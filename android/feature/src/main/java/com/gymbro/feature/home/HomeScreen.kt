@@ -1,7 +1,6 @@
 package com.gymbro.feature.home
 
 import androidx.compose.foundation.background
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,16 +16,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.SwapHoriz
-import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -50,13 +46,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
@@ -73,12 +67,9 @@ import com.gymbro.core.model.PlannedExercise
 import com.gymbro.core.model.WorkoutDay
 import com.gymbro.core.model.WorkoutPlan
 import com.gymbro.core.preferences.UserPreferences
+import com.gymbro.core.service.WorkoutPlanGenerator
 import com.gymbro.feature.common.FullScreenLoading
 import com.gymbro.feature.common.ObserveErrors
-import java.time.Instant
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
 
 private val AccentGreen = Color(0xFF00FF87)
 private val AccentCyan = Color(0xFF00E5FF)
@@ -223,9 +214,8 @@ fun HomeScreen(
 
                     // Context Chips
                     item {
-                        ContextChipsRow(
-                            exerciseCount = state.todayWorkout.exercises.size,
-                            trainingGoal = state.activePlan.goal,
+                        DurationChip(
+                            exercises = state.todayWorkout.exercises,
                         )
                     }
 
@@ -366,41 +356,17 @@ private fun WorkoutHeader(
     }
 }
 
-// ─── ContextChipsRow: Duration, training type, exercise count ───
+// ─── DurationChip: Estimated workout time based on exercise data ───
 @Composable
-private fun ContextChipsRow(
-    exerciseCount: Int,
-    trainingGoal: UserPreferences.TrainingGoal,
+private fun DurationChip(
+    exercises: List<PlannedExercise>,
 ) {
-    val estimatedMinutes = exerciseCount * 5
-    val goalLabel = when (trainingGoal) {
-        UserPreferences.TrainingGoal.STRENGTH -> stringResource(R.string.home_goal_strength)
-        UserPreferences.TrainingGoal.POWERLIFTING -> stringResource(R.string.home_goal_powerlifting)
-        UserPreferences.TrainingGoal.HYPERTROPHY -> stringResource(R.string.home_goal_hypertrophy)
-        UserPreferences.TrainingGoal.GENERAL_FITNESS -> stringResource(R.string.home_goal_general_fitness)
-    }
-
-    LazyRow(
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        item {
-            InfoChip(
-                label = stringResource(R.string.home_estimated_duration, estimatedMinutes),
-                color = AccentCyan,
-            )
-        }
-        item {
-            InfoChip(
-                label = goalLabel,
-                color = AccentGreen,
-            )
-        }
-        item {
-            InfoChip(
-                label = pluralStringResource(R.plurals.exercises_count, exerciseCount, exerciseCount),
-                color = AccentCyan,
-            )
-        }
+    val estimatedMinutes = remember(exercises) { estimateWorkoutDurationMinutes(exercises) }
+    Row {
+        InfoChip(
+            label = stringResource(R.string.home_estimated_duration, estimatedMinutes),
+            color = AccentCyan,
+        )
     }
 }
 
@@ -606,10 +572,40 @@ private fun InfoChip(
     }
 }
 
-private fun formatDuration(seconds: Long): String {
-    val hours = seconds / 3600
-    val minutes = (seconds % 3600) / 60
-    return if (hours > 0) "${hours}h ${minutes}m" else "${minutes}m"
+/**
+ * Estimates total workout duration in minutes using the same time constants as
+ * [WorkoutPlanGenerator.estimateExerciseTimeSeconds]. Because [PlannedExercise]
+ * does not carry an [ExerciseCategory], we average the compound and isolation
+ * rep-duration and transition-time values for a reasonable mid-range estimate.
+ */
+private fun estimateWorkoutDurationMinutes(exercises: List<PlannedExercise>): Int {
+    if (exercises.isEmpty()) return 0
+
+    val avgRepDuration = (WorkoutPlanGenerator.REP_DURATION_COMPOUND +
+            WorkoutPlanGenerator.REP_DURATION_ISOLATION) / 2              // 4 s/rep
+    val avgTransitionTime = (WorkoutPlanGenerator.TRANSITION_TIME_COMPOUND +
+            WorkoutPlanGenerator.TRANSITION_TIME_ISOLATION) / 2           // 105 s
+
+    var totalSeconds = WorkoutPlanGenerator.WARMUP_TIME_SECONDS +
+            WorkoutPlanGenerator.COOLDOWN_TIME_SECONDS                    // 8 min overhead
+
+    for (ex in exercises) {
+        val midReps = parseRepsRangeMidpoint(ex.repsRange)
+        val timePerSet = (midReps * avgRepDuration) + ex.restSeconds
+        totalSeconds += (ex.sets * timePerSet) + avgTransitionTime
+    }
+    return ((totalSeconds + 30) / 60)   // round to nearest minute
+}
+
+private fun parseRepsRangeMidpoint(repsRange: String): Int {
+    val parts = repsRange.split("-")
+    return if (parts.size == 2) {
+        val low = parts[0].trim().toIntOrNull() ?: 10
+        val high = parts[1].trim().toIntOrNull() ?: 12
+        (low + high) / 2
+    } else {
+        repsRange.trim().toIntOrNull() ?: 10
+    }
 }
 
 @dagger.hilt.EntryPoint
