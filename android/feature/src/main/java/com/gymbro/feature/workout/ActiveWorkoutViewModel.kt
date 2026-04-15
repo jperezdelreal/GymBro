@@ -218,6 +218,8 @@ class ActiveWorkoutViewModel @Inject constructor(
             is ActiveWorkoutEvent.CompleteSet -> completeSet(event.exerciseIndex, event.setIndex)
             is ActiveWorkoutEvent.QuickCompleteSet -> completeSet(event.exerciseIndex, event.setIndex)
             is ActiveWorkoutEvent.RemoveSet -> removeSet(event.exerciseIndex, event.setIndex)
+            is ActiveWorkoutEvent.DeleteSet -> removeSet(event.exerciseIndex, event.setIndex)
+            is ActiveWorkoutEvent.UncompleteSet -> uncompleteSet(event.exerciseIndex, event.setIndex)
             is ActiveWorkoutEvent.RemoveExercise -> removeExercise(event.exerciseIndex)
             is ActiveWorkoutEvent.ReplaceExercise -> {
                 val muscleGroup = _state.value.exercises.getOrNull(event.exerciseIndex)?.exercise?.muscleGroup
@@ -696,6 +698,19 @@ class ActiveWorkoutViewModel @Inject constructor(
 
             current.copy(exercises = exercises)
         }
+        recalculateTotals()
+    }
+
+    private fun uncompleteSet(exerciseIndex: Int, setIndex: Int) {
+        val currentState = _state.value
+        if (exerciseIndex !in currentState.exercises.indices) return
+        val exerciseUi = currentState.exercises[exerciseIndex]
+        if (setIndex !in exerciseUi.sets.indices) return
+        val setUi = exerciseUi.sets[setIndex]
+        if (!setUi.isCompleted) return
+
+        viewModelScope.launch { workoutRepository.removeSet(setUi.id) }
+        updateSetField(exerciseIndex, setIndex) { it.copy(isCompleted = false) }
         recalculateTotals()
     }
 
