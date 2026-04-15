@@ -502,15 +502,6 @@ fun ActiveWorkoutScreen(
                     }
                 }
 
-                // Duration target selector (#545)
-                item {
-                    DurationTargetChips(
-                        selectedMinutes = state.targetDurationMinutes,
-                        elapsedSeconds = state.elapsedSeconds,
-                        onSelect = { minutes -> onEvent(ActiveWorkoutEvent.SetTargetDuration(minutes)) },
-                    )
-                }
-
                 // Empty workout guidance
                 if (state.exercises.isEmpty() && !state.isLoading) {
                     item {
@@ -856,108 +847,6 @@ private fun StatItem(label: String, value: String, color: Color) {
             style = MaterialTheme.typography.labelSmall,
             color = Color.White.copy(alpha = 0.6f),
         )
-    }
-}
-
-@Composable
-private fun DurationTargetChips(
-    selectedMinutes: Int,
-    elapsedSeconds: Long,
-    onSelect: (Int) -> Unit,
-) {
-    val durations = listOf(30, 45, 60, 90)
-    var isExpanded by remember { mutableStateOf(true) }
-    val elapsedMinutes = (elapsedSeconds / 60).toInt()
-    val remaining = selectedMinutes - elapsedMinutes
-    val remainingColor = when {
-        remaining <= 0 -> AccentRed
-        remaining <= 10 -> AccentAmberStart
-        else -> AccentGreenStart
-    }
-
-    // Collapsed: single chip showing selected duration + remaining
-    AnimatedVisibility(visible = !isExpanded) {
-        Box(
-            modifier = Modifier
-                .height(32.dp)
-                .clip(RoundedCornerShape(16.dp))
-                .background(AccentGreenStart.copy(alpha = 0.15f))
-                .border(1.dp, AccentGreenStart.copy(alpha = 0.4f), RoundedCornerShape(16.dp))
-                .clickable { isExpanded = true }
-                .padding(horizontal = 14.dp, vertical = 4.dp),
-            contentAlignment = Alignment.Center,
-        ) {
-            val remainingText = if (remaining > 0) {
-                stringResource(R.string.active_workout_remaining, remaining)
-            } else {
-                stringResource(R.string.active_workout_overtime)
-            }
-            Text(
-                text = "⏱ ${selectedMinutes}m · $remainingText",
-                style = MaterialTheme.typography.labelMedium,
-                fontWeight = FontWeight.Bold,
-                color = if (remaining > 0) AccentGreenStart else AccentRed,
-            )
-        }
-    }
-
-    // Expanded: all duration chips
-    AnimatedVisibility(visible = isExpanded) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            Icon(
-                Icons.Default.PlayArrow,
-                contentDescription = null,
-                tint = remainingColor,
-                modifier = Modifier.size(18.dp),
-            )
-            durations.forEach { minutes ->
-                val isSelected = minutes == selectedMinutes
-                Box(
-                    modifier = Modifier
-                        .height(32.dp)
-                        .background(
-                            color = if (isSelected) AccentGreenStart.copy(alpha = 0.2f) else Color.Transparent,
-                            shape = RoundedCornerShape(16.dp),
-                        )
-                        .border(
-                            width = 1.dp,
-                            color = if (isSelected) AccentGreenStart else Color.White.copy(alpha = 0.2f),
-                            shape = RoundedCornerShape(16.dp),
-                        )
-                        .clickable {
-                            onSelect(minutes)
-                            isExpanded = false
-                        }
-                        .padding(horizontal = 12.dp, vertical = 4.dp),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text(
-                        text = "${minutes}m",
-                        style = MaterialTheme.typography.labelMedium,
-                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                        color = if (isSelected) AccentGreenStart else Color.White.copy(alpha = 0.6f),
-                    )
-                }
-            }
-            Spacer(modifier = Modifier.weight(1f))
-            if (remaining > 0) {
-                Text(
-                    text = stringResource(R.string.active_workout_remaining, remaining),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = remainingColor,
-                )
-            } else {
-                Text(
-                    text = stringResource(R.string.active_workout_overtime),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = AccentRed,
-                )
-            }
-        }
     }
 }
 
@@ -1378,36 +1267,7 @@ private fun ExerciseCardContent(
                     .size(18.dp)
                     .clickable { onEvent(ActiveWorkoutEvent.ShowExerciseDetail(exerciseUi.exercise)) },
             )
-            // Voice input — auto-fills the first incomplete set
-            VoiceInputButton(
-                voiceRecognitionService = voiceRecognitionService,
-                defaultWeightUnit = defaultWeightUnit,
-                onVoiceResult = { parsed ->
-                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                    val targetSetIndex = exerciseUi.sets.indexOfFirst { !it.isCompleted }
-                    if (targetSetIndex >= 0) {
-                        val parser = com.gymbro.core.voice.VoiceInputParser()
-                        onEvent(
-                            ActiveWorkoutEvent.VoiceInput(
-                                exerciseIndex = exerciseIndex,
-                                setIndex = targetSetIndex,
-                                weight = parsed.weight.let { w ->
-                                    if (w == w.toLong().toDouble()) w.toLong().toString() else w.toString()
-                                },
-                                reps = parsed.reps.toString(),
-                                rpe = parsed.rpe?.let { r ->
-                                    if (r == r.toLong().toDouble()) r.toLong().toString() else r.toString()
-                                } ?: "",
-                            )
-                        )
-                        voiceToast = parser.formatConfirmation(parsed)
-                    }
-                },
-                onError = { errorMsg ->
-                    voiceToast = errorMsg
-                },
-            )
-            // Superset link button — visible entry point for creating supersets
+            // Superset link button— visible entry point for creating supersets
             if (!isInSuperset) {
                 IconButton(
                     onClick = {
