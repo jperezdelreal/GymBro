@@ -2,6 +2,7 @@ package com.gymbro.core.service
 
 import android.content.Context
 import com.gymbro.core.R
+import com.gymbro.core.model.Equipment
 import com.gymbro.core.model.Exercise
 import com.gymbro.core.model.ExerciseCategory
 import com.gymbro.core.model.MuscleGroup
@@ -90,6 +91,47 @@ class WorkoutPlanGenerator @Inject constructor(
         fun workTimeBudgetSeconds(sessionDurationMinutes: Int): Int {
             val totalSeconds = sessionDurationMinutes * 60
             return maxOf(0, totalSeconds - WARMUP_TIME_SECONDS - COOLDOWN_TIME_SECONDS)
+        }
+
+        /**
+         * Scores equipment suitability for a training goal.
+         * Lower score = better fit. Used to sort exercise candidates so the most
+         * appropriate equipment type is selected first.
+         */
+        private fun equipmentPriority(equipment: Equipment, goal: UserPreferences.TrainingGoal): Int {
+            return when (goal) {
+                UserPreferences.TrainingGoal.STRENGTH,
+                UserPreferences.TrainingGoal.POWERLIFTING -> when (equipment) {
+                    Equipment.BARBELL -> 0
+                    Equipment.DUMBBELL -> 1
+                    Equipment.CABLE -> 2
+                    Equipment.MACHINE -> 3
+                    Equipment.KETTLEBELL -> 4
+                    Equipment.BODYWEIGHT -> 5
+                    Equipment.BAND -> 6
+                    Equipment.OTHER -> 7
+                }
+                UserPreferences.TrainingGoal.HYPERTROPHY -> when (equipment) {
+                    Equipment.BARBELL -> 0
+                    Equipment.DUMBBELL -> 1
+                    Equipment.CABLE -> 2
+                    Equipment.MACHINE -> 3
+                    Equipment.KETTLEBELL -> 4
+                    Equipment.BODYWEIGHT -> 5
+                    Equipment.BAND -> 6
+                    Equipment.OTHER -> 7
+                }
+                UserPreferences.TrainingGoal.GENERAL_FITNESS -> when (equipment) {
+                    Equipment.BODYWEIGHT -> 0
+                    Equipment.DUMBBELL -> 1
+                    Equipment.MACHINE -> 2
+                    Equipment.CABLE -> 3
+                    Equipment.KETTLEBELL -> 4
+                    Equipment.BARBELL -> 5
+                    Equipment.BAND -> 6
+                    Equipment.OTHER -> 7
+                }
+            }
         }
 
         private fun parseRepsRangeMidpoint(repsRange: String): Int {
@@ -200,8 +242,8 @@ class WorkoutPlanGenerator @Inject constructor(
         // Strength: 5 sets, heavy compounds, 3-min rest → fewer exercises fit
         val baseSets = 5
         val workoutDays = when (split) {
-            TrainingSplit.FULL_BODY -> generateFullBodyDays(exercises, sets = baseSets, reps = "3-5", rest = REST_TIME_STRENGTH, sessionDurationMinutes = sessionDurationMinutes, volumeMultiplier = volumeMultiplier)
-            TrainingSplit.UPPER_LOWER -> generateUpperLowerDays(exercises, sets = baseSets, reps = "3-5", rest = REST_TIME_STRENGTH, sessionDurationMinutes = sessionDurationMinutes, volumeMultiplier = volumeMultiplier)
+            TrainingSplit.FULL_BODY -> generateFullBodyDays(exercises, sets = baseSets, reps = "3-5", rest = REST_TIME_STRENGTH, sessionDurationMinutes = sessionDurationMinutes, volumeMultiplier = volumeMultiplier, goal = UserPreferences.TrainingGoal.STRENGTH)
+            TrainingSplit.UPPER_LOWER -> generateUpperLowerDays(exercises, sets = baseSets, reps = "3-5", rest = REST_TIME_STRENGTH, sessionDurationMinutes = sessionDurationMinutes, volumeMultiplier = volumeMultiplier, goal = UserPreferences.TrainingGoal.STRENGTH)
             else -> {
                 listOf(
                     WorkoutDay(
@@ -212,6 +254,7 @@ class WorkoutPlanGenerator @Inject constructor(
                             listOf(MuscleGroup.CHEST, MuscleGroup.BACK, MuscleGroup.SHOULDERS),
                             sets = baseSets, reps = "3-5", rest = REST_TIME_STRENGTH,
                             sessionDurationMinutes = sessionDurationMinutes, volumeMultiplier = volumeMultiplier,
+                            goal = UserPreferences.TrainingGoal.STRENGTH,
                         ),
                     ),
                     WorkoutDay(
@@ -222,6 +265,7 @@ class WorkoutPlanGenerator @Inject constructor(
                             listOf(MuscleGroup.QUADRICEPS, MuscleGroup.HAMSTRINGS, MuscleGroup.GLUTES),
                             sets = baseSets, reps = "3-5", rest = REST_TIME_STRENGTH,
                             sessionDurationMinutes = sessionDurationMinutes, volumeMultiplier = volumeMultiplier,
+                            goal = UserPreferences.TrainingGoal.STRENGTH,
                         ),
                     ),
                     WorkoutDay(
@@ -232,6 +276,7 @@ class WorkoutPlanGenerator @Inject constructor(
                             listOf(MuscleGroup.CHEST, MuscleGroup.BACK, MuscleGroup.QUADRICEPS),
                             sets = baseSets, reps = "3-5", rest = REST_TIME_STRENGTH,
                             sessionDurationMinutes = sessionDurationMinutes, volumeMultiplier = volumeMultiplier,
+                            goal = UserPreferences.TrainingGoal.STRENGTH,
                         ),
                     ),
                 )
@@ -261,11 +306,11 @@ class WorkoutPlanGenerator @Inject constructor(
         // Hypertrophy: 4 sets, moderate reps, 90s rest → more exercises fit
         val baseSets = 4
         val workoutDays = when (split) {
-            TrainingSplit.FULL_BODY -> generateFullBodyDays(exercises, sets = baseSets, reps = "8-12", rest = REST_TIME_HYPERTROPHY, sessionDurationMinutes = sessionDurationMinutes, volumeMultiplier = volumeMultiplier)
-            TrainingSplit.UPPER_LOWER -> generateUpperLowerDays(exercises, sets = baseSets, reps = "8-12", rest = REST_TIME_HYPERTROPHY, sessionDurationMinutes = sessionDurationMinutes, volumeMultiplier = volumeMultiplier)
-            TrainingSplit.PPL -> generatePPLDays(exercises, sets = baseSets, reps = "8-12", rest = REST_TIME_HYPERTROPHY, sessionDurationMinutes = sessionDurationMinutes, volumeMultiplier = volumeMultiplier)
-            TrainingSplit.PPLUL -> generatePPLULDays(exercises, volumeMultiplier, sessionDurationMinutes)
-            else -> generatePPLDays(exercises, sets = baseSets, reps = "8-12", rest = REST_TIME_HYPERTROPHY, sessionDurationMinutes = sessionDurationMinutes, volumeMultiplier = volumeMultiplier)
+            TrainingSplit.FULL_BODY -> generateFullBodyDays(exercises, sets = baseSets, reps = "8-12", rest = REST_TIME_HYPERTROPHY, sessionDurationMinutes = sessionDurationMinutes, volumeMultiplier = volumeMultiplier, goal = UserPreferences.TrainingGoal.HYPERTROPHY)
+            TrainingSplit.UPPER_LOWER -> generateUpperLowerDays(exercises, sets = baseSets, reps = "8-12", rest = REST_TIME_HYPERTROPHY, sessionDurationMinutes = sessionDurationMinutes, volumeMultiplier = volumeMultiplier, goal = UserPreferences.TrainingGoal.HYPERTROPHY)
+            TrainingSplit.PPL -> generatePPLDays(exercises, sets = baseSets, reps = "8-12", rest = REST_TIME_HYPERTROPHY, sessionDurationMinutes = sessionDurationMinutes, volumeMultiplier = volumeMultiplier, goal = UserPreferences.TrainingGoal.HYPERTROPHY)
+            TrainingSplit.PPLUL -> generatePPLULDays(exercises, volumeMultiplier, sessionDurationMinutes, goal = UserPreferences.TrainingGoal.HYPERTROPHY)
+            else -> generatePPLDays(exercises, sets = baseSets, reps = "8-12", rest = REST_TIME_HYPERTROPHY, sessionDurationMinutes = sessionDurationMinutes, volumeMultiplier = volumeMultiplier, goal = UserPreferences.TrainingGoal.HYPERTROPHY)
         }
 
         return WorkoutPlan(
@@ -301,6 +346,7 @@ class WorkoutPlanGenerator @Inject constructor(
                             listOf(MuscleGroup.QUADRICEPS, MuscleGroup.HAMSTRINGS, MuscleGroup.GLUTES, MuscleGroup.CORE),
                             sets = baseSets, reps = "1-5", rest = REST_TIME_POWER,
                             sessionDurationMinutes = sessionDurationMinutes, volumeMultiplier = volumeMultiplier,
+                            goal = UserPreferences.TrainingGoal.POWERLIFTING,
                         ),
                     ),
                     WorkoutDay(
@@ -311,6 +357,7 @@ class WorkoutPlanGenerator @Inject constructor(
                             listOf(MuscleGroup.CHEST, MuscleGroup.TRICEPS, MuscleGroup.SHOULDERS),
                             sets = baseSets, reps = "1-5", rest = REST_TIME_POWER,
                             sessionDurationMinutes = sessionDurationMinutes, volumeMultiplier = volumeMultiplier,
+                            goal = UserPreferences.TrainingGoal.POWERLIFTING,
                         ),
                     ),
                     WorkoutDay(
@@ -321,6 +368,7 @@ class WorkoutPlanGenerator @Inject constructor(
                             listOf(MuscleGroup.BACK, MuscleGroup.HAMSTRINGS, MuscleGroup.GLUTES),
                             sets = baseSets, reps = "1-5", rest = REST_TIME_POWER,
                             sessionDurationMinutes = sessionDurationMinutes, volumeMultiplier = volumeMultiplier,
+                            goal = UserPreferences.TrainingGoal.POWERLIFTING,
                         ),
                     ),
                 )
@@ -336,6 +384,7 @@ class WorkoutPlanGenerator @Inject constructor(
                             listOf(MuscleGroup.CHEST, MuscleGroup.BACK, MuscleGroup.SHOULDERS),
                             sets = baseSets, reps = "1-5", rest = REST_TIME_POWER,
                             sessionDurationMinutes = sessionDurationMinutes, volumeMultiplier = volumeMultiplier,
+                            goal = UserPreferences.TrainingGoal.POWERLIFTING,
                         ),
                     ),
                     WorkoutDay(
@@ -346,6 +395,7 @@ class WorkoutPlanGenerator @Inject constructor(
                             listOf(MuscleGroup.QUADRICEPS, MuscleGroup.HAMSTRINGS, MuscleGroup.GLUTES),
                             sets = baseSets, reps = "1-5", rest = REST_TIME_POWER,
                             sessionDurationMinutes = sessionDurationMinutes, volumeMultiplier = volumeMultiplier,
+                            goal = UserPreferences.TrainingGoal.POWERLIFTING,
                         ),
                     ),
                     WorkoutDay(
@@ -356,6 +406,7 @@ class WorkoutPlanGenerator @Inject constructor(
                             listOf(MuscleGroup.CHEST, MuscleGroup.BACK, MuscleGroup.SHOULDERS),
                             sets = accessorySets, reps = "6-8", rest = 120,
                             sessionDurationMinutes = sessionDurationMinutes, volumeMultiplier = volumeMultiplier,
+                            goal = UserPreferences.TrainingGoal.POWERLIFTING,
                         ),
                     ),
                     WorkoutDay(
@@ -366,6 +417,7 @@ class WorkoutPlanGenerator @Inject constructor(
                             listOf(MuscleGroup.QUADRICEPS, MuscleGroup.HAMSTRINGS, MuscleGroup.CORE),
                             sets = accessorySets, reps = "6-8", rest = 120,
                             sessionDurationMinutes = sessionDurationMinutes, volumeMultiplier = volumeMultiplier,
+                            goal = UserPreferences.TrainingGoal.POWERLIFTING,
                         ),
                     ),
                 )
@@ -380,6 +432,7 @@ class WorkoutPlanGenerator @Inject constructor(
                             listOf(MuscleGroup.QUADRICEPS, MuscleGroup.HAMSTRINGS, MuscleGroup.GLUTES, MuscleGroup.CORE),
                             sets = baseSets, reps = "1-5", rest = REST_TIME_POWER,
                             sessionDurationMinutes = sessionDurationMinutes, volumeMultiplier = volumeMultiplier,
+                            goal = UserPreferences.TrainingGoal.POWERLIFTING,
                         ),
                     ),
                     WorkoutDay(
@@ -390,6 +443,7 @@ class WorkoutPlanGenerator @Inject constructor(
                             listOf(MuscleGroup.CHEST, MuscleGroup.TRICEPS, MuscleGroup.SHOULDERS),
                             sets = baseSets, reps = "1-5", rest = REST_TIME_POWER,
                             sessionDurationMinutes = sessionDurationMinutes, volumeMultiplier = volumeMultiplier,
+                            goal = UserPreferences.TrainingGoal.POWERLIFTING,
                         ),
                     ),
                 )
@@ -419,7 +473,7 @@ class WorkoutPlanGenerator @Inject constructor(
         // General fitness / endurance: 3 sets, high reps, short rest → most exercises fit
         // Skill: "12-20 reps, 2-3 sets, moderate intensity"
         val baseSets = 3
-        val workoutDays = generateFullBodyDays(exercises, sets = baseSets, reps = "12-20", rest = REST_TIME_ENDURANCE, sessionDurationMinutes = sessionDurationMinutes, volumeMultiplier = volumeMultiplier)
+        val workoutDays = generateFullBodyDays(exercises, sets = baseSets, reps = "12-20", rest = REST_TIME_ENDURANCE, sessionDurationMinutes = sessionDurationMinutes, volumeMultiplier = volumeMultiplier, goal = UserPreferences.TrainingGoal.GENERAL_FITNESS)
 
         return WorkoutPlan(
             name = context.getString(R.string.gen_plan_general),
@@ -448,6 +502,7 @@ class WorkoutPlanGenerator @Inject constructor(
         rest: Int,
         sessionDurationMinutes: Int,
         volumeMultiplier: Float = 1.0f,
+        goal: UserPreferences.TrainingGoal = UserPreferences.TrainingGoal.HYPERTROPHY,
     ): List<PlannedExercise> {
         val workBudget = workTimeBudgetSeconds(sessionDurationMinutes)
         val result = mutableListOf<PlannedExercise>()
@@ -466,10 +521,11 @@ class WorkoutPlanGenerator @Inject constructor(
 
         // Phase 1: One compound per target muscle
         for (muscle in targetMuscles) {
-            val compound = allExercises.firstOrNull {
-                it.muscleGroup == muscle && it.category == ExerciseCategory.COMPOUND 
-                    && it.name !in usedNames && it.name !in UNSUITABLE_FOR_PLANS
-            } ?: continue
+            val compound = allExercises
+                .filter { it.muscleGroup == muscle && it.category == ExerciseCategory.COMPOUND 
+                    && it.name !in usedNames && it.name !in UNSUITABLE_FOR_PLANS }
+                .sortedBy { equipmentPriority(it.equipment, goal) }
+                .firstOrNull() ?: continue
             usedNames.add(compound.name)
             candidates.add(Candidate(compound, sets, reps, rest))
         }
@@ -478,10 +534,11 @@ class WorkoutPlanGenerator @Inject constructor(
         // Skill: "60-90s for accessories" even in BULK, proportionally less rest than compounds
         val isolationNames = mutableSetOf<String>()
         for (muscle in targetMuscles) {
-            val isolation = allExercises.firstOrNull {
-                it.muscleGroup == muscle && it.category == ExerciseCategory.ISOLATION 
-                    && it.name !in usedNames && it.name !in isolationNames && it.name !in UNSUITABLE_FOR_PLANS
-            } ?: continue
+            val isolation = allExercises
+                .filter { it.muscleGroup == muscle && it.category == ExerciseCategory.ISOLATION 
+                    && it.name !in usedNames && it.name !in isolationNames && it.name !in UNSUITABLE_FOR_PLANS }
+                .sortedBy { equipmentPriority(it.equipment, goal) }
+                .firstOrNull() ?: continue
             isolationNames.add(isolation.name)
             candidates.add(Candidate(
                 isolation,
@@ -494,11 +551,12 @@ class WorkoutPlanGenerator @Inject constructor(
         // Phase 3: Accessories — shortest rest, highest reps, least setup
         val accessoryNames = mutableSetOf<String>()
         for (muscle in targetMuscles) {
-            val accessory = allExercises.firstOrNull {
-                it.muscleGroup == muscle && it.category == ExerciseCategory.ACCESSORY
+            val accessory = allExercises
+                .filter { it.muscleGroup == muscle && it.category == ExerciseCategory.ACCESSORY
                     && it.name !in usedNames && it.name !in isolationNames && it.name !in accessoryNames
-                    && it.name !in UNSUITABLE_FOR_PLANS
-            } ?: continue
+                    && it.name !in UNSUITABLE_FOR_PLANS }
+                .sortedBy { equipmentPriority(it.equipment, goal) }
+                .firstOrNull() ?: continue
             accessoryNames.add(accessory.name)
             candidates.add(Candidate(
                 accessory,
@@ -510,11 +568,12 @@ class WorkoutPlanGenerator @Inject constructor(
 
         // Phase 4: Extra compound variants
         for (muscle in targetMuscles) {
-            val extra = allExercises.firstOrNull {
-                it.muscleGroup == muscle && it.category == ExerciseCategory.COMPOUND
+            val extra = allExercises
+                .filter { it.muscleGroup == muscle && it.category == ExerciseCategory.COMPOUND
                     && it.name !in usedNames && it.name !in isolationNames && it.name !in accessoryNames
-                    && it.name !in UNSUITABLE_FOR_PLANS
-            } ?: continue
+                    && it.name !in UNSUITABLE_FOR_PLANS }
+                .sortedBy { equipmentPriority(it.equipment, goal) }
+                .firstOrNull() ?: continue
             candidates.add(Candidate(
                 extra,
                 sets = maxOf(sets - 1, 2),
@@ -583,6 +642,7 @@ class WorkoutPlanGenerator @Inject constructor(
         rest: Int,
         sessionDurationMinutes: Int,
         volumeMultiplier: Float,
+        goal: UserPreferences.TrainingGoal = UserPreferences.TrainingGoal.HYPERTROPHY,
     ): List<WorkoutDay> {
         return listOf(
             WorkoutDay(
@@ -591,7 +651,7 @@ class WorkoutPlanGenerator @Inject constructor(
                 exercises = buildExerciseList(
                     exercises,
                     listOf(MuscleGroup.CHEST, MuscleGroup.BACK, MuscleGroup.QUADRICEPS, MuscleGroup.CORE),
-                    sets, reps, rest, sessionDurationMinutes, volumeMultiplier,
+                    sets, reps, rest, sessionDurationMinutes, volumeMultiplier, goal,
                 ),
             ),
             WorkoutDay(
@@ -600,7 +660,7 @@ class WorkoutPlanGenerator @Inject constructor(
                 exercises = buildExerciseList(
                     exercises,
                     listOf(MuscleGroup.SHOULDERS, MuscleGroup.BACK, MuscleGroup.HAMSTRINGS, MuscleGroup.CORE),
-                    sets, reps, rest, sessionDurationMinutes, volumeMultiplier,
+                    sets, reps, rest, sessionDurationMinutes, volumeMultiplier, goal,
                 ),
             ),
             WorkoutDay(
@@ -609,7 +669,7 @@ class WorkoutPlanGenerator @Inject constructor(
                 exercises = buildExerciseList(
                     exercises,
                     listOf(MuscleGroup.CHEST, MuscleGroup.BACK, MuscleGroup.QUADRICEPS, MuscleGroup.BICEPS),
-                    sets, reps, rest, sessionDurationMinutes, volumeMultiplier,
+                    sets, reps, rest, sessionDurationMinutes, volumeMultiplier, goal,
                 ),
             ),
         )
@@ -622,6 +682,7 @@ class WorkoutPlanGenerator @Inject constructor(
         rest: Int,
         sessionDurationMinutes: Int,
         volumeMultiplier: Float,
+        goal: UserPreferences.TrainingGoal = UserPreferences.TrainingGoal.HYPERTROPHY,
     ): List<WorkoutDay> {
         return listOf(
             WorkoutDay(
@@ -630,7 +691,7 @@ class WorkoutPlanGenerator @Inject constructor(
                 exercises = buildExerciseList(
                     exercises,
                     listOf(MuscleGroup.CHEST, MuscleGroup.BACK, MuscleGroup.SHOULDERS, MuscleGroup.BICEPS),
-                    sets, reps, rest, sessionDurationMinutes, volumeMultiplier,
+                    sets, reps, rest, sessionDurationMinutes, volumeMultiplier, goal,
                 ),
             ),
             WorkoutDay(
@@ -639,7 +700,7 @@ class WorkoutPlanGenerator @Inject constructor(
                 exercises = buildExerciseList(
                     exercises,
                     listOf(MuscleGroup.QUADRICEPS, MuscleGroup.HAMSTRINGS, MuscleGroup.GLUTES, MuscleGroup.CALVES),
-                    sets, reps, rest, sessionDurationMinutes, volumeMultiplier,
+                    sets, reps, rest, sessionDurationMinutes, volumeMultiplier, goal,
                 ),
             ),
             WorkoutDay(
@@ -648,7 +709,7 @@ class WorkoutPlanGenerator @Inject constructor(
                 exercises = buildExerciseList(
                     exercises,
                     listOf(MuscleGroup.CHEST, MuscleGroup.BACK, MuscleGroup.SHOULDERS, MuscleGroup.TRICEPS),
-                    sets, reps, rest, sessionDurationMinutes, volumeMultiplier,
+                    sets, reps, rest, sessionDurationMinutes, volumeMultiplier, goal,
                 ),
             ),
             WorkoutDay(
@@ -657,7 +718,7 @@ class WorkoutPlanGenerator @Inject constructor(
                 exercises = buildExerciseList(
                     exercises,
                     listOf(MuscleGroup.QUADRICEPS, MuscleGroup.HAMSTRINGS, MuscleGroup.GLUTES, MuscleGroup.CORE),
-                    sets, reps, rest, sessionDurationMinutes, volumeMultiplier,
+                    sets, reps, rest, sessionDurationMinutes, volumeMultiplier, goal,
                 ),
             ),
         )
@@ -670,6 +731,7 @@ class WorkoutPlanGenerator @Inject constructor(
         rest: Int,
         sessionDurationMinutes: Int,
         volumeMultiplier: Float,
+        goal: UserPreferences.TrainingGoal = UserPreferences.TrainingGoal.HYPERTROPHY,
     ): List<WorkoutDay> {
         return listOf(
             WorkoutDay(
@@ -678,7 +740,7 @@ class WorkoutPlanGenerator @Inject constructor(
                 exercises = buildExerciseList(
                     exercises,
                     listOf(MuscleGroup.CHEST, MuscleGroup.SHOULDERS, MuscleGroup.TRICEPS),
-                    sets, reps, rest, sessionDurationMinutes, volumeMultiplier,
+                    sets, reps, rest, sessionDurationMinutes, volumeMultiplier, goal,
                 ),
             ),
             WorkoutDay(
@@ -687,7 +749,7 @@ class WorkoutPlanGenerator @Inject constructor(
                 exercises = buildExerciseList(
                     exercises,
                     listOf(MuscleGroup.BACK, MuscleGroup.BICEPS, MuscleGroup.FOREARMS),
-                    sets, reps, rest, sessionDurationMinutes, volumeMultiplier,
+                    sets, reps, rest, sessionDurationMinutes, volumeMultiplier, goal,
                 ),
             ),
             WorkoutDay(
@@ -696,7 +758,7 @@ class WorkoutPlanGenerator @Inject constructor(
                 exercises = buildExerciseList(
                     exercises,
                     listOf(MuscleGroup.QUADRICEPS, MuscleGroup.HAMSTRINGS, MuscleGroup.GLUTES, MuscleGroup.CALVES),
-                    sets, reps, rest, sessionDurationMinutes, volumeMultiplier,
+                    sets, reps, rest, sessionDurationMinutes, volumeMultiplier, goal,
                 ),
             ),
             WorkoutDay(
@@ -705,7 +767,7 @@ class WorkoutPlanGenerator @Inject constructor(
                 exercises = buildExerciseList(
                     exercises,
                     listOf(MuscleGroup.CHEST, MuscleGroup.SHOULDERS, MuscleGroup.TRICEPS),
-                    sets - 1, reps, rest - 30, sessionDurationMinutes, volumeMultiplier,
+                    sets - 1, reps, rest - 30, sessionDurationMinutes, volumeMultiplier, goal,
                 ),
             ),
             WorkoutDay(
@@ -714,7 +776,7 @@ class WorkoutPlanGenerator @Inject constructor(
                 exercises = buildExerciseList(
                     exercises,
                     listOf(MuscleGroup.BACK, MuscleGroup.BICEPS, MuscleGroup.FOREARMS),
-                    sets - 1, reps, rest - 30, sessionDurationMinutes, volumeMultiplier,
+                    sets - 1, reps, rest - 30, sessionDurationMinutes, volumeMultiplier, goal,
                 ),
             ),
             WorkoutDay(
@@ -723,13 +785,18 @@ class WorkoutPlanGenerator @Inject constructor(
                 exercises = buildExerciseList(
                     exercises,
                     listOf(MuscleGroup.QUADRICEPS, MuscleGroup.HAMSTRINGS, MuscleGroup.GLUTES, MuscleGroup.CALVES),
-                    sets - 1, reps, rest - 30, sessionDurationMinutes, volumeMultiplier,
+                    sets - 1, reps, rest - 30, sessionDurationMinutes, volumeMultiplier, goal,
                 ),
             ),
         )
     }
 
-    private fun generatePPLULDays(exercises: List<Exercise>, volumeMultiplier: Float, sessionDurationMinutes: Int = 60): List<WorkoutDay> {
+    private fun generatePPLULDays(
+        exercises: List<Exercise>,
+        volumeMultiplier: Float,
+        sessionDurationMinutes: Int = 60,
+        goal: UserPreferences.TrainingGoal = UserPreferences.TrainingGoal.HYPERTROPHY,
+    ): List<WorkoutDay> {
         val mainBaseSets = 4
         val secondaryBaseSets = 3
         return listOf(
@@ -741,6 +808,7 @@ class WorkoutPlanGenerator @Inject constructor(
                     listOf(MuscleGroup.CHEST, MuscleGroup.SHOULDERS, MuscleGroup.TRICEPS),
                     sets = mainBaseSets, reps = "8-12", rest = REST_TIME_HYPERTROPHY,
                     sessionDurationMinutes = sessionDurationMinutes, volumeMultiplier = volumeMultiplier,
+                    goal = goal,
                 ),
             ),
             WorkoutDay(
@@ -751,6 +819,7 @@ class WorkoutPlanGenerator @Inject constructor(
                     listOf(MuscleGroup.BACK, MuscleGroup.BICEPS, MuscleGroup.FOREARMS),
                     sets = mainBaseSets, reps = "8-12", rest = REST_TIME_HYPERTROPHY,
                     sessionDurationMinutes = sessionDurationMinutes, volumeMultiplier = volumeMultiplier,
+                    goal = goal,
                 ),
             ),
             WorkoutDay(
@@ -761,6 +830,7 @@ class WorkoutPlanGenerator @Inject constructor(
                     listOf(MuscleGroup.QUADRICEPS, MuscleGroup.HAMSTRINGS, MuscleGroup.GLUTES),
                     sets = mainBaseSets, reps = "8-12", rest = REST_TIME_HYPERTROPHY,
                     sessionDurationMinutes = sessionDurationMinutes, volumeMultiplier = volumeMultiplier,
+                    goal = goal,
                 ),
             ),
             WorkoutDay(
@@ -771,6 +841,7 @@ class WorkoutPlanGenerator @Inject constructor(
                     listOf(MuscleGroup.CHEST, MuscleGroup.BACK, MuscleGroup.SHOULDERS),
                     sets = secondaryBaseSets, reps = "12-15", rest = 60,
                     sessionDurationMinutes = sessionDurationMinutes, volumeMultiplier = volumeMultiplier,
+                    goal = goal,
                 ),
             ),
             WorkoutDay(
@@ -781,6 +852,7 @@ class WorkoutPlanGenerator @Inject constructor(
                     listOf(MuscleGroup.QUADRICEPS, MuscleGroup.HAMSTRINGS, MuscleGroup.CALVES),
                     sets = secondaryBaseSets, reps = "12-15", rest = 60,
                     sessionDurationMinutes = sessionDurationMinutes, volumeMultiplier = volumeMultiplier,
+                    goal = goal,
                 ),
             ),
         )
@@ -858,9 +930,10 @@ class WorkoutPlanGenerator @Inject constructor(
         if (adjusted.size < MAX_EXERCISES && accumulatedTime < workBudget) {
             val usedNames = adjusted.map { it.exerciseName }.toMutableSet()
             val candidates = allExercises.filter { it.name !in usedNames }
-            val extras = candidates.filter {
+            val extras = (candidates.filter {
                 it.category == ExerciseCategory.ACCESSORY || it.category == ExerciseCategory.ISOLATION
-            } + candidates.filter { it.category == ExerciseCategory.COMPOUND }
+            } + candidates.filter { it.category == ExerciseCategory.COMPOUND })
+                .sortedBy { equipmentPriority(it.equipment, goal) }
 
             for (ex in extras) {
                 if (adjusted.size >= MAX_EXERCISES) break
