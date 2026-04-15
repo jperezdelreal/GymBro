@@ -997,4 +997,19 @@
     <string name="gen_day_legs">Legs</string>
     <string name="gen_day_upper">Upper</string>
     <string name="gen_day_lower">Lower</string>
+
+    <!-- Home redesign (FitBod-inspired) -->
+    <string name="home_estimated_duration">~%d min</string>
+    <string name="home_training_type">Training Type</string>
+    <string name="home_suggested_weight">Suggested: %s</string>
+    <string name="home_start_workout">Start Workout</string>
+    <string name="home_compound">Compound</string>
+    <string name="home_isolation">Isolation</string>
+    <string name="home_accessory">Accessory</string>
+    <string name="home_exercises_subtitle">%1$s · %2$d exercises</string>
+    <string name="home_goal_strength">Strength</string>
+    <string name="home_goal_powerlifting">Powerlifting</string>
+    <string name="home_goal_hypertrophy">Hypertrophy</string>
+    <string name="home_goal_general_fitness">General Fitness</string>
+    <string name="home_sets_reps">%1$d × %2$s</string>
 </resources>
