@@ -2,15 +2,18 @@ package com.gymbro.feature.home
 
 import com.gymbro.core.repository.WorkoutRepository
 import com.gymbro.core.repository.ExerciseRepository
+import com.gymbro.core.preferences.UserPreferences
 import com.gymbro.core.service.ActivePlanStore
 import com.gymbro.core.service.PersonalRecordService
 import com.gymbro.core.service.PlateauDetectionService
+import com.gymbro.core.service.WorkoutPlanGenerator
 import com.gymbro.feature.common.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import androidx.lifecycle.viewModelScope
@@ -24,6 +27,8 @@ class HomeViewModel @Inject constructor(
     private val personalRecordService: PersonalRecordService,
     private val plateauDetectionService: PlateauDetectionService,
     private val exerciseRepository: ExerciseRepository,
+    private val userPreferences: UserPreferences,
+    private val workoutPlanGenerator: WorkoutPlanGenerator,
 ) : BaseViewModel() {
 
     private val _state = MutableStateFlow(HomeState())
@@ -39,6 +44,7 @@ class HomeViewModel @Inject constructor(
         loadWorkoutStreak()
         loadRecentPR()
         loadPlateauAlerts()
+        loadTargetDuration()
     }
 
     fun onEvent(event: HomeEvent) {
@@ -131,6 +137,9 @@ class HomeViewModel @Inject constructor(
                         todayWorkout = nextWorkout,
                     )
                 }
+            }
+            is HomeEvent.SetTargetDuration -> {
+                adjustWorkoutForDuration(event.minutes)
             }
         }
     }
@@ -350,6 +359,37 @@ class HomeViewModel @Inject constructor(
             _state.update { 
                 it.copy(plateauAlerts = alerts.take(3))
             }
+        }
+    }
+
+    private fun loadTargetDuration() {
+        viewModelScope.launch {
+            val saved = userPreferences.sessionDurationMinutes.firstOrNull() ?: 60
+            _state.update { it.copy(targetDurationMinutes = saved) }
+        }
+    }
+
+    private fun adjustWorkoutForDuration(minutes: Int) {
+        val todayWorkout = _state.value.todayWorkout ?: return
+        _state.update { it.copy(targetDurationMinutes = minutes, isAdjustingDuration = true) }
+
+        safeLaunch(
+            onError = { error ->
+                _state.update { it.copy(isAdjustingDuration = false) }
+                handleError(error) { adjustWorkoutForDuration(minutes) }
+            }
+        ) {
+            userPreferences.setSessionDurationMinutes(minutes)
+
+            val adjusted = workoutPlanGenerator.adjustDayForDuration(todayWorkout, minutes)
+            _state.update {
+                it.copy(
+                    todayWorkout = adjusted,
+                    isAdjustingDuration = false,
+                )
+            }
+            // Update the pending workout day so ActiveWorkout picks up the adjusted plan
+            activePlanStore.setPendingWorkoutDay(adjusted)
         }
     }
 

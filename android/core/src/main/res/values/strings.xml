@@ -1000,6 +1000,8 @@
 
     <!-- Home redesign (FitBod-inspired) -->
     <string name="home_estimated_duration">~%d min</string>
+    <string name="home_target_duration" formatted="false">⏱ %dm target</string>
+    <string name="home_adjusting_duration">Adjusting…</string>
     <string name="home_training_type">Training Type</string>
     <string name="home_suggested_weight">Suggested: %s</string>
     <string name="home_start_workout">Start Workout</string>

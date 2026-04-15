@@ -42,7 +42,10 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -212,10 +215,13 @@ fun HomeScreen(
                         )
                     }
 
-                    // Context Chips
+                    // Context Chips — tappable duration selector
                     item {
                         DurationChip(
                             exercises = state.todayWorkout.exercises,
+                            selectedMinutes = state.targetDurationMinutes,
+                            isAdjusting = state.isAdjustingDuration,
+                            onSelectDuration = { minutes -> onEvent(HomeEvent.SetTargetDuration(minutes)) },
                         )
                     }
 
@@ -356,17 +362,63 @@ private fun WorkoutHeader(
     }
 }
 
-// ─── DurationChip: Estimated workout time based on exercise data ───
+// ─── DurationChip: Interactive duration selector ───
 @Composable
 private fun DurationChip(
     exercises: List<PlannedExercise>,
+    selectedMinutes: Int,
+    isAdjusting: Boolean,
+    onSelectDuration: (Int) -> Unit,
 ) {
-    val estimatedMinutes = remember(exercises) { estimateWorkoutDurationMinutes(exercises) }
-    Row {
-        InfoChip(
-            label = stringResource(R.string.home_estimated_duration, estimatedMinutes),
-            color = AccentCyan,
-        )
+    val durations = listOf(30, 45, 60, 90)
+    var expanded by remember { mutableStateOf(false) }
+
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        // Main chip — tappable to expand options
+        Box(
+            modifier = Modifier
+                .clip(RoundedCornerShape(8.dp))
+                .background(AccentCyan.copy(alpha = 0.15f))
+                .clickable { expanded = !expanded }
+                .padding(horizontal = 12.dp, vertical = 6.dp),
+        ) {
+            Text(
+                text = if (isAdjusting) {
+                    stringResource(R.string.home_adjusting_duration)
+                } else {
+                    stringResource(R.string.home_target_duration, selectedMinutes)
+                },
+                style = MaterialTheme.typography.labelMedium.copy(
+                    fontWeight = FontWeight.SemiBold,
+                ),
+                color = AccentCyan,
+            )
+        }
+
+        // Expanded: show alternative duration options
+        if (expanded) {
+            durations.filter { it != selectedMinutes }.forEach { minutes ->
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+                        .clickable {
+                            onSelectDuration(minutes)
+                            expanded = false
+                        }
+                        .padding(horizontal = 10.dp, vertical = 6.dp),
+                ) {
+                    Text(
+                        text = "${minutes}m",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                    )
+                }
+            }
+        }
     }
 }
 

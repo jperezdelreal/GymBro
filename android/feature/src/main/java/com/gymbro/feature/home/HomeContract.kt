@@ -23,6 +23,8 @@ data class HomeState(
     val showMilestoneCelebration: Boolean = false,
     val milestoneCelebration: MilestoneCelebration? = null,
     val plateauAlerts: List<PlateauAlert> = emptyList(),
+    val targetDurationMinutes: Int = 60,
+    val isAdjustingDuration: Boolean = false,
 )
 
 data class MilestoneCelebration(
@@ -54,6 +56,7 @@ sealed interface HomeEvent {
     data class DismissPlateauAlert(val exerciseId: String) : HomeEvent
     data class OpenCoachForPlateau(val alert: PlateauAlert) : HomeEvent
     data object SwapDay : HomeEvent
+    data class SetTargetDuration(val minutes: Int) : HomeEvent
 }
 
 sealed interface HomeEffect {
