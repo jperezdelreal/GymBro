@@ -1,6 +1,7 @@
 package com.gymbro.feature.home
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,6 +19,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.FitnessCenter
@@ -382,20 +384,32 @@ private fun DurationChip(
             modifier = Modifier
                 .clip(RoundedCornerShape(8.dp))
                 .background(AccentCyan.copy(alpha = 0.15f))
+                .border(1.5.dp, AccentCyan.copy(alpha = 0.6f), RoundedCornerShape(8.dp))
                 .clickable { expanded = !expanded }
                 .padding(horizontal = 12.dp, vertical = 6.dp),
         ) {
-            Text(
-                text = if (isAdjusting) {
-                    stringResource(R.string.home_adjusting_duration)
-                } else {
-                    stringResource(R.string.home_target_duration, selectedMinutes)
-                },
-                style = MaterialTheme.typography.labelMedium.copy(
-                    fontWeight = FontWeight.SemiBold,
-                ),
-                color = AccentCyan,
-            )
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = if (isAdjusting) {
+                        stringResource(R.string.home_adjusting_duration)
+                    } else {
+                        stringResource(R.string.home_target_duration, selectedMinutes)
+                    },
+                    style = MaterialTheme.typography.labelMedium.copy(
+                        fontWeight = FontWeight.SemiBold,
+                    ),
+                    color = AccentCyan,
+                )
+                Icon(
+                    imageVector = Icons.Default.ArrowDropDown,
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp),
+                    tint = AccentCyan.copy(alpha = 0.8f),
+                )
+            }
         }
 
         // Expanded: show alternative duration options
