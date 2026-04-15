@@ -15,6 +15,7 @@ import com.gymbro.core.repository.ExerciseRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlin.math.roundToInt
 import kotlinx.coroutines.flow.first
+import org.json.JSONArray
 import javax.inject.Inject
 
 class WorkoutPlanGenerator @Inject constructor(
@@ -62,6 +63,18 @@ class WorkoutPlanGenerator @Inject constructor(
             "Band Dislocate",
             "Band Pull-Apart"
         )
+
+        /**
+         * Maps a TrainingGoal to the suitability tag used in exercises-seed.json.
+         */
+        private fun goalToSuitabilityTag(goal: UserPreferences.TrainingGoal): String {
+            return when (goal) {
+                UserPreferences.TrainingGoal.STRENGTH -> "strength"
+                UserPreferences.TrainingGoal.HYPERTROPHY -> "hypertrophy"
+                UserPreferences.TrainingGoal.POWERLIFTING -> "powerlifting"
+                UserPreferences.TrainingGoal.GENERAL_FITNESS -> "general_fitness"
+            }
+        }
 
         /**
          * Estimates how long a single exercise takes in seconds.
@@ -144,6 +157,43 @@ class WorkoutPlanGenerator @Inject constructor(
                 repsRange.trim().toIntOrNull() ?: 10
             }
         }
+    }
+
+    /**
+     * Lazily-loaded map of exercise name → suitability tags from exercises-seed.json.
+     * Exercises missing from the map are treated as suitable for all goals (backward compatible).
+     */
+    private val suitabilityMap: Map<String, List<String>> by lazy {
+        try {
+            val json = context.assets.open("exercises-seed.json").bufferedReader().use { it.readText() }
+            val array = JSONArray(json)
+            val map = mutableMapOf<String, List<String>>()
+            for (i in 0 until array.length()) {
+                val obj = array.getJSONObject(i)
+                val name = obj.getString("name")
+                val tags = mutableListOf<String>()
+                val arr = obj.optJSONArray("suitability")
+                if (arr != null) {
+                    for (j in 0 until arr.length()) {
+                        tags.add(arr.getString(j))
+                    }
+                }
+                map[name] = tags
+            }
+            map
+        } catch (_: Exception) {
+            emptyMap()
+        }
+    }
+
+    /**
+     * Returns true if the exercise is suitable for the given training goal.
+     * If no suitability data exists for the exercise, defaults to suitable (backward compatible).
+     */
+    private fun isSuitableForGoal(exerciseName: String, goal: UserPreferences.TrainingGoal): Boolean {
+        val tags = suitabilityMap[exerciseName] ?: return true  // unknown → allow
+        if (tags.isEmpty()) return false  // explicitly unsuitable (skill/gymnastics)
+        return goalToSuitabilityTag(goal) in tags
     }
 
     private fun splitName(split: TrainingSplit): String = context.getString(
@@ -523,7 +573,8 @@ class WorkoutPlanGenerator @Inject constructor(
         for (muscle in targetMuscles) {
             val compound = allExercises
                 .filter { it.muscleGroup == muscle && it.category == ExerciseCategory.COMPOUND 
-                    && it.name !in usedNames && it.name !in UNSUITABLE_FOR_PLANS }
+                    && it.name !in usedNames && it.name !in UNSUITABLE_FOR_PLANS
+                    && isSuitableForGoal(it.name, goal) }
                 .sortedBy { equipmentPriority(it.equipment, goal) }
                 .firstOrNull() ?: continue
             usedNames.add(compound.name)
@@ -536,7 +587,8 @@ class WorkoutPlanGenerator @Inject constructor(
         for (muscle in targetMuscles) {
             val isolation = allExercises
                 .filter { it.muscleGroup == muscle && it.category == ExerciseCategory.ISOLATION 
-                    && it.name !in usedNames && it.name !in isolationNames && it.name !in UNSUITABLE_FOR_PLANS }
+                    && it.name !in usedNames && it.name !in isolationNames && it.name !in UNSUITABLE_FOR_PLANS
+                    && isSuitableForGoal(it.name, goal) }
                 .sortedBy { equipmentPriority(it.equipment, goal) }
                 .firstOrNull() ?: continue
             isolationNames.add(isolation.name)
@@ -554,7 +606,8 @@ class WorkoutPlanGenerator @Inject constructor(
             val accessory = allExercises
                 .filter { it.muscleGroup == muscle && it.category == ExerciseCategory.ACCESSORY
                     && it.name !in usedNames && it.name !in isolationNames && it.name !in accessoryNames
-                    && it.name !in UNSUITABLE_FOR_PLANS }
+                    && it.name !in UNSUITABLE_FOR_PLANS
+                    && isSuitableForGoal(it.name, goal) }
                 .sortedBy { equipmentPriority(it.equipment, goal) }
                 .firstOrNull() ?: continue
             accessoryNames.add(accessory.name)
@@ -571,7 +624,8 @@ class WorkoutPlanGenerator @Inject constructor(
             val extra = allExercises
                 .filter { it.muscleGroup == muscle && it.category == ExerciseCategory.COMPOUND
                     && it.name !in usedNames && it.name !in isolationNames && it.name !in accessoryNames
-                    && it.name !in UNSUITABLE_FOR_PLANS }
+                    && it.name !in UNSUITABLE_FOR_PLANS
+                    && isSuitableForGoal(it.name, goal) }
                 .sortedBy { equipmentPriority(it.equipment, goal) }
                 .firstOrNull() ?: continue
             candidates.add(Candidate(
@@ -929,7 +983,8 @@ class WorkoutPlanGenerator @Inject constructor(
         // If new duration is longer and there's time left, add more exercises
         if (adjusted.size < MAX_EXERCISES && accumulatedTime < workBudget) {
             val usedNames = adjusted.map { it.exerciseName }.toMutableSet()
-            val candidates = allExercises.filter { it.name !in usedNames }
+            val candidates = allExercises.filter { it.name !in usedNames
+                && it.name !in UNSUITABLE_FOR_PLANS && isSuitableForGoal(it.name, goal) }
             val extras = (candidates.filter {
                 it.category == ExerciseCategory.ACCESSORY || it.category == ExerciseCategory.ISOLATION
             } + candidates.filter { it.category == ExerciseCategory.COMPOUND })
