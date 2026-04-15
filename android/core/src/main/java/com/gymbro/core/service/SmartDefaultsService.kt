@@ -84,7 +84,10 @@ class SmartDefaultsService @Inject constructor(
         }
 
         return historyDefaults.copy(
-            beginnerSuggestion = beginner?.let { "${it.suggestedWeightKg.toInt()} kg" },
+            beginnerSuggestion = beginner?.let { 
+                if (it.suggestedWeightKg == 0.0) null 
+                else "${it.suggestedWeightKg.toInt()} kg" 
+            },
         )
     }
 }

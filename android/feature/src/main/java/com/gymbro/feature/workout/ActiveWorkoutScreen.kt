@@ -339,9 +339,13 @@ fun ActiveWorkoutScreen(
         var isRestTimerMinimized by remember { mutableStateOf(false) }
 
         // Auto-show bottom sheet when rest timer activates
+        // F3: Auto-dismiss tooltips when rest timer activates
         LaunchedEffect(state.isRestTimerActive) {
             if (state.isRestTimerActive) {
                 isRestTimerMinimized = false
+                onTooltipDismissed()
+                onFirstSetCompletedTooltipDismissed()
+                onFinishTooltipDismissed()
             }
         }
 
@@ -529,7 +533,7 @@ fun ActiveWorkoutScreen(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clip(RoundedCornerShape(8.dp))
-                                    .background(AccentGreenStart.copy(alpha = 0.1f))
+                                    .background(Color.White.copy(alpha = 0.05f))
                                     .clickable { onEvent(ActiveWorkoutEvent.UnlinkSuperset(supersetGroup.key)) }
                                     .padding(horizontal = 12.dp, vertical = 6.dp),
                                 verticalAlignment = Alignment.CenterVertically,
@@ -539,12 +543,12 @@ fun ActiveWorkoutScreen(
                                     text = stringResource(R.string.active_workout_superset_label),
                                     style = MaterialTheme.typography.labelMedium,
                                     fontWeight = FontWeight.Bold,
-                                    color = AccentGreenStart,
+                                    color = Color.White,
                                 )
                                 Text(
                                     text = stringResource(R.string.active_workout_ungroup_superset),
                                     style = MaterialTheme.typography.labelSmall,
-                                    color = AccentGreenStart.copy(alpha = 0.7f),
+                                    color = Color.White.copy(alpha = 0.7f),
                                 )
                             }
                             Spacer(modifier = Modifier.height(4.dp))
@@ -555,14 +559,10 @@ fun ActiveWorkoutScreen(
                             horizontalArrangement = Arrangement.Start,
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            // Drag handle (#550)
-                            Icon(
-                                Icons.Default.DragHandle,
-                                contentDescription = stringResource(R.string.active_workout_drag_handle),
-                                tint = Color.White.copy(alpha = 0.7f),
+                            // Drag handle (F5: smaller visual, integrated feel)
+                            Box(
                                 modifier = Modifier
-                                    .size(48.dp)
-                                    .padding(12.dp)
+                                    .size(40.dp)
                                     .pointerInput(exerciseIndex) {
                                         detectDragGestures(
                                             onDragStart = {
@@ -591,7 +591,15 @@ fun ActiveWorkoutScreen(
                                             },
                                         )
                                     },
-                            )
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                Icon(
+                                    Icons.Default.DragHandle,
+                                    contentDescription = stringResource(R.string.active_workout_drag_handle),
+                                    tint = Color.White.copy(alpha = 0.3f),
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
                             Spacer(modifier = Modifier.width(4.dp))
 
                             // Accent bracket connecting superset exercises
@@ -601,7 +609,7 @@ fun ActiveWorkoutScreen(
                                         .width(4.dp)
                                         .height(120.dp)
                                         .background(
-                                            AccentGreenStart,
+                                            Color.White.copy(alpha = 0.4f),
                                             shape = if (exerciseIndex == supersetGroup.value.first() && exerciseIndex == supersetGroup.value.last()) {
                                                 RoundedCornerShape(4.dp)
                                             } else if (exerciseIndex == supersetGroup.value.first()) {
@@ -641,7 +649,7 @@ fun ActiveWorkoutScreen(
                                             ),
                                             style = MaterialTheme.typography.labelSmall,
                                             fontWeight = FontWeight.Bold,
-                                            color = AccentGreenStart,
+                                            color = Color.White.copy(alpha = 0.8f),
                                             modifier = Modifier.padding(start = 16.dp, top = 8.dp)
                                         )
                                     }
@@ -667,7 +675,7 @@ fun ActiveWorkoutScreen(
                         Text(
                             text = stringResource(R.string.active_workout_superset_selection_hint),
                             style = MaterialTheme.typography.bodySmall,
-                            color = AccentGreenStart.copy(alpha = 0.7f),
+                            color = Color.White.copy(alpha = 0.7f),
                             textAlign = TextAlign.Center,
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -791,7 +799,7 @@ private fun WorkoutStatsContent(
             value = stringResource(R.string.active_workout_exercise_progress, completedExercises, totalExercises),
             color = AccentCyanStart,
         )
-        StatItem(label = stringResource(R.string.common_volume), value = "${totalVolume.toLong()} $unitLabel", color = AccentGreenStart)
+        StatItem(label = stringResource(R.string.common_volume), value = "${totalVolume.toLong()} $unitLabel", color = Color.White)
         StatItem(label = stringResource(R.string.workout_sets), value = "$totalSets", color = AccentAmberStart)
     }
 }
@@ -1113,7 +1121,7 @@ private fun UnifiedBottomBar(
             Icon(
                 Icons.Default.Add,
                 contentDescription = stringResource(R.string.active_workout_add_exercise),
-                tint = AccentGreenStart,
+                tint = Color.White,
             )
         }
     }
@@ -1266,7 +1274,7 @@ private fun ExerciseCardContent(
             Icon(
                 Icons.Default.Info,
                 contentDescription = stringResource(R.string.active_workout_exercise_info),
-                tint = Color.White.copy(alpha = 0.4f),
+                tint = Color.White.copy(alpha = 0.6f),
                 modifier = Modifier
                     .size(18.dp)
                     .clickable { onEvent(ActiveWorkoutEvent.ShowExerciseDetail(exerciseUi.exercise)) },
@@ -1420,7 +1428,7 @@ private fun ExerciseCardContent(
             Spacer(modifier = Modifier.width(8.dp))
             Text(stringResource(R.string.active_workout_header_reps), style = setHeaderStyle(), modifier = Modifier.weight(1f), textAlign = TextAlign.Center)
             Spacer(modifier = Modifier.width(4.dp))
-            Spacer(modifier = Modifier.width(56.dp)) // RPE column
+            Text("RPE", style = setHeaderStyle(), modifier = Modifier.width(56.dp), textAlign = TextAlign.Center)
             Spacer(modifier = Modifier.width(8.dp))
             Spacer(modifier = Modifier.width(56.dp)) // complete button
         }
@@ -1452,14 +1460,14 @@ private fun ExerciseCardContent(
                     haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                     onEvent(ActiveWorkoutEvent.AddSet(exerciseIndex)) 
                 }
-                .border(1.dp, AccentGreenStart.copy(alpha = 0.3f), RoundedCornerShape(8.dp))
+                .border(1.dp, Color.White.copy(alpha = 0.15f), RoundedCornerShape(8.dp))
                 .padding(vertical = 8.dp),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Icon(Icons.Default.Add, contentDescription = stringResource(R.string.active_workout_cd_add_set), tint = AccentGreenStart, modifier = Modifier.size(16.dp))
+            Icon(Icons.Default.Add, contentDescription = stringResource(R.string.active_workout_cd_add_set), tint = Color.White.copy(alpha = 0.7f), modifier = Modifier.size(16.dp))
             Spacer(modifier = Modifier.width(4.dp))
-            Text(stringResource(R.string.workout_add_set), color = AccentGreenStart, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+            Text(stringResource(R.string.workout_add_set), color = Color.White.copy(alpha = 0.7f), fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
         }
     }
 }
@@ -1792,7 +1800,7 @@ private fun ClickableNumberField(
                     textAlign = TextAlign.Center,
                     fontWeight = FontWeight.Normal,
                     fontSize = 12.sp,
-                    color = AccentGreenStart.copy(alpha = 0.5f),
+                    color = Color.White.copy(alpha = 0.3f),
                 ),
             )
         } else {
