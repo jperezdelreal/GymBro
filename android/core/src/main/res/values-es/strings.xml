@@ -1003,4 +1003,19 @@
     <string name="gen_day_legs">Piernas</string>
     <string name="gen_day_upper">Tren Superior</string>
     <string name="gen_day_lower">Tren Inferior</string>
+
+    <!-- Home redesign (FitBod-inspired) -->
+    <string name="home_estimated_duration">~%d min</string>
+    <string name="home_training_type">Tipo</string>
+    <string name="home_suggested_weight">Sugerido: %s</string>
+    <string name="home_start_workout">Iniciar Entrenamiento</string>
+    <string name="home_compound">Compuesto</string>
+    <string name="home_isolation">Aislamiento</string>
+    <string name="home_accessory">Accesorio</string>
+    <string name="home_exercises_subtitle">%1$s · %2$d ejercicios</string>
+    <string name="home_goal_strength">Fuerza</string>
+    <string name="home_goal_powerlifting">Powerlifting</string>
+    <string name="home_goal_hypertrophy">Hipertrofia</string>
+    <string name="home_goal_general_fitness">Fitness General</string>
+    <string name="home_sets_reps">%1$d × %2$s</string>
 </resources>

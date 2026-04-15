@@ -1,7 +1,6 @@
 package com.gymbro.feature.home
 
 import androidx.compose.foundation.background
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,13 +18,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.SwapHoriz
-import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -49,13 +46,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
@@ -68,15 +63,13 @@ import com.gymbro.core.R
 import com.gymbro.core.model.PlateauAlert
 import com.gymbro.core.model.PlateauSeverity
 import com.gymbro.core.model.PlateauType
+import com.gymbro.core.model.PlannedExercise
 import com.gymbro.core.model.WorkoutDay
 import com.gymbro.core.model.WorkoutPlan
 import com.gymbro.core.preferences.UserPreferences
+import com.gymbro.core.service.WorkoutPlanGenerator
 import com.gymbro.feature.common.FullScreenLoading
 import com.gymbro.feature.common.ObserveErrors
-import java.time.Instant
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
 
 private val AccentGreen = Color(0xFF00FF87)
 private val AccentCyan = Color(0xFF00E5FF)
@@ -132,6 +125,9 @@ fun HomeScreen(
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     weightUnit: UserPreferences.WeightUnit = UserPreferences.WeightUnit.KG,
 ) {
+    val haptic = LocalHapticFeedback.current
+    val hasTodayWorkout = state.activePlan != null && state.todayWorkout != null
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -149,6 +145,49 @@ fun HomeScreen(
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
         containerColor = MaterialTheme.colorScheme.background,
+        bottomBar = {
+            if (hasTodayWorkout) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.background)
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                ) {
+                    Button(
+                        onClick = {
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            onEvent(
+                                HomeEvent.StartTodayWorkout(
+                                    state.todayWorkout!!.dayNumber,
+                                ),
+                            )
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp)
+                            .testTag("start_workout_bottom_button"),
+                        shape = RoundedCornerShape(14.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = AccentGreen,
+                            contentColor = Color.Black,
+                        ),
+                    ) {
+                        Icon(
+                            Icons.Default.PlayArrow,
+                            contentDescription = stringResource(R.string.home_cd_start_workout),
+                            modifier = Modifier.size(24.dp),
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = stringResource(R.string.home_start_workout),
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.Bold,
+                            ),
+                        )
+                    }
+                }
+            }
+        },
     ) { innerPadding ->
         if (state.isLoading && state.recentWorkouts.isEmpty() && state.activePlan == null) {
             FullScreenLoading()
@@ -160,102 +199,57 @@ fun HomeScreen(
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
-                // Quick Start Button — the hero action
-                item {
-                    QuickStartCard(
-                        daysSinceLastWorkout = state.daysSinceLastWorkout,
-                        onQuickStart = { onEvent(HomeEvent.QuickStartWorkout) },
-                    )
-                }
-                
-                if (state.weeklyStreak > 0 || state.totalWorkouts > 0) {
-                    item {
-                        WeeklyStreakCard(
-                            weeklyStreak = state.weeklyStreak,
-                            totalWorkouts = state.totalWorkouts,
-                            nextMilestone = state.nextMilestone,
-                        )
-                    }
-                }
-                
-                if (state.showMilestoneCelebration && state.milestoneCelebration != null) {
-                    item {
-                        MilestoneCelebrationCard(
-                            celebration = state.milestoneCelebration,
-                            onDismiss = { onEvent(HomeEvent.DismissMilestoneBanner) },
-                        )
-                    }
-                }
-
-                // Today's Workout (if active plan exists)
                 if (state.activePlan != null && state.todayWorkout != null) {
+                    // Hero: Workout Header
                     item {
-                        TodayWorkoutCard(
-                            plan = state.activePlan,
-                            todayWorkout = state.todayWorkout,
+                        WorkoutHeader(
+                            dayName = state.todayWorkout.name,
+                            planName = state.activePlan.name,
+                            exerciseCount = state.todayWorkout.exercises.size,
                             canSwapDay = state.activePlan.workoutDays.size > 1,
                             onSwapDay = { onEvent(HomeEvent.SwapDay) },
-                            onStartWorkout = {
-                                onEvent(HomeEvent.StartTodayWorkout(state.todayWorkout.dayNumber))
-                            },
-                            onViewPrograms = { onEvent(HomeEvent.ViewAllPrograms) },
+                            modifier = Modifier.testTag("today_workout_card"),
                         )
+                    }
+
+                    // Context Chips
+                    item {
+                        DurationChip(
+                            exercises = state.todayWorkout.exercises,
+                        )
+                    }
+
+                    // Compact Plateau Alerts
+                    if (state.plateauAlerts.isNotEmpty()) {
+                        items(
+                            items = state.plateauAlerts,
+                            key = { it.exerciseId },
+                        ) { alert ->
+                            CompactPlateauAlert(
+                                alert = alert,
+                                onDismiss = { onEvent(HomeEvent.DismissPlateauAlert(alert.exerciseId)) },
+                                onTalkToCoach = { onEvent(HomeEvent.OpenCoachForPlateau(alert)) },
+                            )
+                        }
+                    }
+
+                    // Exercise Preview Cards
+                    items(
+                        items = state.todayWorkout.exercises,
+                        key = { it.id },
+                    ) { exercise ->
+                        ExercisePreviewCard(exercise = exercise)
+                    }
+
+                    // Bottom spacer for sticky button
+                    item {
+                        Spacer(modifier = Modifier.height(80.dp))
                     }
                 } else {
                     // No active plan — CTA to create one
                     item {
                         CreateProgramCta(
                             onCreateProgram = { onEvent(HomeEvent.CreateFirstProgram) },
-                        )
-                    }
-                }
-
-                // Plateau Alerts - show proactively on Home
-                if (state.plateauAlerts.isNotEmpty()) {
-                    item {
-                        Text(
-                            text = stringResource(R.string.home_plateau_alert_title),
-                            style = MaterialTheme.typography.titleLarge.copy(
-                                fontWeight = FontWeight.Bold,
-                            ),
-                            color = MaterialTheme.colorScheme.onBackground,
-                            modifier = Modifier.semantics { heading() },
-                        )
-                    }
-
-                    items(
-                        items = state.plateauAlerts,
-                        key = { it.exerciseId },
-                    ) { alert ->
-                        HomePlateauAlertCard(
-                            alert = alert,
-                            onDismiss = { onEvent(HomeEvent.DismissPlateauAlert(alert.exerciseId)) },
-                            onTalkToCoach = { onEvent(HomeEvent.OpenCoachForPlateau(alert)) },
-                        )
-                    }
-                }
-
-                // Recent Workouts
-                if (state.recentWorkouts.isNotEmpty()) {
-                    item {
-                        Text(
-                            text = stringResource(R.string.home_recent_workouts),
-                            style = MaterialTheme.typography.titleLarge.copy(
-                                fontWeight = FontWeight.Bold,
-                            ),
-                            color = MaterialTheme.colorScheme.onBackground,
-                            modifier = Modifier.semantics { heading() },
-                        )
-                    }
-
-                    items(
-                        items = state.recentWorkouts,
-                        key = { it.workoutId },
-                    ) { workout ->
-                        RecentWorkoutCard(
-                            workout = workout,
-                            onClick = { onEvent(HomeEvent.ViewWorkoutDetail(workout.workoutId)) },
-                            weightUnit = weightUnit,
                         )
                     }
                 }
@@ -298,208 +292,41 @@ fun HomeScreen(
     }
 }
 
+// ─── WorkoutHeader: Hero section showing today's workout day ───
 @Composable
-private fun QuickStartCard(
-    daysSinceLastWorkout: Int?,
-    onQuickStart: () -> Unit,
+private fun WorkoutHeader(
+    dayName: String,
+    planName: String,
+    exerciseCount: Int,
+    canSwapDay: Boolean,
+    onSwapDay: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val haptic = LocalHapticFeedback.current
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .testTag("quick_start_card"),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    brush = Brush.horizontalGradient(
-                        colors = listOf(
-                            AccentGreen.copy(alpha = 0.15f),
-                            AccentCyan.copy(alpha = 0.10f),
-                        )
-                    ),
-                    shape = RoundedCornerShape(16.dp),
-                )
-                .padding(24.dp),
+    Column(modifier = modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.Top,
         ) {
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                val subtitle = when {
-                    daysSinceLastWorkout == null -> stringResource(R.string.home_quick_start_first)
-                    daysSinceLastWorkout == 0 -> stringResource(R.string.home_quick_start_today)
-                    daysSinceLastWorkout == 1 -> stringResource(R.string.home_quick_start_yesterday)
-                    else -> stringResource(R.string.home_quick_start_days_ago, daysSinceLastWorkout)
-                }
-
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = subtitle,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    text = dayName,
+                    style = MaterialTheme.typography.headlineLarge.copy(
+                        fontWeight = FontWeight.Bold,
+                    ),
+                    color = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier.semantics { heading() },
                 )
-
                 Spacer(modifier = Modifier.height(4.dp))
-
                 Text(
-                    text = stringResource(R.string.home_quick_start_subtitle),
-                    style = MaterialTheme.typography.bodySmall,
+                    text = stringResource(R.string.home_exercises_subtitle, planName, exerciseCount),
+                    style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                Button(
-                    onClick = {
-                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                        onQuickStart()
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp)
-                        .testTag("quick_start_button"),
-                    shape = RoundedCornerShape(14.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = AccentGreen,
-                        contentColor = Color.Black,
-                    ),
-                ) {
-                    Icon(
-                        Icons.Default.PlayArrow,
-                        contentDescription = stringResource(R.string.home_cd_start_workout),
-                        modifier = Modifier.size(24.dp),
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = stringResource(R.string.home_quick_start),
-                        style = MaterialTheme.typography.titleMedium.copy(
-                            fontWeight = FontWeight.Bold,
-                        ),
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun TodayWorkoutCard(
-    plan: WorkoutPlan,
-    todayWorkout: WorkoutDay,
-    canSwapDay: Boolean = false,
-    onSwapDay: () -> Unit = {},
-    onStartWorkout: () -> Unit,
-    onViewPrograms: () -> Unit,
-) {
-    val haptic = LocalHapticFeedback.current
-    val viewAllProgramsLabel = stringResource(R.string.home_cd_view_all_programs)
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .testTag("today_workout_card"),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-        ) {
-            // TODAY badge
-            Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(AccentGreen.copy(alpha = 0.15f))
-                    .padding(horizontal = 10.dp, vertical = 4.dp),
-            ) {
-                Text(
-                    text = stringResource(R.string.home_today_badge),
-                    style = MaterialTheme.typography.labelMedium.copy(
-                        fontWeight = FontWeight.Bold,
-                    ),
-                    color = AccentGreen,
-                )
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = stringResource(R.string.home_todays_workout),
-                        style = MaterialTheme.typography.labelLarge,
-                        color = AccentGreen,
-                        fontWeight = FontWeight.SemiBold,
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = todayWorkout.name,
-                        style = MaterialTheme.typography.titleLarge.copy(
-                            fontWeight = FontWeight.Bold,
-                        ),
-                        color = MaterialTheme.colorScheme.onSurface,
-                    )
-                    Spacer(modifier = Modifier.height(2.dp))
-                    Text(
-                        text = plan.name,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-
-                Button(
-                    onClick = {
-                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                        onStartWorkout()
-                    },
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = AccentGreen,
-                        contentColor = Color.Black,
-                    ),
-                ) {
-                    Icon(
-                        Icons.Default.PlayArrow,
-                        contentDescription = stringResource(R.string.home_cd_start_workout),
-                        modifier = Modifier.size(18.dp),
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = stringResource(R.string.home_start),
-                        fontWeight = FontWeight.Bold,
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                InfoChip(
-                    label = pluralStringResource(R.plurals.exercises_count, todayWorkout.exercises.size, todayWorkout.exercises.size),
-                    color = AccentCyan,
-                )
-                InfoChip(
-                    label = stringResource(R.string.programs_day_number, todayWorkout.dayNumber),
-                    color = AccentGreen,
-                )
-            }
-
-            // Swap day button
             if (canSwapDay) {
-                Spacer(modifier = Modifier.height(8.dp))
                 Row(
                     modifier = Modifier
                         .clip(RoundedCornerShape(8.dp))
@@ -507,7 +334,7 @@ private fun TodayWorkoutCard(
                             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                             onSwapDay()
                         })
-                        .padding(vertical = 4.dp, horizontal = 2.dp),
+                        .padding(vertical = 8.dp, horizontal = 8.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Icon(
@@ -525,46 +352,151 @@ private fun TodayWorkoutCard(
                     )
                 }
             }
+        }
+    }
+}
 
-            // Exercise list
-            if (todayWorkout.exercises.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(12.dp))
-                todayWorkout.exercises.forEach { exercise ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 2.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Icon(
-                            Icons.Default.FitnessCenter,
-                            contentDescription = null,
-                            modifier = Modifier.size(14.dp),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = "${exercise.exerciseName} — ${exercise.sets} × ${exercise.repsRange}",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
-                }
+// ─── DurationChip: Estimated workout time based on exercise data ───
+@Composable
+private fun DurationChip(
+    exercises: List<PlannedExercise>,
+) {
+    val estimatedMinutes = remember(exercises) { estimateWorkoutDurationMinutes(exercises) }
+    Row {
+        InfoChip(
+            label = stringResource(R.string.home_estimated_duration, estimatedMinutes),
+            color = AccentCyan,
+        )
+    }
+}
+
+// ─── ExercisePreviewCard: Enriched card for each exercise ───
+@Composable
+private fun ExercisePreviewCard(
+    exercise: PlannedExercise,
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            // Exercise icon
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(AccentGreen.copy(alpha = 0.12f)),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    Icons.Default.FitnessCenter,
+                    contentDescription = null,
+                    modifier = Modifier.size(20.dp),
+                    tint = AccentGreen,
+                )
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = stringResource(R.string.home_view_all_programs),
-                style = MaterialTheme.typography.labelMedium,
-                color = AccentCyan,
-                fontWeight = FontWeight.SemiBold,
-                modifier = Modifier
-                    .semantics { contentDescription = viewAllProgramsLabel }
-                    .clickable(onClick = {
-                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                        onViewPrograms()
-                    })
-                    .padding(vertical = 4.dp),
+            Spacer(modifier = Modifier.width(12.dp))
+
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = exercise.exerciseName,
+                    style = MaterialTheme.typography.titleSmall.copy(
+                        fontWeight = FontWeight.Bold,
+                    ),
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    text = stringResource(R.string.home_sets_reps, exercise.sets, exercise.repsRange),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+    }
+}
+
+// ─── CompactPlateauAlert: Banner-style plateau warning ───
+@Composable
+private fun CompactPlateauAlert(
+    alert: PlateauAlert,
+    onDismiss: () -> Unit,
+    onTalkToCoach: () -> Unit,
+) {
+    val haptic = LocalHapticFeedback.current
+    val alertColor = when (alert.severity) {
+        PlateauSeverity.MILD -> Color(0xFFFFA726)
+        PlateauSeverity.MODERATE -> Color(0xFFFF9800)
+        PlateauSeverity.SEVERE -> Color(0xFFEF5350)
+    }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(10.dp))
+            .background(alertColor.copy(alpha = 0.10f))
+            .padding(horizontal = 12.dp, vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(
+            imageVector = Icons.Default.Warning,
+            contentDescription = null,
+            tint = alertColor,
+            modifier = Modifier.size(18.dp),
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            text = when (alert.type) {
+                PlateauType.STAGNATION -> stringResource(
+                    R.string.home_plateau_stagnation_weeks,
+                    alert.exerciseName,
+                    alert.weeksDuration,
+                )
+                PlateauType.REGRESSION -> stringResource(
+                    R.string.home_plateau_regression_weeks,
+                    alert.exerciseName,
+                    alert.weeksDuration,
+                )
+            },
+            style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.SemiBold),
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.weight(1f),
+        )
+        Text(
+            text = stringResource(R.string.home_plateau_talk_to_coach),
+            style = MaterialTheme.typography.labelSmall,
+            color = alertColor,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier
+                .clip(RoundedCornerShape(6.dp))
+                .clickable {
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    onTalkToCoach()
+                }
+                .padding(horizontal = 8.dp, vertical = 4.dp),
+        )
+        IconButton(
+            onClick = {
+                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                onDismiss()
+            },
+            modifier = Modifier.size(28.dp),
+        ) {
+            Icon(
+                imageVector = Icons.Default.Close,
+                contentDescription = stringResource(R.string.action_dismiss),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(16.dp),
             )
         }
     }
@@ -620,202 +552,6 @@ private fun CreateProgramCta(
 }
 
 @Composable
-private fun RecentWorkoutCard(
-    workout: RecentWorkoutItem,
-    onClick: () -> Unit,
-    weightUnit: UserPreferences.WeightUnit = UserPreferences.WeightUnit.KG,
-) {
-    val haptic = LocalHapticFeedback.current
-    val dateFormatter = remember {
-        DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
-    }
-    val formattedDate = remember(workout.date) {
-        Instant.ofEpochMilli(workout.date)
-            .atZone(ZoneId.systemDefault())
-            .format(dateFormatter)
-    }
-
-    val workoutDescription = stringResource(
-        R.string.home_cd_recent_workout,
-        formattedDate,
-        workout.exerciseCount,
-    )
-
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .semantics(mergeDescendants = true) { contentDescription = workoutDescription }
-            .clickable(onClick = {
-                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                onClick()
-            }),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = formattedDate,
-                    style = MaterialTheme.typography.titleSmall.copy(
-                        fontWeight = FontWeight.SemiBold,
-                    ),
-                    color = MaterialTheme.colorScheme.onSurface,
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
-                    StatLabel(
-                        icon = Icons.Default.FitnessCenter,
-                        text = pluralStringResource(R.plurals.exercises_count, workout.exerciseCount, workout.exerciseCount),
-                    )
-                    StatLabel(
-                        icon = Icons.Default.Timer,
-                        text = formatDuration(workout.durationSeconds),
-                    )
-                }
-            }
-
-            Text(
-                text = "%.0f %s".format(workout.totalVolume, if (weightUnit == UserPreferences.WeightUnit.LBS) "lb" else "kg"),
-                style = MaterialTheme.typography.titleMedium.copy(
-                    fontWeight = FontWeight.Bold,
-                ),
-                color = AccentGreen,
-            )
-        }
-    }
-}
-
-@Composable
-private fun StatLabel(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    text: String,
-) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Icon(
-            icon,
-            contentDescription = null,
-            modifier = Modifier.size(14.dp),
-            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        Spacer(modifier = Modifier.width(4.dp))
-        Text(
-            text = text,
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-    }
-}
-
-@Composable
-private fun HomePlateauAlertCard(
-    alert: PlateauAlert,
-    onDismiss: () -> Unit,
-    onTalkToCoach: () -> Unit,
-) {
-    val haptic = LocalHapticFeedback.current
-    val alertColor = when (alert.severity) {
-        PlateauSeverity.MILD -> Color(0xFFFFA726)
-        PlateauSeverity.MODERATE -> Color(0xFFFF9800)
-        PlateauSeverity.SEVERE -> Color(0xFFEF5350)
-    }
-
-    Card(
-        colors = CardDefaults.cardColors(
-            containerColor = alertColor.copy(alpha = 0.15f)
-        ),
-        shape = RoundedCornerShape(12.dp),
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.Top,
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Warning,
-                    contentDescription = null,
-                    tint = alertColor,
-                    modifier = Modifier.size(24.dp)
-                )
-                Spacer(modifier = Modifier.width(12.dp))
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = when (alert.type) {
-                            PlateauType.STAGNATION -> stringResource(
-                                R.string.home_plateau_stagnation_weeks,
-                                alert.exerciseName,
-                                alert.weeksDuration
-                            )
-                            PlateauType.REGRESSION -> stringResource(
-                                R.string.home_plateau_regression_weeks,
-                                alert.exerciseName,
-                                alert.weeksDuration
-                            )
-                        },
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        fontWeight = FontWeight.Bold,
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = alert.suggestion,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-                IconButton(
-                    onClick = {
-                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                        onDismiss()
-                    }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Close,
-                        contentDescription = stringResource(R.string.action_dismiss),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
-            }
-            Spacer(modifier = Modifier.height(12.dp))
-            Button(
-                onClick = {
-                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                    onTalkToCoach()
-                },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = alertColor,
-                    contentColor = Color.White
-                ),
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(8.dp)
-            ) {
-                Text(
-                    text = stringResource(R.string.home_plateau_talk_to_coach),
-                    style = MaterialTheme.typography.labelLarge,
-                    fontWeight = FontWeight.SemiBold
-                )
-            }
-        }
-    }
-}
-
-@Composable
 private fun InfoChip(
     label: String,
     color: Color,
@@ -836,148 +572,40 @@ private fun InfoChip(
     }
 }
 
-@Composable
-private fun WeeklyStreakCard(
-    weeklyStreak: Int,
-    totalWorkouts: Int,
-    nextMilestone: Int?,
-) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Column {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = "🔥",
-                        style = MaterialTheme.typography.headlineMedium,
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = pluralStringResource(R.plurals.weeks_count, weeklyStreak, weeklyStreak),
-                        style = MaterialTheme.typography.titleMedium.copy(
-                            fontWeight = FontWeight.Bold,
-                        ),
-                        color = MaterialTheme.colorScheme.onSurface,
-                    )
-                }
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = stringResource(R.string.home_total_workouts, totalWorkouts),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-            
-            if (nextMilestone != null) {
-                Column(horizontalAlignment = Alignment.End) {
-                    Text(
-                        text = stringResource(R.string.home_next_milestone),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                    val remaining = nextMilestone - totalWorkouts
-                    Text(
-                        text = stringResource(R.string.home_workouts_to_milestone, remaining, nextMilestone),
-                        style = MaterialTheme.typography.bodyMedium.copy(
-                            fontWeight = FontWeight.SemiBold,
-                        ),
-                        color = AccentGreen,
-                    )
-                }
-            }
-        }
+/**
+ * Estimates total workout duration in minutes using the same time constants as
+ * [WorkoutPlanGenerator.estimateExerciseTimeSeconds]. Because [PlannedExercise]
+ * does not carry an [ExerciseCategory], we average the compound and isolation
+ * rep-duration and transition-time values for a reasonable mid-range estimate.
+ */
+private fun estimateWorkoutDurationMinutes(exercises: List<PlannedExercise>): Int {
+    if (exercises.isEmpty()) return 0
+
+    val avgRepDuration = (WorkoutPlanGenerator.REP_DURATION_COMPOUND +
+            WorkoutPlanGenerator.REP_DURATION_ISOLATION) / 2              // 4 s/rep
+    val avgTransitionTime = (WorkoutPlanGenerator.TRANSITION_TIME_COMPOUND +
+            WorkoutPlanGenerator.TRANSITION_TIME_ISOLATION) / 2           // 105 s
+
+    var totalSeconds = WorkoutPlanGenerator.WARMUP_TIME_SECONDS +
+            WorkoutPlanGenerator.COOLDOWN_TIME_SECONDS                    // 8 min overhead
+
+    for (ex in exercises) {
+        val midReps = parseRepsRangeMidpoint(ex.repsRange)
+        val timePerSet = (midReps * avgRepDuration) + ex.restSeconds
+        totalSeconds += (ex.sets * timePerSet) + avgTransitionTime
     }
+    return ((totalSeconds + 30) / 60)   // round to nearest minute
 }
 
-@Composable
-private fun MilestoneCelebrationCard(
-    celebration: MilestoneCelebration,
-    onDismiss: () -> Unit,
-) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = AccentGreen.copy(alpha = 0.2f),
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-    ) {
-        Box(modifier = Modifier.fillMaxWidth()) {
-            IconButton(
-                onClick = onDismiss,
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(4.dp),
-            ) {
-                Icon(
-                    Icons.Default.Close,
-                    contentDescription = stringResource(R.string.action_dismiss),
-                    tint = MaterialTheme.colorScheme.onSurface,
-                )
-            }
-            
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Text(
-                    text = celebration.emoji,
-                    style = MaterialTheme.typography.displayLarge,
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = stringResource(
-                        when (celebration.titleKey) {
-                            "milestone_7_title" -> R.string.milestone_7_title
-                            "milestone_30_title" -> R.string.milestone_30_title
-                            "milestone_100_title" -> R.string.milestone_100_title
-                            "milestone_365_title" -> R.string.milestone_365_title
-                            else -> R.string.milestone_7_title
-                        }
-                    ),
-                    style = MaterialTheme.typography.titleLarge.copy(
-                        fontWeight = FontWeight.Bold,
-                    ),
-                    color = MaterialTheme.colorScheme.onSurface,
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = stringResource(
-                        when (celebration.messageKey) {
-                            "milestone_7_message" -> R.string.milestone_7_message
-                            "milestone_30_message" -> R.string.milestone_30_message
-                            "milestone_100_message" -> R.string.milestone_100_message
-                            "milestone_365_message" -> R.string.milestone_365_message
-                            else -> R.string.milestone_7_message
-                        }
-                    ),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    textAlign = TextAlign.Center,
-                )
-            }
-        }
+private fun parseRepsRangeMidpoint(repsRange: String): Int {
+    val parts = repsRange.split("-")
+    return if (parts.size == 2) {
+        val low = parts[0].trim().toIntOrNull() ?: 10
+        val high = parts[1].trim().toIntOrNull() ?: 12
+        (low + high) / 2
+    } else {
+        repsRange.trim().toIntOrNull() ?: 10
     }
-}
-
-private fun formatDuration(seconds: Long): String {
-    val hours = seconds / 3600
-    val minutes = (seconds % 3600) / 60
-    return if (hours > 0) "${hours}h ${minutes}m" else "${minutes}m"
 }
 
 @dagger.hilt.EntryPoint
