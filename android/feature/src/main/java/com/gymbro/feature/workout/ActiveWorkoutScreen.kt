@@ -596,7 +596,7 @@ fun ActiveWorkoutScreen(
                                 Icon(
                                     Icons.Default.DragHandle,
                                     contentDescription = stringResource(R.string.active_workout_drag_handle),
-                                    tint = Color.White.copy(alpha = 0.3f),
+                                    tint = Color.White.copy(alpha = 0.15f),
                                     modifier = Modifier.size(20.dp)
                                 )
                             }
@@ -1635,40 +1635,13 @@ private fun SetRow(
 
         Spacer(modifier = Modifier.width(4.dp))
 
-        // RPE with label and info icon
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
+        // RPE picker (label in column header only)
+        RpeQuickPicker(
+            selectedRpe = setUi.rpe,
+            onRpeSelected = { onEvent(ActiveWorkoutEvent.UpdateSetRpe(exerciseIndex, setIndex, it)) },
+            enabled = !setUi.isCompleted,
             modifier = Modifier.width(56.dp),
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center,
-            ) {
-                Text(
-                    text = stringResource(R.string.rpe_label),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = Color.White.copy(alpha = 0.5f),
-                    fontSize = 9.sp,
-                )
-                IconButton(
-                    onClick = { showRpeTooltip = true },
-                    modifier = Modifier.size(12.dp),
-                ) {
-                    Icon(
-                        Icons.Default.Info,
-                        contentDescription = "RPE info",
-                        tint = Color.White.copy(alpha = 0.4f),
-                        modifier = Modifier.size(10.dp),
-                    )
-                }
-            }
-            RpeQuickPicker(
-                selectedRpe = setUi.rpe,
-                onRpeSelected = { onEvent(ActiveWorkoutEvent.UpdateSetRpe(exerciseIndex, setIndex, it)) },
-                enabled = !setUi.isCompleted,
-                modifier = Modifier.width(48.dp),
-            )
-        }
+        )
 
         Spacer(modifier = Modifier.width(8.dp))
 

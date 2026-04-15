@@ -5,7 +5,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.Alignment
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -64,7 +66,7 @@ fun GradientButton(
                 haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                 onClick()
             },
-            modifier = if (testTag != null) Modifier.testTag(testTag) else Modifier,
+            modifier = (if (testTag != null) Modifier.testTag(testTag) else Modifier).fillMaxWidth(),
             enabled = enabled,
             shape = RoundedCornerShape(12.dp),
             colors = ButtonDefaults.buttonColors(
@@ -75,12 +77,14 @@ fun GradientButton(
         ) {
             Box(
                 modifier = Modifier
+                    .fillMaxWidth()
                     .gradientBackground(
                         Brush.horizontalGradient(
                             colors = if (enabled) gradientColors else gradientColors.map { it.copy(alpha = 0.5f) }
                         )
                     )
-                    .padding(horizontal = 24.dp, vertical = 12.dp)
+                    .padding(horizontal = 24.dp, vertical = 12.dp),
+                contentAlignment = Alignment.Center,
             ) {
                 Text(
                     text = text,
