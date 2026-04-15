@@ -1012,4 +1012,11 @@
     <string name="home_goal_hypertrophy">Hypertrophy</string>
     <string name="home_goal_general_fitness">General Fitness</string>
     <string name="home_sets_reps">%1$d × %2$s</string>
+
+    <!-- Active Workout UI Redesign (P0/P1) -->
+    <string name="active_workout_delete_set">Delete set</string>
+    <string name="active_workout_delete_set_confirm_title">Delete completed set?</string>
+    <string name="active_workout_delete_set_confirm_message">This set has recorded data. Are you sure you want to delete it?</string>
+    <string name="active_workout_exercise_progress">%1$d/%2$d</string>
+    <string name="active_workout_exercise_info">Exercise info</string>
 </resources>

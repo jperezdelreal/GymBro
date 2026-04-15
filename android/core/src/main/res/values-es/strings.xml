@@ -1018,4 +1018,11 @@
     <string name="home_goal_hypertrophy">Hipertrofia</string>
     <string name="home_goal_general_fitness">Fitness General</string>
     <string name="home_sets_reps">%1$d × %2$s</string>
+
+    <!-- Active Workout UI Redesign (P0/P1) -->
+    <string name="active_workout_delete_set">Eliminar serie</string>
+    <string name="active_workout_delete_set_confirm_title">¿Eliminar serie completada?</string>
+    <string name="active_workout_delete_set_confirm_message">Esta serie tiene datos registrados. ¿Estás seguro de que quieres eliminarla?</string>
+    <string name="active_workout_exercise_progress">%1$d/%2$d</string>
+    <string name="active_workout_exercise_info">Info del ejercicio</string>
 </resources>

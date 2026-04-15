@@ -106,6 +106,8 @@ sealed interface ActiveWorkoutEvent {
     data class CompleteSet(val exerciseIndex: Int, val setIndex: Int) : ActiveWorkoutEvent
     data class QuickCompleteSet(val exerciseIndex: Int, val setIndex: Int) : ActiveWorkoutEvent
     data class RemoveSet(val exerciseIndex: Int, val setIndex: Int) : ActiveWorkoutEvent
+    data class DeleteSet(val exerciseIndex: Int, val setIndex: Int) : ActiveWorkoutEvent
+    data class UncompleteSet(val exerciseIndex: Int, val setIndex: Int) : ActiveWorkoutEvent
     data class RemoveExercise(val exerciseIndex: Int) : ActiveWorkoutEvent
     data class ReplaceExercise(val exerciseIndex: Int) : ActiveWorkoutEvent
     data class VoiceInput(val exerciseIndex: Int, val setIndex: Int, val weight: String, val reps: String, val rpe: String = "") : ActiveWorkoutEvent

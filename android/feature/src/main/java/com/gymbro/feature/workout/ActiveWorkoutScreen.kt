@@ -72,6 +72,10 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
+import androidx.compose.material3.rememberSwipeToDismissBoxState
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -333,6 +337,14 @@ fun ActiveWorkoutScreen(
         val haptic = LocalHapticFeedback.current
         val context = androidx.compose.ui.platform.LocalContext.current
         var showDiscardDialog by remember { mutableStateOf(false) }
+        var isRestTimerMinimized by remember { mutableStateOf(false) }
+
+        // Auto-show bottom sheet when rest timer activates
+        LaunchedEffect(state.isRestTimerActive) {
+            if (state.isRestTimerActive) {
+                isRestTimerMinimized = false
+            }
+        }
 
         BackHandler { showDiscardDialog = true }
         
@@ -477,25 +489,14 @@ fun ActiveWorkoutScreen(
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
-                // Hero Rest Timer at top when active
-                if (state.isRestTimerActive) {
-                    item {
-                        HeroRestTimer(
-                            remainingSeconds = state.restTimerSeconds,
-                            totalSeconds = state.restTimerTotal,
-                            onSkip = { onEvent(ActiveWorkoutEvent.SkipRestTimer) },
-                            onAdjust = { delta -> onEvent(ActiveWorkoutEvent.AdjustRestTimer(delta)) },
-                        )
-                    }
-                }
-
                 // Stats card
                 item {
                     GlassmorphicCard {
                         WorkoutStatsContent(
-                            elapsedSeconds = state.elapsedSeconds,
                             totalVolume = state.totalVolume,
                             totalSets = state.totalSets,
+                            completedExercises = state.exercises.count { ex -> ex.sets.any { it.isCompleted } },
+                            totalExercises = state.exercises.size,
                             weightUnit = defaultWeightUnit,
                         )
                     }
@@ -778,14 +779,52 @@ fun ActiveWorkoutScreen(
                 defaultWeightUnit = defaultWeightUnit,
             )
         }
+
+        // Rest Timer Bottom Sheet — always visible regardless of scroll position (#570)
+        if (state.isRestTimerActive && !isRestTimerMinimized) {
+            ModalBottomSheet(
+                onDismissRequest = { isRestTimerMinimized = true },
+                containerColor = Color(0xFF1C1C1E),
+            ) {
+                RestTimerSheetContent(
+                    remainingSeconds = state.restTimerSeconds,
+                    totalSeconds = state.restTimerTotal,
+                    onSkip = { onEvent(ActiveWorkoutEvent.SkipRestTimer) },
+                    onAdjust = { delta -> onEvent(ActiveWorkoutEvent.AdjustRestTimer(delta)) },
+                )
+            }
+        }
+
+        // Mini rest timer badge when sheet is dismissed
+        if (state.isRestTimerActive && isRestTimerMinimized) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(start = 16.dp, bottom = 100.dp)
+                    .clip(RoundedCornerShape(24.dp))
+                    .background(
+                        Brush.horizontalGradient(listOf(AccentGreenStart, AccentGreenEnd))
+                    )
+                    .clickable { isRestTimerMinimized = false }
+                    .padding(horizontal = 16.dp, vertical = 10.dp),
+            ) {
+                Text(
+                    text = "⏱ ${state.restTimerSeconds}s",
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White,
+                )
+            }
+        }
     }
 }
 
 @Composable
 private fun WorkoutStatsContent(
-    elapsedSeconds: Long,
     totalVolume: Double,
     totalSets: Int,
+    completedExercises: Int,
+    totalExercises: Int,
     weightUnit: UserPreferences.WeightUnit = UserPreferences.WeightUnit.KG,
 ) {
     val unitLabel = if (weightUnit == UserPreferences.WeightUnit.LBS) "lb" else "kg"
@@ -793,7 +832,11 @@ private fun WorkoutStatsContent(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly,
     ) {
-        StatItem(label = stringResource(R.string.common_duration), value = formatDuration(elapsedSeconds), color = AccentCyanStart)
+        StatItem(
+            label = stringResource(R.string.workout_exercises),
+            value = stringResource(R.string.active_workout_exercise_progress, completedExercises, totalExercises),
+            color = AccentCyanStart,
+        )
         StatItem(label = stringResource(R.string.common_volume), value = "${totalVolume.toLong()} $unitLabel", color = AccentGreenStart)
         StatItem(label = stringResource(R.string.workout_sets), value = "$totalSets", color = AccentAmberStart)
     }
@@ -823,6 +866,7 @@ private fun DurationTargetChips(
     onSelect: (Int) -> Unit,
 ) {
     val durations = listOf(30, 45, 60, 90)
+    var isExpanded by remember { mutableStateOf(true) }
     val elapsedMinutes = (elapsedSeconds / 60).toInt()
     val remaining = selectedMinutes - elapsedMinutes
     val remainingColor = when {
@@ -831,56 +875,88 @@ private fun DurationTargetChips(
         else -> AccentGreenStart
     }
 
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        Icon(
-            Icons.Default.PlayArrow,
-            contentDescription = null,
-            tint = remainingColor,
-            modifier = Modifier.size(18.dp),
-        )
-        durations.forEach { minutes ->
-            val isSelected = minutes == selectedMinutes
-            Box(
-                modifier = Modifier
-                    .height(32.dp)
-                    .background(
-                        color = if (isSelected) AccentGreenStart.copy(alpha = 0.2f) else Color.Transparent,
-                        shape = RoundedCornerShape(16.dp),
+    // Collapsed: single chip showing selected duration + remaining
+    AnimatedVisibility(visible = !isExpanded) {
+        Box(
+            modifier = Modifier
+                .height(32.dp)
+                .clip(RoundedCornerShape(16.dp))
+                .background(AccentGreenStart.copy(alpha = 0.15f))
+                .border(1.dp, AccentGreenStart.copy(alpha = 0.4f), RoundedCornerShape(16.dp))
+                .clickable { isExpanded = true }
+                .padding(horizontal = 14.dp, vertical = 4.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            val remainingText = if (remaining > 0) {
+                stringResource(R.string.active_workout_remaining, remaining)
+            } else {
+                stringResource(R.string.active_workout_overtime)
+            }
+            Text(
+                text = "⏱ ${selectedMinutes}m · $remainingText",
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Bold,
+                color = if (remaining > 0) AccentGreenStart else AccentRed,
+            )
+        }
+    }
+
+    // Expanded: all duration chips
+    AnimatedVisibility(visible = isExpanded) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Icon(
+                Icons.Default.PlayArrow,
+                contentDescription = null,
+                tint = remainingColor,
+                modifier = Modifier.size(18.dp),
+            )
+            durations.forEach { minutes ->
+                val isSelected = minutes == selectedMinutes
+                Box(
+                    modifier = Modifier
+                        .height(32.dp)
+                        .background(
+                            color = if (isSelected) AccentGreenStart.copy(alpha = 0.2f) else Color.Transparent,
+                            shape = RoundedCornerShape(16.dp),
+                        )
+                        .border(
+                            width = 1.dp,
+                            color = if (isSelected) AccentGreenStart else Color.White.copy(alpha = 0.2f),
+                            shape = RoundedCornerShape(16.dp),
+                        )
+                        .clickable {
+                            onSelect(minutes)
+                            isExpanded = false
+                        }
+                        .padding(horizontal = 12.dp, vertical = 4.dp),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        text = "${minutes}m",
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                        color = if (isSelected) AccentGreenStart else Color.White.copy(alpha = 0.6f),
                     )
-                    .border(
-                        width = 1.dp,
-                        color = if (isSelected) AccentGreenStart else Color.White.copy(alpha = 0.2f),
-                        shape = RoundedCornerShape(16.dp),
-                    )
-                    .clickable { onSelect(minutes) }
-                    .padding(horizontal = 12.dp, vertical = 4.dp),
-                contentAlignment = Alignment.Center,
-            ) {
+                }
+            }
+            Spacer(modifier = Modifier.weight(1f))
+            if (remaining > 0) {
                 Text(
-                    text = "${minutes}m",
-                    style = MaterialTheme.typography.labelMedium,
-                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                    color = if (isSelected) AccentGreenStart else Color.White.copy(alpha = 0.6f),
+                    text = stringResource(R.string.active_workout_remaining, remaining),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = remainingColor,
+                )
+            } else {
+                Text(
+                    text = stringResource(R.string.active_workout_overtime),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = AccentRed,
                 )
             }
-        }
-        Spacer(modifier = Modifier.weight(1f))
-        if (remaining > 0) {
-            Text(
-                text = stringResource(R.string.active_workout_remaining, remaining),
-                style = MaterialTheme.typography.labelSmall,
-                color = remainingColor,
-            )
-        } else {
-            Text(
-                text = stringResource(R.string.active_workout_overtime),
-                style = MaterialTheme.typography.labelSmall,
-                color = AccentRed,
-            )
         }
     }
 }
@@ -1031,6 +1107,74 @@ private fun HeroRestTimer(
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun RestTimerSheetContent(
+    remainingSeconds: Int,
+    totalSeconds: Int,
+    onSkip: () -> Unit,
+    onAdjust: (Int) -> Unit,
+) {
+    val haptic = LocalHapticFeedback.current
+    val progress = if (totalSeconds > 0) (totalSeconds - remainingSeconds).toFloat() / totalSeconds else 0f
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp, vertical = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(
+            text = stringResource(R.string.active_workout_rest),
+            style = MaterialTheme.typography.labelLarge,
+            fontWeight = FontWeight.SemiBold,
+            color = Color.White.copy(alpha = 0.6f),
+            letterSpacing = 2.sp,
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+        Text(
+            text = "${remainingSeconds}s",
+            fontSize = 48.sp,
+            fontWeight = FontWeight.Black,
+            color = Color.White,
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        LinearProgressIndicator(
+            progress = { progress },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(8.dp)
+                .clip(RoundedCornerShape(4.dp)),
+            color = AccentGreenStart,
+            trackColor = Color.White.copy(alpha = 0.1f),
+        )
+        Spacer(modifier = Modifier.height(20.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+        ) {
+            OutlinedButton(
+                onClick = {
+                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    onAdjust(-15)
+                },
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White),
+            ) { Text("-15s") }
+            GradientButton(
+                text = stringResource(R.string.active_workout_skip),
+                onClick = onSkip,
+            )
+            OutlinedButton(
+                onClick = {
+                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    onAdjust(15)
+                },
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White),
+            ) { Text("+15s") }
+        }
+        Spacer(modifier = Modifier.height(16.dp))
     }
 }
 
@@ -1225,6 +1369,14 @@ private fun ExerciseCardContent(
                         onClick = { onEvent(ActiveWorkoutEvent.ShowExerciseDetail(exerciseUi.exercise)) }
                     )
                     .semantics { heading() },
+            )
+            Icon(
+                Icons.Default.Info,
+                contentDescription = stringResource(R.string.active_workout_exercise_info),
+                tint = Color.White.copy(alpha = 0.4f),
+                modifier = Modifier
+                    .size(18.dp)
+                    .clickable { onEvent(ActiveWorkoutEvent.ShowExerciseDetail(exerciseUi.exercise)) },
             )
             // Voice input — auto-fills the first incomplete set
             VoiceInputButton(
@@ -1448,6 +1600,7 @@ private fun ExerciseCardContent(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SetRow(
     setUi: WorkoutSetUi,
@@ -1465,12 +1618,74 @@ private fun SetRow(
     var showRepsDialog by remember { mutableStateOf(false) }
     var showWarmupTooltip by remember { mutableStateOf(false) }
     var showRpeTooltip by remember { mutableStateOf(false) }
+    var showDeleteConfirmation by remember { mutableStateOf(false) }
     
     val rowBackground = when {
         setUi.isCompleted -> AccentGreenStart.copy(alpha = 0.08f)
         setUi.isWarmup -> AccentAmberStart.copy(alpha = 0.05f)
         else -> Color.Transparent
     }
+
+    // Swipe-to-delete confirmation for sets with data (#570)
+    if (showDeleteConfirmation) {
+        AlertDialog(
+            onDismissRequest = { showDeleteConfirmation = false },
+            title = { Text(stringResource(R.string.active_workout_delete_set_confirm_title)) },
+            text = { Text(stringResource(R.string.active_workout_delete_set_confirm_message)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    showDeleteConfirmation = false
+                    onEvent(ActiveWorkoutEvent.RemoveSet(exerciseIndex, setIndex))
+                }) {
+                    Text(stringResource(R.string.active_workout_delete_set), color = AccentRed)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteConfirmation = false }) {
+                    Text(stringResource(R.string.number_input_cancel))
+                }
+            },
+            containerColor = Color(0xFF1C1C1E),
+        )
+    }
+
+    val dismissState = rememberSwipeToDismissBoxState(
+        confirmValueChange = { value ->
+            if (value == SwipeToDismissBoxValue.EndToStart) {
+                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                if (setUi.isCompleted || setUi.weight.isNotEmpty() || setUi.reps.isNotEmpty()) {
+                    showDeleteConfirmation = true
+                    false
+                } else {
+                    onEvent(ActiveWorkoutEvent.RemoveSet(exerciseIndex, setIndex))
+                    true
+                }
+            } else {
+                false
+            }
+        }
+    )
+
+    SwipeToDismissBox(
+        state = dismissState,
+        enableDismissFromStartToEnd = false,
+        backgroundContent = {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(AccentRed.copy(alpha = 0.2f))
+                    .padding(horizontal = 20.dp),
+                contentAlignment = Alignment.CenterEnd,
+            ) {
+                Icon(
+                    Icons.Default.Delete,
+                    contentDescription = stringResource(R.string.active_workout_delete_set),
+                    tint = AccentRed,
+                )
+            }
+        },
+    ) {
 
     Row(
         modifier = Modifier
@@ -1603,6 +1818,10 @@ private fun SetRow(
                         .size(if (setUi.isPR) 28.dp else 56.dp)
                         .clip(CircleShape)
                         .background(Brush.horizontalGradient(listOf(AccentGreenStart, AccentGreenEnd)))
+                        .clickable {
+                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            onEvent(ActiveWorkoutEvent.UncompleteSet(exerciseIndex, setIndex))
+                        }
                         .semantics { contentDescription = completedDescription },
                     contentAlignment = Alignment.Center,
                 ) {
@@ -1637,6 +1856,7 @@ private fun SetRow(
             }
         }
     }
+    } // SwipeToDismissBox
     
     // Dialogs
     if (showWeightDialog) {
