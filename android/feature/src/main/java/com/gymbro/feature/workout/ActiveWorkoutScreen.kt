@@ -1234,6 +1234,7 @@ private fun ExerciseCardContent(
     val haptic = LocalHapticFeedback.current
     var voiceToast by remember { mutableStateOf<String?>(null) }
     var showOverflowMenu by remember { mutableStateOf(false) }
+    var showRpeHeaderTooltip by remember { mutableStateOf(false) }
     val weightPlaceholder = exerciseUi.beginnerWeightHint?.let {
         stringResource(R.string.beginner_weight_hint, it)
     }
@@ -1428,7 +1429,22 @@ private fun ExerciseCardContent(
             Spacer(modifier = Modifier.width(8.dp))
             Text(stringResource(R.string.active_workout_header_reps), style = setHeaderStyle(), modifier = Modifier.weight(1f), textAlign = TextAlign.Center)
             Spacer(modifier = Modifier.width(4.dp))
-            Text("RPE", style = setHeaderStyle(), modifier = Modifier.width(56.dp), textAlign = TextAlign.Center)
+            Row(
+                modifier = Modifier.width(56.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text("RPE", style = setHeaderStyle())
+                Spacer(modifier = Modifier.width(2.dp))
+                Icon(
+                    Icons.Default.Info,
+                    contentDescription = stringResource(R.string.active_workout_exercise_info),
+                    tint = Color.White.copy(alpha = 0.5f),
+                    modifier = Modifier
+                        .size(12.dp)
+                        .clickable { showRpeHeaderTooltip = true },
+                )
+            }
             Spacer(modifier = Modifier.width(8.dp))
             Spacer(modifier = Modifier.width(56.dp)) // complete button
         }
@@ -1468,6 +1484,15 @@ private fun ExerciseCardContent(
             Icon(Icons.Default.Add, contentDescription = stringResource(R.string.active_workout_cd_add_set), tint = Color.White.copy(alpha = 0.7f), modifier = Modifier.size(16.dp))
             Spacer(modifier = Modifier.width(4.dp))
             Text(stringResource(R.string.workout_add_set), color = Color.White.copy(alpha = 0.7f), fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+        }
+
+        // RPE info tooltip (triggered from column header)
+        if (showRpeHeaderTooltip) {
+            InfoTooltipDialog(
+                title = stringResource(R.string.rpe_tooltip_title),
+                message = stringResource(R.string.rpe_tooltip_message),
+                onDismiss = { showRpeHeaderTooltip = false },
+            )
         }
     }
 }
