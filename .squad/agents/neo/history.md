@@ -762,3 +762,28 @@ Full details: .squad/decisions/morpheus-v1-platform-strategy.md
 
 ---
 
+### 2026-04-08: Exercise Suitability Tags — Nivel 2 (Plan Quality)
+
+**Implemented goal-aware exercise filtering via suitability metadata:**
+- Added `suitability` array to all 209 exercises in `exercises-seed.json` with tags: `strength`, `hypertrophy`, `powerlifting`, `general_fitness`
+- Python tagging script (`scripts/add_suitability.py`) assigns tags based on exercise-science rules: equipment type, movement pattern, specificity, and explicit overrides
+- WorkoutPlanGenerator loads suitability map lazily from seed JSON via `org.json.JSONArray` — no Room schema changes needed
+- `isSuitableForGoal()` filter added to all 4 exercise selection phases in `buildExerciseList` plus the `adjustDayForDuration` extras section
+- Backward compatible: exercises without suitability data default to suitable for all goals
+
+**Key classification decisions:**
+- Standard barbell compounds (Bench, Squat, Deadlift, OHP, Row) → all goals
+- Powerlifting variants (Board Press, Spoto Press, Larsen Press, Pause Bench, Reverse Band, Floor Press) → `powerlifting` only or `powerlifting + strength` — NOT hypertrophy
+- Olympic lifts → `strength + powerlifting`
+- Cable/machine exercises → `hypertrophy + general_fitness`
+- Advanced bodyweight (Archer Push-Up, Ring exercises) → `general_fitness` only (skill-dependent)
+- Skill/gymnastics (Lever, Planche, Muscle-Up) → empty array (already in UNSUITABLE_FOR_PLANS)
+- Kettlebell swing/clean → `strength + general_fitness`; other KB → `general_fitness` only
+
+**Suitability distribution across 209 exercises:**
+- general_fitness: 168 | hypertrophy: 125 | strength: 93 | powerlifting: 53 | empty/unsuitable: 6
+
+**Impact:** Hypertrophy plans will no longer select Board Press, Spoto Press, Larsen Press, or other powerlifting-specific technique exercises. Powerlifting plans now preferentially select PL variants. This is Nivel 2 of the exercise selection quality improvements (Nivel 1 was equipment priority sorting).
+
+**Build verified:** `:core:compileDebugKotlin` passes cleanly.
+
